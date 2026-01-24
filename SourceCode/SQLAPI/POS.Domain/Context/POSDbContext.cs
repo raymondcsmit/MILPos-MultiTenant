@@ -28,6 +28,10 @@ namespace POS.Domain
         // Multi-tenancy
         public DbSet<Tenant> Tenants { get; set; }
         
+        // Sync entities
+        public DbSet<SyncMetadata> SyncMetadata { get; set; }
+        public DbSet<SyncLog> SyncLogs { get; set; }
+        
         public DbSet<Data.Action> Actions { get; set; }
         public DbSet<Page> Pages { get; set; }
         public DbSet<NLog> NLog { get; set; }
@@ -117,6 +121,23 @@ namespace POS.Domain
                 b.Property(t => t.ContactEmail).HasMaxLength(200);
                 b.Property(t => t.TimeZone).HasMaxLength(100);
                 b.Property(t => t.Currency).HasMaxLength(10);
+            });
+
+            // Configure SyncMetadata entity (Desktop only - SQLite)
+            builder.Entity<SyncMetadata>(entity =>
+            {
+                entity.HasKey(e => e.Id);
+                entity.Property(e => e.EntityType).IsRequired().HasMaxLength(100);
+                entity.HasIndex(e => e.EntityType);
+            });
+
+            // Configure SyncLog entity
+            builder.Entity<SyncLog>(entity =>
+            {
+                entity.HasKey(e => e.Id);
+                entity.Property(e => e.DeviceId).HasMaxLength(50);
+                entity.Property(e => e.ErrorMessage).HasMaxLength(4000);
+                entity.HasIndex(e => new { e.TenantId, e.StartedAt });
             });
 
             builder.Entity<User>(b =>

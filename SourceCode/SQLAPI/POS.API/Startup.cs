@@ -26,6 +26,7 @@ using POS.Data;
 using POS.Data.Dto;
 using POS.Data.Entities;
 using POS.Domain;
+using POS.Domain.Sync;
 using POS.Helper;
 using POS.MediatR.PipeLineBehavior;
 using POS.Repository;
@@ -70,6 +71,19 @@ namespace POS.API
             {
                 // Desktop mode: Single-tenant support
                 services.AddScoped<ITenantProvider, SingleTenantProvider>();
+            }
+            
+            // Register sync services
+            services.AddSingleton<IDeviceIdentifier, DeviceIdentifier>();
+            services.AddScoped<ChangeTrackingService>();
+            services.AddScoped<ConflictResolutionService>();
+            services.AddHttpClient<CloudApiClient>();
+            services.AddScoped<SyncEngine>();
+            
+            // Register scheduled sync service (Desktop only)
+            if (deploymentSettings?.DeploymentMode == "Desktop")
+            {
+                services.AddHostedService<POS.API.Services.ScheduledSyncService>();
             }
             
             JwtSettings settings;

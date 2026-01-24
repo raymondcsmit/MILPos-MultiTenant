@@ -201,14 +201,20 @@ namespace POS.DataMigrationUtility
             optionsBuilder.UseSqlServer(_sqlServerConnectionString);
             // Add NoTracking for performance
             optionsBuilder.UseQueryTrackingBehavior(QueryTrackingBehavior.NoTracking);
-            return new POSDbContext(optionsBuilder.Options);
+            
+            // Create a single tenant provider for migration
+            var tenantProvider = new POS.Domain.SingleTenantProvider();
+            return new POSDbContext(optionsBuilder.Options, tenantProvider);
         }
 
         private POSDbContext CreateSqliteContext()
         {
             var optionsBuilder = new DbContextOptionsBuilder<POSDbContext>();
             optionsBuilder.UseSqlite(_sqliteConnectionString);
-            return new POSDbContext(optionsBuilder.Options);
+            
+            // Create a single tenant provider for migration
+            var tenantProvider = new POS.Domain.SingleTenantProvider();
+            return new POSDbContext(optionsBuilder.Options, tenantProvider);
         }
 
         private IQueryable<T> GetSourceQuery<T>(IQueryable<T> query) where T : class
