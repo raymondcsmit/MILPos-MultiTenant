@@ -24,6 +24,7 @@ using POS.API.Helpers;
 using POS.API.Helpers.Mapping;
 using POS.Data;
 using POS.Data.Dto;
+using POS.Data.Entities;
 using POS.Domain;
 using POS.Helper;
 using POS.MediatR.PipeLineBehavior;
@@ -55,8 +56,21 @@ namespace POS.API
 
             services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
             
-            // Register tenant provider for multi-tenancy
-            services.AddScoped<ITenantProvider, TenantProvider>();
+            // Configure deployment settings
+            services.Configure<DeploymentSettings>(Configuration);
+            var deploymentSettings = Configuration.Get<DeploymentSettings>();
+            
+            // Register tenant provider based on deployment mode
+            if (deploymentSettings?.MultiTenancy?.Enabled == true)
+            {
+                // Cloud mode: Full multi-tenant support
+                services.AddScoped<ITenantProvider, TenantProvider>();
+            }
+            else
+            {
+                // Desktop mode: Single-tenant support
+                services.AddScoped<ITenantProvider, SingleTenantProvider>();
+            }
             
             JwtSettings settings;
             settings = GetJwtSettings();
@@ -68,7 +82,7 @@ namespace POS.API
             services.AddDbContextPool<POSDbContext>((serviceProvider, options) =>
             {
                 var tenantProvider = serviceProvider.GetService<ITenantProvider>();
-                var provider = "Sqlite"; // Configuration.GetValue<string>("DatabaseProvider");
+                var provider = Configuration.GetValue<string>("DatabaseProvider") ?? "Sqlite";
                 if (provider == "Sqlite")
                 {
                     options.UseSqlite(Configuration.GetConnectionString("SqliteConnectionString"))
@@ -107,8 +121,39 @@ namespace POS.API
             services.AddScoped<TenantDataMigrationService>();
             services.AddDependencyInjection();
             services.AddJwtAutheticationConfiguration(settings);
+            
+            // Configure CORS based on deployment mode
             services.AddCors(options =>
             {
+                if (deploymentSettings?.IsCloud == true)
+                {
+                    // Cloud mode: Restrict to specific origins
+                    var allowedOrigins = deploymentSettings.CloudSettings?.CorsOrigins?.ToArray() 
+                        ?? new[] { "https://app.yourcompany.com" };
+                    
+                    options.AddPolicy("CloudCorsPolicy", builder =>
+                    {
+                        builder.WithOrigins(allowedOrigins)
+                               .AllowAnyHeader()
+                               .AllowAnyMethod()
+                               .AllowCredentials()
+                               .WithExposedHeaders("X-Pagination", "X-Tenant-ID");
+                    });
+                }
+                else
+                {
+                    // Desktop mode: Allow all origins (embedded app)
+                    options.AddPolicy("DesktopCorsPolicy", builder =>
+                    {
+                        builder.SetIsOriginAllowed(origin => true)
+                               .AllowAnyHeader()
+                               .AllowAnyMethod()
+                               .AllowCredentials()
+                               .WithExposedHeaders("X-Pagination");
+                    });
+                }
+                
+                // Keep legacy policy for backward compatibility
                 options.AddPolicy("ExposeResponseHeaders",
                     builder =>
                     {
@@ -217,11 +262,26 @@ namespace POS.API
             });
             app.UseStaticFiles();
 
-            app.UseCors("ExposeResponseHeaders");
+            // Get deployment settings
+            var deploymentSettings = app.ApplicationServices.GetService<Microsoft.Extensions.Options.IOptions<DeploymentSettings>>()?.Value;
+            
+            // Apply CORS based on deployment mode
+            if (deploymentSettings?.IsCloud == true)
+            {
+                app.UseCors("CloudCorsPolicy");
+            }
+            else
+            {
+                app.UseCors("DesktopCorsPolicy");
+            }
+            
             app.UseHttpsRedirection();
             
-            // Add tenant resolution middleware BEFORE authentication
-            app.UseMiddleware<POS.API.Middleware.TenantResolutionMiddleware>();
+            // Add tenant resolution middleware only in cloud mode
+            if (deploymentSettings?.MultiTenancy?.Enabled == true)
+            {
+                app.UseMiddleware<POS.API.Middleware.TenantResolutionMiddleware>();
+            }
             
             app.UseAuthentication();
             app.UseRouting();
