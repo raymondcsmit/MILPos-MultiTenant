@@ -27,6 +27,7 @@ using POS.Data.Dto;
 using POS.Data.Entities;
 using POS.Domain;
 using POS.Domain.Sync;
+using POS.Domain.ImportExport;
 using POS.Helper;
 using POS.MediatR.PipeLineBehavior;
 using POS.Repository;
@@ -93,9 +94,10 @@ namespace POS.API
             services.AddSingleton(new PathHelper(Configuration));
             services.AddSingleton<IConnectionMappingRepository, ConnectionMappingRepository>();
             services.AddScoped(c => new UserInfoToken() { Id = Guid.Parse(defaultUserId) });
-            services.AddDbContextPool<POSDbContext>((serviceProvider, options) =>
+            
+            // Configure DbContext Factory - properly handles scoped services
+            services.AddDbContextFactory<POSDbContext>((serviceProvider, options) =>
             {
-                var tenantProvider = serviceProvider.GetService<ITenantProvider>();
                 var provider = Configuration.GetValue<string>("DatabaseProvider") ?? "Sqlite";
                 if (provider == "Sqlite")
                 {
@@ -118,6 +120,14 @@ namespace POS.API
                     }
                 });
             });
+
+            // Also register DbContext for backward compatibility with existing code
+            services.AddScoped<POSDbContext>(serviceProvider =>
+            {
+                var factory = serviceProvider.GetRequiredService<IDbContextFactory<POSDbContext>>();
+                return factory.CreateDbContext();
+            });
+            
             services.AddIdentity<User, Role>()
              .AddEntityFrameworkStores<POSDbContext>()
              .AddDefaultTokenProviders();
@@ -133,6 +143,12 @@ namespace POS.API
             services.AddSingleton(MapperConfig.GetMapperConfigs());
             services.AddScoped<SeedingService>();
             services.AddScoped<TenantDataMigrationService>();
+            
+            // Import/Export Services
+            services.AddScoped<IImportExportService<POS.Data.Product>, ProductImportExportService>();
+            services.AddScoped<IImportExportService<POS.Data.Customer>, CustomerImportExportService>();
+            services.AddScoped<IImportExportService<POS.Data.Supplier>, SupplierImportExportService>();
+            
             services.AddDependencyInjection();
             services.AddJwtAutheticationConfiguration(settings);
             

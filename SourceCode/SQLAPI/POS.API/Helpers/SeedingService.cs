@@ -30,6 +30,13 @@ namespace POS.API.Helpers
 
                 Console.WriteLine("Starting database seeding...");
 
+                // NOTE: This seeding service is obsolete with the new migration approach
+                // Seed data is now handled directly in migrations
+                // Keeping this method for backward compatibility but it won't execute
+                Console.WriteLine("Seeding is now handled by EF Core migrations. Run 'dotnet ef database update' to seed data.");
+                return;
+
+                /*
                 var assembly = typeof(POS.Domain.Migrations.Initial_Data).Assembly;
                 // Resource name might vary, checking for the specific file
                 var resourceName = assembly.GetManifestResourceNames()
@@ -40,14 +47,9 @@ namespace POS.API.Helpers
                     Console.WriteLine("Error: Seeding script '20250223073432_Initial_Data.sql' not found in resources.");
                     return;
                 }
+                */
 
-                string sqlContent;
-                using (var stream = assembly.GetManifestResourceStream(resourceName))
-                using (var reader = new StreamReader(stream))
-                {
-                    sqlContent = await reader.ReadToEndAsync();
-                }
-
+                /*
                 // Split by GO statements
                 // Regex to split by GO on a separate line, case insensitive
                 var commands = Regex.Split(sqlContent, @"^\s*GO\s*$", RegexOptions.Multiline | RegexOptions.IgnoreCase);
@@ -105,6 +107,7 @@ namespace POS.API.Helpers
                         throw;
                     }
                 }
+                */
             }
             catch (Exception ex)
             {

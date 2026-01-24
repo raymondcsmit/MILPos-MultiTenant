@@ -12,6 +12,24 @@
           <mat-icon class="medium-icon fs-5 align-middle">add</mat-icon>
           <span class="d-none d-sm-inline">{{ 'ADD_SUPPLIER' | translate }}</span>
         </button>
+        <button class="primary me-2" matButton="filled" (click)="openImportDialog()">
+          <mat-icon class="medium-icon fs-5 align-middle">cloud_upload</mat-icon>
+          <span class="d-none d-sm-inline"> {{ "IMPORT" | translate }} </span>
+        </button>
+        <button class="secondary me-2" matButton="filled" [matMenuTriggerFor]="exportMenu">
+          <mat-icon class="medium-icon fs-5 align-middle">cloud_download</mat-icon>
+          <span class="d-none d-sm-inline"> {{ "EXPORT" | translate }} </span>
+        </button>
+        <mat-menu #exportMenu="matMenu">
+          <button mat-menu-item (click)="exportData('excel')">
+            <mat-icon>description</mat-icon>
+            <span>Export to Excel</span>
+          </button>
+          <button mat-menu-item (click)="exportData('csv')">
+            <mat-icon>text_snippet</mat-icon>
+            <span>Export to CSV</span>
+          </button>
+        </mat-menu>
         <button class="error me-2" matButton="filled" (click)="refresh()">
           <mat-icon class="medium-icon fs-5 align-middle">refresh</mat-icon>
           <span class="d-none d-sm-inline"> {{ 'REFRESH' | translate }} </span>
