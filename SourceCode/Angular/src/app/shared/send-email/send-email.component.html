@@ -1,0 +1,91 @@
+<mat-dialog-content>
+  <div class="mb-0 d-flex justify-content-between">
+    <span class="mb-4 page-title">
+      {{ "SEND_EMAIL" | translate }}
+    </span>
+    <mat-icon class="close-icon text-danger cursor-pointer" (click)="closeDialog()">cancel</mat-icon>
+  </div>
+  <form [formGroup]="emailForm">
+    @if(!smtpConfigured){
+    <div class="d-flex alert alert-warning mt-2">
+      {{ 'PLEASE_CONFIGURE_EMAIL_SMTP_SETTINGS' | translate }}
+    </div>
+    }
+    <div class="row">
+      <div class="col-md-6 pb-1">
+        <div class="input-group">
+          <span class="input-group-text" id="toAddress">
+            {{'TO' | translate}}
+          </span>
+          <input formControlName="toAddress" type="text" class="form-control" placeholder="{{'EMAIL' | translate}}"
+            aria-label="To" aria-describedby="toAddress">
+        </div>
+        @if(emailForm.get('toAddress')?.touched && emailForm.get('toAddress')?.errors &&
+        emailForm.get('toAddress')?.errors?.['required']){
+        <div class="text-danger">
+          {{'TO_ADDRESS_IS_REQUIRED' | translate}}
+        </div>
+        }
+        @if(emailForm.get('toAddress')?.touched && emailForm.get('toAddress')?.errors
+        &&emailForm.get('toAddress')?.errors?.['email'] ){
+        <div class="text-danger">
+          {{'PLEASE_ENTER_VALID_EMAIL' | translate}}
+        </div>
+        }
+      </div>
+      <div class="col-md-6 pb-1">
+        <div class="input-group">
+          <span class="input-group-text" id="subject">
+            {{'SUBJECT' | translate}}
+          </span>
+          <input formControlName="subject" type="text" class="form-control" placeholder="{{'SUBJECT' | translate}}"
+            aria-label="To" aria-describedby="subject">
+        </div>
+        @if(emailForm.get('subject')?.touched && emailForm.get('subject')?.errors &&
+        emailForm.get('subject')?.errors?.['required'])
+        {
+        <div class="text-danger">
+          {{'SUBJECT_IS_REQUIRED' | translate}}
+        </div>
+        }
+      </div>
+      <div class="col-md-12">
+        <div class="form-group">
+          <label class="font-weight-bold">
+            {{'BODY' | translate}}
+          </label>
+          <div class="NgxEditor__Wrapper">
+            <app-text-editor formControlName="body"></app-text-editor>
+          </div>
+          @if(emailForm.get('body')?.touched && emailForm.get('body')?.errors &&
+          emailForm.get('body')?.errors?.['required']){
+          <div class="text-danger">
+            {{'BODY_IS_REQUIRED' | translate}}
+          </div>
+          }
+        </div>
+      </div>
+      <div class="col-md-12 pb-1">
+        <div class="input-group mt-3">
+          <div class="input-group-prepend">
+            <span class="input-group-text">
+              {{'ATTACHMENT' | translate}} :: {{data?.name}}
+            </span>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-12 mt-3">
+        <button (click)="sendEmail()" type="submit" class="success" matButton="filled" [disabled]="!smtpConfigured">
+          <mat-icon class="medium-icon fs-5 align-middle">send</mat-icon> {{'SEND' | translate}}
+        </button>
+      </div>
+    </div>
+  </form>
+  @if(isLoading){
+  <div class="spinner-container">
+    <div class="spinner-border text-primary" role="status">
+      <span class="visually-hidden">Loading...</span>
+    </div>
+  </div>
+  }
+</mat-dialog-content>

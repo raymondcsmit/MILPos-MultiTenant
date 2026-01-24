@@ -1,0 +1,54 @@
+<mat-card appearance="outlined" class="mb-4">
+  <mat-card-content>
+    <div class="row align-items-center">
+      <div class="col-md-8 mb-2">
+        <span class="mb-0 page-title">{{ "RECENT_PURCHASE_ORDER_EXPECTED_DELIVERY" | translate }}
+          <app-page-help-text code="RECENT_PURCHASE_ORDER_EXPECTED_DELIVERY"></app-page-help-text>
+        </span>
+      </div>
+    </div>
+    <div class="row">
+      <div class="grid-height-small">
+        <table [dir]="langDir" mat-table matSortDisableClear [dataSource]="dataSource">
+          <!-- Name Column -->
+          <ng-container matColumnDef="Order_Number">
+            <th mat-header-cell *matHeaderCellDef> {{'ORDER_NUMBER' | translate}} </th>
+            <td mat-cell *matCellDef="let element">
+              <a [routerLink]="['/purchase-order/detail',element.purchaseOrderId]">
+                {{element.purchaseOrderNumber}}
+              </a>
+            </td>
+          </ng-container>
+          <ng-container matColumnDef="Supplier_Name">
+            <th mat-header-cell *matHeaderCellDef> {{'SUPPLIER' | translate}} </th>
+            <td mat-cell *matCellDef="let element">
+              {{element.supplierName}}
+            </td>
+          </ng-container>
+          <ng-container matColumnDef="ExpectedDispatchDate">
+            <th mat-header-cell *matHeaderCellDef> {{'EXPECTED_DELIVERY_DATE' | translate}} </th>
+            <td mat-cell *matCellDef="let element"> {{element.expectedDispatchDate |
+              utcToLocalTime:'shortDate'}}
+            </td>
+          </ng-container>
+          <ng-container matColumnDef="Quantity">
+            <th mat-header-cell *matHeaderCellDef> {{'QUANTITY' | translate}} </th>
+            <td mat-cell *matCellDef="let element"> {{element.totalQuantity}} </td>
+          </ng-container>
+          <tr *matNoDataRow>
+            <td colspan="5">
+              <span class="p-4 mt-4">
+                <b> {{'NO_DATA_FOUND' | translate}}</b>
+              </span>
+            </td>
+          </tr>
+          <tr class="grid-header-color" mat-header-row *matHeaderRowDef="displayedColumns;sticky: true"></tr>
+          <tr mat-row *matRowDef="let row; columns: displayedColumns;" [ngClass]="{
+                              'odd-row': isOddDataRow(getDataIndex(row)),
+                              'even-row': !isOddDataRow(getDataIndex(row))
+                            }"></tr>
+        </table>
+      </div>
+    </div>
+  </mat-card-content>
+</mat-card>

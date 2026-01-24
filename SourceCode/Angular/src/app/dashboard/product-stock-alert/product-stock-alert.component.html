@@ -1,0 +1,61 @@
+<mat-card appearance="outlined" class="mb-4">
+  <mat-card-content>
+    <div class="row align-items-center">
+      <div class="col-md-8 mb-2">
+        <span class="mb-0 page-title">{{ "PRODUCT_STOCK_ALERT" | translate }}
+          <app-page-help-text code="PRODUCT_STOCK_ALERT"></app-page-help-text>
+        </span>
+      </div>
+    </div>
+    <div class="row">
+      <div class="table-responsive">
+        <div class="grid-height-small">
+          <table [dir]="langDir" mat-table matSortDisableClear [dataSource]="dataSource" matSort
+            matSortActive="createdDate" matSortDirection="desc">
+            <ng-container matColumnDef="productName">
+              <th class="table-column-300" mat-header-cell *matHeaderCellDef>
+                {{'NAME' | translate}}
+              </th>
+              <td class="table-column-300" mat-cell *matCellDef="let product"> {{product.productName}}
+              </td>
+            </ng-container>
+            <ng-container matColumnDef="businessLocation">
+              <th class="table-column-200" mat-header-cell *matHeaderCellDef>
+                {{"BUSINESS_LOCATION" | translate}}
+              </th>
+              <td class="table-column-200" mat-cell *matCellDef="let product">
+                {{product.businessLocation}} </td>
+            </ng-container>
+            <ng-container matColumnDef="stock">
+              <th class="table-column-200" mat-header-cell *matHeaderCellDef>
+                {{"STOCK" | translate}}
+              </th>
+              <td class="table-column-200" mat-cell *matCellDef="let product">
+                {{product.stock}} </td>
+            </ng-container>
+            <ng-container matColumnDef="footer">
+              <td mat-footer-cell colspan="3" *matFooterCellDef>
+                <mat-paginator [dir]="langDir" [length]="productResource.totalCount"
+                  [pageSize]="productResource.pageSize" [pageSizeOptions]="[15, 20, 30]">
+                </mat-paginator>
+              </td>
+            </ng-container>
+            <tr *matNoDataRow>
+              <td colspan="3">
+                <span class="p-4 mt-4">
+                  <b> {{'NO_DATA_FOUND' | translate}}</b>
+                </span>
+              </td>
+            </tr>
+            <tr class="grid-header-color" mat-header-row *matHeaderRowDef="displayedColumns;sticky: true"></tr>
+            <tr mat-row *matRowDef="let row; columns: displayedColumns;"  [ngClass]="{
+                              'odd-row': isOddDataRow(getDataIndex(row)),
+                              'even-row': !isOddDataRow(getDataIndex(row))
+                            }"></tr>
+            <tr mat-footer-row *matFooterRowDef="footerToDisplayed;sticky: true"></tr>
+          </table>
+        </div>
+      </div>
+    </div>
+  </mat-card-content>
+</mat-card>

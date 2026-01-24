@@ -1,0 +1,72 @@
+<section class="content">
+  <div class="container-fluid">
+    <div class="row align-items-center">
+      <div class="col-md-6 mb-2">
+        <span class="mb-0 page-title">{{'MANAGE_ROLE' | translate}}
+          <app-page-help-text code="MANAGE_ROLE"></app-page-help-text>
+        </span>
+      </div>
+    </div>
+    <mat-card appearance="outlined">
+      <mat-card-content>
+        <div class="page-header-main">
+          <div class="row align-items-center justify-content-between">
+            <div class="col-md-auto col-sm-auto">
+              <div class="content-header">
+                <h1></h1>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="row mb-3">
+          <div class="form-group col-md-6">
+            <label class="form-label text-danger fw-semibold">{{'ROLE_NAME' | translate}} <sup>*</sup></label>
+            <input [(ngModel)]="role.name" type="text" class="form-control form-control-sm"
+              placeholder="{{'ROLE_NAME' | translate}}">
+          </div>
+        </div>
+        <div class="row align-items-center">
+          <div class="col-sm-12">
+            <h4 class="widget-title">{{'PERMISSION' | translate}}</h4>
+            <mat-checkbox [dir]="langDir" color="primary" (change)="selecetAll($event)" class="example-margin">Select
+              All</mat-checkbox>
+          </div>
+        </div>
+        <div class="row">
+          <div class="col-sm-12">
+            @for(page of pages; let i=$index; track $index){
+            <div class="d-flex flex-column border my-4" style="background-color: #fff;">
+              <div>
+                <mat-checkbox [dir]="langDir" color="primary" (change)="onPageSelect($event,page)">
+                  <b> {{page.name.replaceAll(' ', '_').toUpperCase() | translate}}</b>
+                </mat-checkbox>
+              </div>
+              <div class="d-flex gap-2  flex-wrap mt-2 mb-3">
+                @for(action of page.pageActions; track action.id){
+                <!-- <div class="col-sm-3 mb-0"> -->
+                <mat-checkbox [dir]="langDir" color="primary" [checked]="checkPermission(action.id??'')"
+                  (change)="onPermissionChange($event,page,action)">
+                  {{action.name.replaceAll(' ', '_').toUpperCase() | translate}}
+                </mat-checkbox>
+                <!-- </div> -->
+                }
+              </div>
+            </div>
+            }
+          </div>
+        </div>
+        <div class="row">
+          <div class="col-sm-12 mt-2">
+            <button *hasClaim="['ROLES_ADD_ROLE','ROLES_UPDATE_ROLE']" class="success me-2" matButton="filled"
+              (click)="saveRole()" cdkFocusInitial>
+              <mat-icon class="medium-icon fs-5 align-middle">save</mat-icon> {{'SAVE' | translate}}
+            </button>
+            <button class="error" matButton="filled" [routerLink]="['/roles']">
+              <mat-icon class="medium-icon fs-5 align-middle">cancel</mat-icon> {{'CANCEL' | translate}}
+            </button>
+          </div>
+        </div>
+      </mat-card-content>
+    </mat-card>
+  </div>
+</section>

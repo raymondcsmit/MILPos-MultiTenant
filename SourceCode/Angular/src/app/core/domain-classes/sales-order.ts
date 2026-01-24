@@ -1,0 +1,48 @@
+import { BusinessLocation } from './business-location';
+import { Customer } from './customer';
+import { PaymentStatusEnum } from './paymentaStatus';
+import { SalesDeliveryStatusEnum } from './sales-delivery-statu';
+import { SalesOrderItem } from './sales-order-item';
+import { SalesOrderPayment } from './sales-order-payment';
+import { SalesOrderStatusEnum } from './sales-order-status';
+
+export interface SalesOrder {
+  id?: string;
+  orderNumber: string;
+  soCreatedDate: Date;
+  note?: string;
+  termAndCondition?: string;
+  isSalesOrderRequest: boolean;
+  salesOrderStatus: SalesOrderStatusEnum;
+  deliveryDate: Date;
+  deliveryStatus: SalesDeliveryStatusEnum;
+  customerId: string;
+  locationId: string;
+  totalQuantity?: number;
+  totalAmount: number;
+  totalTax: number;
+  flatDiscount: number;
+  totalDiscount: number;
+  totalPaidAmount?: number;
+  customer?: Customer;
+  customerName?: string;
+  paymentStatus?: PaymentStatusEnum;
+  salesOrderItems: SalesOrderItem[];
+  status?: number;
+  paymentMethod?: number;
+  location?: BusinessLocation;
+  businessLocation?: string;
+  customerTaxNumber?: string;
+  isAllowPayment?: boolean;
+  salesOrderPayments?: SalesOrderPayment[];
+  createdByName?: string;
+  modifiedDate?: Date;
+  isPOSScreenOrder?: boolean;
+  referenceNumber?: string;
+  returnitemcount?: number;
+  returnItemPrice?: number;
+  totalItemQuantities?: number;
+  totalRoundOff?: number;
+  isSelectPaymentMethod?: boolean;
+  totalRefundAmount: number;
+}

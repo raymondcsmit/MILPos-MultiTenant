@@ -1,0 +1,133 @@
+<section class="content">
+  <div class="container-fluid">
+    <div class="row align-items-center">
+      <div class="col-md-6 mb-2">
+        <span class="mb-0 page-title">{{ 'PAGES' | translate }}</span>
+      </div>
+      <div class="col-md-6 d-flex justify-content-end mb-2">
+        <button class="btn btn-success btn-sm me-2" (click)="managePage(null)">
+          <mat-icon class="medium-icon fs-5 align-middle">add</mat-icon>
+          {{ 'ADD_PAGE' | translate }}
+        </button>
+      </div>
+    </div>
+    <div class="card">
+      <div class="body">
+        <div class="table-responsive">
+          <div class="grid-height-medium">
+            <table [dir]="langDir" mat-table [dataSource]="pages" multiTemplateDataRows>
+              <ng-container matColumnDef="subaction">
+                <th mat-header-cell *matHeaderCellDef></th>
+                <td mat-cell *matCellDef="let element">
+                  <button matMiniFab class="neutral" (click)="toggleRow(element)">
+                    @if(element == expandedElement){
+                    <mat-icon class="cursor-pointer">
+                      expand_more</mat-icon>
+                    }@else {
+                    <mat-icon class="cursor-pointer">
+                      chevron_right</mat-icon>
+                    }
+                  </button>
+                </td>
+              </ng-container>
+              <!-- Action Column -->
+              <ng-container matColumnDef="action">
+                <th style="width: 30%" mat-header-cell *matHeaderCellDef>
+                  {{ 'ACTION' | translate }}
+                </th>
+                <td style="width: 30%" mat-cell *matCellDef="let element">
+                  <!-- <button (click)="managePage(element)" class="btn btn-success btn-sm me-2" type="button">
+                    <mat-icon class="medium-icon fs-5 align-middle">edit</mat-icon>
+                    <span class="d-none d-sm-inline"> {{ 'EDIT' | translate }}</span>
+                  </button>
+                  <button (click)="deletePage(element)" class="btn btn-danger btn-sm" type="button">
+                    <mat-icon class="medium-icon fs-5 align-middle">delete</mat-icon>
+                    <span class="d-none d-sm-inline"> {{ 'DELETE' | translate }}</span>
+                  </button> -->
+
+                  <div class="d-flex gap-2">
+                    <button matMiniFab (click)="managePage(element)" class="primary">
+                     <mat-icon class="medium-icon fs-5 align-middle">edit</mat-icon>
+                    </button>
+                    <button matMiniFab (click)="deletePage(element)" class="error">
+                      <mat-icon class="medium-icon fs-5 align-middle">delete</mat-icon>
+                    </button>
+                  </div>
+
+                </td>
+              </ng-container>
+              <!-- Name Column -->
+              <ng-container matColumnDef="name">
+                <th mat-header-cell *matHeaderCellDef>{{ 'NAME' | translate }}</th>
+                <td mat-cell *matCellDef="let element">{{ element.name }}</td>
+              </ng-container>
+              <ng-container matColumnDef="order">
+                <th mat-header-cell *matHeaderCellDef>{{ 'ORDER' | translate }}</th>
+                <td mat-cell *matCellDef="let element">{{ element.order }}</td>
+              </ng-container>
+
+              <ng-container matColumnDef="expandedDetail">
+                <td mat-cell *matCellDef="let actionObject" [attr.colspan]="displayedColumns.length">
+                  <div animate.enter="expandanimation" animate.leave="collapseanimation" class="expandable-panel">
+                    <div class="my-2 mx-5">
+                      <div class="row  align-items-center justify-content-between">
+                        <div class="col-md-auto col-sm-auto">
+                          <div class="section-title">
+                            <h2>{{ 'ACTION' | translate }}</h2>
+                          </div>
+                        </div>
+                        <div class="col-md-auto col-sm-auto">
+                          <h4 class="widget-title">
+                            <button class="btn btn-success btn-sm me-2" (click)="addAction(actionObject)">
+                              <mat-icon class="medium-icon fs-5 align-middle">add</mat-icon>
+                              {{ 'ADD_ACTION' | translate }}
+                            </button>
+                          </h4>
+                        </div>
+                      </div>
+                      <table mat-table [dataSource]="subActions" multiTemplateDataRows class="table">
+                        <ng-container matColumnDef="action">
+                          <th mat-header-cell *matHeaderCellDef>{{ 'ACTION' | translate }}</th>
+                          <td mat-cell *matCellDef="let element">
+                            <button (click)="manageAction(element)" class="btn btn-success btn-sm me-2" type="button">
+                              <mat-icon class="medium-icon fs-5 align-middle">edit</mat-icon>
+                              {{ 'EDIT' | translate }}
+                            </button>
+                            <button (click)="deleteAction(element)" class="btn btn-danger btn-sm" type="button">
+                              <mat-icon class="medium-icon fs-5 align-middle">delete</mat-icon>
+                              {{ 'DELETE' | translate }}
+                            </button>
+                          </td>
+                        </ng-container>
+                        <ng-container matColumnDef="name">
+                          <th mat-header-cell *matHeaderCellDef>{{ 'NAME' | translate }}</th>
+                          <td mat-cell *matCellDef="let element">{{ element.name }}</td>
+                        </ng-container>
+                        <ng-container matColumnDef="order">
+                          <th mat-header-cell *matHeaderCellDef>{{ 'ORDER' | translate }}</th>
+                          <td mat-cell *matCellDef="let element">{{ element.order }}</td>
+                        </ng-container>
+                        <ng-container matColumnDef="code">
+                          <th mat-header-cell *matHeaderCellDef>{{ 'CODE' | translate }}</th>
+                          <td mat-cell *matCellDef="let element">{{ element.code }}</td>
+                        </ng-container>
+
+                        <tr class="grid-header-color" mat-header-row
+                          *matHeaderRowDef="subActionColumnToDisplay; sticky: true"></tr>
+                        <tr mat-row *matRowDef="let row; columns: subActionColumnToDisplay"></tr>
+                      </table>
+                    </div>
+                  </div>
+                </td>
+              </ng-container>
+
+              <tr class="grid-header-color" mat-header-row *matHeaderRowDef="displayedColumns; sticky: true"></tr>
+              <tr mat-row *matRowDef="let row; columns: displayedColumns"></tr>
+              <tr mat-row *matRowDef="let row; columns: ['expandedDetail']" class="example-detail-row"></tr>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>

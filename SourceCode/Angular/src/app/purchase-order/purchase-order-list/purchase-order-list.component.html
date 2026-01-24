@@ -1,0 +1,316 @@
+<section class="content">
+  <div class="container-fluid">
+    <div class="d-flex mb-2">
+      <div class="me-auto">
+        <span class="mb-0 page-title">{{ "PURCHASE_ORDERS" | translate }}
+          <app-page-help-text code="PURCHASE_ORDERS"></app-page-help-text>
+        </span>
+      </div>
+      <div class="d-flex justify-content-end mb-2">
+        <button *hasClaim="'PO_ADD_PO'" matButton="filled" class="primary me-2" [routerLink]="['/purchase-order/add']">
+          <mat-icon class="medium-icon fs-5 align-middle">add</mat-icon>
+          <span class="d-none d-sm-inline"> {{ "ADD_PURCHASE_ORDER" | translate }} </span>
+        </button>
+        <button class="error me-2" matButton="filled" (click)="refresh()">
+          <mat-icon class="medium-icon fs-5 align-middle">refresh</mat-icon>
+          <span class="d-none d-sm-inline"> {{ "REFRESH" | translate }}</span>
+        </button>
+        <button class="secondary me-2" matButton="filled" (click)="onTableRefresh()">
+          <mat-icon class="medium-icon fs-5 align-middle">settings</mat-icon>
+          <span class="d-none d-sm-inline">{{ "TABLE_SETTINGS" | translate }}</span>
+        </button>
+      </div>
+    </div>
+    <mat-card appearance="outlined">
+      <mat-card-content>
+        <div class="table-responsive">
+          <div class="grid-height-large">
+            <table [dir]="langDir" mat-table matSortDisableClear [dataSource]="purchaseOrderStore.purchaseOrders()"
+              multiTemplateDataRows matSort [matSortActive]="orderByColumn" [matSortDirection]="orderByDirection">
+              @for(column of tableSettingsStore.purchaseOrdersTableSettingsVisible(); track $index){
+              <ng-container [matColumnDef]="column.key">
+                @if(column.key === 'action') {
+                <th [ngStyle]="{'min-width.px': column.width}" mat-header-cell *matHeaderCellDef>
+                </th>
+                <td [ngStyle]="{'min-width.px': column.width}" mat-cell *matCellDef="let po">
+                  <div class="d-flex gap-2">
+                    <button matMiniFab class="neutral" (click)="toggleRow(po)">
+                      @if(po != expandedElement){
+                      <mat-icon>chevron_right</mat-icon>
+                      } @if(po == expandedElement){
+                      <mat-icon>expand_more</mat-icon>
+                      }
+                    </button>
+                    <button matMiniFab [matMenuTriggerFor]="menu" aria-label="Action"
+                      *hasClaim="['PO_UPDATE_PO','PO_VIEW_PO_DETAIL','PO_DELETE_PO','PO_RETURN_PO','PO_ADD_PO_PAYMENT','PO_VIEW_PO_PAYMENTS','PO_GENERATE_INVOICE']"
+                      class="primary">
+                      <mat-icon>more_vert</mat-icon>
+                    </button>
+                    <mat-menu #menu="matMenu">
+                      @if(po.status == 0 && po.paymentStatus == 1){
+                      <button *hasClaim="'PO_UPDATE_PO'" mat-menu-item [routerLink]="['/purchase-order/', po.id]">
+                        <mat-icon>edit</mat-icon>
+                        <span>{{'EDIT' | translate}}</span>
+                      </button>
+                      }
+                      <button *hasClaim="'PO_VIEW_PO_DETAIL'" mat-menu-item
+                        [routerLink]="['/purchase-order/detail', po.id]">
+                        <mat-icon>info</mat-icon>
+                        <span>{{'DETAIL' | translate}}</span>
+                      </button>
+                      @if(po.status == 0 && po.deliveryStatus != 1){
+                      <button *hasClaim="'PO_UPDATE_PO'" mat-menu-item (click)="markAsReceived(po.id)">
+                        <mat-icon>edit</mat-icon>
+                        <span>{{'MARK_AS_RECEIVED' | translate}}</span>
+                      </button>
+                      }
+                      <button *hasClaim="'PO_RETURN_PO'" mat-menu-item (click)="OnPurchaseOrderReturn(po)">
+                        <mat-icon>assignment_return</mat-icon>
+                        <span>{{'PURCHASE_ORDER_RETURN' | translate}}</span>
+                      </button>
+                      @if(po.paymentStatus != 0){
+                      <button *hasClaim="'PO_ADD_PO_PAYMENT'" mat-menu-item (click)="addPayment(po)">
+                        <mat-icon>payment</mat-icon>
+                        <span>{{'ADD_PAYMENT' | translate}}</span>
+                      </button>
+                      }
+                      <button *hasClaim="'PO_VIEW_PO_PAYMENTS'" mat-menu-item (click)="viewPayment(po)">
+                        <mat-icon>view_carousel</mat-icon>
+                        <span>{{'VIEW_PAYMENT' | translate}}</span>
+                      </button>
+                      <button *hasClaim="'PO_GENERATE_INVOICE'" mat-menu-item (click)="generateInvoice(po)">
+                        <mat-icon>receipt</mat-icon>
+                        <span>{{'GENERATE_INVOICE' | translate}}</span>
+                      </button>
+                      @if(po.status == 0){
+                      <button *hasClaim="'PO_DELETE_PO'" mat-menu-item (click)="deletePurchaseOrder(po)">
+                        <mat-icon>delete</mat-icon>
+                        <span>{{'DELETE' | translate}}</span>
+                      </button>
+                      }
+                      <button *hasClaim="'PO_SEND_EMAIL'" mat-menu-item (click)="sendEmail(po)">
+                        <mat-icon>mail</mat-icon>
+                        <span>{{'SEND_EMAIL' | translate}}</span>
+                      </button>
+                    </mat-menu>
+                  </div>
+                </td>
+                }
+                @else if(column.type === 'datetime'){
+                <th [ngStyle]="{'min-width.px': column.width}" mat-header-cell *matHeaderCellDef mat-sort-header
+                  [disabled]="!column.allowSort">
+                  {{ column.header | translate }}
+                </th>
+                <td [ngStyle]="{'min-width.px': column.width}" mat-cell *matCellDef="let po">
+                  {{ po[column.key] | utcToLocalTime:'short'}}
+                </td>
+                }
+                @else if(column.type === 'currency'){
+                <th [ngStyle]="{'min-width.px': column.width}" mat-header-cell *matHeaderCellDef mat-sort-header
+                  [disabled]="!column.allowSort">
+                  {{ column.header | translate }}
+                </th>
+                <td [ngStyle]="{'min-width.px': column.width}" mat-cell *matCellDef="let po">
+                  {{ po[column.key] | customCurrency}}
+                </td>
+                }
+                @else if(column.key === 'orderNumber'){
+                <th [ngStyle]="{'min-width.px': column.width}" mat-header-cell *matHeaderCellDef mat-sort-header
+                  [disabled]="!column.allowSort">
+                  {{ column.header | translate }}
+                </th>
+                <td [ngStyle]="{'min-width.px': column.width}" mat-cell *matCellDef="let po">
+                  <a [routerLink]="['/purchase-order/detail', po.id]">{{po.orderNumber}} </a>
+                  @if(po.status == 1){
+                  <mat-icon matTooltip="{{'SOME_PRODUCTS_ARE_RETURNED_FROM_THIS_PURCHASE' | translate}}"
+                    class="ms-1 text-danger">reply</mat-icon>
+                  }
+                </td>
+                }
+                @else if(column.key === 'deliveryStatus'){
+                <th [ngStyle]="{'min-width.px': column.width}" mat-header-cell *matHeaderCellDef mat-sort-header
+                  [disabled]="!column.allowSort">
+                  {{ column.header | translate }}
+                </th>
+                <td [ngStyle]="{'min-width.px': column.width}" mat-cell *matCellDef="let po"
+                  style="text-align: center;">
+                  <span class="badge"
+                    [ngClass]="{'bg-danger': po.deliveryStatus == 0 ,'bg-success' : po.deliveryStatus == 1}">
+                    {{po.deliveryStatus | purchaseDeliveryStatus }}</span>
+                </td>
+                }
+                @else if(column.key === 'paymentStatus'){
+                <th [ngStyle]="{'min-width.px': column.width}" mat-header-cell *matHeaderCellDef mat-sort-header
+                  [disabled]="!column.allowSort">
+                  {{ column.header | translate }}
+                </th>
+                <td [ngStyle]="{'min-width.px': column.width}" mat-cell *matCellDef="let po"
+                  style="text-align: center;">
+                  <span (click)="viewPayment(po)" class="badge cursor-pointer" [ngClass]="{'bg-success': po.paymentStatus == 0 ,
+                                                'bg-danger' : po.paymentStatus == 1,
+                                                              'bg-warning' : po.paymentStatus == 2}">
+                    {{po.paymentStatus | paymentStatus }}
+                  </span>
+                </td>
+                }
+                @else if(column.key === 'status'){
+                <th [ngStyle]="{'min-width.px': column.width}" mat-header-cell *matHeaderCellDef mat-sort-header
+                  [disabled]="!column.allowSort">
+                  {{ column.header | translate }}
+                </th>
+                <td [ngStyle]="{'min-width.px': column.width}" mat-cell *matCellDef="let po"
+                  style="text-align: center;">
+                  @if(po.status == 1){
+                  {{'YES' | translate}}
+                  } @else {
+                  {{'NO' | translate}}
+                  }
+                </td>
+                }
+                @else {
+                <th [ngStyle]="{'min-width.px': column.width}" mat-header-cell mat-sort-header
+                  [disabled]="!column.allowSort" *matHeaderCellDef>
+                  {{ column.header | translate }}
+                </th>
+                <td [ngStyle]="{'min-width.px': column.width}" mat-cell *matCellDef="let po">
+                  {{ po[column.key] }}
+                </td>
+                }
+              </ng-container>
+              }
+              @for(column of tableSettingsStore.purchaseOrdersTableSettingsVisible(); track $index){
+              <ng-container [matColumnDef]="column.key + '-search'">
+                @if(column.key === 'poCreatedDate') {
+                <th mat-header-cell *matHeaderCellDef class="table-column-220">
+                  <div class="input-group">
+                    <mat-date-range-input class="form-control form-control-sm input-with-clear" [rangePicker]="picker">
+                      <input matStartDate (focus)="picker.open()" [(ngModel)]="OrderFromDateFilter"
+                        placeholder="{{'FROM_DATE' | translate}}">
+                      <input matEndDate (focus)="picker.open()" [(ngModel)]="OrderToDateFilter"
+                        placeholder="{{'TO_DATE' | translate}}">
+                    </mat-date-range-input>
+                    <mat-date-range-picker #picker></mat-date-range-picker>
+                    <button style="margin-left: -34px; z-index: 100" (click)="clearOrderDates()"
+                      class="btn btn-sm bg-transparent" type="button">
+                      <mat-icon class="medium-icon text-danger fs-6 align-middle">cancel</mat-icon>
+                    </button>
+                  </div>
+                </th>
+                } @else if (column.key === 'orderNumber') {
+                <th mat-header-cell *matHeaderCellDef>
+                  <input placeholder="{{'ORDER_NO' | translate}}" type="text" class="form-control form-control-sm"
+                    [(ngModel)]="OrderNumberFilter">
+                </th>
+                }
+                @else if (column.key === 'deliveryStatus') {
+                <th mat-header-cell *matHeaderCellDef class="table-column-160">
+                  <mat-select [dir]="langDir" [(ngModel)]="purchaseStatusFilter" panelClass="mat-select-control"
+                    placeholder="{{'PURCHASE_STATUS' | translate}}" class="form-control form-control-sm">
+                    <mat-option value="">{{'NONE' | translate}}</mat-option>
+                    @for(deliveryStatus of deliveryStatuses; track $index){
+                    <mat-option [value]="deliveryStatus.id.toString()">
+                      {{deliveryStatus.name | translate}}
+                    </mat-option>
+                    }
+                  </mat-select>
+                </th>
+                }
+                @else if (column.key === 'paymentStatus') {
+                <th mat-header-cell *matHeaderCellDef class="table-column-160">
+                  <mat-select [dir]="langDir" [(ngModel)]="paymentStatusFilter" panelClass="mat-select-control"
+                    placeholder="{{'PAYMENT_STATUS' | translate}}" class="form-control form-control-sm">
+                    <mat-option value="">{{'NONE' | translate}}</mat-option>
+                    @for(paymentStatus of paymentStatuses; track $index){
+                    <mat-option [value]="paymentStatus.id.toString()">
+                      {{paymentStatus.name | translate}}
+                    </mat-option>
+                    }
+                  </mat-select>
+                </th>
+                }
+                @else if (column.key === 'businessLocation') {
+                <th mat-header-cell *matHeaderCellDef class="table-column-160">
+                  <mat-select [dir]="langDir" [(ngModel)]="locationFilter" panelClass="mat-select-control"
+                    placeholder="{{'BUSINESS_LOCATION' | translate}}" class="form-control form-control-sm">
+                    @for(location of locations; track $index){
+                    <mat-option [value]="location.id">
+                      {{location.name}}
+                    </mat-option>
+                    }
+                    @if(locations.length==0){
+                    <mat-option value="">
+                      {{'NO_RECORDS' | translate}}
+                    </mat-option>
+                    }
+                  </mat-select>
+                </th>
+                }
+                @else if (column.key ==='supplierName') {
+                <th mat-header-cell *matHeaderCellDef class="table-column-160">
+                  <input placeholder="{{'SUPPLIER' | translate}}" type="text" class="form-control form-control-sm"
+                    [formControl]="supplierNameControl" [matAutocomplete]="autoSupplier">
+                  <mat-autocomplete [autoActiveFirstOption]="true" (optionSelected)='SupplierFilter=$event.option.value'
+                    #autoSupplier="matAutocomplete">
+                    <mat-option value="">{{'NONE' | translate}}</mat-option>
+                    @let suppliers = supplierList$ | async;
+                    @for(supplier of suppliers; track $index){
+                    <mat-option [value]="supplier.supplierName">
+                      {{supplier.supplierName}}
+                    </mat-option>
+                    }
+                  </mat-autocomplete>
+                </th>
+                }
+                @else {
+                <th mat-header-cell *matHeaderCellDef></th>
+                }
+              </ng-container>
+              }
+              <ng-container matColumnDef="footer">
+                <td mat-footer-cell [attr.colspan]="visibleTableKeys.length" *matFooterCellDef>
+                  <mat-paginator [length]="purchaseOrderStore.purchaseOrderResourceParameter().totalCount"
+                    [pageSize]="purchaseOrderStore.purchaseOrderResourceParameter().pageSize"
+                    [pageSizeOptions]="[10, 20, 30]">
+                  </mat-paginator>
+                </td>
+              </ng-container>
+              <ng-container matColumnDef="expandedDetail">
+                <td mat-cell *matCellDef="let poObject" [attr.colspan]="visibleTableKeys.length">
+                  @if(poObject == expandedElement){
+                  <div animate.enter="expandanimation" animate.leave="collapseanimation" class="expandable-panel">
+                    <div class="my-2 mx-5">
+                      <app-purchase-order-item [purchaseOrder]="poObject">
+                      </app-purchase-order-item>
+                    </div>
+                  </div>
+                  }
+                </td>
+              </ng-container>
+              <tr *matNoDataRow>
+                <td [attr.colspan]="visibleTableKeys.length">
+                  <span class="p-4 mt-4">
+                    <b> {{'NO_DATA_FOUND' | translate}}</b>
+                  </span>
+                </td>
+              </tr>
+              <tr class="grid-header-color" mat-header-row *matHeaderRowDef="visibleTableKeys"></tr>
+              <tr mat-row *matRowDef="let row; columns: visibleTableKeys;" [ngClass]="row.status===1 ? 'bg-warning1' :{
+                              'odd-row': isOddDataRow(getDataIndex(row)),
+                              'even-row': !isOddDataRow(getDataIndex(row))
+                            }"></tr>
+              <tr style="height: 45px !important;" mat-header-row *matHeaderRowDef="visibleTableKeysSearch">
+              <tr mat-footer-row *matFooterRowDef="footerToDisplayed"></tr>
+              <tr mat-row *matRowDef="let row; columns: ['expandedDetail']" class="example-detail-row"></tr>
+            </table>
+          </div>
+        </div>
+      </mat-card-content>
+    </mat-card>
+  </div>
+  <!-- </div> -->
+</section>
+@if(purchaseOrderForInvoice){
+<app-purchase-order-invoice [purchaseOrder]="purchaseOrderForInvoice" [sendEmail]="isSendEmail"
+  (emailBlob)="onEmailBlob($event)">
+</app-purchase-order-invoice>
+}

@@ -1,0 +1,49 @@
+<div class="d-flex align-items-center justify-content-center vh-100">
+  <div class="text-center">
+    <div class="row g-0">
+      <div class="col-lg-12">
+        <div class="card">
+          <div class="card-header">
+            <h4 class="card-title text-danger">
+              Problem with License Activation.
+            </h4>
+          </div>
+          <div class="card-body">
+            <div class="row">
+              <div class="col-md-12">
+                <h5>
+                  @switch(errorCode) {
+                  @case('YOU_DOES_NOT_OWN_THIS_ITEM') {
+                  <span>You do not own this product. Please purchase it first from codecanyon.</span> <br> <br>
+                  <a href="https://codecanyon.net/item/advanced-pos-with-inventory-management/38228862" target="_blank">
+                    {{ "Purchase this Item" | translate }}
+                  </a>
+                  }
+                  @case('COULD_NOT_VERIFY_LICENSE') {
+                  <span>Could not verify license.</span>
+                  }
+                  @case('NO_PURCHASES_FOUND') {
+                  <span>No purchases found for this account.</span>
+                  }
+                  @case('PRODUCT_ALREADY_HOSTED') {
+                  <span> This product is already activated on another domain.</span><br><br>
+                  <span>
+                    To host it on this domain, please purchase an additional license from CodeCanyon.
+                  </span><br><br>
+                  <span>
+                    Currently activated on: &nbsp;<span class="text-primary"> {{productionUrl}}</span>
+                  </span>
+                  }
+                  @default {
+                  <span>An error occurred while processing your request. Please try agian or contact support.</span>
+                  }
+                  }
+                </h5>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

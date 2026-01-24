@@ -1,0 +1,80 @@
+<mat-dialog-content>
+  <div class="mb-0 d-flex justify-content-between">
+    <span class="mb-4 page-title">
+      {{ 'STOCK_TRANSFER_DETAIL' | translate }}(<b>{{"REFERENCE_NO" | translate}}:</b>{{stockTransfer.referenceNo}})
+      <app-page-help-text code="STOCK_TRANSFER"></app-page-help-text>
+    </span>
+    <mat-icon class="close-icon text-danger cursor-pointer" (click)="onCancel()">cancel</mat-icon>
+  </div>
+  <div class="row invoice-info">
+    <div class="col-sm-4 invoice-col">
+      {{"FROM_LOCATION" | translate}}:
+      <address>
+        <strong>{{stockTransfer.fromLocation?.name}}</strong>
+      </address>
+    </div>
+    <div class="col-md-4 invoice-col">
+      {{"TO_LOCATION" | translate}}:
+      <address>
+        <strong>{{stockTransfer.toLocation?.name}}</strong>
+      </address>
+    </div>
+
+    <div class="col-sm-4 invoice-col">
+      <b>{{"REFERENCE_NO" | translate}}:</b> {{stockTransfer.referenceNo}}<br>
+      <b>{{"TRANSFER_DATE" | translate}}:</b> {{stockTransfer.transferDate |
+      utcToLocalTime:'shortDate'
+      }}<br>
+      <b>{{"STATUS" | translate}}:</b> {{stockTransfer.status | salesDeliveryStatus}}
+    </div>
+  </div>
+  <h5>{{"STOCK_TRANSFER_ITEMS" | translate}}</h5>
+  <div class="table-responsive">
+    <table class="table table-pos table-bordered table-sm">
+      <thead>
+        <tr class="grid-header-color">
+          <th style="width:1%">{{"NO." | translate}}</th>
+          <th style="width:20%">{{"PRODUCT_NAME" | translate}}</th>
+          <th style="width:3%">{{"UNIT_PRICE" | translate}}</th>
+          <th style="width:2%">{{"QUANTITY" | translate}}</th>
+          <th style="width:2%">{{"SHIPPING_CHARGE" | translate}}</th>
+          <th style="width:2%">{{"SUB_TOTAL" | translate}}</th>
+        </tr>
+      </thead>
+      <tbody>
+        @for(stockTransferItem of stockTransfer.stockTransferItems;let i=$index; track $index){
+        <tr>
+          <td style="text-align: center;">{{i+1}}</td>
+          <td>{{stockTransferItem?.product?.name}}</td>
+          <td class="text-end">{{stockTransferItem.unitPrice | customCurrency}}</td>
+          <td class="text-end">{{stockTransferItem.quantity}} <span
+              style="font-size: 10px;">({{stockTransferItem?.unitName}})</span>
+          </td>
+          <td class="text-end">{{stockTransferItem.shippingCharge | customCurrency}}</td>
+          <td class="text-end">{{stockTransferItem.subTotal | customCurrency}}</td>
+        </tr>
+        }
+        <tr>
+          <td colspan="4" class="text-end"><strong>{{"TOTAL" | translate}}</strong></td>
+          <td class="text-end"><strong>{{stockTransfer.totalShippingCharge | customCurrency}}</strong>
+          </td>
+          <td class="text-end"><strong>{{stockTransfer.totalAmount | customCurrency}}</strong></td>
+      </tbody>
+    </table>
+  </div>
+  <br>
+  <div class="row">
+    <div class="col-sm-12">
+      <strong>{{"NOTES" | translate}}:</strong><br>
+      <p class="well well-sm no-shadow bg-gray">
+        {{stockTransfer.notes}}
+      </p>
+    </div>
+  </div>
+  <div class="d-flex">
+    <button type="button" (click)="onCancel()" class="btn btn-danger btn-sm"><mat-icon
+        class="medium-icon fs-5 align-middle">cancel</mat-icon>
+      {{'CANCEL' | translate}}
+    </button>
+  </div>
+</mat-dialog-content>

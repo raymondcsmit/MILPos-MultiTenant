@@ -1,0 +1,157 @@
+<section class="content">
+  <div class="container-fluid">
+    <div class="row align-items-center">
+      <div class="col-md-6 mb-2">
+        @if(isEditMode){
+        <span class="mb-0 page-title">
+          {{'EDIT_EMAIL_SMTP_SETTING' | translate }}
+        </span>
+        }@else {
+        <span class="mb-0 page-title">
+          {{'ADD_EMAIL_SMTP_SETTING' | translate }}
+        </span>
+        }
+        <app-page-help-text code="EMAIL_SMTP_SETTINGS"></app-page-help-text>
+      </div>
+    </div>
+    <mat-card>
+      <mat-card-content>
+        <form [formGroup]="smtpSettingForm">
+          <mat-card appearance="outlined">
+            <mat-card-content>
+              <div class="row">
+                <div class="col-lg-3 col-sm-6">
+                  <div class="form-group">
+                    <label class="form-label text-danger"> {{ "HOST" | translate }} <sup>*</sup></label>
+                    <input formControlName="host" class="form-control" type="text" />
+                    @if(smtpSettingForm.get('host')?.touched &&
+                    smtpSettingForm.get('host')?.errors && smtpSettingForm.get('host')?.errors?.['required']){
+                    <div class="text-danger">
+                      {{ "HOST_IS_REQUIRED" | translate }}
+                    </div>
+                    }
+                  </div>
+                </div>
+                <div class="col-lg-3 col-sm-6">
+                  <div class="form-group">
+                    <label class="form-label text-danger"> {{ "PORT" | translate }} <sup>*</sup></label>
+                    <input formControlName="port" class="form-control" type="number" />
+                    @if(smtpSettingForm.get('port')?.touched &&
+                    smtpSettingForm.get('port')?.errors && smtpSettingForm.get('port')?.errors?.['required']){
+                    <div class="text-danger">
+                      {{ "PORT_IS_REQUIRED" | translate }}
+                    </div>
+                    }
+                  </div>
+                </div>
+                <div class="col-lg-3 col-sm-6">
+                  <div class="form-group">
+                    <label class="form-label text-danger"> {{ "USER_NAME" | translate }} <sup>*</sup></label>
+                    <input formControlName="userName" class="form-control" type="text" />
+                    @if(smtpSettingForm.get('userName')?.touched &&
+                    smtpSettingForm.get('userName')?.errors && smtpSettingForm.get('userName')?.errors?.['required']){
+                    <div class="text-danger">
+                      {{ "USER_NAME_IS_REQUIRED" | translate }}
+                    </div>
+                    }
+                  </div>
+                </div>
+                <div class="col-lg-3 col-sm-6">
+                  <div class="form-group">
+                    <label class="form-label text-danger"> {{ "PASSWORD" | translate }} <sup>*</sup></label>
+                    <input autocomplete="new-password" formControlName="password" class="form-control"
+                      type="password" />
+                    @if(smtpSettingForm.get('password')?.touched &&
+                    smtpSettingForm.get('password')?.errors && smtpSettingForm.get('password')?.errors?.['required']){
+                    <div class="text-danger">
+                      {{ "PASSWORD_IS_REQUIRED" | translate }}
+                    </div>
+                    }
+                  </div>
+                </div>
+                <div class="col-lg-3 col-sm-6">
+                  <div class="form-group">
+                    <label>{{ "ENCRYPTION" | translate }}</label>
+                    <mat-select class="form-control" panelClass="mat-select-control" formControlName="encryptionType">
+                      <mat-option value=""> None </mat-option>
+                      <mat-option value="ssl"> ssl </mat-option>
+                      <mat-option value="tls"> tls </mat-option>
+                      <mat-option value="starttls"> starttls </mat-option>
+                    </mat-select>
+                  </div>
+                </div>
+                <div class="col-lg-3 col-sm-6">
+                  <div class="form-group">
+                    <label class="form-label text-danger">{{ "FROM_EMAIL" | translate }} <sup>*</sup></label>
+                    <input formControlName="fromEmail" class="form-control" type="email" />
+                    @if(smtpSettingForm.get('fromEmail')?.touched &&
+                    smtpSettingForm.get('fromEmail')?.errors){
+                    @if(smtpSettingForm.get('fromEmail')?.errors?.['required']){
+                    <div class="text-danger">
+                      {{ "FROM_EMAIL_IS_REQUIRED" | translate }}
+                    </div>
+                    }
+                    @if(smtpSettingForm.get('fromEmail')?.errors?.['email']){
+                    <div class="text-danger">
+                      {{ "INVALID_EMAIL" | translate }}
+                    </div>
+                    }
+                    }
+                  </div>
+                </div>
+                <div class="col-lg-3 col-sm-6">
+                  <div class="form-group">
+                    <label class="form-label text-danger">{{ "FROM_NAME" | translate }} <sup>*</sup></label>
+                    <input formControlName="fromName" class="form-control" type="text" />
+                    @if(smtpSettingForm.get('fromName')?.touched &&
+                    smtpSettingForm.get('fromName')?.errors && smtpSettingForm.get('fromName')?.errors?.['required']){
+                    <div class="text-danger">
+                      {{ "FROM_NAME_IS_REQUIRED" | translate }}
+                    </div>
+                    }
+                  </div>
+                </div>
+                <div class="row">
+                  <div class="col-lg-3 col-sm-6 mt-sm-2 status-switch">
+                    <mat-slide-toggle color="primary" formControlName="isDefault">
+                      @if(smtpSettingForm.get('isDefault')?.value){
+                      <span>
+                        {{ "IS_DEFAULT" | translate }}
+                      </span>
+                      }@else {
+                      <span>
+                        {{ "IS_DEFAULT" | translate }}
+                      </span>
+                      }
+                    </mat-slide-toggle>
+                  </div>
+                </div>
+                <div class="my-3 col-sm-12">
+                  @if(isEditMode){
+                  <button class="success me-2" matButton="filled" (click)="saveEmailSMTPSetting()" cdkFocusInitial>
+                    <mat-icon class="medium-icon fs-5 align-middle">save</mat-icon>
+                    {{ "SAVE" | translate }}
+                  </button>
+                  } @else {
+                  <button class="warning me-2" matButton="filled" (click)="testEmailSMTPSetting()" cdkFocusInitial>
+                    <mat-icon class="medium-icon fs-5 align-middle">mail</mat-icon>
+                    {{ "TEST" | translate }}
+                  </button>
+                  <button class="success me-2" matButton="filled" (click)="saveEmailSMTPSetting()" cdkFocusInitial>
+                    <mat-icon class="medium-icon fs-5 align-middle">save</mat-icon>
+                    {{ "SAVE" | translate }}
+                  </button>
+                  }
+                  <button type="button" class="error" matButton="filled" [routerLink]="['/email-smtp']">
+                    <mat-icon class="medium-icon fs-5 align-middle">cancel</mat-icon>
+                    {{ "CANCEL" | translate }}
+                  </button>
+                </div>
+              </div>
+            </mat-card-content>
+          </mat-card>
+        </form>
+      </mat-card-content>
+    </mat-card>
+  </div>
+</section>

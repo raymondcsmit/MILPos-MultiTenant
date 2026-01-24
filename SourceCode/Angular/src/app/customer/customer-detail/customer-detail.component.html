@@ -1,0 +1,301 @@
+<section [ngClass]="isDialog ? '' : 'content'">
+  <div [ngClass]="!isDialog ? 'container-fluid' : ''">
+    @if(!isDialog) {
+
+
+    <div class="row align-items-center">
+      <div class="col-md-6 mb-2">
+        <span class="mb-0 page-title">{{ 'MANAGE_CUSTOMER' | translate }}
+          <app-page-help-text code="CUSTOMERS"></app-page-help-text>
+        </span>
+      </div>
+    </div>
+    }
+    <form autocomplete="off" [formGroup]="customerForm" (ngSubmit)="onCustomerSubmit()">
+      <mat-card appearance="outlined">
+        @if(isDialog) {
+        <mat-card-header>
+          <div class="col-md-12 mb-0 d-flex justify-content-between">
+            <span class="mb-4 page-title">
+              {{ "MANAGE_CUSTOMER" | translate }}
+              <app-page-help-text code="CUSTOMERS"></app-page-help-text>
+            </span>
+            <mat-icon class="close-icon text-danger cursor-pointer" (click)="onCancel()">cancel</mat-icon>
+          </div>
+        </mat-card-header>
+        }
+        <mat-card-content>
+          <div class="row">
+            <div class="col-lg-3 col-sm-6">
+              <div class="form-group">
+                <label class="text-danger">{{ 'CUSTOMER_NAME' | translate }} *</label>
+                <input formControlName="customerName" class="form-control" type="text" />
+                @if (customerForm.get('customerName')?.touched &&
+                customerForm.get('customerName')?.errors) { @if
+                (customerForm.get('customerName')?.errors?.['required']) {
+                <div class="text-danger">
+                  {{ 'CUSTOMER_NAME_IS_REQUIRED' | translate }}
+                </div>
+                } }
+              </div>
+            </div>
+            <div class="col-lg-3 col-sm-6">
+              <div class="form-group">
+                <label>{{ 'CONTACT_PERSON' | translate }}</label>
+                <input formControlName="contactPerson" class="form-control" type="text" />
+              </div>
+            </div>
+            <div class="col-lg-3 col-sm-6">
+              <div class="form-group">
+                <label class="text-danger">{{ 'EMAIL' | translate }} *</label>
+                <input formControlName="email" class="form-control" type="text" />
+                @if(customerForm.get('email')?.touched &&
+                customerForm.get('email')?.errors?.['email']){
+                <div class="text-danger">
+                  {{ 'PLEASE_ENTER_VALID_EMAIL' | translate }}
+                </div>
+                } @if(customerForm.get('email')?.touched &&
+                customerForm.get('email')?.errors?.['required']){
+                <div class="text-danger">
+                  {{ 'EMAIL_IS_REQUIRED' | translate }}
+                </div>
+                }
+              </div>
+            </div>
+            <div class="col-lg-3 col-sm-6">
+              <div class="form-group">
+                <label>{{ 'WEBSITE' | translate }}</label>
+                <input formControlName="website" class="form-control" type="text" />
+              </div>
+            </div>
+            <div class="col-lg-3 col-sm-6">
+              <div class="form-group">
+                <label class="text-danger">{{ 'MOBILE_NUMBER' | translate }} *</label>
+                <input formControlName="mobileNo" class="form-control" type="text" />
+                @if(customerForm.get('mobileNo')?.touched &&
+                customerForm.get('mobileNo')?.errors?.['required']){
+                <div class="text-danger">
+                  {{ 'MOBILE_IS_REQUIRED' | translate }}
+                </div>
+                }
+              </div>
+            </div>
+            <div class="col-lg-3 col-sm-6">
+              <div class="form-group">
+                <label>{{ 'PHONE_NUMBER' | translate }}</label>
+                <input formControlName="phoneNo" class="form-control" type="text" />
+              </div>
+            </div>
+            <div class="col-lg-3 col-sm-6">
+              <div class="form-group">
+                <label>{{ 'TAX_NUMBER' | translate }}</label>
+                <input formControlName="taxNumber" class="form-control" type="text" />
+              </div>
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-md-12" formGroupName="billingAddress">
+              <div class="row align-items-center">
+                <div class="col-sm-6 mb-2">
+                  <span class="page-title-sub">{{ 'BILLING_ADDRESS' | translate }}</span>
+                </div>
+              </div>
+              <div class="row">
+                <div class="col-lg-4 col-sm-12">
+                  <div class="form-group">
+                    <label class="text-danger"> {{ 'ADDRESS' | translate }} * </label>
+                    <textarea formControlName="address" class="form-control"></textarea>
+                    @if(customerForm.get('billingAddress')?.get('address')?.touched &&
+                    customerForm.get('billingAddress')?.get('address')?.errors?.['required']){
+                    <div class="text-danger">
+                      {{ 'ADDRESS_IS_REQUIRED' | translate }}
+                    </div>
+                    }
+                  </div>
+                </div>
+                <div class="col-lg-4 col-sm-6">
+                  <mat-label [dir]="langDir" class="text-danger">
+                    {{ 'COUNTRY' | translate }} *
+                  </mat-label>
+                  <mat-select [dir]="langDir" placeholder="{{ 'COUNTRY' | translate }}" class="form-control"
+                    formControlName="countryName" panelClass="mat-select-control"
+                    (selectionChange)="onCountryChange($event, 'billingAddress')">
+                    @for (country of countries; track $index) {
+                    <mat-option [dir]="langDir" [value]="country.countryName">
+                      {{ country.countryName }}
+                    </mat-option>
+                    }
+                  </mat-select>
+                  @if(customerForm.get('billingAddress')?.get('countryName')?.touched &&
+                  customerForm.get('billingAddress')?.get('countryName')?.errors?.['required']) {
+                  <mat-error [dir]="langDir" class="text-danger">
+                    {{ 'PLEASE_SELECT_COUNTRY' | translate }}
+                  </mat-error>
+                  }
+                </div>
+                <div class="col-lg-4 col-sm-6">
+                  <mat-label [dir]="langDir" class="text-danger">
+                    {{ 'CITY' | translate }} *
+                  </mat-label>
+                  <input class="form-control" autocomplete="new-city"
+                    (input)="handleFilterCity($event, 'billingAddress')" type="text"
+                    placeholder="{{ 'CITY' | translate }}" [matAutocomplete]="auto" formControlName="cityName" />
+                  @if(customerForm.get('billingAddress')?.get('cityName')?.touched &&
+                  customerForm.get('billingAddress')?.get('cityName')?.errors?.['required']){
+                  <div class="text-danger">
+                    {{ 'PLEASE_SELECT_CITY' | translate }}
+                  </div>
+                  }
+                  <mat-autocomplete [dir]="langDir" #auto="matAutocomplete">
+                    @for (city of cities; track $index) {
+                    <mat-option [dir]="langDir" [value]="city.cityName">
+                      <span>{{ city.cityName }}</span>
+                    </mat-option>
+                    }
+                  </mat-autocomplete>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-sm-12" formGroupName="shippingAddress">
+              <div class="row align-items-center">
+                <div class="col-lg-4 col-sm-6 mb-0">
+                  <span class="page-title-sub">{{ 'SHIPPING_ADDRESS' | translate }}</span>
+                </div>
+                <div class="col-lg-4 col-sm-6 d-flex justify-content-start mb-0">
+                  <mat-checkbox [dir]="langDir" color="primary" (change)="onSameAsBillingAddress($event)">
+                    {{ 'SAME_AS_BILLING_ADDRESS' | translate }}
+                  </mat-checkbox>
+                </div>
+              </div>
+              <div class="row">
+                <div class="col-lg-4 col-sm-12">
+                  <div class="form-group">
+                    <label class="text-danger"> {{ 'ADDRESS' | translate }} * </label>
+                    <textarea formControlName="address" class="form-control"></textarea>
+                    @if(customerForm.get('shippingAddress')?.get('address')?.touched &&
+                    customerForm.get('shippingAddress')?.get('address')?.errors?.['required']){
+                    <div class="text-danger">
+                      {{ 'ADDRESS_IS_REQUIRED' | translate }}
+                    </div>
+                    }
+                  </div>
+                </div>
+                <div class="col-lg-4 col-sm-6">
+                  <mat-label [dir]="langDir" class="text-danger">
+                    {{ 'COUNTRY' | translate }} *</mat-label>
+                  <mat-select [dir]="langDir" placeholder="{{ 'COUNTRY' | translate }}" class="form-control"
+                    formControlName="countryName" panelClass="mat-select-control"
+                    (selectionChange)="onCountryChange($event, 'shippingAddress')">
+                    @for (country of countries; track $index) {
+                    <mat-option [dir]="langDir" [value]="country.countryName">
+                      {{ country.countryName }}
+                    </mat-option>
+                    }
+                  </mat-select>
+                  @if (customerForm.get('shippingAddress')?.get('countryName')?.touched &&
+                  customerForm.get('shippingAddress')?.get('countryName')?.errors?.['required']) {
+                  <mat-error [dir]="langDir" class="text-danger">
+                    {{ 'PLEASE_SELECT_COUNTRY' | translate }}
+                  </mat-error>
+                  }
+                </div>
+                <div class="col-lg-4 col-sm-6">
+                  <mat-label [dir]="langDir" class="text-danger">
+                    {{ 'CITY' | translate }} *</mat-label>
+                  <input class="form-control" autocomplete="new-city"
+                    (input)="handleFilterCity($event, 'shippingAddress')" type="text"
+                    placeholder="{{ 'CITY' | translate }}" [matAutocomplete]="auto" formControlName="cityName" />
+                  @if (customerForm.get('shippingAddress')?.get('cityName')?.touched &&
+                  customerForm.get('shippingAddress')?.get('cityName')?.errors?.['required']) {
+                  <div class="text-danger">
+                    {{ 'PLEASE_SELECT_CITY' | translate }}
+                  </div>
+                  }
+                  <mat-autocomplete [dir]="langDir" #auto="matAutocomplete">
+                    @for (city of cities; track $index) {
+                    <mat-option [dir]="langDir" [value]="city.cityName">
+                      <span>{{ city.cityName }}</span>
+                    </mat-option>
+                    }
+                  </mat-autocomplete>
+                </div>
+                <div class="col-sm-6">
+                  <div class="form-group">
+                    <label>{{ 'CONTACT_PERSON' | translate }}</label>
+                    <input formControlName="contactPerson" class="form-control" type="text" />
+                  </div>
+                </div>
+                <div class="col-sm-6">
+                  <div class="form-group">
+                    <label>{{ 'MOBILE_NUMBER' | translate }}</label>
+                    <input formControlName="mobileNo" class="form-control" type="text" />
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-lg-9 col-sm-12">
+              <div class="form-group">
+                <label>
+                  {{ 'DESCRIPTION' | translate }}
+                </label>
+                <app-text-editor formControlName="description"></app-text-editor>
+              </div>
+            </div>
+            <div class="col-lg-3 col-sm-6">
+              <label>
+                {{ 'UPLOAD_LOGO' | translate }}
+              </label>
+              <mat-card [dir]="langDir" class="cus-mat-card text-center">
+                <input hidden (change)="onFileSelect($event)" #fileInput name="logo" type="file" name="Profile Image"
+                  fxFlex="30" />
+                @if(imgSrc){
+                <img class="full-width" [src]="imgSrc" />
+                } @if(!imgSrc){
+                <img class="full-width" src="/images/company-logo.jpg" />
+                }
+                <div class="row my-2" [dir]="langDir">
+                  <div class="col-sm-12">
+                    @if (!imgSrc) {
+                    <button type="button" class="success me-2" matButton="filled" (click)="fileInput.click()">
+                      <mat-icon class="medium-icon fs-5 align-middle">image</mat-icon>
+                      <span class="d-none d-sm-inline">{{ 'ADD_LOGO' | translate }}</span>
+                    </button>
+                    } @if (imgSrc) {
+                    <button type="button" class="success me-2 mt-2 py-4" [ngClass]="{ 'py-4': isDialog }"
+                      matButton="filled" (click)="fileInput.click()">
+                      <mat-icon class="medium-icon fs-5 align-middle">image</mat-icon>
+                      <span class="d-none d-sm-inline">{{ 'CHANGE_LOGO' | translate }}</span>
+                    </button>
+                    <button type="button" (click)="onRemoveImage()" class="error me-2 mt-2"
+                      [ngClass]="{ 'py-4': isDialog }" matButton="filled">
+                      <mat-icon class="medium-icon fs-5 align-middle">delete</mat-icon>
+                      <span class="d-none d-sm-inline">{{ 'REMOVE_LOGO' | translate }}</span>
+                    </button>
+                    }
+                  </div>
+                </div>
+              </mat-card>
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-md-12 mt-2">
+              <button *hasClaim="['CUST_ADD_CUSTOMER', 'CUST_UPDATE_CUSTOMER']" type="submit" class="success me-2"
+                matButton="filled">
+                <mat-icon class="medium-icon fs-5 align-middle">save</mat-icon>
+                {{ 'SAVE' | translate }}
+              </button>
+              <button type="button" class="error" matButton="filled" (click)="onCustomerList()">
+                <mat-icon class="medium-icon fs-5 align-middle">cancel</mat-icon>
+                {{ 'CANCEL' | translate }}
+              </button>
+            </div>
+          </div>
+        </mat-card-content>
+      </mat-card>
+    </form>
+  </div>
+</section>

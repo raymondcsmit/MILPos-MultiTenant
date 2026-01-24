@@ -1,0 +1,75 @@
+<mat-card appearance="outlined" class="mb-4">
+  <mat-card-header>
+    <div class="col-md-12 mb-0 d-flex justify-content-between">
+      <span class="mb-4 page-title">
+        {{ "ATTACHMENTS" | translate }}
+      </span>
+      <button *hasClaim="'INQ_ADD_INQUIRY'" class="primary me-2" matButton="filled" (click)="onAddInquiryAttachement()">
+        <mat-icon class="medium-icon fs-5 align-middle">attach_file</mat-icon>
+        <span class="ml-1">{{'ADD_ATTACHMENT' | translate}}</span>
+      </button>
+    </div>
+  </mat-card-header>
+  <mat-card-content>
+    <div class="row">
+      <div class="table-responsive">
+        <table [dir]="langDir" mat-table [dataSource]="inquiryAttachments">
+          <ng-container matColumnDef="action">
+            <th mat-header-cell *matHeaderCellDef class="w-25"> {{'ACTION' | translate}} </th>
+            <td mat-cell *matCellDef="let inquiryAttachment">
+              <!-- <button class="primary me-2" matButton="filled" (click)="onDownload(inquiryAttachment)"
+                aria-label="Download">
+                <mat-icon class="medium-icon fs-5 align-middle">download</mat-icon>
+                <span class="ml-1">{{'DOWNLOAD' | translate}}</span>
+              </button>
+              <button class="error" matButton="filled" (click)="onDeleted(inquiryAttachment)" aria-label="Delete">
+                <mat-icon class="medium-icon fs-5 align-middle">delete</mat-icon>
+                <span class="ml-1">{{'DELETE' | translate}}</span>
+              </button> -->
+              <div class="d-flex gap-2">
+                <button matMiniFab (click)="onDownload(inquiryAttachment)" class="warning">
+                  <mat-icon>download</mat-icon>
+                </button>
+                <button matMiniFab (click)="onDeleted(inquiryAttachment)" class="error" aria-label="Delete">
+                  <mat-icon class="medium-icon fs-5 align-middle">delete</mat-icon>
+                </button>
+              </div>
+            </td>
+          </ng-container>
+          <ng-container matColumnDef="name">
+            <th mat-header-cell *matHeaderCellDef> {{'NAME' | translate}} </th>
+            <td mat-cell *matCellDef="let inquiryAttachment"> {{inquiryAttachment.name}}
+            </td>
+          </ng-container>
+          <ng-container matColumnDef="createdDate">
+            <th mat-header-cell *matHeaderCellDef> {{'CREATED_DATE' | translate}} </th>
+            <td mat-cell *matCellDef="let inquiryAttachment">
+              {{inquiryAttachment.createdDate |
+              utcToLocalTime:'shortDate'}} </td>
+          </ng-container>
+
+          <ng-container matColumnDef="assignToName">
+            <th mat-header-cell *matHeaderCellDef> {{'CREATED_USER' | translate}}</th>
+            <td mat-cell *matCellDef="let inquiryAttachment">
+              {{inquiryAttachment?.createdByUser?.firstName}}
+              {{inquiryAttachment?.createdByUser?.lastName}}
+            </td>
+          </ng-container>
+          <tr class="grid-header-color" mat-header-row *matHeaderRowDef="displayedColumns;sticky: true"></tr>
+          <tr mat-row *matRowDef="let row; columns: displayedColumns;" [ngClass]="{
+                              'odd-row': isOddDataRow(getDataIndex(row)),
+                              'even-row': !isOddDataRow(getDataIndex(row))
+                            }"></tr>
+        </table>
+
+        @if(inquiryAttachments.length === 0){
+        <div class="row">
+          <div class="col-sm-12 ml-4 mt-3">
+            <label class="fw-bolder"> {{'NO_DATA_FOUND' | translate}}</label>
+          </div>
+        </div>
+        }
+      </div>
+    </div>
+  </mat-card-content>
+</mat-card>

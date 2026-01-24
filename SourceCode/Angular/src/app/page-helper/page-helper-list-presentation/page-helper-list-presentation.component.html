@@ -1,0 +1,63 @@
+<section class="content">
+  <div class="container-fluid">
+    <div class="d-flex mb-2">
+      <div class="me-auto">
+        <span class="page-title">{{ "PAGE_HELPER" | translate }}
+          <app-page-help-text code="PAGE_HELPERS"></app-page-help-text>
+        </span>
+      </div>
+    </div>
+    <mat-card appearance="outlined">
+      <mat-card-content>
+        <div class="table-responsive">
+          <div class="grid-height-large">
+            <table mat-table [dataSource]="pageHelpers" multiTemplateDataRows>
+              <ng-container matColumnDef="action">
+                <th class="table-column-200" mat-header-cell *matHeaderCellDef>
+                  {{ "ACTION" | translate }}
+                </th>
+                <td class="table-column-fix-250" mat-cell *matCellDef="let element">
+                  <div class="d-flex gap-2 my-1">
+                    <!-- <button (click)="managePageHelper(element)" class="primary me-2" matButton="filled" type="button">
+                    <mat-icon class="medium-icon fs-5 align-middle">edit</mat-icon>
+                    <span class="d-none d-sm-inline"> {{'EDIT' | translate}} </span>
+                  </button>
+                  <button (click)="viewPageHelper(element)" class="warning me-2" matButton="filled" type="button">
+                    <mat-icon class="medium-icon fs-5 align-middle">visibility</mat-icon>
+                    <span class="d-none d-sm-inline"> {{ "VIEW" | translate }}</span>
+                  </button> -->
+
+                    <button matMiniFab (click)="managePageHelper(element)" class="primary">
+                      <mat-icon class="medium-icon fs-5 align-middle">edit</mat-icon>
+                    </button>
+                    <button matMiniFab (click)="viewPageHelper(element)" class="neutral">
+                      <mat-icon class="medium-icon fs-5 align-middle">visibility</mat-icon>
+                    </button>
+                  </div>
+                </td>
+              </ng-container>
+              <!-- Name Column -->
+              <ng-container matColumnDef="name">
+                <th mat-header-cell *matHeaderCellDef>
+                  {{ "NAME" | translate }}
+                </th>
+                <td mat-cell *matCellDef="let element">{{ element.name }}</td>
+              </ng-container>
+              <ng-container matColumnDef="code">
+                <th mat-header-cell *matHeaderCellDef>
+                  {{ "CODE" | translate }}
+                </th>
+                <td mat-cell *matCellDef="let element">{{ element.code }}</td>
+              </ng-container>
+              <tr class="grid-header-color" mat-header-row *matHeaderRowDef="columnsToDisplay; sticky: true"></tr>
+              <tr mat-row *matRowDef="let row; columns: columnsToDisplay" [ngClass]="{
+              'odd-row': isOddDataRow(getDataIndex(row)),
+              'even-row': !isOddDataRow(getDataIndex(row))
+            }"></tr>
+            </table>
+          </div>
+        </div>
+      </mat-card-content>
+    </mat-card>
+  </div>
+</section>

@@ -1,0 +1,19 @@
+<mat-dialog-content>
+  <div class=" mb-0 d-flex justify-content-between">
+    <span class="mb-4 page-title">
+      {{ data.name }}
+      <mat-icon *hasClaim="'SETT_MANAGE_PAGE_HELPER'" class="cursor-pointer text-primary medium-icon fs-4 ms-1"
+        (click)="editPageHelper()">edit</mat-icon>
+    </span>
+    <mat-icon class="close-icon text-danger cursor-pointer" (click)="onCancel()">cancel</mat-icon>
+  </div>
+  <div class="row">
+    <div class="col-sm-12">
+      <div class="card-body">
+        <form class="row" [formGroup]="helperForm">
+          <app-text-editor [hideToolBar]="true" [disabled]="true" formControlName="description"></app-text-editor>
+        </form>
+      </div>
+    </div>
+  </div>
+</mat-dialog-content>

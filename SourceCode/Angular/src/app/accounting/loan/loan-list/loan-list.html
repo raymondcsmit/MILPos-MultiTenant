@@ -1,0 +1,128 @@
+<section class="content">
+  <div class="container-fluid">
+    <div class="d-flex mb-2">
+      <div class="me-auto">
+        <span class="mb-0 page-title">{{ 'LOAN' | translate }}
+          <app-page-help-text code="LOAN"></app-page-help-text>
+        </span>
+      </div>
+      <div class="d-flex justify-content-end">
+        <button *hasClaim="'LOAN_MANAGE_LOAN'" matButton="filled" class="primary"
+          [routerLink]="['/accounting/loan/addItem']">
+          <mat-icon class="medium-icon fs-5 align-middle">add</mat-icon>
+          {{ 'ADD_LOAN' | translate }}
+        </button>
+      </div>
+    </div>
+    <mat-card appearance="outlined">
+      <mat-card-content>
+        <div class="table-responsive">
+          <div class="grid-height-large">
+            <table [dir]="langDir" mat-table [dataSource]="loans" multiTemplateDataRows>
+              <ng-container matColumnDef="action">
+                <th mat-header-cell *matHeaderCellDef>{{ 'ACTION' | translate }}</th>
+                <td mat-cell *matCellDef="let loan">
+                  <div class="d-flex align-items-center my-1 gap-2">
+                    <button matMiniFab class="neutral" (click)="toggleRow(loan)">
+                      @if(loan != expandedElement){
+                      <mat-icon>chevron_right</mat-icon>
+                      } @if(loan == expandedElement){
+                      <mat-icon>expand_more</mat-icon>
+                      }
+                    </button>
+                    @if(loan.loanAmount != loan.totalPaidPricipalAmount){
+                    <button class="ms-3 primary" matButton="filled" *hasClaim="'LOAN_MANAGE_LOAN'" aria-label="Action"
+                      (click)="openLOanPaymentDialog(loan)">
+                      <mat-icon class="me-1 medium-icon align-middle">add</mat-icon>
+                      {{ 'ADD_PAYMENT' | translate }}
+                    </button>
+                    } @else {
+                    <button class="ms-3 success pe-none" matButton="filled">
+                      <mat-icon class="me-1 medium-icon align-middle">check_circle</mat-icon>
+                      {{ 'COMPLETED' | translate }}
+                    </button>
+                    }
+                  </div>
+                </td>
+              </ng-container>
+
+              <ng-container matColumnDef="loanName">
+                <th mat-header-cell *matHeaderCellDef>{{ 'ACCOUNT_NAME' | translate }}</th>
+                <td mat-cell *matCellDef="let loan">{{ loan.accountName }}</td>
+              </ng-container>
+
+              <ng-container matColumnDef="loanNumber">
+                <th mat-header-cell *matHeaderCellDef>{{ 'LOAN_NUMBER' | translate }}</th>
+                <td mat-cell *matCellDef="let loan">{{ loan.loanNumber }}</td>
+              </ng-container>
+
+              <ng-container matColumnDef="loanAmount">
+                <th mat-header-cell *matHeaderCellDef>{{ 'LOAN_AMOUNT' | translate }}</th>
+                <td mat-cell *matCellDef="let loan">{{ loan.loanAmount }}</td>
+              </ng-container>
+
+              <ng-container matColumnDef="paidPrincipal">
+                <th mat-header-cell *matHeaderCellDef>{{ 'PAID_PRINCIPAL' | translate }}</th>
+                <td mat-cell *matCellDef="let loan">{{ loan.totalPaidPricipalAmount || 0 }}</td>
+              </ng-container>
+
+              <ng-container matColumnDef="paidInterest">
+                <th mat-header-cell *matHeaderCellDef>{{ 'PAID_INTEREST' | translate }}</th>
+                <td mat-cell *matCellDef="let loan">{{ loan.totalPaidInterestAmount || 0 }}</td>
+              </ng-container>
+
+              <ng-container matColumnDef="lenderName">
+                <th mat-header-cell *matHeaderCellDef>{{ 'LENDER_NAME' | translate }}</th>
+                <td mat-cell *matCellDef="let loan">{{ loan.lenderName }}</td>
+              </ng-container>
+
+              <ng-container matColumnDef="loanDate">
+                <th mat-header-cell *matHeaderCellDef>{{ 'LOAN_DATE' | translate }}</th>
+                <td mat-cell *matCellDef="let loan">
+                  {{ loan.loanDate | utcToLocalTime : "shortDate" }}
+                </td>
+              </ng-container>
+
+              <ng-container matColumnDef="branch">
+                <th mat-header-cell *matHeaderCellDef>{{ 'BRANCH' | translate }}</th>
+                <td mat-cell *matCellDef="let loan">
+                  @if(loan.branchId) {
+                  {{ loan.branchName }}
+                  }
+                </td>
+              </ng-container>
+
+              <ng-container matColumnDef="expandedDetail">
+                <td mat-cell *matCellDef="let loan" [attr.colspan]="displayedColumns.length">
+                  @if(loan == expandedElement){
+                  <div animate.enter="expandanimation" animate.leave="collapseanimation" class="expandable-panel">
+                    <div class="my-2 mx-5">
+                      <app-loan-payment-list [loanId]="loan.id"></app-loan-payment-list>
+                    </div>
+                  </div>
+                  }
+                </td>
+              </ng-container>
+
+              <tr *matNoDataRow>
+                <td colspan="9">
+                  <span class="p-4 mt-4">
+                    <b> {{ 'NO_DATA_FOUND' | translate }}</b>
+                  </span>
+                </td>
+              </tr>
+
+              <tr class="grid-header-color" mat-header-row *matHeaderRowDef="displayedColumns; sticky: true"></tr>
+              <tr mat-row *matRowDef="let row; columns: displayedColumns" [ngClass]="{
+                              'odd-row': isOddDataRow(getDataIndex(row)),
+                              'even-row': !isOddDataRow(getDataIndex(row))
+                            }"></tr>
+              <tr mat-row *matRowDef="let row; columns: ['expandedDetail']" class="example-detail-row">
+              </tr>
+            </table>
+          </div>
+        </div>
+      </mat-card-content>
+    </mat-card>
+  </div>
+</section>

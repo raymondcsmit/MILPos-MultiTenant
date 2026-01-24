@@ -1,0 +1,141 @@
+<section class="content">
+  <div class="container-fluid">
+    <div class="row align-items-center">
+      <div class="col-md-6 mb-2">
+        <span class="mb-0 page-title">{{ "DAMAGE_STOCK" | translate }}
+          <app-page-help-text code="DAMAGED_STOCK"></app-page-help-text>
+        </span>
+      </div>
+      <div class="col-md-6 d-flex justify-content-end mb-2">
+        <button class="primary me-2" matButton="filled" [routerLink]="['/damaged-stock/add']">
+          <mat-icon class="medium-icon fs-5 align-middle">add</mat-icon>
+          {{ "ADD_DAMAGED_STOCK" | translate }}
+        </button>
+        <button class="error" matButton="filled" (click)="refresh()">
+          <mat-icon class="medium-icon fs-5 align-middle">refresh</mat-icon>
+          {{ "REFRESH" | translate }}
+        </button>
+      </div>
+    </div>
+    <mat-card appearance="outlined">
+      <mat-card-content>
+        <div class="table-responsive">
+          <div class="grid-height-large">
+            <table [dir]="langDir" mat-table matSortDisableClear [dataSource]="damagedStore.damagedStocks()" matSort
+              matSortActive="damagedDate" matSortDirection="desc">
+              <ng-container matColumnDef="damagedDate">
+                <th class="table-column-300" mat-header-cell *matHeaderCellDef mat-sort-header>
+                  {{ "DAMAGED_DATE" | translate }}
+                </th>
+                <td class="table-column-300" mat-cell *matCellDef="let damagedStock">
+                  {{ damagedStock.damagedDate | utcToLocalTime : "shortDate" }}
+                </td>
+              </ng-container>
+              <ng-container matColumnDef="product">
+                <th class="table-column-200" mat-header-cell *matHeaderCellDef mat-sort-header>
+                  {{ "PRODUCT" | translate }}
+                </th>
+                <td class="table-column-200" mat-cell *matCellDef="let damagedStock">
+                  {{ damagedStock.productName }}
+                </td>
+              </ng-container>
+              <ng-container matColumnDef="location">
+                <th class="table-column-200" mat-header-cell *matHeaderCellDef mat-sort-header>
+                  {{ "LOCATION" | translate }}
+                </th>
+                <td class="table-column-200" mat-cell *matCellDef="let damagedStock">
+                  {{ damagedStock.location }}
+                </td>
+              </ng-container>
+              <ng-container matColumnDef="damagedQuantity">
+                <th class="table-column-200" mat-header-cell *matHeaderCellDef mat-sort-header>
+                  {{ "DAMAGED_QUANTITY" | translate }}
+                </th>
+                <td class="table-column-200" mat-cell *matCellDef="let damagedStock">
+                  {{ damagedStock.damagedQuantity }}
+                </td>
+              </ng-container>
+
+              <ng-container matColumnDef="reason">
+                <th class="table-column-200" mat-header-cell *matHeaderCellDef>
+                  {{ "REASON" | translate }}
+                </th>
+                <td class="table-column-200" mat-cell *matCellDef="let damagedStock">
+                  {{ damagedStock.reason }}
+                </td>
+              </ng-container>
+
+              <ng-container matColumnDef="reportedBy">
+                <th class="table-column-200" mat-header-cell *matHeaderCellDef mat-sort-header>
+                  {{ "REPORTED_BY" | translate }}
+                </th>
+                <td class="table-column-200" mat-cell *matCellDef="let damagedStock">
+                  {{ damagedStock.reportedBy }}
+                </td>
+              </ng-container>
+              <ng-container matColumnDef="damagedDate-search">
+                <th mat-header-cell *matHeaderCellDef>
+                  <input type="text" placeholder="{{'DAMAGED_DATE' | translate}}" #fromDate
+                    (focus)="fromDatePicker.open()" [matDatepicker]="fromDatePicker" [(ngModel)]="DamagedDateFilter"
+                    class="form-control form-control-sm">
+                  <mat-datepicker #fromDatePicker (closed)="fromDate.blur()"></mat-datepicker>
+                </th>
+              </ng-container>
+              <ng-container matColumnDef="product-search">
+                <th mat-header-cell *matHeaderCellDef>
+                  <input type="text" class="form-control form-control-sm" [(ngModel)]="ProductFilter" />
+                </th>
+              </ng-container>
+              <ng-container matColumnDef="location-search">
+                <th mat-header-cell *matHeaderCellDef>
+                  <mat-select [dir]="langDir" placeholder="{{ 'LOCATION' | translate }}"
+                    class="form-control form-control-sm" [(ngModel)]="LocationFilter" panelClass="mat-select-control">
+                    <mat-option value="">{{ "NONE" | translate }}</mat-option>
+                    @for (location of locations; track location.id) {
+                    <mat-option [value]="location.id">
+                      {{ location.name }}
+                    </mat-option>
+                    }
+                  </mat-select>
+                </th>
+              </ng-container>
+              <ng-container matColumnDef="damagedQuantity-search">
+                <th mat-header-cell *matHeaderCellDef>
+                </th>
+              </ng-container>
+              <ng-container matColumnDef="reason-search">
+                <th mat-header-cell *matHeaderCellDef>
+                </th>
+              </ng-container>
+              <ng-container matColumnDef="reportedBy-search">
+                <th mat-header-cell *matHeaderCellDef>
+                </th>
+              </ng-container>
+              <ng-container matColumnDef="footer">
+                <td mat-footer-cell colspan="6" *matFooterCellDef>
+                  <mat-paginator [dir]="langDir" [length]="damagedStore.damagedStockResourceParameter().totalCount"
+                    [pageSize]="damagedStore.damagedStockResourceParameter().pageSize" [pageSizeOptions]="[15, 20, 30]">
+                  </mat-paginator>
+                </td>
+              </ng-container>
+              <tr *matNoDataRow>
+                <td colspan="6">
+                  <span class="p-4 mt-4">
+                    <b> {{ "NO_DATA_FOUND" | translate }}</b>
+                  </span>
+                </td>
+              </tr>
+              <tr class="grid-header-color" mat-header-row *matHeaderRowDef="displayedColumns; sticky: true"></tr>
+              <tr mat-row *matRowDef="let row; columns: displayedColumns" [ngClass]="{
+                              'odd-row': isOddDataRow(getDataIndex(row)),
+                              'even-row': !isOddDataRow(getDataIndex(row))
+                            }"></tr>
+              <tr style="height: 45px !important;" mat-header-row *matHeaderRowDef="searchColumns; sticky: true"></tr>
+              <tr mat-footer-row *matFooterRowDef="footerToDisplayed; sticky: true"></tr>
+            </table>
+          </div>
+        </div>
+      </mat-card-content>
+    </mat-card>
+  </div>
+</section>

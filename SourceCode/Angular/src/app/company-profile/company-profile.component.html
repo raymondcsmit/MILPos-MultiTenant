@@ -1,0 +1,139 @@
+<section class="content">
+  <div class="container-fluid">
+    <div class="row align-items-center">
+      <div class="col-md-6 mb-2">
+        <span class="mb-0 page-title">{{'COMPANY_PROFILE' | translate}}
+          <app-page-help-text code="COMPANY_PROFILE"></app-page-help-text>
+        </span>
+      </div>
+    </div>
+    <mat-card>
+      <mat-card-content>
+        <form [formGroup]="companyProfileForm" (ngSubmit)="saveCompanyProfile()">
+          <mat-card appearance="outlined">
+            <mat-card-content>
+              <div class="row">
+                <div class="col-md-12">
+                  <div class="form-row">
+                    <div class="row d-flex">
+                      <div class="col-md-6">
+                        <div class="col-md-12">
+                          <div class="form-group">
+                            <label class="form-label">{{'TITLE' | translate}}</label>
+                            <input formControlName="title" class="form-control form-control-sm" type="text">
+                          </div>
+                        </div>
+                        <div class="col-md-12">
+                          <label class="form-label text-danger">{{'CURRENCY' | translate}} <sup>*</sup></label>
+                          <mat-select [dir]="langDir" placeholder="{{'CURRENCY' | translate}}"
+                            class="form-control form-control-sm" panelClass="mat-select-control"
+                            formControlName="currencyCode">
+                            <input type="text" name="" id="" class="form-control form-control-sm"
+                              placeholder="{{'SEARCH' | translate}}" (input)="filterName($event.target.value)">
+                            @for(currency of filteredCurrencies; track $index){
+                            <mat-option [value]="currency.symbol">
+                              {{currency.name}} ({{currency.symbol}})
+                            </mat-option>
+                            }
+                          </mat-select>
+                          @if(companyProfileForm.get('currencyCode')?.touched &&
+                          companyProfileForm.get('currencyCode')?.errors?.['required']){
+                          <div class="text-danger">
+                            {{'CURRENCY_IS_REQUIRED' | translate}}
+                          </div>
+                          }
+                        </div>
+                      </div>
+                      <div class="col-md-6 d-flex justify-content-center">
+                        <div class="col-md-6 mt-2 ml-5">
+                          <mat-card appearance="outlined"
+                            class="cus-mat-card d-flex justify-content-center align-items-center" [dir]="langDir">
+                            <input hidden (change)="onFileSelect($event)" #fileInput name="logo" type="file"
+                              name="Profile Photo" fxFlex="30">
+                            @if(imgSrc){
+                            <img class="full-width company-logo" [src]="imgSrc" />
+                            }@else {
+                            <img class="full-width company-logo" src="/images/logo.png" />
+                            }
+                            <mat-card-actions>
+                              <button type="button" class="btn btn-success btn-sm mb-2" (click)="fileInput.click()">
+                                <mat-icon class="medium-icon fs-5 align-middle">image</mat-icon> {{'CHANGE_LOGO' |
+                                translate}}
+                              </button>
+                            </mat-card-actions>
+                          </mat-card>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="col-md-12">
+                      <div class="form-group">
+                        <label class="form-label text-danger">{{'ADDRESS' | translate}} <sup>*</sup></label>
+                        <textarea cols="30" rows="3" class="form-control form-control-sm" formControlName="address">
+                        </textarea>
+                      </div>
+                      @if(companyProfileForm.get('address')?.touched &&
+                      companyProfileForm.get('address')?.errors?.['required']){
+                      <div class="text-danger">
+                        {{'ADDRESS_IS_REQUIRED' | translate}}
+                      </div>
+                      }
+                    </div>
+                    <div class="col-md-12">
+                      <div class="row">
+                        <div class="col-md-6">
+                          <div class="form-group">
+                            <label class="form-label">{{'PHONE_NUMBER' | translate}}</label>
+                            <input formControlName="phone" class="form-control form-control-sm" type="text">
+                          </div>
+                        </div>
+                        <div class="col-md-6">
+                          <div class="form-group">
+                            <label class="form-label text-danger">{{'EMAIL' | translate}} <sup>*</sup></label>
+                            <input formControlName="email" class="form-control form-control-sm" type="text">
+                            @if(companyProfileForm.get('email')?.touched &&
+                            (companyProfileForm.get('email')?.errors?.['required'] ||
+                            companyProfileForm.get('email')?.errors?.['email'])){
+                            <div class="text-danger">
+                              {{'PLEASE_ENTER_VALID_EMAIL' | translate}}
+                            </div>
+                            }
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="col-md-12">
+                      <div class="row">
+                        <div class="col-md-6">
+                          <div class="form-group">
+                            <label class="form-label">{{'TAX_NAME' | translate}}</label>
+                            <input formControlName="taxName" class="form-control form-control-sm" type="text">
+                          </div>
+                        </div>
+                        <div class="col-md-6">
+                          <div class="form-group">
+                            <label class="form-label">{{'TAX_NUMBER' | translate}}</label>
+                            <input formControlName="taxNumber" class="form-control form-control-sm" type="text">
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+              </div>
+              <div class="col-md-12 mt-3">
+                <button type="submit" *hasClaim="'SETT_UPDATE_COM_PROFILE'" class="success me-2" matButton="filled"
+                  cdkFocusInitial>
+                  <mat-icon class="medium-icon fs-5 align-middle">save</mat-icon> {{'SAVE' | translate}}
+                </button>
+                <button class="error" matButton="filled" [routerLink]="['/dashboard']" type="button">
+                  <mat-icon class="medium-icon fs-5 align-middle">cancel</mat-icon> {{'CANCEL' | translate}}
+                </button>
+              </div>
+            </mat-card-content>
+          </mat-card>
+        </form>
+      </mat-card-content>
+    </mat-card>
+  </div>
+</section>

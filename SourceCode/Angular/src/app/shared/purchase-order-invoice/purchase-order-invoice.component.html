@@ -1,0 +1,281 @@
+<div style="position:absolute;left:-15420px;">
+  <div style="width:100%;display:flex;">
+    <div id="purchaseOrderInvoice">
+      <div class="container" style="width:95%;margin-right:auto;margin-left:auto;">
+        <div class="brand-section">
+          <div class="row" style="display: flex;flex-wrap: wrap;">
+            <div class="col-6" style="width: 50%;flex: 0 0 auto;">
+              <div>
+                @if(isquatation){
+                <h4 style="margin-bottom: 0px !important;">
+                  {{'PURCHASE_ORDER_REQUEST' | translate}}</h4>
+                } @else {
+                <h4 style="margin-bottom: 0px !important;font-size: 14px;">
+                  {{'PURCHASE_ORDER_INVOICE' | translate}}</h4>
+                }
+                <span>{{purchaseOrderForInvoice.orderNumber}}
+                </span>
+              </div>
+              <div>
+                <span> {{'ORDER_DATE' | translate}} :</span> {{purchaseOrderForInvoice.poCreatedDate
+                | utcToLocalTime:'shortDate'}}
+              </div>
+            </div>
+            <div class="col-6" style="width: 50%;flex: 0 0 auto;">
+              <div class="company-details" style="float: right;text-align: right;">
+                @if(companyProfile?.logoUrl){
+                <img class="img-fluid" style="max-height:50px;object-position: left;" [src]="companyProfile?.logoUrl" />
+                } @else {
+                <img class="img-fluid" style="max-height:50px; object-position: left;" src="/images/logo.png" />
+                }
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="body-section" style="padding:10px 10px 20px 20px;border: 1px solid gray;margin-top:10px;">
+          <div class="row" style="display:flex;flex-wrap: wrap;">
+            <div class="col-8" style="width:50%;flex: 0 0 auto;">
+              <h4 class="heading" style="margin-bottom: 2px;"><strong> {{'SUPPLIER' | translate}} : </strong> </h4>
+              <span style="font-size: 13px;"><strong>{{purchaseOrderForInvoice.supplier?.supplierName}}</strong>
+                <br></span>
+              @if(purchaseOrderForInvoice.supplier?.billingAddress){
+              <div style="width:50%;">
+                <span style="font-size: 12px;"> {{purchaseOrderForInvoice.supplier?.billingAddress?.address}} </span>
+              </div>
+              }
+              <div style="margin-top: 2px;">
+                @if(purchaseOrderForInvoice.supplier?.mobileNo){
+                <div style="font-size: 14px !important;">
+                  <strong style="font-size: 13px;"> {{'PHONE' | translate}} :</strong> <span style="font-size: 12px;">
+                    {{purchaseOrderForInvoice.supplier?.mobileNo}}</span>
+                </div>
+                }
+                @if(purchaseOrderForInvoice.supplier?.email){
+                <div style="font-size: 14px !important;">
+                  <strong style="font-size: 13px;"> {{'EMAIL' | translate}} :</strong> <span
+                    style="font-size: 12px;">{{purchaseOrderForInvoice.supplier?.email}}</span>
+                </div>
+                }
+                @if(purchaseOrderForInvoice.supplier?.taxNumber){
+                <div>
+                  <strong style="font-size: 13px;"> {{'TAX_NUMBER' | translate}} :</strong>
+                  <span style="font-size: 12px;">{{purchaseOrderForInvoice.supplier?.taxNumber}}</span>
+                </div>
+                }
+              </div>
+            </div>
+            <div class="col-4" style="width: 50%;flex: 0 0 auto;">
+              <h4 class="heading" style="margin-bottom: 2px;"><strong> {{'BUSINESS' | translate}} : </strong></h4>
+              <span style="font-size: 13px;"> <strong>{{purchaseOrderForInvoice.location?.name}}</strong> </span><br>
+              <div style="margin-top:3px;width: 60%;">
+                @if(purchaseOrderForInvoice.location?.address){
+                <div>
+                  <span style="font-size: 12px;"> {{purchaseOrderForInvoice.location?.address}} </span> <br>
+                </div>
+                }
+                <div style="margin-top: 2px;">
+                  @if(purchaseOrderForInvoice.location?.mobile){
+                  <div>
+                    <strong style="font-size: 13px;">{{'PHONE' | translate}}:</strong>
+                    <span style="font-size: 12px;"> {{purchaseOrderForInvoice.location?.mobile}} </span> <br>
+                  </div>
+                  }
+                  @if(purchaseOrderForInvoice.location?.email){
+                  <div>
+                    <strong style="font-size: 13px;">{{'EMAIL' | translate}}:</strong>
+                    <span style="font-size: 12px;"> {{purchaseOrderForInvoice.location?.email}} </span>
+                  </div>
+                  }
+                  @if(companyProfile?.taxName){
+                  <strong style="font-size: 13px;"> {{companyProfile?.taxName}}: </strong><span
+                    style="font-size: 12px;">{{companyProfile?.taxNumber}}</span>
+                  }
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="body-section" style="padding:16px;border: 1px solid gray;">
+          <h4 class="heading" style="margin-top:2px;">{{'PURCHASE_ORDER_ITEMS' | translate}}</h4>
+          <table class="table-bordered"
+            style="background-color: #fff;width:100%;border-collapse:collapse;box-shadow: 0px 0px 5px 0.5px #fff;">
+            <thead>
+              <tr style="border:1px solid #111;background-color:#fff;">
+                <th style="font-size: 13;padding-top:08px;padding-bottom:08px;border:1px solid #dee2e6;width:5%;">
+                  {{'NO' | translate}}
+                </th>
+                <th style="font-size: 13;padding-top:08px;padding-bottom:08px;border:1px solid #dee2e6; width:20%;">
+                  {{'DESCRIPTION' | translate}}</th>
+                <th class="w-20"
+                  style="font-size: 13;padding-top:08px;padding-bottom:08px;border:1px solid #dee2e6;width:20%;">
+                  {{'UNIT_PRICE' | translate}}</th>
+                <th class="w-20"
+                  style="font-size: 13;padding-top:08px;padding-bottom:08px;border:1px solid #dee2e6;width:8%;">
+                  {{'QUANTITY' | translate}} </th>
+                <th class="w-20"
+                  style="font-size: 13;padding-top:08px;padding-bottom:08px;border:1px solid #dee2e6;width:20%;">
+                  {{'DISCOUNT' | translate}}</th>
+                <th class="w-20"
+                  style="font-size: 13;padding-top:08px;padding-bottom:08px;border:1px solid #dee2e6;width:20%;">
+                  {{'TAX' | translate}}</th>
+                <th class="w-20"
+                  style="font-size: 13;padding-top:08px;padding-bottom:08px;border:1px solid #dee2e6;width:20%;">
+                  {{'TOTAL_AMOUNT' | translate}}</th>
+              </tr>
+            </thead>
+            <tbody>
+              @for(purchaseItem of purchaseOrderItems;let i=$index; track $index){
+              <tr>
+                <td style="font-size: 12px;vertical-align:middle!important;text-align:center;border:1px solid #dee2e6;">
+                  {{i+1}}</td>
+                <td style="font-size: 12px;vertical-align:middle!important;text-align:center;border:1px solid #dee2e6;">
+                  {{purchaseItem?.product?.name}}</td>
+                <td style="font-size: 12px;vertical-align:middle!important;text-align:center;border:1px solid #dee2e6;">
+                  {{purchaseItem.unitPrice | customCurrency}}</td>
+                <td style="font-size: 12px;vertical-align:middle!important;text-align:center;border:1px solid #dee2e6;">
+                  {{purchaseItem.quantity}} <span
+                    style="font-size: 10px;">({{purchaseItem?.unitConversation?.name}})</span></td>
+                <td style="font-size: 12px;vertical-align:middle!important;text-align:center;border:1px solid #dee2e6;">
+                  {{purchaseItem.discount | customCurrency}}</td>
+                <td style="font-size: 12px;vertical-align:middle!important;text-align:center;border:1px solid #dee2e6;">
+                  {{purchaseItem.taxValue | customCurrency}}
+                  @for(itemTax of purchaseItem.purchaseOrderItemTaxes;let last=$last; track $index){
+                  <span style="font-size: 10px;">
+                    {{itemTax?.taxName}}({{itemTax?.taxPercentage}}%)
+                    @if(!last){
+                    <span>,
+                    </span>
+                    }
+                  </span>
+                  }
+                </td>
+                <td style="font-size: 12px;vertical-align:middle!important;text-align:center;border:1px solid #dee2e6;">
+                  {{( ( purchaseItem?.quantity ?? 0) * ( purchaseItem?.unitPrice ?? 0) ) - purchaseItem.discount +
+                  purchaseItem.taxValue | customCurrency }}
+                </td>
+              </tr>
+              }
+              @if(purchaseOrderReturnsItems.length > 0){
+              <tr style="vertical-align:middle!important;border:1px solid #dee2e6;background-color: blanchedalmond;">
+                <td colspan="100%"><strong> {{'RETURNED_ITEMS' | translate}}</strong></td>
+              </tr>
+              }
+              @for(purchaseItem of purchaseOrderReturnsItems;let i=$index; track $index){
+              <tr style="background-color: blanchedalmond;">
+                <td style="font-size: 12px;vertical-align:middle!important;text-align:center;border:1px solid #dee2e6;">
+                  {{i+1}}</td>
+                <td style="font-size: 12px;vertical-align:middle!important;text-align:center;border:1px solid #dee2e6;">
+                  {{purchaseItem?.product?.name}}</td>
+                <td style="font-size: 12px;vertical-align:middle!important;text-align:center;border:1px solid #dee2e6;">
+                  {{purchaseItem.unitPrice | customCurrency}}</td>
+                <td style="font-size: 12px;vertical-align:middle!important;text-align:center;border:1px solid #dee2e6;">
+                  {{-1 * purchaseItem.quantity}}<br>
+                  <span style="font-size: 10px;">({{purchaseItem?.unitConversation?.name}})</span>
+                </td>
+                <td style="font-size: 12px;vertical-align:middle!important;text-align:center;border:1px solid #dee2e6;">
+                  {{-1 * purchaseItem.discount | customCurrency}}</td>
+                <td style="font-size: 12px;vertical-align:middle!important;text-align:center;border:1px solid #dee2e6;">
+                  {{-1 * purchaseItem.taxValue | customCurrency}}<br>
+                  @for(itemTax of purchaseItem.purchaseOrderItemTaxes;let last=$last; track $index){
+                  <span style="font-size: 10px;">
+                    {{itemTax?.taxName}}({{itemTax?.taxPercentage}}%)
+                    @if(!last){
+                    <span>,
+                    </span>
+                    }
+                  </span>
+                  }
+                </td>
+                <td style="font-size: 12px;vertical-align:middle!important;text-align:center;border:1px solid #dee2e6;">
+                  {{
+                  -1 * (((purchaseItem?.quantity ?? 0 )* ( purchaseItem?.unitPrice ?? 0)) - purchaseItem.discount +
+                  purchaseItem.taxValue) | customCurrency }}
+                </td>
+              </tr>
+              }
+              <tr>
+                <td colspan="3" class="text-end"
+                  style="font-size: 13;text-align:end;border:1px solid #dee2e6;font-weight: bold;">
+                  {{'TOTAL' | translate}}
+                </td>
+                <td class="text-end" style="font-size: 13;text-align:end;border:1px solid #dee2e6;font-weight: bold;">
+                  {{purchaseOrderForInvoice.totalQuantity}}
+                </td>
+                <td class="text-end" style="font-size: 13;text-align:end;border:1px solid #dee2e6;font-weight: bold;">
+                  {{purchaseOrderForInvoice.totalDiscount | customCurrency}}
+                </td>
+                <td class="text-end" style="font-size: 13;text-align:end;border:1px solid #dee2e6;font-weight: bold;">
+                  {{purchaseOrderForInvoice.totalTax | customCurrency}}
+                </td>
+                <td style="font-size: 13;text-align:end;border:1px solid #dee2e6;font-weight: bold;">
+                  {{purchaseOrderForInvoice.totalAmount | customCurrency}}
+                </td>
+              </tr>
+              <tr>
+                <td colspan="6" class="text-end"
+                  style="font-size: 13;text-align:end;border:1px solid #dee2e6;font-weight: bold;">
+                  {{'PAID' | translate}}
+                </td>
+                <td style="font-size: 13;text-align:end;border:1px solid #dee2e6;">
+                  {{purchaseOrderForInvoice.totalPaidAmount | customCurrency}}
+                </td>
+              </tr>
+              <tr>
+                <td colspan="6" class="text-end"
+                  style="font-size: 13;text-align:end;border:1px solid #dee2e6;font-weight: bold;">
+                  {{'REFUND' | translate}}
+                </td>
+                <td style="font-size: 13;text-align:end;border:1px solid #dee2e6;">
+                  {{-1 * purchaseOrderForInvoice.totalRefundAmount | customCurrency}}
+                </td>
+              </tr>
+              <tr>
+                <td colspan="6" class="text-end"
+                  style="font-size: 13;text-align:end;border:1px solid #dee2e6;font-weight: bold;">
+                  {{'BALANCE' | translate}}
+                </td>
+                <td style="font-size: 13; text-align:end;border:1px solid #dee2e6;">
+                  {{purchaseOrderForInvoice.totalAmount + purchaseOrderForInvoice.totalRefundAmount - (
+                  purchaseOrderForInvoice.totalPaidAmount ?? 0) |
+                  customCurrency}}
+                </td>
+              </tr>
+            </tbody>
+          </table>
+          @if(purchaseOrderForInvoice.termAndCondition){
+          <div style="display:flex;flex-wrap: wrap;margin-top: 20px;">
+            <h5 class="heading" style="margin-top:2px;font-size: 13;">{{'TERM_AND_CONDITION' | translate}}:</h5>
+            <span style="font-size: 12;"> {{purchaseOrderForInvoice.termAndCondition}}</span>
+          </div>
+          }
+          @if(purchaseOrderForInvoice.note){
+          <div class="row" style="display:flex;flex-wrap: wrap;margin-top: 20px;">
+            <h5 class="heading" style="margin-top:2px;font-size: 13;">{{'NOTE' | translate}}:</h5>
+            <span style="font-size: 12;">{{purchaseOrderForInvoice.note}}</span>
+          </div>
+          }
+
+          <div class="row" style="display:flex;flex-wrap: wrap;margin-top: 20px;">
+            <div class="col-8" style="width:60%;flex: 0 0 auto;margin-top: 10px;">
+              <strong style="font-size: 13;"> {{'PAYMENT_STATUS' | translate}}:</strong>
+              <span style="font-size: 12;"> {{purchaseOrderForInvoice.paymentStatus | paymentStatus}}</span>
+            </div>
+            <div class="col-4" style="width:40%;">
+              ___________________________ <span style="margin-left:40px;font-size: 13;">
+                {{'AUTHORIZED_SIGNATURE' | translate}}</span>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+@if(isVisible){
+<div class="spinner-container">
+  <div class="spinner-border text-primary" role="status">
+    <span class="visually-hidden">Loading...</span>
+  </div>
+</div>
+}

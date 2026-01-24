@@ -1,0 +1,170 @@
+<section class="content">
+  <div class="container-fluid">
+    <div class="row align-items-center">
+      <div class="col-md-6 mb-2">
+        <span class="mb-0 page-title">{{'SEND_EMAIL' | translate }}
+          <app-page-help-text code="SEND_EMAIL"></app-page-help-text>
+        </span>
+      </div>
+    </div>
+    <mat-card>
+      <mat-card-content>
+        <div class="row">
+          <div class="col-md-12 col-sm-12">
+            <div class="form-group">
+              <mat-label [dir]="langDir">
+                {{'SELECT_EMAIL_TAMPLATE' | translate }}
+              </mat-label>
+              <mat-select [dir]="langDir" placeholder="{{'SELECT_EMAIL_TAMPLATE' | translate}}" class="form-control"
+                panelClass="mat-select-control" name="selectedEmailTamplate" [(ngModel)]="selectedEmailTamplate"
+                (selectionChange)="onTempateChange()">
+                @for (tamplate of emailTamplates; let i = $index; track i) {
+                <mat-option [value]="tamplate">
+                  {{tamplate.name}}
+                </mat-option>
+                }
+                @if(emailTamplates.length===0){
+                <mat-option disabled>
+                  {{'NO_DATA_FOUND' | translate }}
+                </mat-option>
+                }
+              </mat-select>
+            </div>
+          </div>
+        </div>
+        <form [formGroup]="emailForm">
+          <mat-card appearance="outlined" class="mt-3">
+            <mat-card-content>
+              <div class="row">
+                <div class="col-md-12 mb-3">
+                  <div class="input-group">
+                    <span class="input-group-text text-danger" id="toAddress">
+                      {{'TO' | translate }}*
+                    </span>
+                    <input formControlName="toAddress" type="text" class="form-control"
+                      placeholder="{{'COMMA_SEPARATED_EMAILS' | translate}}" aria-label="To"
+                      aria-describedby="toAddress">
+                  </div>
+                  @if (emailForm.get('toAddress')?.touched && emailForm.get('toAddress')?.errors) {
+                  @if (emailForm.get('toAddress')?.errors?.['required']) {
+                  <div class="text-danger">
+                    {{'TO_ADDRESS_IS_REQUIRED' | translate }}
+                  </div>
+                  }
+                  }
+                </div>
+                <div class="col-md-12 mb-3">
+                  <div class="input-group">
+                    <span class="input-group-text" id="toAddress">
+                      {{'CC' | translate }}
+                    </span>
+                    <input formControlName="cCAddress" type="text" class="form-control"
+                      placeholder="{{'COMMA_SEPARATED_EMAILS' | translate}}" aria-label="To"
+                      aria-describedby="toAddress">
+                  </div>
+                </div>
+                <div class="col-md-12 mb-3">
+                  <div class="input-group">
+                    <span class="input-group-text text-danger" id="subject">
+                      {{'SUBJECT' | translate }} *
+                    </span>
+                    <input formControlName="subject" type="text" class="form-control"
+                      placeholder="{{'SUBJECT' | translate }}" aria-label="To" aria-describedby="subject">
+                  </div>
+                  @if (emailForm.get('subject')?.touched && emailForm.get('subject')?.errors) {
+                  @if (emailForm.get('subject')?.errors?.['required']) {
+                  <div class="text-danger">
+                    {{'SUBJECT_IS_REQUIRED' | translate }}
+                  </div>
+                  }
+                  }
+                </div>
+                <div class="col-md-12 mb-3">
+                  <div class="form-group">
+                    <label class="fw-bolder text-danger">
+                      {{'BODY' | translate }} *
+                    </label>
+                    <app-text-editor formControlName="body"></app-text-editor>
+                    @if (emailForm.get('body')?.touched && emailForm.get('body')?.errors) {
+                    @if (emailForm.get('body')?.errors?.['required']) {
+                    <div class="text-danger">
+                      {{'BODY_IS_REQUIRED' | translate }}
+                    </div>
+                    }
+                    }
+                  </div>
+                </div>
+                <div class="col-md-12" formArrayName="parameters">
+                  @if (parameters.controls.length>0) {
+                  <div class="row">
+                    <div class="col-md-6 fw-bolder">
+                      {{'PARAMETER_NAME' | translate }}
+                    </div>
+                    <div class="col-md-6 fw-bolder text-danger">
+                      {{'PARAMETER_VALUE' | translate }} *
+                    </div>
+                  </div>
+                  }
+                  @for (param of parameters.controls; let i = $index; track i) {
+                  <div class="row mt-1">
+                    <ng-container [formGroupName]="i">
+                      <div class="col-md-6">
+                        <input readonly class="form-control" type="text" formControlName="parameter">
+                      </div>
+                      <div class="col-md-6">
+                        <input (focusout)="setParameterValue()" class="form-control" type="text"
+                          formControlName="value">
+                        @if (param.get('value')?.touched && param.get('value')?.errors) {
+                        @if (param.get('value')?.errors?.['required']) {
+                        <div class="text-danger">
+                          {{'PARAMETER_VALUE_IS_REQUIRED' | translate }}
+                        </div>
+                        }
+                        }
+                      </div>
+                    </ng-container>
+                  </div>
+                  }
+                </div>
+                <div class="col-md-12 mb-3">
+                  <div class="form-group">
+                    <label class="fw-bolder"> {{'ATTACHMENTS' | translate}} </label>
+                    <div class="dropzone" appDragDrop (onFileDropped)="onFileDropped($event)">
+                      <input type="file" #fileDropRef id="fileDropRef" multiple
+                        (change)="fileBrowseHandler($event.target.files)" />
+                      <mat-icon>upload</mat-icon>
+                      <h3>{{'DRAG_AND_DROP_FILE_HERE' | translate}}</h3>
+                      <h3>{{'OR' | translate}}</h3>
+                      <label for="fileDropRef">{{'BROWSE_FOR_FILE' | translate}}</label>
+                    </div>
+                  </div>
+                </div>
+                <div class="col-md-12">
+                  <ul class="list-group">
+                    @for (file of files; let i = $index; track i) {
+                    <li class="list-group-item d-flex justify-content-between align-items-center">
+                      <h5 class="name text-primary">
+                        {{ file?.name }} -- {{ formatBytes(file?.size) }}
+                      </h5>
+                      <span class="badge badge-pill">
+                        <mat-icon class="text-danger" (click)="onDeleteFile(i)"
+                          style="cursor:pointer;">delete</mat-icon>
+                      </span>
+                    </li>
+                    }
+                  </ul>
+                </div>
+                <div class="col-md-12 mt-2" *hasClaim="'EMAIL_SEND_EMAIL'">
+                  <button (click)="sendEmail()" type="submit" class="success" matButton="filled">
+                    <mat-icon class="medium-icon fs-5 align-middle">send</mat-icon>
+                    {{'SEND' | translate }}
+                  </button>
+                </div>
+              </div>
+            </mat-card-content>
+          </mat-card>
+        </form>
+      </mat-card-content>
+    </mat-card>
+  </div>
+</section>

@@ -1,0 +1,30 @@
+.hr {
+  border-bottom: 1px solid #2095F3;
+}
+
+.max-width-120 {
+  width: 200px;
+}
+
+.max-width-40 {
+  width: 40px;
+}
+
+::ng-deep .mat-mdc-radio-button .mat-internal-form-field {
+  font-size: 12px !important;
+}
+
+@media screen and (min-width: 768px) and (max-width: 1024px) {
+  .fixed-select {
+    width: 110px;
+    /* fixed width */
+  }
+
+  .max-width-120 {
+    width: 100px;
+  }
+
+  .max-width-40 {
+    width: 40px;
+  }
+}

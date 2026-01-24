@@ -1,0 +1,379 @@
+<section class="content pos-content">
+  <div class="container-fluid">
+    <form autocomplete="off" [formGroup]="salesOrderForm">
+      <div class="row">
+        <div class="col-sm-12 col-lg-3 mt-2">
+          <mat-card appearance="outlined">
+            <mat-card-content>
+              <div class="row">
+                <div class="col-6 mb-2">
+                  <button type="button" class="primary w-100" matButton="filled" (click)="toggleDrawer('CATEGORY')">
+                    {{ 'CATEGORY' | translate }}
+                  </button>
+                </div>
+                <div class="col-6 mb-2">
+                  <button type="button" class="secondary w-100" matButton="filled" (click)="toggleDrawer('BRAND')">
+                    {{ 'BRAND' | translate }}
+                  </button>
+                </div>
+                <!-- Category Drawer -->
+                @if (isCategoryOpen) {
+                <app-category-drawer [isOpen]="isCategoryOpen" [categories]="categories"
+                  [selectedCategoryId]="selectedCategoryId" (select)="onCategorySelected($event)"
+                  (close)="isCategoryOpen = false"></app-category-drawer>
+                }
+
+                <!-- Brand Drawer -->
+                @if (isBrandOpen) {
+                <app-brand-drawer [isOpen]="isBrandOpen" [brands]="brands" [selectedBrandId]="selectedBrandId"
+                  (select)="onBrandSelected($event)" (close)="isBrandOpen = false"></app-brand-drawer>
+                }
+              </div>
+              <div class="row">
+                <div class="col-sm-12">
+                  <input class="form-control form-control-sm" formControlName="filterProductValue" type="text"
+                    autocomplete="off" placeholder="{{ 'SEARCH_BY_NAME' | translate }}" />
+                </div>
+              </div>
+              <div class="row mt-1">
+                <div class="col-sm-12">
+                  <input #filterValue class="form-control form-control-sm" formControlName="filterBarCodeValue"
+                    type="text" autocomplete="off" placeholder="{{ 'SCAN_BARCODE' | translate }}" />
+                </div>
+              </div>
+              <div class="d-flex flex-wrap gap-1 p-1 mt-2 product-list">
+                @for (a of filterProducts; let i = $index; track $index) {
+                <!-- <div class="col-sm-4"> -->
+                <div class="card card-pos cursor-pointer " (click)="onProductSelect(a)">
+                  <div class="text-center card-text">{{ a.name }}</div>
+                  <div class="card-body d-flex justify-content-center align-items-center">
+                    @if (a.productUrl) {
+                    <img [src]="baseUrl + a.productUrl" class="product-img" />
+                    } @else {
+                    <img src="/images/no-preview.jpg" class="product-img" alt="{{ 'PRODUCT_IMAGE' | translate }}" />
+                    }
+                  </div>
+                  <!-- </div> -->
+                </div>
+                }
+              </div>
+              @if (filterProducts.length == 0) {
+              <div>
+                <b>{{ 'NO_DATA_FOUND' | translate }}</b>
+              </div>
+              }
+            </mat-card-content>
+          </mat-card>
+        </div>
+        <div class="col-sm-12 col-lg-9 mt-2">
+          <mat-card appearance="outlined">
+            <mat-card-content>
+              <div class="row">
+                <div class="col-sm-5">
+                  <label class="text-danger">{{ 'CUSTOMER_NAME' | translate }} *</label>
+                  <div class="input-group">
+                    <mat-select formControlName="customerId" [dir]="langDir"
+                      placeholder="{{ 'SELECT_CUSTOMER' | translate }}" class="form-control form-control-sm"
+                      panelClass="mat-select-control">
+                      <input class="form-control form-control-sm" formControlName="filerCustomer" focused="'true'"
+                        type="text" autocomplete="off" placeholder="{{ 'SEARCH_OTHER_CUSTOMERS' | translate }} " />
+                      <mat-divider></mat-divider>
+                      @for (customer of customers; track $index) {
+                      <mat-option [value]="customer.id">
+                        {{ customer.customerName }}
+                      </mat-option>
+                      } @if (customers.length == 0) {
+                      <mat-option value="">
+                        {{ 'NO_RECORDS' | translate }}
+                      </mat-option>
+                      }
+                    </mat-select>
+                    <button *hasClaim="'CUST_ADD_CUSTOMER'" class="btn btn-primary" type="button"
+                      (click)="addNewCustomer()">
+                      <mat-icon class="medium-icon fs-5 align-middle">add</mat-icon>
+                    </button>
+                  </div>
+
+                  @if (salesOrderForm.get('customerId')?.touched &&
+                  salesOrderForm.get('customerId')?.errors) { @if
+                  (salesOrderForm.get('customerId')?.errors?.['required']) {
+                  <div class="text-danger">
+                    {{ 'CUSTOMER_NAME_IS_REQUIRED' | translate }}
+                  </div>
+                  } }
+                </div>
+                <div class="col-md-4">
+                  <div class="form-group">
+                    <label class="text-danger">{{ 'BUSINESS_LOCATION' | translate }} *</label>
+                    <div class="input-group">
+                      <mat-select [dir]="langDir" formControlName="locationId"
+                        placeholder="{{ 'BUSINESS_LOCATION' | translate }}" class="form-control form-control-sm"
+                        panelClass="mat-select-control">
+                        @for (location of locations; track $index) {
+                        <mat-option [value]="location.id">
+                          {{ location.name }}
+                        </mat-option>
+                        } @if (locations.length == 0) {
+                        <mat-option value="">
+                          {{ 'NO_RECORDS' | translate }}
+                        </mat-option>
+                        }
+                      </mat-select>
+                    </div>
+                    @if (salesOrderForm.get('locationId')?.touched &&
+                    salesOrderForm.get('locationId')?.errors) { @if
+                    (salesOrderForm.get('locationId')?.errors?.['required']) {
+                    <div class="text-danger">
+                      {{ 'BUSINESS_LOCATION_IS_REQUIRED' | translate }}
+                    </div>
+                    } }
+                  </div>
+                </div>
+                <div class="col-md-3">
+                  <div class="form-group">
+                    <label class="text-danger">{{ 'DELIVERY_STATUS' | translate }} *</label>
+                    <div class="input-group">
+                      <mat-select [dir]="langDir" formControlName="deliveryStatus"
+                        placeholder="{{ 'DELIVERY_STATUS' | translate }}" class="form-control form-control-sm"
+                        panelClass="mat-select-control">
+                        @for (deliveryStatus of salesDeliveryStatus; track $index) {
+                        <mat-option [value]="deliveryStatus.id">
+                          {{ deliveryStatus.name | translate }}
+                        </mat-option>
+                        }
+                      </mat-select>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div class="row">
+                <div class="col-sm-12 col-md-12 col-lg-12 mt-2">
+                  <div class="row">
+                    <div class="col-sm-12" formArrayName="salesOrderItems">
+                      <div class="row">
+                        <div class="col">
+                          <div class="table-responsive">
+                            <table class="w-100 table table-pos table-bordered">
+                              <thead>
+                                <tr class="grid-header-color">
+                                  <th class="table-column-150">
+                                    {{ 'PRODUCT' | translate }}
+                                  </th>
+                                  <th class="table-column-150">{{ 'UNIT' | translate }}</th>
+                                  <th class="table-column-110">
+                                    {{ 'PRICE' | translate }}
+                                  </th>
+                                  <th class="table-column-80">
+                                    {{ 'QUANTITY' | translate }}
+                                  </th>
+                                  <th class="table-column-150">
+                                    {{ 'TOTAL' | translate }}
+                                  </th>
+                                </tr>
+                              </thead>
+                              <tbody>
+                                @for (salesOrderItem of salesOrderItemsArray.controls; track $index;
+                                let i = $index) {
+                                <tr [ngClass]="{ 'odd-row': i % 2 === 0, 'even-row': i % 2 !== 0 }" [formGroupName]="i">
+                                  <td>
+                                    <div class="d-flex flex-column gap-1">
+                                      <div class="d-flex gap-2">
+                                        @if (salesOrderItemsArray.controls.length !== 1) {
+                                        <button matMiniFab class="error" (click)="onRemoveSalesOrderItem(i)">
+                                          <mat-icon class="medium-icon fs-5 align-middle">delete</mat-icon>
+                                        </button>
+                                        } @if (salesOrderItem.get('productUrl')?.value) {
+                                        <img class="d-none d-lg-inline img-thumbnail grid-img-thumbnail"
+                                          [src]="baseUrl + salesOrderItem.get('productUrl')?.value"
+                                          alt="{{ 'PRODUCT_IMAGE' | translate }}" />
+                                        } @else {
+                                        <img class="d-none d-lg-inline img-thumbnail grid-img-thumbnail"
+                                          src="/images/no-preview.jpg" alt="{{ 'PRODUCT_IMAGE' | translate }}" />
+                                        }
+                                      </div>
+                                      <span class="ms-1">
+                                        {{ salesOrderItem.get('productName')?.value }}
+                                      </span>
+                                    </div>
+                                  </td>
+                                  <td>
+                                    <div class="d-flex flex-column gap-1">
+                                      <mat-select [dir]="langDir" formControlName="unitId"
+                                        (selectionChange)="onSelectionChange($event.value, i)"
+                                        class="form-control form-control-sm" panelClass="mat-select-control">
+                                        @for (a of unitsMap[i]; track a.id) {
+                                        <mat-option [dir]="langDir" [value]="a.id">
+                                          {{ a.name }}
+                                        </mat-option>
+                                        }
+                                      </mat-select>
+
+                                      @if (salesOrderItem.get('unitId')?.touched &&
+                                      salesOrderItem.get('unitId')?.errors) { @if
+                                      (salesOrderItem.get('unitId')?.errors?.['required']) {
+                                      <div class="text-danger">
+                                        {{ 'UNIT_IS_REQUIRED' | translate }}
+                                      </div>
+                                      } }
+                                    </div>
+                                  </td>
+                                  <td>
+                                    <div class="d-flex flex-column gap-1">
+                                      <input class="form-control form-control-sm" type="number"
+                                        (change)="onUnitPriceChange()" formControlName="unitPrice"
+                                        placeholder="{{ 'UNIT_PER_PRICE' | translate }}" />
+                                      @if (salesOrderItem.get('unitPrice')?.touched &&
+                                      salesOrderItem.get('unitPrice')?.errors) { @if
+                                      (salesOrderItem.get('unitPrice')?.errors?.['required'])
+                                      {
+                                      <div class="text-danger">
+                                        {{ 'UNIT_PER_PRICE_IS_REQUIRED' | translate }}
+                                      </div>
+                                      } @if (salesOrderItem.get('unitPrice')?.errors?.['min'])
+                                      {
+                                      <div class="text-danger">
+                                        {{ 'PRICE_SHOULD_BE_MORE_THEN_0' | translate }}
+                                      </div>
+                                      } }
+                                    </div>
+                                  </td>
+                                  <td>
+                                    <div class="d-flex flex-column gap-1">
+                                      <input class="form-control form-control-sm" type="number"
+                                        (change)="onQuantityChange()" formControlName="quantity"
+                                        placeholder="{{ 'QUANTITY' | translate }}" />
+                                      @if (salesOrderItem.get('quantity')?.touched &&
+                                      salesOrderItem.get('quantity')?.errors) { @if
+                                      (salesOrderItem.get('quantity')?.errors?.['required']) {
+                                      <div class="text-danger">
+                                        {{ 'QUANTITY_IS_REQUIRED' | translate }}
+                                      </div>
+                                      } @if (salesOrderItem.get('quantity')?.errors?.['min'])
+                                      {
+                                      <div class="text-danger">
+                                        {{ 'QUANTITY_SHOULD_BE_MORE_THEN_0' | translate }}
+                                      </div>
+                                      } }
+                                    </div>
+                                  </td>
+                                  <td>
+                                    <input class="form-control form-control-sm" type="number"
+                                      (change)="onTotalChange(i)" formControlName="total"
+                                      placeholder="{{ 'TOTAL' | translate }}" />
+                                    @if (salesOrderItem.get('taxValue')?.value) {
+                                    <div class="text-danger">
+                                      {{ 'TAX_AMOUNT' | translate }}
+                                      @if(salesOrderItem.get('taxPercentage')?.value !=0){ ({{
+                                      salesOrderItem.get('taxPercentage')?.value
+                                      }}%) } :
+                                      {{
+                                      salesOrderItem.get('quantity')?.value
+                                      | quantitiesunitpriceTax
+                                      : salesOrderItem.get('unitPrice')?.value
+                                      : salesOrderItem.get('discountPercentage')?.value
+                                      : salesOrderItem.get('taxValue')?.value
+                                      : taxsMap[i]
+                                      : 'fixed'
+                                      | customCurrency
+                                      }}
+                                    </div>
+                                    }
+                                  </td>
+                                </tr>
+                                }
+                              </tbody>
+                            </table>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="row mt-1">
+                    <div class="col-9 text-end fw-bolder">
+                      {{ 'SUB_TOTAL_BEFORE_DISCOUNT' | translate }}:
+                    </div>
+                    <div class="col-3 text-start fw-bolder">
+                      {{ totalBeforeDiscount | customCurrency }}
+                    </div>
+                  </div>
+                  <div class="row">
+                    <div class="col-9 text-end fw-bolder">
+                      {{ 'TOTAL_TAX' | translate }}:
+                    </div>
+                    <div class="col-3 text-start text-danger fw-bolder">
+                      {{ totalTax | customCurrency }}
+                    </div>
+                  </div>
+                  <div class="row">
+                    <div class="col-9 text-end fw-bolder">{{ 'TOTAL_DISCOUNT' | translate }}:</div>
+                    <div class="col-3 text-start text-danger fw-bolder">
+                      {{ totalDiscount | customCurrency }}
+                    </div>
+                  </div>
+                  <div class="row">
+                    <div class="col-12"><mat-divider></mat-divider></div>
+                  </div>
+                  <div class="row">
+                    <div class="col-9 text-end fw-bolder">{{ 'GRAND_TOTAL' | translate }} :</div>
+                    <div class="col-3 text-start fw-bolder">
+                      {{ grandTotal | customCurrency }}
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div class="row">
+                <div class="col-md-12 row mb-1">
+                  <div class="row">
+                    <div class="col-lg-2 col-sm-6">
+                      <div class="form-group">
+                        <label for="referenceNumber" class="form-label">{{
+                          'PAYMENT_METHOD' | translate
+                          }}</label>
+                        <mat-select [dir]="langDir" panelClass="mat-select-control"
+                          placeholder="{{ 'SELECT_PAYING_BY' | translate }}" class="form-control form-control-sm"
+                          formControlName="paymentMethod">
+                          @for (paymentMethod of paymentMethodslist; track paymentMethod.id) {
+                          <mat-option [dir]="langDir" [value]="paymentMethod?.id">
+                            {{ paymentMethod?.id | paymentmethod }}
+                          </mat-option>
+                          }
+                        </mat-select>
+                      </div>
+                    </div>
+                    <div class="col-lg-2 col-sm-6">
+                      <div class="form-group">
+                        <label for="referenceNumber" class="form-label">{{
+                          'REFERENCE_NUMBER' | translate
+                          }}</label>
+                        <input formControlName="referenceNumber" type="text" class="form-control"
+                          id="referenceNumber" />
+                      </div>
+                    </div>
+                    <div class="col-lg-8 col-sm-12 mt-4">
+                      <div class="d-flex justify-content-end">
+                        <button type="button" (click)="onSalesOrderSubmit()" class="success me-2" matButton="filled"
+                          *hasClaim="['SO_ADD_SO', 'SO_UPDATE_SO', 'SO_RETURN_SO', 'POS_POS']">
+                          <mat-icon class="medium-icon fs-5 align-middle">save</mat-icon>
+                          {{ 'PAY' | translate }}
+                        </button>
+                        @if (!hasOnlyPOSPermission) {
+                        <button type="button" (click)="onSalesOrderList()" class="error" matButton="filled">
+                          <mat-icon class="medium-icon fs-5 align-middle">cancel</mat-icon>
+                          {{ 'CANCEL' | translate }}
+                        </button>
+                        }
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </mat-card-content>
+          </mat-card>
+        </div>
+      </div>
+    </form>
+  </div>
+</section>
+@if(salesOrderForInvoice){
+<app-sales-order-invoice [sendEmail]="false" [salesOrder]="salesOrderForInvoice"></app-sales-order-invoice>
+}

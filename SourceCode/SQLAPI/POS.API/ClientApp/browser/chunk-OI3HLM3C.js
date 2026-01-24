@@ -1,0 +1,1 @@
+function a(i){let t=i.get("discountPercentage")?.value??0,e=i.get("discountType")?.value,n=i.get("quantity")?.value??0,r=i.get("unitPrice")?.value??0;if(e==="fixed"&&t<0)return{invalidFixedDiscount:!0};if(e==="fixed"&&t>0){let u=n*r;return t>u?{invalidFixedDiscount:!0}:null}return e==="percentage"&&(t<0||t>100)?{invalidPercentageDiscount:!0}:null}export{a};

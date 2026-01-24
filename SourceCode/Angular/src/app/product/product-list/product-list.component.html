@@ -1,0 +1,223 @@
+<section class="content">
+  <div class="container-fluid">
+    <div class="d-flex">
+      <div class="me-auto p-2">
+        <span class="mb-0 page-title">{{ "PRODUCTS" | translate }}
+          <app-page-help-text code="PRODUCTS"></app-page-help-text>
+        </span>
+      </div>
+      <div class="d-flex justify-content-end mb-2">
+        <button *hasClaim="'PRO_ADD_PRODUCT'" class="primary me-2" matButton="filled" [routerLink]="['/products/add']">
+          <mat-icon class="medium-icon align-middle fs-5">add</mat-icon>
+          <span class="d-none d-lg-inline"> {{ "ADD_PRODUCT" | translate }}</span>
+        </button>
+        <button class="error me-2" matButton="filled" (click)="refresh()">
+          <mat-icon class="medium-icon align-middle fs-5">refresh</mat-icon>
+          <span class="d-none d-lg-inline"> {{ "REFRESH" | translate }}</span>
+        </button>
+        <button class="secondary me-2" matButton="filled" (click)="onTableSettings()">
+          <mat-icon class="medium-icon align-middle fs-5">settings</mat-icon>
+          <span class="d-none d-lg-inline"> {{ "TABLE_SETTINGS" | translate }}</span>
+        </button>
+      </div>
+    </div>
+    <mat-card appearance="outlined">
+      <mat-card-content>
+        <div class="table-responsive">
+          <div class="grid-height-large">
+            <table [dir]="langDir" mat-table matSortDisableClear [dataSource]="this.productStore.products()" matSort
+              [matSortActive]="orderByColumn" [matSortDirection]="orderByDirection">
+              @for(column of tableSettingsStore.productsTableSettingsVisible(); track column.key){
+              <ng-container [matColumnDef]="column.key">
+                @if(column.key === 'action') {
+                <th [ngStyle]="{'min-width.px': column.width}" mat-header-cell *matHeaderCellDef>
+                </th>
+                <td [ngStyle]="{'min-width.px': column.width}" mat-cell *matCellDef="let product">
+                  <!-- <button mat-icon-button aria-label="Action">
+                    <mat-icon>more_vert</mat-icon>
+                  </button> -->
+                  <div class="d-flex gap-2 my-1">
+                    <button matMiniFab *hasClaim="'PRO_UPDATE_PRODUCT'" [routerLink]="['/products/manage',product.id]"
+                      class="primary">
+                      <mat-icon class="medium-icon fs-5 align-middle">edit</mat-icon>
+                    </button>
+                    <button matMiniFab *hasClaim="'PRO_DELETE_PRODUCT'" (click)="deleteProduct(product)" class="error">
+                      <mat-icon class="medium-icon fs-5 align-middle">delete</mat-icon>
+                    </button>
+                  </div>
+
+                  <!-- <button *hasClaim="['PRO_UPDATE_PRODUCT', 'PRO_DELETE_PRODUCT']" matMiniFab [matMenuTriggerFor]="menu"
+                    class="neutral">
+                    <mat-icon>more_vert</mat-icon>
+                  </button> -->
+
+                  <!-- <mat-menu #menu="matMenu" [dir]="langDir">
+                    <button *hasClaim="'PRO_UPDATE_PRODUCT'" [routerLink]="['/products/manage',product.id]"
+                      mat-menu-item>
+                     <mat-icon class="medium-icon fs-5 align-middle">edit</mat-icon>
+                      <span>{{'EDIT' | translate}}</span>
+                    </button>
+                    <button *hasClaim="'PRO_DELETE_PRODUCT'" mat-menu-item (click)="deleteProduct(product)">
+                      <mat-icon>delete</mat-icon>
+                      <span>{{'DELETE' | translate}}</span>
+                    </button>
+                  </mat-menu> -->
+                </td>
+                }
+                @else if(column.key === 'imageUrl') {
+                <th mat-header-cell *matHeaderCellDef mat-sort-header [disabled]="!column.allowSort"
+                  [ngStyle]="{'min-width.px': column.width}">
+                  <!-- {{ column.header | translate }} -->
+                </th>
+                <td mat-cell *matCellDef="let product" [ngStyle]="{'min-width.px': column.width}">
+                  @if(product.productUrl){
+                  <img class="img-thumbnail grid-img-thumbnail" [src]="baseUrl + product.productUrl"
+                    alt="{{'PRODUCT_IMAGE' | translate}}">
+                  } @else {
+                  <img class="img-thumbnail grid-img-thumbnail" src="/images/no-preview.jpg"
+                    alt="{{'PRODUCT_IMAGE' | translate}}">
+                  }
+                </td>
+                }
+                @else if(column.key === 'margin'){
+                <th [ngStyle]="{'min-width.px': column.width}" mat-header-cell *matHeaderCellDef mat-sort-header
+                  [disabled]="!column.allowSort">
+                  {{ column.header | translate }}
+                </th>
+                <td [ngStyle]="{'min-width.px': column.width}" mat-cell *matCellDef="let product">
+                  {{product.margin ? product.margin + '%' : ''}}
+                </td>
+                }
+                @else if(column.key === 'productTaxes'){
+                <th [ngStyle]="{'min-width.px': column.width}" mat-header-cell *matHeaderCellDef mat-sort-header
+                  [disabled]="!column.allowSort">
+                  {{ column.header | translate }}
+                </th>
+                <td [ngStyle]="{'min-width.px': column.width}" mat-cell *matCellDef="let product">
+                  @if (product.productTaxes.length > 0)
+                  {
+                  @for(productTax of product.productTaxes;let last = $last; track $index){
+                  <span>
+                    {{productTax.tax?.name}} ({{productTax.tax?.percentage}}%)
+                    @if(!last){
+                    {{","}}
+                    }
+                  </span>
+                  }
+                  }
+                </td>
+                }
+                @else if(column.type === 'currency'){
+                <th [ngStyle]="{'min-width.px': column.width}" mat-header-cell *matHeaderCellDef mat-sort-header
+                  [disabled]="!column.allowSort">
+                  {{ column.header | translate }}
+                </th>
+                <td [ngStyle]="{'min-width.px': column.width}" mat-cell *matCellDef="let po">
+                  {{ po[column.key] | customCurrency}}
+                </td>
+                }
+                @else {
+                <th mat-header-cell *matHeaderCellDef mat-sort-header [disabled]="!column.allowSort"
+                  [ngStyle]="{'min-width.px': column.width}">
+                  {{ column.header | translate }}
+                </th>
+                <td mat-cell *matCellDef="let element" [ngStyle]="{'min-width.px': column.width}">
+                  {{ element[column.key] }}
+                </td>
+                }
+              </ng-container>
+              }
+              @for(column of tableSettingsStore.productsTableSettingsVisible(); track column.key){
+              <ng-container [matColumnDef]="column.key +'-search'">
+                @if(column.key === 'name') {
+                <th mat-header-cell *matHeaderCellDef>
+                  <input type="text" class="form-control form-control-sm" [(ngModel)]="NameFilter">
+                </th>
+                }
+                @else if(column.key == 'brandName') {
+                <th mat-header-cell *matHeaderCellDef>
+                  <mat-select placeholder="{{'BRAND' | translate}}" [(ngModel)]="BrandFilter"
+                    class="form-control form-control-sm" panelClass="mat-select-control">
+                    <mat-option value="">{{'NONE' | translate}}</mat-option>
+                    @for(brand of brands; track brand.id){
+                    <mat-option [value]="brand.id">
+                      {{brand.name}}
+                    </mat-option>
+                    }
+                  </mat-select>
+                </th>
+                }
+                @else if(column.key === 'categoryName') {
+                <th mat-header-cell *matHeaderCellDef class="table-column-200">
+                  <mat-select [dir]="langDir" panelClass="mat-select-control"
+                    placeholder="{{'SELECT_CATEGORY' | translate}}" class="form-control form-control-sm"
+                    [(ngModel)]="CategoryFilter">
+                    <mat-option value="">{{'NONE' | translate}}</mat-option>
+                    @for(category of allCategories; track category.id){
+                    <mat-option [dir]="langDir" [value]="category.id">
+                      <div class="country-item"
+                        [ngStyle]="langDir == 'ltr' ? {'margin-left.px': (category.deafLevel ?? 0) * 20} : {'margin-right.px': (category.deafLevel ?? 0) * 30}">
+                        @if(category.parentId){
+                        <div>
+                          {{category.name}}
+                        </div>
+                        }@else {
+                        <div>
+                          <b> {{category.name}}</b>
+                        </div>
+                        }
+                      </div>
+                    </mat-option>
+                    }
+                  </mat-select>
+                </th>
+                }
+                @else if(column.key === 'unitName') {
+                <th mat-header-cell *matHeaderCellDef>
+                  <mat-select [dir]="langDir" panelClass="mat-select-control" placeholder="{{'UNIT' | translate}}"
+                    [(ngModel)]="UnitFilter" class="form-control form-control-sm">
+                    <mat-option value="">{{'NONE' | translate}}</mat-option>
+                    @for(unit of units; track unit.id){
+                    <mat-option [value]="unit.id">
+                      {{unit.name}}
+                    </mat-option>
+                    }
+                  </mat-select>
+                </th>
+                }
+                @else {
+                <th mat-header-cell *matHeaderCellDef>
+                </th>
+                }
+              </ng-container>
+              }
+              <ng-container matColumnDef="footer">
+                <td mat-footer-cell [attr.colspan]="visibleTableKeys.length" *matFooterCellDef>
+                  <mat-paginator [dir]="langDir" [length]="productStore.productResourceParameter().totalCount"
+                    [pageSize]="productStore.productResourceParameter().pageSize" [pageSizeOptions]="[15, 20, 30]">
+                  </mat-paginator>
+                </td>
+              </ng-container>
+              <tr *matNoDataRow>
+                <td [attr.colspan]="visibleTableKeys.length">
+                  <span class="p-4 mt-4">
+                    <b> {{'NO_DATA_FOUND' | translate}}</b>
+                  </span>
+                </td>
+              </tr>
+              <tr class="grid-header-color" mat-header-row *matHeaderRowDef="visibleTableKeys;sticky: true"></tr>
+              <tr mat-row *matRowDef="let row; columns: visibleTableKeys;" [ngClass]="{
+                              'odd-row': isOddDataRow(getDataIndex(row)),
+                              'even-row': !isOddDataRow(getDataIndex(row))
+                            }"></tr>
+              <tr style="height: 45px !important;" mat-header-row
+                *matHeaderRowDef="visibleTableKeysSearch;sticky: true">
+              </tr>
+              <tr mat-footer-row *matFooterRowDef="footerToDisplayed;sticky: true"></tr>
+            </table>
+          </div>
+        </div>
+      </mat-card-content>
+    </mat-card>
+  </div>
+</section>

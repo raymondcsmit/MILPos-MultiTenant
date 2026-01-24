@@ -1,0 +1,162 @@
+<section class="content">
+  <div class="container-fluid">
+    <div class="d-flex mb-2">
+      <div class="me-auto">
+        <span class="mb-0 page-title">{{ 'CUSTOMERS' | translate }}
+          <app-page-help-text code="CUSTOMERS"></app-page-help-text>
+        </span>
+      </div>
+      <div class="d-flex justify-content-end">
+        <button matButton="filled" class="primary me-2" [routerLink]="['/customer/addItem']">
+          <mat-icon class="medium-icon fs-5 align-middle">add</mat-icon>
+          <span class="d-none d-sm-inline"> {{ 'ADD_CUSTOMER' | translate }} </span>
+        </button>
+        <button class="error me-2" matButton="filled" (click)="refresh()">
+          <mat-icon class="medium-icon fs-5 align-middle">refresh</mat-icon>
+          <span class="d-none d-sm-inline"> {{ 'REFRESH' | translate }} </span>
+        </button>
+        <button class="secondary me-2" matButton="filled" (click)="onTableRefresh()">
+          <mat-icon class="medium-icon fs-5 align-middle">settings</mat-icon>
+          <span class="d-none d-sm-inline"> {{ 'TABLE_SETTINGS' | translate }} </span>
+        </button>
+      </div>
+    </div>
+    <mat-card appearance="outlined">
+      <mat-card-content>
+        <div class="table-responsive">
+          <div class="grid-height-large">
+            <table [dir]="langDir" class="primary" mat-table matSortDisableClear
+              [dataSource]="customerStore.customers()" matSort multiTemplateDataRows [matSortActive]="orderByColumn"
+              [matSortDirection]="orderByDirection">
+              @for (column of tableSettingsStore.customersTableSettingsVisible(); track $index) {
+              <ng-container [matColumnDef]="column.key">
+                @if(column.key === 'action') {
+                <th [ngStyle]="{ 'min-width.px': column.width }" mat-header-cell *matHeaderCellDef></th>
+                <td [ngStyle]="{ 'min-width.px': column.width }" mat-cell *matCellDef="let customer">
+                  <div class="d-flex align-items-center gap-2 my-1">
+                    <!-- <button mat-icon-button (click)="toggleRow(customer)">
+                      @if(customer != expandedElement){
+                      <mat-icon>chevron_right</mat-icon>
+                      } @if(customer == expandedElement){
+                      <mat-icon>expand_more</mat-icon>
+                      }
+                    </button>
+                    <button class="ms-3" *hasClaim="['CUST_UPDATE_CUSTOMER', 'CUST_DELETE_CUSTOMER']" mat-icon-button
+                      [matMenuTriggerFor]="menu" aria-label="Action">
+                      <mat-icon>more_vert</mat-icon>
+                    </button> -->
+
+                    <button matMiniFab class="neutral" (click)="toggleRow(customer)">
+                      @if(customer != expandedElement){
+                      <mat-icon>chevron_right</mat-icon>
+                      } @if(customer == expandedElement){
+                      <mat-icon>expand_more</mat-icon>
+                      }
+                    </button>
+                    <button matMiniFab class="primary" [matMenuTriggerFor]="menu"
+                      *hasClaim="['CUST_UPDATE_CUSTOMER', 'CUST_DELETE_CUSTOMER']" class="primary">
+                      <mat-icon>more_vert</mat-icon>
+                    </button>
+                    <mat-menu #menu="matMenu">
+                      <button *hasClaim="'CUST_UPDATE_CUSTOMER'" (click)="editCustomer(customer.id)" mat-menu-item>
+                        <mat-icon>edit</mat-icon>
+                        <span>{{ 'EDIT' | translate }}</span>
+                      </button>
+                      <button *hasClaim="'CUST_DELETE_CUSTOMER'" mat-menu-item (click)="deleteCustomer(customer)">
+                        <mat-icon>delete</mat-icon>
+                        <span>{{ 'DELETE' | translate }}</span>
+                      </button>
+                    </mat-menu>
+                  </div>
+                </td>
+                } @else if(column.key === 'email') {
+                <th mat-header-cell *matHeaderCellDef mat-sort-header [disabled]="!column.allowSort"
+                  [ngStyle]="{ 'min-width.px': column.width }">
+                  {{ column.header | translate }}
+                </th>
+                <td mat-cell *matCellDef="let element" [ngStyle]="{ 'min-width.px': column.width }">
+                  @if(element[column.key]){
+                  <ng-container>
+                    <a href="mailto:{{ element[column.key] }}">{{ element[column.key] }}</a>
+                  </ng-container>
+                  }
+                </td>
+                } @else {
+                <th mat-header-cell *matHeaderCellDef mat-sort-header [disabled]="!column.allowSort"
+                  [ngStyle]="{ 'min-width.px': column.width }">
+                  {{ column.header | translate }}
+                </th>
+                <td mat-cell *matCellDef="let element" [ngStyle]="{ 'min-width.px': column.width }">
+                  {{ element[column.key] }}
+                </td>
+                }
+              </ng-container>
+              } @for (column of tableSettingsStore.customersTableSettingsVisible(); track $index) {
+              <ng-container [matColumnDef]="column.key + '-search'">
+                @if(column.key === 'customerName') {
+                <th mat-header-cell *matHeaderCellDef>
+                  <input type="text" class="form-control form-control-sm" [(ngModel)]="NameFilter" />
+                </th>
+                } @else if(column.key === 'contactPerson') {
+                <th mat-header-cell *matHeaderCellDef>
+                  <input type="text" class="form-control form-control-sm" [(ngModel)]="ContactFilter" />
+                </th>
+                } @else if(column.key === 'email') {
+                <th mat-header-cell *matHeaderCellDef>
+                  <input type="text" class="form-control form-control-sm" [(ngModel)]="EmailFilter" />
+                </th>
+                } @else if(column.key === 'mobileNo') {
+                <th mat-header-cell *matHeaderCellDef>
+                  <input type="text" class="form-control form-control-sm" [(ngModel)]="MobileOrPhoneFilter" />
+                </th>
+                } @else if(column.key === 'website') {
+                <th mat-header-cell *matHeaderCellDef>
+                  <input type="text" class="form-control form-control-sm" [(ngModel)]="WebsiteFilter" />
+                </th>
+                } @else {
+                <th mat-header-cell *matHeaderCellDef></th>
+                }
+              </ng-container>
+              }
+              <ng-container matColumnDef="footer">
+                <td mat-footer-cell [attr.colspan]="visibleTableKeys.length" *matFooterCellDef>
+                  <mat-paginator [length]="customerStore.customerResourceParameter().totalCount"
+                    [pageSize]="customerStore.customerResourceParameter().pageSize"
+                    [pageSizeOptions]="[10, 20, 30, 50]">
+                  </mat-paginator>
+                </td>
+              </ng-container>
+              <ng-container matColumnDef="expandedDetail">
+                <td mat-cell *matCellDef="let customer" [attr.colspan]="visibleTableKeys.length">
+                  @if(customer.id == expandedElement?.id){
+                  <div animate.enter="expandanimation" animate.leave="collapseanimation" class="expandable-panel">
+                    <div class="my-2 mx-5">
+                      <app-customer-so-list [customerId]="customer.id"> </app-customer-so-list>
+                    </div>
+                  </div>
+                  }
+                </td>
+              </ng-container>
+              <tr *matNoDataRow>
+                <td [attr.colspan]="visibleTableKeys.length">
+                  <span class="p-4 mt-4">
+                    <b> {{ 'NO_DATA_FOUND' | translate }}</b>
+                  </span>
+                </td>
+              </tr>
+              <tr class="grid-header-color" mat-header-row *matHeaderRowDef="visibleTableKeys; sticky: true"></tr>
+              <tr mat-row *matRowDef="let row; columns: visibleTableKeys" [ngClass]="{
+                              'odd-row': isOddDataRow(getDataIndex(row)),
+                              'even-row': !isOddDataRow(getDataIndex(row))
+                            }"></tr>
+              <tr style="height: 45px !important;" mat-header-row
+                *matHeaderRowDef="visibleTableKeysSearch; sticky: true"></tr>
+              <tr mat-footer-row *matFooterRowDef="columnsToDisplay; sticky: true"></tr>
+              <tr mat-row *matRowDef="let row; columns: ['expandedDetail']" class="example-detail-row"></tr>
+            </table>
+          </div>
+        </div>
+      </mat-card-content>
+    </mat-card>
+  </div>
+</section>

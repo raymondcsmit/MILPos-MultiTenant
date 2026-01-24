@@ -1,0 +1,258 @@
+<section class="content">
+  <div class="container-fluid">
+    <div class="row align-items-center">
+      <div class="col-md-6 mb-2">
+        <span class="mb-0 page-title">{{'MANAGE_INQUIRY' | translate}}
+          <app-page-help-text code="INQUIRY_LIST"></app-page-help-text>
+        </span>
+      </div>
+    </div>
+
+    <form autocomplete="off" [formGroup]="inquiryForm" (ngSubmit)="onInquirySubmit()">
+      <mat-card appearance="outlined">
+        <mat-card-content>
+          <div class="row">
+            <div class="col-md-6">
+              <div class="form-group">
+                <label [dir]="langDir" class="form-label text-danger">
+                  <mat-icon class="me-1 text-primary align-middle">inventory_2</mat-icon>
+                  {{'PRODUCTS' | translate}} <sup>*</sup>
+                </label>
+                <mat-select [dir]="langDir" formControlName="productId" placeholder="{{'SELECT_PRODUCT' | translate}}"
+                  (selectionChange)="selectProduct()" class="form-control form-control-sm"
+                  panelClass="mat-select-control">
+                  <input class="form-control form-control-sm" formControlName="productNameInput" focused="'true'"
+                    type="text" autocomplete="off" placeholder="search other products">
+                  <mat-divider></mat-divider>
+                  @for (a of products; track $index) {
+                  <mat-option [value]="a.id">
+                    {{a.name}}
+                  </mat-option>
+                  }
+                  @if (products.length == 0) {
+                  <mat-option value="">
+                    {{'NO_RECORDS' | translate}}
+                  </mat-option>
+                  }
+                </mat-select>
+              </div>
+            </div>
+            <div class="col-md-12 mt-3" formArrayName="inquiryProducts">
+              @if (inquieryProductArray.controls.length) {
+              <div class="fw-bold mb-2">
+                {{ 'SELECTED_PRODUCTS' | translate }}:
+              </div>
+              }
+
+              <div class="d-flex flex-wrap gap-2">
+                @for (product of inquieryProductArray.controls; track product) {
+                <div class="badge btn btn-primary border rounded-pill d-flex align-items-center px-3  shadow-sm">
+                  <span [formGroupName]="inquieryProductArray.controls.indexOf(product)" class="me-2 p-0 fw-bold fs-6">
+                    {{ product.get('name')?.value }}
+                  </span>
+                  <button type="button" class="btn btn-link btn-sm p-0 text-light"
+                    (click)="removeProduct(inquieryProductArray.controls.indexOf(product))">
+                    <mat-icon class="medium-icon fs-5 align-middle">cancel</mat-icon>
+                  </button>
+                </div>
+                }
+              </div>
+            </div>
+
+            @if (inquieryProductArray.controls.length) {
+            <hr class="mt-3 mb-3">
+            }
+            <div class="row">
+              <div class="col-md-3">
+                <div class="form-group">
+                  <label [dir]="langDir" class="text-danger form-label">{{'INQUIRY_STATUS' | translate}} *</label>
+                  <div class="input-group">
+                    <mat-select [dir]="langDir" placeholder="{{'SELECT_STATUS' | translate}}"
+                      class="form-control form-control-sm" formControlName="inquiryStatusId"
+                      panelClass="mat-select-control">
+                      @for (inquiryStatus of inquiryStatuses; track inquiryStatus) {
+                      <mat-option [value]="inquiryStatus.id">
+                        {{inquiryStatus.name}}
+                      </mat-option>
+                      }
+                    </mat-select>
+                    <button class="btn btn-primary btn-sm" type="button">
+                      <mat-icon class="cursor-pointer medium-icon fs-5 align-middle"
+                        (click)="openAddInquiryStatusDialog()">
+                        add
+                      </mat-icon>
+                    </button>
+                  </div>
+                  @if (inquiryForm.get('inquiryStatusId')?.touched &&
+                  inquiryForm.get('inquiryStatusId')?.errors?.['required']) {
+                  <div class="text-danger">
+                    {{'PLEASE_SELECT_INQUIRY_STATUS' | translate}}
+                  </div>
+                  }
+                </div>
+              </div>
+              <div class="col-md-3">
+                <div class="form-group">
+                  <label [dir]="langDir" class="form-label">{{'ASSIGN_TO' | translate}}</label>
+                  <mat-select [dir]="langDir" placeholder="{{'SELECT_USER' | translate}}"
+                    class="form-control form-control-sm" formControlName="assignTo" panelClass="mat-select-control">
+                    @for (user of users; track user.id) {
+                    <mat-option [value]="user.id">
+                      {{user.firstName}} {{user.lastName}}
+                    </mat-option>
+                    }
+                  </mat-select>
+                </div>
+              </div>
+              <div class="col-md-3">
+                <div class="form-group">
+                  <label class="text-danger form-label">{{'ORGANIZATION' | translate}} *</label>
+                  <input formControlName="companyName" class="form-control form-control-sm" type="text">
+                  @if (inquiryForm.get('companyName')?.touched &&
+                  inquiryForm.get('companyName')?.errors?.['required'])
+                  {
+                  <div class="text-danger">
+                    {{'PLEASE_ENTER_ORGANIZATION' | translate}}
+                  </div>
+                  }
+                </div>
+              </div>
+              <div class="col-md-3">
+                <div class="form-group ">
+                  <label class="text-danger form-label">{{'CONTACT_PERSON' | translate}} *</label>
+                  <input formControlName="contactPerson" class="form-control form-control-sm" type="text">
+                  @if (inquiryForm.get('contactPerson')?.touched &&
+                  inquiryForm.get('contactPerson')?.errors?.['required']) {
+                  <div class="text-danger">
+                    {{'CONTACT_PERSON_NAME_IS_REQUIRED' | translate}}
+                  </div>
+                  }
+                </div>
+              </div>
+            </div>
+            <div class="row">
+              <div class="col-md-3">
+                <div class="form-group ">
+                  <label class="form-label">{{'PHONE_NUMBER' | translate}}</label>
+                  <input formControlName="phoneNo" class="form-control form-control-sm" type="text">
+                </div>
+              </div>
+              <div class="col-md-3">
+                <div class="form-group ">
+                  <label class="form-label">{{'MOBILE_NO' | translate}} </label>
+                  <input formControlName="mobileNo" class="form-control form-control-sm" type="text">
+                </div>
+              </div>
+              <div class="col-md-3">
+                <div class="form-group ">
+                  <label class="form-label">{{'EMAIL' | translate}} </label>
+                  <input formControlName="email" class="form-control form-control-sm" type="text">
+                  @if (inquiryForm.get('email')?.touched && inquiryForm.get('email')?.errors?.['email']) {
+                  <div class="text-danger">
+                    {{'PLEASE_ENTER_VALID_EMAIL' | translate}}
+                  </div>
+                  }
+                  @if (inquiryForm.get('mobileNo')?.touched || inquiryForm.get('email')?.errors?.['mobileoremail'])
+                  {
+                  <div class="text-danger">
+                    {{'EITHER_EMAIL_OR_MOBILE_NUMBER_IS_REQUIRED' | translate}}
+                  </div>
+                  }
+                </div>
+              </div>
+              <div class="col-md-3">
+                <div class="form-group ">
+                  <label class="form-label">{{'WEBSITE' | translate}}</label>
+                  <input formControlName="website" class="form-control form-control-sm" type="text">
+                  @if (inquiryForm.get('website')?.touched && inquiryForm.get('website')?.errors?.['valid_url']) {
+                  <div class="text-danger">
+                    {{'PLEASE_ENTER_CORRECT_URL_OF_WEBSITE' | translate}}
+                  </div>
+                  }
+                </div>
+              </div>
+            </div>
+            <div class="row">
+              <div class="col-md-3">
+                <div class="form-group">
+                  <label [dir]="langDir" class="form-label">{{'SELECT_COUNTRY' | translate}}</label>
+                  <mat-select [dir]="langDir" placeholder="{{'SEARCH_COUNTRY' | translate}}"
+                    class="form-control form-control-sm" formControlName="countryName"
+                    (selectionChange)="onCountryChange($event)" panelClass="mat-select-control">
+                    @for (country of countries; track country) {
+                    <mat-option [value]="country.countryName">
+                      {{country.countryName}}
+                    </mat-option>
+                    }
+                  </mat-select>
+                </div>
+              </div>
+              <div class="col-md-3">
+                <div class="form-group">
+                  <label [dir]="langDir" class="form-label">{{'SELECT_CITY' | translate}} </label>
+                  <input class="form-control form-control-sm" autocomplete="new-city" (input)="handleFilterCity($event)"
+                    type="text" placeholder="{{'SEARCH_CITY' | translate}}" [matAutocomplete]="auto"
+                    formControlName="cityName" />
+                  <mat-autocomplete [dir]="langDir" #auto="matAutocomplete">
+                    @for (city of cities; track city) {
+                    <mat-option [value]="city.cityName">
+                      <span>{{ city.cityName }}</span>
+                    </mat-option>
+                    }
+                  </mat-autocomplete>
+                </div>
+              </div>
+              <div class="col-md-6">
+                <div class="form-group">
+                  <label class="form-label">{{'ADDRESS' | translate}}</label>
+                  <textarea formControlName="address" class="form-control form-control-sm"></textarea>
+                </div>
+              </div>
+            </div>
+            <div class="row">
+              <div class="col-md-6">
+                <label [dir]="langDir" class="text-danger form-label">{{'SOURCE_OF_INQUIRY' | translate}} *</label>
+                <div class="input-group">
+                  <mat-select [dir]="langDir" placeholder="{{'SELECT_SOURCE' | translate}}"
+                    class="form-control form-control-sm" formControlName="inquirySourceId"
+                    panelClass="mat-select-control">
+                    @for (source of sourcesOfInquiry; track source.id) {
+                    <mat-option [value]="source.id">
+                      {{source.name}}
+                    </mat-option>
+                    }
+                  </mat-select>
+                  <button class="btn btn-primary btn-sm" type="button" (click)="openAddInquirySourceDialog()">
+                    <mat-icon class="cursor-pointer medium-icon fs-5 align-middle">add</mat-icon>
+                  </button>
+                </div>
+                @if (inquiryForm.get('inquirySourceId')?.touched &&
+                inquiryForm.get('inquirySourceId')?.errors?.['required']) {
+                <mat-error [dir]="langDir" class="text-danger">
+                  {{'SOURCE_OF_INQUIRY_IS_REQUIRED' | translate}}
+                </mat-error>
+                }
+              </div>
+            </div>
+            <div class="col-md-12">
+              <div class="form-group">
+                <label class="form-label">{{'MESSAGE' | translate}}</label>
+                <app-text-editor formControlName="message"></app-text-editor>
+              </div>
+            </div>
+            <div class="col-md-12 mt-3">
+              <button type="submit" class="success me-2" matButton="filled">
+                <mat-icon class="medium-icon fs-5 align-middle">save</mat-icon> {{'SAVE' | translate}}
+              </button>
+              <button type="button" class="error" matButton="filled" (click)="onInquiryList()">
+                <mat-icon class="medium-icon fs-5 align-middle">cancel</mat-icon>
+                {{'CANCEL' | translate}}
+              </button>
+            </div>
+          </div>
+        </mat-card-content>
+      </mat-card>
+    </form>
+
+  </div>
+</section>

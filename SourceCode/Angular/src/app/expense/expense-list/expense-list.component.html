@@ -1,0 +1,208 @@
+<section class="content">
+  <div class="container-fluid">
+    <div class="d-flex mb-2">
+      <div class="me-auto">
+        <span class="mb-0 page-title">{{'EXPENSE_LIST' | translate}}
+          <app-page-help-text code="EXPENSE_LIST"></app-page-help-text>
+        </span>
+      </div>
+      <div class="d-flex justify-content-end">
+        <button *hasClaim="'EXP_ADD_EXPENSE'" class="primary me-2" matButton="filled" [routerLink]="'/expense/add'">
+          <mat-icon class="medium-icon fs-5 align-middle">add</mat-icon>
+          {{'ADD_EXPENSE' | translate }}
+        </button>
+      </div>
+    </div>
+    <mat-card appearance="outlined">
+      <mat-card-content>
+        <div class="row">
+          <div class="col-sm-12">
+            <div class="table-responsive">
+              <div class="grid-height-large">
+                <table [dir]="langDir" mat-table matSortDisableClear [dataSource]="dataSource" matSort
+                  matSortActive="createdDate" matSortDirection="desc">
+                  <ng-container matColumnDef="action">
+                    <th mat-header-cell *matHeaderCellDef class="table-column-50">
+                    </th>
+                    <td mat-cell *matCellDef="let expense" class="table-column-50">
+                      <!-- <button mat-icon-button [matMenuTriggerFor]="menu" aria-label="Example icon-button with a menu">
+                        <mat-icon>more_vert</mat-icon>
+                      </button> -->
+                      <button matMiniFab class="primary" [matMenuTriggerFor]="menu" aria-label="Menu Horizontal">
+                        <mat-icon>more_vert</mat-icon>
+                      </button>
+                      <mat-menu #menu="matMenu">
+                        <button *hasClaim="'EXP_UPDATE_EXPENSE'" mat-menu-item (click)="editExpense(expense.id)">
+                          <mat-icon>edit</mat-icon>
+                          <span>{{'EDIT' | translate}}</span>
+                        </button>
+                        @if(expense.receiptName){
+                        <button mat-menu-item (click)="downloadReceipt(expense)">
+                          <mat-icon>cloud_download</mat-icon>
+                          <span>{{'DOWNLOAD_RECEIPT' | translate}}</span>
+                        </button>
+                        }
+                        <button *hasClaim="'EXP_DELETE_EXPENSE'" mat-menu-item (click)="deleteExpense(expense)">
+                          <mat-icon>delete</mat-icon>
+                          <span>{{'DELETE' | translate}}</span>
+                        </button>
+                      </mat-menu>
+                    </td>
+                  </ng-container>
+                  <ng-container matColumnDef="createdDate">
+                    <th mat-header-cell *matHeaderCellDef mat-sort-header class="table-column-130">
+                      {{'CREATED_DATE' | translate}}
+                    </th>
+                    <td mat-cell *matCellDef="let expense" class="table-column-130">
+                      {{expense.createdDate | utcToLocalTime:'shortDate'}} </td>
+                  </ng-container>
+                  <ng-container matColumnDef="expenseDate">
+                    <th mat-header-cell *matHeaderCellDef mat-sort-header class="table-column-130">
+                      {{'EXPENSE_DATE' | translate}}
+                    </th>
+                    <td mat-cell *matCellDef="let expense" class="table-column-130">
+                      {{expense.expenseDate | utcToLocalTime:'shortDate'}} </td>
+                  </ng-container>
+                  <ng-container matColumnDef="amount">
+                    <th mat-header-cell *matHeaderCellDef mat-sort-header class="table-column-150 pl-3">
+                      {{'AMOUNT' | translate}} </th>
+                    <td mat-cell *matCellDef="let expense" class="table-column-150 pl-3">
+                      {{expense.amount | customCurrency}} </td>
+                  </ng-container>
+                  <ng-container matColumnDef="reference">
+                    <th mat-header-cell *matHeaderCellDef mat-sort-header class="table-column-150 pl-3">
+                      {{'REFERENCE' | translate}} </th>
+                    <td mat-cell *matCellDef="let expense" class="table-column-150 pl-3">
+                      {{expense.reference}} </td>
+                  </ng-container>
+                  <ng-container matColumnDef="expenseCategoryId">
+                    <th mat-header-cell *matHeaderCellDef mat-sort-header class="table-column-200">
+                      {{'EXPENSE_CATEGORY' | translate}}
+                    </th>
+                    <td mat-cell *matCellDef="let expense" class="table-column-200">
+                      {{expense.expenseCategory}}
+                    </td>
+                  </ng-container>
+                  <ng-container matColumnDef="expenseBy">
+                    <th mat-header-cell *matHeaderCellDef mat-sort-header class="table-column-200">
+                      {{'USER' | translate}}
+                    </th>
+                    <td mat-cell *matCellDef="let expense" class="table-column-200">
+                      {{expense.expenseBy}}
+                    </td>
+                  </ng-container>
+                  <ng-container matColumnDef="location">
+                    <th mat-header-cell *matHeaderCellDef mat-sort-header class="table-column-200">
+                      {{'BUSINESS_LOCATION' | translate}}
+                    </th>
+                    <td mat-cell *matCellDef="let expense" class="table-column-200">
+                      {{expense.locationName}}
+                    </td>
+                  </ng-container>
+                  <ng-container matColumnDef="taxes">
+                    <th mat-header-cell *matHeaderCellDef class="table-column-200"> {{"TAX" |
+                      translate}} </th>
+                    <td mat-cell *matCellDef="let element" class="table-column-200">
+                      @for(itemTax of element.expenseTaxes;let last = $last; track itemTax.id){
+                      <span>
+                        {{itemTax?.tax?.name}}({{itemTax?.tax?.percentage}}%)
+                        @if(!last){
+                        <span> ,</span>
+                        }
+                      </span>
+                      }
+                    </td>
+                  </ng-container>
+                  <ng-container matColumnDef="totalTax">
+                    <th mat-header-cell *matHeaderCellDef mat-sort-header class="table-column-200">
+                      {{'TOTAL_TAX' | translate}}
+                    </th>
+                    <td mat-cell *matCellDef="let expense" class="table-column-200">
+                      {{expense.totalTax | customCurrency}}
+                    </td>
+                  </ng-container>
+                  <ng-container matColumnDef="action-search">
+                    <th mat-header-cell *matHeaderCellDef> </th>
+                  </ng-container>
+                  <ng-container matColumnDef="date-search">
+                    <th mat-header-cell *matHeaderCellDef> </th>
+                  </ng-container>
+                  <ng-container matColumnDef="expensedate-search">
+                    <th mat-header-cell *matHeaderCellDef> </th>
+                  </ng-container>
+                  <ng-container matColumnDef="amount-search">
+                    <th mat-header-cell *matHeaderCellDef> </th>
+                  </ng-container>
+                  <ng-container matColumnDef="reference-search">
+                    <th mat-header-cell *matHeaderCellDef>
+                      <input placeholder="{{'REFERENCE' | translate}}" type="text" class="form-control form-control-sm"
+                        [(ngModel)]="ReferenceFilter">
+                    </th>
+                  </ng-container>
+                  <ng-container matColumnDef="expenseCategoryId-search">
+                    <th mat-header-cell *matHeaderCellDef>
+                      <mat-select [dir]="langDir" placeholder="{{'EXPENSE_CATEGORY' | translate}}"
+                        [(ngModel)]="CategoryFilter" class="form-control form-control-sm"
+                        panelClass="mat-select-control">
+                        <mat-option value="">{{'NONE' | translate}}</mat-option>
+                        @for(category of expenseCategories; track category.id){
+                        <mat-option [value]="category.id">
+                          {{category.name}}
+                        </mat-option>
+                        }
+                      </mat-select>
+                    </th>
+                  </ng-container>
+                  <ng-container matColumnDef="expenseBy-search">
+                    <th mat-header-cell *matHeaderCellDef>
+                      <mat-select [dir]="langDir" [(ngModel)]="UserFilter" placeholder="{{'USER' | translate}}"
+                        class="form-control form-control-sm" panelClass="mat-select-control">
+                        <mat-option value="">{{'NONE' | translate}}</mat-option>
+                        @for(user of users; track user.id){
+                        <mat-option [value]="user.id">
+                          {{user.firstName}} {{user.lastName}}
+                        </mat-option>
+                        }
+                      </mat-select>
+                    </th>
+                  </ng-container>
+                  <ng-container matColumnDef="taxes-search">
+                    <th mat-header-cell *matHeaderCellDef> </th>
+                  </ng-container>
+                  <ng-container matColumnDef="tax-search">
+                    <th mat-header-cell *matHeaderCellDef> </th>
+                  </ng-container>
+                  <ng-container matColumnDef="location-search">
+                    <th mat-header-cell *matHeaderCellDef> </th>
+                  </ng-container>
+                  <ng-container matColumnDef="footer">
+                    <td mat-footer-cell colspan="11" *matFooterCellDef>
+                      <mat-paginator class="float-left" [length]="expenseResource.totalCount"
+                        [pageSize]="expenseResource.pageSize" [pageSizeOptions]="[15, 20, 30]">
+                      </mat-paginator>
+                    </td>
+                  </ng-container>
+                  <tr *matNoDataRow>
+                    <td colspan="11">
+                      <span class="p-4 mt-4">
+                        <b> {{'NO_DATA_FOUND' | translate}}</b>
+                      </span>
+                    </td>
+                  </tr>
+                  <tr class="grid-header-color" mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+                  <tr mat-row *matRowDef="let row; columns: displayedColumns;" [ngClass]="{
+                              'odd-row': isOddDataRow(getDataIndex(row)),
+                              'even-row': !isOddDataRow(getDataIndex(row))
+                            }"></tr>
+                  <tr mat-header-row *matHeaderRowDef="filteredColoumns">
+                  </tr>
+                  <tr mat-footer-row *matFooterRowDef="footerToDisplayed"></tr>
+                </table>
+              </div>
+            </div>
+          </div>
+        </div>
+      </mat-card-content>
+    </mat-card>
+  </div>
+</section>

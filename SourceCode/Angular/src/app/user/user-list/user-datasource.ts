@@ -1,0 +1,56 @@
+import { DataSource } from '@angular/cdk/table';
+import { HttpResponse } from '@angular/common/http';
+import { ResponseHeader } from '@core/domain-classes/response-header';
+import { User } from '@core/domain-classes/user';
+import { UserResource } from '@core/domain-classes/user-resource';
+import { BehaviorSubject, Observable, of, Subscription } from 'rxjs';
+import { UserService } from '../user.service';
+
+export class UserDataSource implements DataSource<User> {
+  private userSubject = new BehaviorSubject<User[]>([]);
+  private responseHeaderSubject = new BehaviorSubject<ResponseHeader>(new ResponseHeader());
+  private loadingSubject = new BehaviorSubject<boolean>(false);
+
+  public loading$ = this.loadingSubject.asObservable();
+  private _count: number = 0;
+  sub$: Subscription;
+
+  public get count(): number {
+    return this._count;
+  }
+
+  public responseHeaderSubject$ = this.responseHeaderSubject.asObservable();
+
+  constructor(private userService: UserService) {
+    this.sub$ = new Subscription();
+  }
+
+  connect(): Observable<User[]> {
+    return this.userSubject.asObservable();
+  }
+
+  disconnect(): void {
+    this.userSubject.complete();
+    this.loadingSubject.complete();
+    this.sub$.unsubscribe();
+  }
+
+  loadUsers(userResource: UserResource) {
+    this.loadingSubject.next(true);
+    this.sub$ = this.userService
+      .getUsers(userResource)
+      .subscribe((resp: HttpResponse<User[]>) => {
+        if (resp && resp.headers.get('X-Pagination')) {
+          const paginationParam = JSON.parse(
+            resp.headers.get('X-Pagination') ?? '{}'
+          ) as ResponseHeader;
+          this.responseHeaderSubject.next(paginationParam);
+        }
+        if (resp && resp.body) {
+          const users = [...resp.body];
+          this._count = users.length;
+          this.userSubject.next(users);
+        }
+      });
+  }
+}

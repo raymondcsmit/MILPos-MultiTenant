@@ -1,0 +1,93 @@
+<mat-dialog-content>
+
+  <div class="mb-0 d-flex justify-content-between">
+    <span class="mb-4 page-title">
+      {{ "EMAIL_LOG_DETAIL" | translate }}
+    </span>
+    <mat-icon class="close-icon text-danger cursor-pointer" (click)="close()">cancel</mat-icon>
+  </div>
+
+  <div class="row">
+    <div class="col-md-12 mb-2">
+      <label class="fw-bold">{{'DATE' | translate}}: </label>
+      <span>{{data.sentAt | utcToLocalTime:'short'}}</span>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-md-6 mb-2">
+      <label for="staticEmail" class="fw-bold">
+        {{"FROM" | translate}}
+      </label>
+      <span class="form-control">{{data.senderEmail}}</span>
+    </div>
+    <div class="col-md-6 mb-2">
+      <label for="source" class="fw-bold">
+        {{"TO" | translate}}
+      </label>
+      <span type="text" class="form-control">{{data.recipientEmail}}</span>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-md-12">
+      <label for="staticEmail" class="fw-bold">
+        {{"SUBJECT" | translate}}
+      </label>
+      <span class="form-control">{{data.subject}}</span>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-md-12">
+      <label for="staticEmail" class="fw-bold">
+        {{"BODY" | translate}}
+      </label>
+      <app-text-editor [hideToolBar]="true" [disabled]="true" [formControl]="body"></app-text-editor>
+    </div>
+  </div>
+  <div class="row mt-3">
+    <div class="col-md-4">
+      <label for="staticEmail" class="fw-bold me-2">
+        {{"STATUS" | translate}} :
+      </label>
+      @if(data.statusName.toLocaleLowerCase() =='sent'){
+      <span class="badge bg-success">
+        {{'SUCCESS' | translate}}
+      </span>
+      }
+      @else if(data.statusName.toLocaleLowerCase() =='failed'){
+      <span class="badge bg-danger">
+        {{'FAILED' | translate}}
+      </span>
+      }
+    </div>
+    @if(data && data.emailLogAttachments && data.emailLogAttachments.length > 0){
+    <div class="col-md-8">
+      <label for="staticEmail" class="fw-bold me-2">
+        {{"ATTACHMENTS" | translate}} :
+      </label>
+      @for (attachment of data.emailLogAttachments; track attachment) {
+      <div>
+        <a class="link-primary">{{attachment.name}}</a>
+        <button mat-icon-button color="primary" (click)="downloadAttachment(attachment)">
+          <mat-icon class="medium-icon fs-5 align-middle text-success ms-2 cursor-pointer">download</mat-icon>
+        </button>
+      </div>
+      }
+    </div>
+    }
+  </div>
+  @if(data.errorMessage){
+  <div class="row">
+    <div class="col-md-12">
+      <label><strong> {{'ERROR' | translate}} : </strong></label>
+      <span class="text-danger form-control">{{data.errorMessage}}</span>
+    </div>
+  </div>
+  }
+  <div class="row mt-3">
+    <div class="col-md-12">
+      <button class="error" matButton="filled" (click)="close()">
+        <mat-icon class="medium-icon fs-5 align-middle" color="warn">cancel</mat-icon> {{'CLOSE' | translate}}
+      </button>
+    </div>
+  </div>
+</mat-dialog-content>

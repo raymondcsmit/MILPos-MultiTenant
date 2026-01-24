@@ -1,0 +1,98 @@
+<section class="content">
+  <div class="container-fluid">
+    <div class="d-flex mb-2">
+      <div class="me-auto">
+        <span class="mb-0 page-title">{{ 'FINANCIAL_YEAR' | translate }}
+          <app-page-help-text code="FINANCIAL_YEAR"></app-page-help-text>
+        </span>
+      </div>
+      <div class="d-flex justify-content-end">
+        <button class="error me-2" matButton="filled" (click)="refresh()">
+          <mat-icon class="medium-icon fs-5 align-middle">refresh</mat-icon>
+          <span class="d-none d-sm-inline"> {{ 'REFRESH' | translate }} </span>
+        </button>
+      </div>
+    </div>
+    <mat-card appearance="outlined">
+      <mat-card-content>
+        <!-- <div class="table-responsive"> -->
+        <div class="table-responsive">
+          <div class="grid-height-large">
+            <table [dir]="langDir" mat-table [dataSource]="financialYearStore.financialYears()">
+              <ng-container matColumnDef="action">
+                <th class="table-column-150" mat-header-cell *matHeaderCellDef>
+                  {{ 'ACTION' | translate }}
+                </th>
+                <td class="table-column-150" mat-cell *matCellDef="let element">
+                  @if (!element.isClosed) {
+                  <!-- <button *hasClaim="'ACCOUNTING_MANAGE_FINANCIAL_YEAR'" (click)="openManageFinancialYear(element)"
+                    class="primary me-2" matButton="filled" type="button">
+                    <mat-icon class="medium-icon fs-5 align-middle">edit</mat-icon>
+                    <span class="d-none d-sm-inline"> {{ "EDIT" | translate }}</span>
+                  </button> -->
+                  <div class="d-flex">
+                    <button matMiniFab (click)="openManageFinancialYear(element)"
+                      *hasClaim="'ACCOUNTING_MANAGE_FINANCIAL_YEAR'" class="primary">
+                      <mat-icon class="medium-icon fs-5 align-middle">edit</mat-icon>
+                    </button>
+                  </div>
+                  }
+                </td>
+              </ng-container>
+              <ng-container matColumnDef="startDate">
+                <th mat-header-cell *matHeaderCellDef>
+                  {{ 'START_DATE' | translate }}
+                </th>
+                <td mat-cell *matCellDef="let element">
+                  {{ element.startDate | utcToLocalTime : 'shortDate' }}
+                </td>
+              </ng-container>
+              <ng-container matColumnDef="endDate">
+                <th mat-header-cell *matHeaderCellDef>
+                  {{ 'END_DATE' | translate }}
+                </th>
+                <td mat-cell *matCellDef="let element">
+                  {{ element.endDate | utcToLocalTime : 'shortDate' }}
+                </td>
+              </ng-container>
+              <ng-container matColumnDef="isClosed">
+                <th mat-header-cell *matHeaderCellDef>
+                  {{ 'CLOSED' | translate }}
+                </th>
+                <td mat-cell *matCellDef="let element">
+                  @if (element.isClosed) {
+                  {{ "YES" | translate }}
+                  } @else {
+                  {{ "NO" | translate }}
+                  }
+                </td>
+              </ng-container>
+
+              <ng-container matColumnDef="closedDate">
+                <th mat-header-cell *matHeaderCellDef>
+                  {{ 'CLOSE_DATE' | translate }}
+                </th>
+                <td mat-cell *matCellDef="let element">
+                  {{ element.closedDate | utcToLocalTime : 'shortDate' }}
+                </td>
+              </ng-container>
+              <ng-container matColumnDef="closedBy">
+                <th mat-header-cell *matHeaderCellDef>
+                  {{ 'CLOSE_BY' | translate }}
+                </th>
+                <td mat-cell *matCellDef="let element">
+                  {{ element.closedByName }}
+                </td>
+              </ng-container>
+              <tr class="grid-header-color" mat-header-row *matHeaderRowDef="displayedColumns; sticky: true"></tr>
+              <tr mat-row *matRowDef="let row; columns: displayedColumns" [ngClass]="{
+                              'odd-row': isOddDataRow(getDataIndex(row)),
+                              'even-row': !isOddDataRow(getDataIndex(row))
+                            }" [class.bg-warning1]="row.status===1" [class.bg-warning1]="row.status === 1"></tr>
+            </table>
+          </div>
+        </div>
+      </mat-card-content>
+    </mat-card>
+  </div>
+</section>

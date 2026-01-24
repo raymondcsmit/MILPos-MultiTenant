@@ -1,0 +1,74 @@
+<mat-dialog-content>
+  <div class="mb-0 d-flex">
+    <span class="mb-4 page-title">
+      {{ 'VIEW_PAYMENT' | translate }} ({{ this.data.orderNumber }})
+      <app-page-help-text code="PURCHASE_ORDER_PAYMENT"></app-page-help-text>
+    </span>
+    <div class="ms-auto">
+      @if(data.paymentStatus != 0){
+      <button class="primary me-2 mb-2" matButton="filled" *hasClaim="'PO_ADD_PO_PAYMENT'" (click)="addPayment()">
+        <mat-icon class="medium-icon fs-5 align-middle">add</mat-icon>
+        {{ 'ADD_PAYMENT' | translate }}
+      </button>
+      }
+      <mat-icon class="close-icon text-danger cursor-pointer" (click)="onCancel()">cancel</mat-icon>
+    </div>
+  </div>
+  <div class="d-flex">
+    <div class="grid-height-medium">
+      <table [dir]="langDir" mat-table [dataSource]="dataSource">
+        <ng-container matColumnDef="action">
+          <th mat-header-cell *matHeaderCellDef>{{ 'ACTION' | translate }}</th>
+          <td mat-cell *matCellDef="let element">
+            @if(data.status != 1){
+            <!-- <button *hasClaim="'PO_DELETE_PO_PAYMENT'" (click)="deletePayment(element)" class="btn btn-danger btn-sm"
+              type="button">
+              <mat-icon class="medium-icon fs-5 align-middle">delete</mat-icon>
+            </button> -->
+
+            <button matMiniFab (click)="deletePayment(element)" *hasClaim="'PO_DELETE_PO_PAYMENT'" class="error">
+              <mat-icon class="medium-icon fs-5 align-middle">delete</mat-icon>
+            </button>
+            }
+          </td>
+        </ng-container>
+        <ng-container matColumnDef="paymentType">
+          <th mat-header-cell *matHeaderCellDef>{{ 'PAYMENT_TYPE' | translate }}</th>
+          <td mat-cell *matCellDef="let element">
+            {{ element.paymentType | paymentType | translate }}
+          </td>
+        </ng-container>
+        <ng-container matColumnDef="paymentDate">
+          <th mat-header-cell *matHeaderCellDef>{{ 'PAYMENT_DATE' | translate }}</th>
+          <td mat-cell *matCellDef="let element">
+            {{ element.paymentDate | utcToLocalTime : 'shortDate' }}
+          </td>
+        </ng-container>
+        <ng-container matColumnDef="referenceNumber">
+          <th mat-header-cell *matHeaderCellDef>{{ 'REFERENCE_NUMBER' | translate }}</th>
+          <td mat-cell *matCellDef="let element">{{ element.referenceNumber }}</td>
+        </ng-container>
+        <ng-container matColumnDef="amount">
+          <th mat-header-cell *matHeaderCellDef>{{ 'AMOUNT' | translate }}</th>
+          <td mat-cell *matCellDef="let element">{{ element.amount | customCurrency }}</td>
+        </ng-container>
+        <ng-container matColumnDef="paymentMethod">
+          <th mat-header-cell *matHeaderCellDef>{{ 'PAID_BY' | translate }}</th>
+          <td mat-cell *matCellDef="let element">{{ element.paymentMethod | paymentmethod }}</td>
+        </ng-container>
+        <tr *matNoDataRow>
+          <td colspan="9">
+            <span class="p-4 mt-4">
+              <b> {{ 'NO_DATA_FOUND' | translate }}</b>
+            </span>
+          </td>
+        </tr>
+        <tr class="grid-header-color" mat-header-row *matHeaderRowDef="displayedColumns; sticky: true"></tr>
+        <tr mat-row *matRowDef="let row; columns: displayedColumns" [ngClass]="{
+                              'odd-row': isOddDataRow(getDataIndex(row)),
+                              'even-row': !isOddDataRow(getDataIndex(row))
+                            }"></tr>
+      </table>
+    </div>
+  </div>
+</mat-dialog-content>

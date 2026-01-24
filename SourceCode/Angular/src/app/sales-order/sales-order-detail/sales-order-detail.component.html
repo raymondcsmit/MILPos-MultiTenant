@@ -1,0 +1,314 @@
+<section class="content">
+  <div class="container-fluid">
+    <div class="row align-items-center">
+      <div class="col-md-6 mb-2">
+        @if(!salesOrder?.isSalesOrderRequest){
+        <span class="mb-0 page-title">
+          {{'SALES_ORDER' | translate}}#{{salesOrder?.orderNumber}}
+          <app-page-help-text code="SALES_ORDER"></app-page-help-text>
+        </span>
+        }
+        @if(salesOrder?.isSalesOrderRequest){
+        <span class="mb-0 page-title">
+          {{'SALES_ORDER_REQUEST' | translate}}#{{salesOrder?.orderNumber}}
+          <app-page-help-text code="SALES_ORDER_REQUEST"></app-page-help-text>
+        </span>
+        }
+      </div>
+      <div class="col-md-6 d-flex justify-content-end mb-2">
+        <button *hasClaim="['SO_GENERATE_INVOICE','SOR_GENERATE_INVOICE']" class="success me-2" matButton="filled"
+          (click)="generateInvoice()">
+          <mat-icon class="medium-icon fs-5 align-middle">description</mat-icon>
+          {{ "GENERATE_INVOICE" | translate }}
+        </button>
+        <button *hasClaim="['SO_SEND_EMAIL','SOR_SEND_EMAIL']" class="warning" matButton="filled" (click)="sendEmail()">
+          <mat-icon class="medium-icon fs-5 align-middle">mail</mat-icon>
+          {{ "SEND_EMAIL" | translate }}
+        </button>
+      </div>
+    </div>
+    <mat-card>
+      <mat-card-content>
+        @if(salesOrder){
+        <mat-card appearance="outlined">
+          <mat-card-content>
+            <div class="row">
+              <div class="col-sm-4">
+                <div class="form-group">
+                  <h5 class="">{{"CUSTOMER" | translate}}</h5>
+                  <b> {{salesOrder.customer?.customerName}}</b>
+                  @if(salesOrder.customer?.billingAddress){
+                  <span>
+                    <br>{{salesOrder.customer?.billingAddress?.address}}
+                    @if(salesOrder.customer?.billingAddress?.cityName){
+                    <span> <br>
+                      {{salesOrder.customer?.billingAddress?.cityName}},</span>
+                    }
+                    @if(salesOrder.customer?.billingAddress?.countryName){
+                    <span>
+                      {{salesOrder.customer?.billingAddress?.countryName}}.
+                    </span>
+                    }
+                  </span>
+                  }
+                  @if(salesOrder.customer?.mobileNo){
+                  <br> <strong> {{"PHONE"| translate}} : </strong>{{salesOrder.customer?.mobileNo}}
+                  }
+                  @if(salesOrder.customer?.email){
+                  <br> <strong> {{"EMAIL"| translate}}: </strong>
+                  <a href="mailto:{{salesOrder.customer?.email}}">{{salesOrder.customer?.email}}</a>
+                  }
+                  @if(salesOrder.customer?.taxNumber){
+                  <br> <strong> {{'TAX_NUMBER' | translate}} :</strong>
+                  {{salesOrder.customer?.taxNumber}}
+                  }
+                  <div class="clearfix"></div>
+                </div>
+              </div>
+              <div class="col-md-4">
+                <div class="form-group">
+                  <h5 class="">{{"BUSINESS" | translate}}</h5>
+                  <b> {{salesOrder.location?.name}}</b>
+                  @if(salesOrder.location?.address){
+                  <span>
+                    <br> {{salesOrder.location?.address}}
+                  </span>
+                  }
+                  @if(salesOrder.location?.mobile){
+                  <br> <strong> {{"PHONE"| translate}} : </strong>{{salesOrder.location?.mobile}}
+                  }
+                  @if(salesOrder.location?.email){
+                  <br> <strong> {{"EMAIL" | translate}} :</strong>
+                  <a href="mailto:{{salesOrder.location?.email}}">{{salesOrder.location?.email}}</a>
+                  }
+                  @if(companyProfile?.taxName){
+                  <br> <strong> {{companyProfile?.taxName}} :</strong> {{companyProfile?.taxNumber}}
+                  }
+                  <div class="clearfix"></div>
+                </div>
+              </div>
+              <div class="col-md-4">
+                <div class="form-group">
+                  <h5 class="">{{'REFERENCE' | translate}}</h5>
+                  <b> {{salesOrder.orderNumber}}</b><br>
+                  <b>{{"DATE" | translate}} : </b>{{salesOrder.soCreatedDate |
+                  utcToLocalTime:'shortDate'}}
+                  @if(!salesOrder.isSalesOrderRequest){
+                  <br><b>{{"PAYMENT_STATUS" | translate}} : </b>
+                  <span class="badge" [ngClass]="{'bg-success': salesOrder.paymentStatus == 0 ,
+                                    'bg-danger' : salesOrder.paymentStatus == 1,
+                                    'bg-warning' : salesOrder.paymentStatus == 2}">
+                    {{salesOrder.paymentStatus | paymentStatus }}
+                  </span>
+                  }
+                  <br> <strong> {{'CREATED_BY' | translate}} : </strong>{{salesOrder.createdByName}}
+                  @if(salesOrder.modifiedDate){
+                  <br> <strong> {{'LAST_MODIFIED_AT' | translate}} : </strong>{{salesOrder.modifiedDate |
+                  utcToLocalTime:'short'}}
+                  <div class="clearfix"></div>
+                  }
+                </div>
+              </div>
+            </div>
+            <h5>{{"SALES_ORDER_ITEMS" | translate}}</h5>
+            <div class="table-responsive">
+              <table class="table table-bordered table-hover table-striped table-sm">
+                <thead class="head">
+                  <tr>
+                    <th style="width:1%">{{"NO." | translate}}</th>
+                    <th style="width:20%">{{"PRODUCT" | translate}}</th>
+                    <th style="width:3%">{{"UNIT_PRICE" | translate}}</th>
+                    <th style="width:2%">{{"QUANTITY" | translate}}</th>
+                    <th style="width:3%">{{"DISCOUNT" | translate}}</th>
+                    <th style="width:5%">{{"TAX" | translate}}</th>
+                    <th style="width:10%">{{"TOTAL_AMOUNT" | translate}}</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  @for(salesItem of salesOrderItems;let i=$index; track $index){
+                  <tr>
+                    @if(salesItem.status == 0){
+                    <td style="text-align: center;">{{i+1}}</td>
+                    <td>
+                      @if(salesItem?.product?.productUrl){
+                      <img class="img-thumbnail grid-img-thumbnail" [src]="baseUrl + salesItem?.product?.productUrl"
+                        alt="{{'PRODUCT_IMAGE' | translate}}">
+                      } @else {
+                      <img class="img-thumbnail grid-img-thumbnail" src="/images/no-preview.jpg"
+                        alt="{{'PRODUCT_IMAGE' | translate}}">
+                      }
+                      <span class="ms-1"> {{salesItem?.product?.name}}</span>
+                    </td>
+                    <td class="text-end">{{salesItem.unitPrice | customCurrency}}</td>
+                    <td class="text-end">{{salesItem.quantity}} <span
+                        style="font-size: 10px;">({{salesItem?.unitConversation?.name}})</span>
+                    </td>
+                    <td class="text-end">{{salesItem.discount | customCurrency}} <span style="font-size: 10px;">
+                        (
+                        @if(salesItem.discountType==='percentage'){
+                        {{salesItem.discountPercentage}}%
+                        }@else {
+                        {{salesItem.discountType }}
+                        }
+                        )
+                      </span></td>
+                    <td class="text-end">{{salesItem.taxValue | customCurrency}}<br>
+                      @for(itemTax of salesItem.salesOrderItemTaxes;let last=$last; track $index){
+                      <span style="font-size: 10px;">
+                        {{itemTax?.taxName}}({{itemTax?.taxPercentage}}%)
+                        @if(!last){
+                        <span>,
+                        </span>
+                        }
+                      </span>
+                      }
+                    </td>
+                    <td class="text-end">
+                      {{((salesItem?.quantity??0) * (salesItem?.unitPrice??0) ) - salesItem.discount +
+                      salesItem.taxValue | customCurrency }}
+                    </td>
+                    }
+                  </tr>
+                  }
+                  @if(salesOrderReturnsItems && salesOrderReturnsItems.length > 0){
+                  <tr class="bg-warning1">
+                    <td colspan="100%" class="no-border"><strong>Returned Items</strong></td>
+                  </tr>
+                  }
+                  @for(salesItem of salesOrderReturnsItems;let i=$index; track $index){
+                  <tr class="bg-warning1">
+                    <td style="text-align: center;">{{i+1}}</td>
+                    <td>
+                      @if(salesItem?.product?.productUrl){
+                      <img class="img-thumbnail grid-img-thumbnail" [src]="baseUrl + salesItem?.product?.productUrl"
+                        alt="{{'PRODUCT_IMAGE' | translate}}">
+                      }@else {
+                      <img class="img-thumbnail grid-img-thumbnail" src="/images/no-preview.jpg"
+                        alt="{{'PRODUCT_IMAGE' | translate}}">
+                      }
+                      <span class="ms-1"> {{salesItem?.product?.name}}</span>
+                    </td>
+                    <td class="text-end">{{salesItem.unitPrice | customCurrency}}</td>
+                    <td class="text-end">{{ -1 *salesItem.quantity}}<br> <span
+                        style="font-size: 10px;">({{salesItem?.unitConversation?.name}})</span></td>
+                    <td class="text-end">{{ -1 *salesItem.discount | customCurrency}} <span style="font-size: 10px;">
+                        (
+                        @if(salesItem.discountType==='percentage'){
+                        {{salesItem.discountPercentage}}%
+                        }@else {
+                        {{salesItem.discountType }}
+                        }
+                        )
+                      </span></td>
+                    <td class="text-end">{{ -1 *salesItem.taxValue | customCurrency}}<br>
+                      @for(itemTax of salesItem.salesOrderItemTaxes;let last=$last; track $index){
+                      <span style="font-size: 10px;">
+                        {{itemTax?.taxName}}({{itemTax?.taxPercentage}}%)
+                        @if(!last){
+                        <span>,
+                        </span>
+                        }
+                      </span>
+                      }
+                    </td>
+                    <td class="text-end">
+                      {{ -1 *(((salesItem?.quantity?? 0) * (salesItem?.unitPrice??0)) - salesItem.discount +
+                      salesItem.taxValue) | customCurrency }}
+                    </td>
+                  </tr>
+                  }
+                  <tr>
+                    <td colspan="4" class="text-end total">{{"TOTAL" | translate}}</td>
+                    <td class="text-end total">{{salesOrder.totalDiscount | customCurrency}}</td>
+                    <td class="text-end total">{{salesOrder.totalTax | customCurrency}}</td>
+                    <td class="total">{{salesOrder.totalAmount | customCurrency}}</td>
+                  </tr>
+                  <tr>
+                    <td colspan="6" class="text-end total">{{"PAID" | translate}}</td>
+                    <td class="total">{{salesOrder.totalPaidAmount | customCurrency}} </td>
+                  </tr>
+                  <tr>
+                    <td colspan="6" class="text-end total">{{'REFUND' | translate}}</td>
+                    <td class="total">{{-1 * salesOrder.totalRefundAmount | customCurrency}} </td>
+                  </tr>
+                  <tr>
+                    <td colspan="6" class="text-end total">{{"BALANCE" | translate}}</td>
+                    <td class="total">
+                      {{salesOrder.totalAmount + salesOrder.totalRefundAmount - (salesOrder.totalPaidAmount ?? 0) |
+                      customCurrency}}
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            @if(salesOrder.salesOrderPayments && salesOrder.salesOrderPayments.length > 0){
+            <div>
+              <h5>{{"SALES_ORDER_PAYMENTS" | translate}}</h5>
+              <div class="table-responsive">
+                <table class="table table-bordered table-hover table-striped table-sm" style="width: 50%;">
+                  <thead>
+                    <tr>
+                      <th class="head">{{"PAYMENT_TYPE" | translate}}</th>
+                      <th class="head">{{"PAYMENT_DATE" | translate}}</th>
+                      <th class="head">{{'AMOUNT' | translate}}</th>
+                      <th class="head">{{'REFERENCE_NUMBER' | translate}}</th>
+                      <th class="head">{{'PAID_BY' | translate}}</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    @for(salesItempayments of salesOrder.salesOrderPayments; track $index){
+                    <tr [ngClass]="{'bg-warning1': salesItempayments.paymentType == 1}">
+                      <td>{{salesItempayments?.paymentType | paymentType}}</td>
+                      <td>{{salesItempayments.paymentDate | utcToLocalTime:'shortDate'}}
+                      </td>
+                      <td>{{salesItempayments.amount | customCurrency}}</td>
+                      <td>{{salesItempayments.referenceNumber}}</td>
+                      <td>{{salesItempayments.paymentMethod | paymentmethod}}</td>
+                    </tr>
+                    }
+                  </tbody>
+                </table>
+              </div>
+            </div>
+            }
+            @if(salesOrder.termAndCondition){
+            <h5>{{"TERMS_AND_CONDITION" | translate}}</h5>
+            <div class="row">
+              <div class="col-sm-12">
+                <div class="form-group">
+                  {{salesOrder.termAndCondition}}<br>
+                  <div class="clearfix"></div>
+                </div>
+              </div>
+            </div>
+            }
+            @if(salesOrder.note){
+            <h5>{{"NOTE" | translate}}</h5>
+            <div class="row">
+              <div class="col-sm-12">
+                <div class="form-group">
+                  {{salesOrder.note}}<br>
+                  <div class="clearfix"></div>
+                </div>
+              </div>
+            </div>
+            }
+            <div class="row">
+              <div class="col-md-12 mb-1">
+                <button type="button" (click)="cancel()" class="error" matButton="filled">
+                  <mat-icon class="medium-icon fs-5 align-middle">cancel</mat-icon>
+                  {{'CANCEL' | translate}}
+                </button>
+              </div>
+            </div>
+          </mat-card-content>
+        </mat-card>
+        }
+      </mat-card-content>
+    </mat-card>
+  </div>
+</section>
+@if(salesOrderForInvoice){
+<app-sales-order-invoice (emailBlob)="onEmailBlob($event)" [sendEmail]="isSendEmail"
+  [salesOrder]="salesOrderForInvoice"></app-sales-order-invoice>
+}

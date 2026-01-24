@@ -1,0 +1,39 @@
+<div class="drawer" [class.open]="isOpen">
+    <mat-card appearance="outlined">
+        <mat-card-content>
+            <div class="row">
+                <div class="col-md-12 d-flex justify-content-between align-items-center">
+                    <h5 class="mt-2 text-dark">
+                        <mat-icon class="me-2 align-middle text-primary">category</mat-icon>
+                        {{ 'CHOOSE_THE_CATEGORY' | translate }}
+                    </h5>
+                    <button class="btn" (click)="close.emit()">
+                        <mat-icon class="fs-4 align-middle text-danger">cancel</mat-icon>
+                    </button>
+                </div>
+            </div>
+            <div class="row" style="max-height: 90vh; overflow-y: auto;">
+                <div class="col-sm-12">
+                    <div class="cursor-pointer mt-3 py-2 text-dark rounded border shadow-sm list-group-item d-flex align-items-center justify-content-center"
+                        style="background-color: #fff; font-weight: 600;" (click)="onCategorySelected('')"
+                        [ngClass]="{'selected-category': selectedCategoryId === ''}">
+                        <button type="button" class="btn rounded category fw-medium">
+                            {{ 'ALL_CATEGORIES' | translate }}
+                        </button>
+                    </div>
+                </div>
+                @for (a of categories; let i = $index; track $index) {
+                <div class="col-sm-12">
+                    <div class="cursor-pointer mt-3 py-2 text-dark rounded border shadow-sm list-group-item d-flex align-items-center justify-content-center"
+                        (click)="onCategorySelected(a.id ?? '')" style="background-color: #fff; font-weight: 600;"
+                        [ngClass]="{'selected-category': selectedCategoryId === a.id}">
+                        <button type="button" class="btn rounded category fw-medium">
+                            {{ a.name }}
+                        </button>
+                    </div>
+                </div>
+                }
+            </div>
+        </mat-card-content>
+    </mat-card>
+</div>

@@ -1,0 +1,14 @@
+﻿using System;
+
+namespace POS.Data.Entities.Accounts
+{
+    public class FinancialYear
+    {
+        public Guid Id { get; set; }
+        public DateTime StartDate { get; set; }
+        public DateTime EndDate { get; set; }
+        public bool IsClosed { get; set; } = false;
+        public DateTime? ClosedDate { get; set; }
+        public Guid ClosedBy { get; set; }
+    }
+}

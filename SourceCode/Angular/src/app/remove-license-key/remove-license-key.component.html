@@ -1,0 +1,59 @@
+<section class="content">
+  <div class="container-fluid">
+    <div class="row align-items-center">
+      <div class="col-md-6 mb-2">
+        <span class="mb-0 page-title">{{ "DEACTIVATE_LICENSE_FOR_THIS_DOMAIN" | translate
+          }}
+        </span>
+      </div>
+    </div>
+    <div class="card">
+      <div class="header">
+        <div class="row">
+          <div class="body" [formGroup]="activatedForm">
+            <div class="row">
+              <div class="col-md-12">
+                <ul class="list-group">
+                  <li class="list-group-item">
+                    <span class="text-danger text-bold">
+                      Important: Once you deactivate the license for this domain, the project will no longer work on the
+                      current domain.
+                    </span>
+                  </li>
+                </ul>
+              </div>
+            </div>
+            <div class="row">
+              <div class="col-md-12">
+                <div class="form-group">
+                  <label>{{'CODECANYON_PRUCHASE_CODE' | translate}}</label>
+                  <input class="form-control" type="input" formControlName="purchaseCode" />
+                  @if((activatedForm.get('purchaseCode')?.touched || activatedForm.get('purchaseCode')?.dirty) &&
+                  activatedForm.get('purchaseCode')?.errors) {
+                  @if(activatedForm.get('purchaseCode')?.errors?.['required']) {
+                  <div class="text-danger">
+                    {{'PURCHASE_CODE_IS_REQUIRED' | translate}}
+                  </div>
+                  }
+                  @if(activatedForm.get('purchaseCode')?.errors?.['minlength']) {
+                  <div class="text-danger">
+                    {{'PLEASE_ENTER_VALID_PURCHASE_CODE' | translate}}
+                  </div>
+                  }
+                  }
+                </div>
+              </div>
+            </div>
+            <div class="row mt-3">
+              <div class="col-md-12">
+                <button type="button" class="btn btn-danger btn-sm" (click)="onDeactiveLicense()">
+                  {{'DEACTIVATE_LICENSE' | translate}}
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>

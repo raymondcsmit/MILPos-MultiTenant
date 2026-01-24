@@ -1,0 +1,244 @@
+<section class="content">
+  <div class="container-fluid">
+    <div class="d-flex mb-2">
+      <div class="me-auto">
+        <span class="mb-0 page-title ">{{ 'LEDGER_ACCOUNTS' | translate }}
+          <app-page-help-text code="LEDGER_ACCOUNTS"></app-page-help-text>
+        </span>
+      </div>
+      <div class="d-flex flex-column flex-md-row  gap-2">
+        <div class="form-group">
+          <label class="d-none d-sm-inline" for="">{{"BUSINESS_LOCATION" | translate}}</label>
+          <mat-select panelClass="mat-select-control" [(ngModel)]="selectedLocation"
+            (selectionChange)="onChangeBusinssLocation($event.value)" [dir]="langDir" panelClass="mat-select-control"
+            class="form-control form-control-sm">
+            @for(location of locations; track location.id){
+            <mat-option [value]="location.id">
+              {{location.name}}
+            </mat-option>
+            }
+          </mat-select>
+        </div>
+        <div class="d-flex justify-content-end mb-2">
+          <button *hasClaim="'ACCOUNTING_ADD_LEDGER_ACCOUNT'" class="primary me-2" matButton="filled"
+            (click)="openLedgerAccountDialog()">
+            <mat-icon class="medium-icon fs-5 align-middle">add</mat-icon>
+            {{ 'ADD_LEDGER_ACCOUNT' | translate }}
+          </button>
+          <button *hasClaim="'MANAGE_OPENING_BALANCE'" class="primary me-2" matButton="filled"
+            (click)="openOpeningBalanceDialog()">
+            <mat-icon class="medium-icon fs-5 align-middle">add</mat-icon>
+            {{ 'ADD_OPENING_BALANCE' | translate }}
+          </button>
+        </div>
+      </div>
+    </div>
+    <mat-card appearance="outlined">
+      <mat-card-content>
+        <div class="table-responsive">
+          <div class="grid-height-large">
+            <!-- <table [dir]="langDir" mat-table matSortDisableClear [dataSource]="dataSource" multiTemplateDataRows
+              matSort>
+              <ng-container matColumnDef="actions">
+                <th class="table-column-75" mat-header-cell *matHeaderCellDef></th>
+                <td class="table-column-75" mat-cell *matCellDef="let la">
+                  @if(la.isSystem == false) {
+                  <div class="d-flex my-1 gap-2" *hasClaim="'ACCOUNTING_UPDATE_LEDGER_ACCOUNT'">
+                    <button matMiniFab class="primary" (click)="openLedgerAccountDialog(la)">
+                      <mat-icon class="medium-icon fs-5 align-middle">edit</mat-icon>
+                    </button>
+                  </div>
+                  }
+                </td>
+              </ng-container>
+              <ng-container matColumnDef="accountCode">
+                <th class="table-column-150" mat-header-cell *matHeaderCellDef mat-sort-header>
+                  {{ 'ACCOUNT_CODE' | translate }}
+                </th>
+                <td class="table-column-150" mat-cell *matCellDef="let la">
+                  {{ la.accountCode }}
+                </td>
+              </ng-container>
+              <ng-container matColumnDef="accountName">
+                <th class="table-column-150" mat-header-cell *matHeaderCellDef mat-sort-header>
+                  {{ 'ACCOUNT_NAME' | translate }}
+                </th>
+                <td class="table-column-150" mat-cell *matCellDef="let la">
+                  {{ la.accountName }}
+                </td>
+              </ng-container>
+              <ng-container matColumnDef="accountType">
+                <th class="table-column-150" mat-header-cell *matHeaderCellDef mat-sort-header>
+                  {{ 'ACCOUNT_TYPE' | translate }}
+                </th>
+                <td class="table-column-150" mat-cell *matCellDef="let la">
+                  {{ la.accountType | accountType }}
+                </td>
+              </ng-container>
+              <ng-container matColumnDef="accountGroup">
+                <th class="table-column-150" mat-header-cell *matHeaderCellDef mat-sort-header>
+                  {{ 'ACCOUNT_GROUP' | translate }}
+                </th>
+                <td class="table-column-150" mat-cell *matCellDef="let la">
+                  {{ la.accountGroup | accountGroup }}
+                </td>
+              </ng-container>
+              <ng-container matColumnDef="openingBalance">
+                <th mat-header-cell *matHeaderCellDef mat-sort-header>
+                  {{ 'OPENING_BALANCE' | translate }}
+                </th>
+                <td mat-cell *matCellDef="let la">
+                  {{ la.openingBalance | customCurrency }}
+                </td>
+              </ng-container>
+              <ng-container matColumnDef="isActive">
+                <th mat-header-cell *matHeaderCellDef mat-sort-header>
+                  {{ 'IS_ACTIVE' | translate }}
+                </th>
+                <td mat-cell *matCellDef="let la">
+                  @if(la.isActive) {
+                  <span class="badge bg-success">{{ 'ACTIVE' | translate }}</span>
+                  } @if(!la.isActive){
+                  <span class="badge bg-warning">{{ 'INACTIVE' | translate }}</span>
+                  }
+                </td>
+              </ng-container>
+              <ng-container matColumnDef="actions-search">
+                <th mat-header-cell *matHeaderCellDef>
+                </th>
+              </ng-container>
+              <ng-container matColumnDef="accountCode-search">
+                <th mat-header-cell *matHeaderCellDef>
+                  <input placeholder="{{ 'ACCOUNT_CODE' | translate }}" type="text" class="form-control form-control-sm"
+                    [(ngModel)]="AccountCodeFilter" />
+                </th>
+              </ng-container>
+              <ng-container matColumnDef="accountName-search">
+                <th mat-header-cell *matHeaderCellDef>
+                  <input placeholder="{{ 'ACCOUNT_NAME' | translate }}" type="text" class="form-control form-control-sm"
+                    [(ngModel)]="AccountNameFilter" />
+                </th>
+              </ng-container>
+              <ng-container matColumnDef="accountType-search">
+                <th mat-header-cell *matHeaderCellDef>
+                  <mat-select [dir]="langDir" [(ngModel)]="AccountTypeFilter" panelClass="mat-select-control"
+                    placeholder="{{ 'ACCOUNT_TYPE' | translate }}" class="form-control form-control-sm">
+                    <mat-option value="">{{ 'NONE' | translate }}</mat-option>
+                    @for (accountType of accountType; track $index) {
+                    <mat-option [value]="accountType.value">{{
+                      accountType.label | translate
+                      }}</mat-option>
+                    }
+                  </mat-select>
+                </th>
+              </ng-container>
+              <ng-container matColumnDef="accountGroup-search">
+                <th mat-header-cell *matHeaderCellDef>
+                  <mat-select [dir]="langDir" [(ngModel)]="AccountGroupFilter" panelClass="mat-select-control"
+                    placeholder="{{ 'ACCOUNT_GROUP' | translate }}" class="form-control form-control-sm">
+                    <mat-option value="">{{ 'NONE' | translate }}</mat-option>
+                    @for (accountGroup of accountGroup; track $index) {
+                    <mat-option [value]="accountGroup.value">{{
+                      accountGroup.value | accountGroup
+                      }}</mat-option>
+                    }
+                  </mat-select>
+                </th>
+              </ng-container>
+              <ng-container matColumnDef="openingBalance-search">
+                <th mat-header-cell *matHeaderCellDef></th>
+              </ng-container>
+              <ng-container matColumnDef="isActive-search">
+                <th mat-header-cell *matHeaderCellDef></th>
+              </ng-container>
+              <ng-container matColumnDef="footer">
+                <td mat-footer-cell colspan="8" *matFooterCellDef>
+                  <mat-paginator [length]="dataSource.data.length" [pageSize]="50" [pageSizeOptions]="[10, 20, 30, 50]">
+                  </mat-paginator>
+                </td>
+              </ng-container>
+              <tr *matNoDataRow>
+                <td colspan="8">
+                  <span class="p-4 mt-4">
+                    <b> {{ 'NO_DATA_FOUND' | translate }}</b>
+                  </span>
+                </td>
+              </tr>
+              <tr class="grid-header-color" mat-header-row *matHeaderRowDef="displayedColumns; sticky: true"></tr>
+              <tr mat-row *matRowDef="let row;  columns: displayedColumns" [ngClass]="{
+                              'odd-row': isOddDataRow(getDataIndex(row)),
+                              'even-row': !isOddDataRow(getDataIndex(row))
+                            }">
+              </tr>
+              <tr style="height: 45px !important;" mat-header-row *matHeaderRowDef="filterColumns; sticky: true"></tr>
+              <tr mat-footer-row *matFooterRowDef="footerToDisplayed; sticky: true"></tr>
+            </table> -->
+            <table mat-table [dataSource]="dataSource">
+              <!-- AccountType Row -->
+              <ng-container matColumnDef="accountType">
+                <th mat-header-cell *matHeaderCellDef> {{ 'ACCOUNT_TYPE' | translate }} </th>
+                <td mat-cell *matCellDef="let group"> <span class="fw-bold"> {{ group.accountType | accountType }}
+                  </span></td>
+              </ng-container>
+              <!-- Expandable Row -->
+              <ng-container matColumnDef="items">
+                <th mat-header-cell *matHeaderCellDef> {{ 'LIST_OF_ACCOUNTS' | translate }} </th>
+                <td mat-cell *matCellDef="let group" colspan="4">
+                  <table mat-table [dataSource]="group.items">
+                    <!-- Columns inside inner table -->
+                    <ng-container matColumnDef="accountName">
+                      <th mat-header-cell *matHeaderCellDef> {{ 'ACCOUNT_NAME' | translate }} </th>
+                      <td mat-cell *matCellDef="let account"> {{ account.accountName }} </td>
+                    </ng-container>
+
+                    <ng-container matColumnDef="accountCode">
+                      <th mat-header-cell *matHeaderCellDef> {{ 'ACCOUNT_CODE' | translate }} </th>
+                      <td mat-cell *matCellDef="let account"> {{ account.accountCode }} </td>
+                    </ng-container>
+
+                    <ng-container matColumnDef="openingBalance">
+                      <th mat-header-cell *matHeaderCellDef>{{ 'OPENING_BALANCE' | translate }} </th>
+                      <td mat-cell *matCellDef="let account"> {{ account.openingBalance | customCurrency }} </td>
+                    </ng-container>
+                    <ng-container matColumnDef="accountGroup">
+                      <th class="table-column-150" mat-header-cell *matHeaderCellDef>
+                        {{ 'ACCOUNT_GROUP' | translate }}
+                      </th>
+                      <td class="table-column-150" mat-cell *matCellDef="let account">
+                        {{ account.accountGroup | accountGroup }}
+                      </td>
+                    </ng-container>
+                    <ng-container matColumnDef="isActive">
+                      <th mat-header-cell *matHeaderCellDef>
+                        {{ 'STATUS' | translate }}
+                      </th>
+                      <td mat-cell *matCellDef="let la">
+                        @if(la.isActive) {
+                        <span class="badge bg-success">{{ 'ACTIVE' | translate }}</span>
+                        } @if(!la.isActive){
+                        <span class="badge bg-warning">{{ 'INACTIVE' | translate }}</span>
+                        }
+                      </td>
+                    </ng-container>
+                    <tr class="grid-header-color" mat-header-row
+                      *matHeaderRowDef="['accountName','accountCode','openingBalance','accountGroup','isActive']">
+                    </tr>
+                    <tr mat-row [ngClass]="{ 'odd-row': i % 2 === 0, 'even-row': i % 2 !== 0 }"
+                      *matRowDef="let row; let i = index; columns: ['accountName','accountCode','openingBalance','accountGroup','isActive']">
+                    </tr>
+                  </table>
+                </td>
+              </ng-container>
+              <tr class="grid-header-color" mat-header-row *matHeaderRowDef="['accountType','items']; sticky: true">
+              </tr>
+              <tr [ngClass]="{
+                              'odd-row': isOddDataRow(getDataIndex(row)),
+                              'even-row': !isOddDataRow(getDataIndex(row))
+                            }" mat-row *matRowDef="let row; columns: ['accountType','items']"></tr>
+            </table>
+          </div>
+        </div>
+      </mat-card-content>
+    </mat-card>
+  </div>
+</section>

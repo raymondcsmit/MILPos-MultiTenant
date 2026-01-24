@@ -1,0 +1,112 @@
+<section class="content">
+  <div class="container-fluid">
+    <div class="row align-items-center">
+      <div class="col-md-6 mb-2">
+        <span class="mb-0 page-title">{{ 'MANAGE_LOAN' | translate }}
+          <app-page-help-text code="MANAGE_LOAN"></app-page-help-text>
+        </span>
+      </div>
+    </div>
+
+    <form autocomplete="off" [formGroup]="LoanForm" (ngSubmit)="onSubmit()">
+      <mat-card appearance="outlined">
+        <mat-card-content>
+          <div class="row">
+            <div class="col-lg-4 col-sm-6">
+              <label class="text-danger">{{ 'BRANCH' | translate }} <sup>*</sup></label>
+              <mat-select formControlName="branchId" id="branch" panelClass="mat-select-control" class="form-control"
+                placeholder="{{ 'SELECT_BRANCH' | translate }}">
+                @for (option of branches; track option.id) {
+                <mat-option [value]="option.id">
+                  {{ option.name | translate }}
+                </mat-option>
+                } @if(branches.length === 0) {
+                <mat-option [disabled]="true">
+                  {{ 'NO_DATA_FOUND' | translate }}
+                </mat-option>
+                }
+              </mat-select>
+              @if (LoanForm.get('branchId')?.touched &&
+              LoanForm.get('branchId')?.errors?.['required']) {
+              <div class="text-danger">
+                {{ 'BRANCH_IS_REQUIRED' | translate }}
+              </div>
+              }
+            </div>
+            <div class="col-lg-4 col-sm-6">
+              <label class="text-danger">{{ 'LOAN_NUMBER' | translate }} <sup>*</sup></label>
+              <input formControlName="loanNumber" class="form-control" type="text"
+                placeholder="{{ 'LOAN_NUMBER' | translate }}" />
+              @if (LoanForm.get('loanNumber')?.touched &&
+              LoanForm.get('loanNumber')?.errors?.['required']) {
+              <div class="text-danger">
+                {{ 'LOAN_NUMBER_IS_REQUIRED' | translate }}
+              </div>
+              }
+            </div>
+            <div class="col-lg-4 col-sm-6">
+              <label class="text-danger">{{ 'LOAN_AMOUNT' | translate }} <sup>*</sup></label>
+              <input formControlName="loanAmount" class="form-control" type="number"
+                placeholder="{{ 'LOAN_AMOUNT' | translate }}" />
+              @if (LoanForm.get('loanAmount')?.touched &&
+              LoanForm.get('loanAmount')?.errors?.['required']) {
+              <div class="text-danger">
+                {{ 'LOAN_AMOUNT_IS_REQUIRED' | translate }}
+              </div>
+              } @if (LoanForm.get('loanAmount')?.touched &&
+              LoanForm.get('loanAmount')?.errors?.['min']) {
+              <div class="text-danger">
+                {{ 'LOAN_AMOUNT_MUST_BE_GREATER_THAN_ZERO' | translate }}
+              </div>
+              }
+            </div>
+            <div class="col-lg-4 col-sm-6">
+              <label class="text-danger">{{ 'LENDER_NAME' | translate }} <sup>*</sup></label>
+              <input formControlName="lenderName" class="form-control" type="text"
+                placeholder="{{ 'LENDER_NAME' | translate }}" />
+              @if (LoanForm.get('lenderName')?.touched &&
+              LoanForm.get('lenderName')?.errors?.['required']) {
+              <div class="text-danger">
+                {{ 'LENDER_NAME_IS_REQUIRED' | translate }}
+              </div>
+              }
+            </div>
+            <div class="col-lg-4 col-sm-6">
+              <label class="text-danger">{{ 'LOAN_DATE' | translate }} <sup>*</sup></label>
+              <div class="input-group">
+                <input matInput [matDatepicker]="picker" #loanDate (focus)="picker.open()" formControlName="loanDate"
+                  class="form-control" placeholder="{{ 'LOAN_DATE' | translate }}" [max]="maxDate" />
+                <button class="btn btn-primary btn-sm" tabindex="-1" type="button" (click)="picker.open()">
+                  <mat-icon class="medium-icon fs-5 align-middle">calendar_today</mat-icon>
+                </button>
+              </div>
+              <mat-datepicker #picker (closed)="loanDate.blur()"></mat-datepicker>
+              @if (LoanForm.get('loanDate')?.touched &&
+              LoanForm.get('loanDate')?.errors?.['required']) {
+              <div class="text-danger">
+                {{ 'LOAN_DATE_IS_REQUIRED' | translate }}
+              </div>
+              }
+            </div>
+            <div class="col-sm-12">
+              <label>{{ 'NARRATION' | translate }}</label>
+              <textarea formControlName="narration" [rows]="4" placeholder="{{ 'TYPE_HERE' | translate }}"
+                class="form-control"></textarea>
+            </div>
+            <div class="col-md-sm mt-3 d-flex">
+              <button type="submit" class="success me-2" matButton="filled">
+                <mat-icon class="medium-icon fs-5 align-middle">save</mat-icon>
+                {{ 'SAVE' | translate }}
+              </button>
+              <button type="button" class="error" matButton="filled" [routerLink]="['/accounting/loans']">
+                <mat-icon class="medium-icon fs-5 align-middle">cancel</mat-icon>
+                {{ 'CANCEL' | translate }}
+              </button>
+            </div>
+          </div>
+        </mat-card-content>
+      </mat-card>
+    </form>
+
+  </div>
+</section>

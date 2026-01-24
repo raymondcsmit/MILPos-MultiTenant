@@ -1,0 +1,63 @@
+<section class="content">
+  <div class="container-fluid">
+    <div class="row align-items-center">
+      <!-- Left-hand side: Title -->
+      <div class="col-md-6 mb-2">
+        <span class="mb-0 page-title">
+          {{ "MANAGE_PAGE_HELPER" | translate }}
+          <app-page-help-text code="PAGE_HELPERS"></app-page-help-text>
+        </span>
+      </div>
+    </div>
+    <mat-card>
+      <mat-card-content>
+        <form [formGroup]="pageHelperForm">
+          <mat-card appearance="outlined">
+            <mat-card-content>
+              <div class="row">
+                <div class="col-md-6">
+                  <div class="form-group">
+                    <label>{{ "NAME" | translate }}</label>
+                    <input formControlName="name" class="form-control" type="text" />
+                    @if(pageHelperForm.get('name')?.touched &&
+                    pageHelperForm.get('name')?.errors && pageHelperForm.get('name')?.hasError('required')){
+                    <div class="text-danger">
+                      {{ "NAME_IS_REQUIRED" | translate }}
+                    </div>
+                    }
+                  </div>
+                </div>
+                <div class="col-md-12">
+                  <div class="form-group">
+                    <label class="font-weight-bold">
+                      {{ "DESCRIPTION" | translate }}
+                    </label>
+                    <app-text-editor formControlName="description"></app-text-editor>
+                    @if(pageHelperForm.get('description')?.touched &&
+                    pageHelperForm.get('description')?.errors &&
+                    pageHelperForm.get('description')?.hasError('required')){
+                    <div class="text-danger">
+                      {{ "DESCRIPTION_IS_REQUIRED" | translate }}
+                    </div>
+                    }
+                  </div>
+                </div>
+                <div class="row mt-3">
+                  <div class="col-md-12">
+                    <button class="success me-2" matButton="filled" (click)="update()" cdkFocusInitial>
+                      <mat-icon class="medium-icon fs-5 align-middle">save</mat-icon>
+                       {{'SAVE' | translate}}
+                    </button>
+                    <button type="button" class="error" matButton="filled" [routerLink]="['/page-helper']">
+                      <mat-icon class="medium-icon fs-5 align-middle">cancel</mat-icon> {{'CANCEL' | translate}}
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </mat-card-content>
+          </mat-card>
+        </form>
+      </mat-card-content>
+    </mat-card>
+  </div>
+</section>

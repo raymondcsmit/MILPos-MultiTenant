@@ -1,0 +1,83 @@
+<mat-card appearance="outlined">
+  <mat-card-content>
+    <div class="row mb-3 align-items-center justify-content-between">
+      <div class="col-md-auto col-sm-auto">
+        <div class="section-title">
+          <span class="mb-0 page-title">
+            {{ 'STOCK_HISTORY' | translate }}
+            <app-page-help-text code="STOCK_HISTORY"></app-page-help-text>
+          </span>
+        </div>
+      </div>
+    </div>
+    <div class="table-responsive">
+      <table [dir]="langDir" mat-table matSortDisableClear [dataSource]="dataSource" matSort multiTemplateDataRows
+        matSortActive="createdDate">
+        <ng-container matColumnDef="createdDate">
+          <th class="table-column-200" mat-header-cell *matHeaderCellDef mat-sort-header>
+            {{ 'DATE' | translate }}
+          </th>
+          <td class="table-column-200" mat-cell *matCellDef="let row">
+            {{ row.createdDate | utcToLocalTime : 'short' }}
+          </td>
+        </ng-container>
+        <ng-container matColumnDef="inventorySource">
+          <th class="table-column-150" mat-header-cell *matHeaderCellDef mat-sort-header>
+            {{ 'SOURCE' | translate }}
+          </th>
+          <td class="table-column-150" mat-cell *matCellDef="let row">
+            {{ row.inventorySource | inventorySource }}
+            @if(row.purchaseOrderId){
+            <span>
+              <a [routerLink]="['/purchase-order/detail', row.purchaseOrderId]">({{ row.purchaseOrderNumber }})</a>
+            </span>
+            } @if(row.salesOrderId){
+            <span>
+              <a [routerLink]="['/sales-order/detail', row.salesOrderId]">({{ row.salesOrderNumber }})</a>
+            </span>
+            } @if(row.stockTransferNo){
+            <span>
+              <a href="javascript:void(0);" (click)="viewTransferDetail(row)">({{ row.stockTransferNo }})</a>
+            </span>
+            }
+          </td>
+        </ng-container>
+        <ng-container matColumnDef="stock">
+          <th class="table-column-150" mat-header-cell *matHeaderCellDef mat-sort-header>
+            {{ 'STOCK' | translate }}
+          </th>
+          <td class="table-column-150" mat-cell *matCellDef="let row">
+            <span>
+              {{ row.stock }}
+            </span>
+          </td>
+        </ng-container>
+        <ng-container matColumnDef="pricePerUnit">
+          <th class="table-column-150" mat-header-cell *matHeaderCellDef mat-sort-header>
+            {{ 'UNIT_PER_PRICE' | translate }}
+          </th>
+          <td class="table-column-150" mat-cell *matCellDef="let row">
+            {{ row.pricePerUnit | customCurrency }}
+          </td>
+        </ng-container>
+        <ng-container matColumnDef="footer">
+          <td mat-footer-cell colspan="5" *matFooterCellDef>
+            <mat-paginator [length]="inventoryHistoryResource.totalCount" [pageSize]="inventoryHistoryResource.pageSize"
+              [pageSizeOptions]="[10, 20, 30]">
+            </mat-paginator>
+          </td>
+        </ng-container>
+        <tr *matNoDataRow>
+          <td colspan="9">
+            <span class="p-4 mt-4">
+              <b> {{ 'NO_DATA_FOUND' | translate }}</b>
+            </span>
+          </td>
+        </tr>
+        <tr class="grid-header-color" mat-header-row *matHeaderRowDef="displayedColumns; sticky: true"></tr>
+        <tr mat-row *matRowDef="let row; columns: displayedColumns"
+          [class.bg-warning1]="row.inventorySource == 2 || row.inventorySource == 3"></tr>
+        <tr mat-footer-row *matFooterRowDef="columnsToDisplay; sticky: true"></tr>
+      </table>
+    </div>
+  </mat-card-content></mat-card>

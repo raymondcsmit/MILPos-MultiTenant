@@ -1,0 +1,239 @@
+<section class="content">
+  <div class="container-fluid">
+    <div class="row align-items-center">
+      <div class="col-md-6 mb-2">
+        <span class="mb-0 page-title">{{ 'PRODUCT_PURCHASE_REPORT' | translate }}
+          <app-page-help-text code="PRODUCT_PURCHASE_REPORT"></app-page-help-text>
+        </span>
+      </div>
+    </div>
+    <mat-card appearance="outlined">
+      <mat-card-content>
+        <div class="row">
+          <div class="col-sm-12 mb-3">
+            <form [formGroup]="searchForm">
+              <div class="row">
+                <div class="col-lg-2 col-md-4 col-sm-12">
+                  <div class="form-group">
+                    <label>{{ 'BUSINESS_LOCATION' | translate }}</label>
+                    <div class="input-group">
+                      <mat-select [dir]="langDir" formControlName="locationId" panelClass="mat-select-control"
+                        placeholder="{{ 'BUSINESS_LOCATION' | translate }}" class="form-control form-control-sm">
+                        @for(location of locations; track location.id){
+                        <mat-option [value]="location.id">
+                          {{ location.name }}
+                        </mat-option>
+                        } @if(locations.length==0){
+                        <mat-option value="">
+                          {{ 'NO_RECORDS' | translate }}
+                        </mat-option>
+                        }
+                      </mat-select>
+                    </div>
+                  </div>
+                </div>
+                <div class="col-lg-2 col-md-4 col-sm-12">
+                  <div class="form-group">
+                    <label for="fromDate">{{ 'FROM_DATE' | translate }}</label>
+                    <input type="text" placeholder="{{ 'FROM_DATE' | translate }}" #fromDate formControlName="fromDate"
+                      (focus)="fromDatePicker.open()" [matDatepicker]="fromDatePicker"
+                      class="form-control form-control-sm" />
+                    <mat-datepicker #fromDatePicker (closed)="fromDate.blur()"></mat-datepicker>
+                  </div>
+                </div>
+                <div class="col-lg-2 col-md-4 col-sm-12">
+                  <div class="form-group">
+                    <label for="toDate">{{ 'TO_DATE' | translate }} </label>
+                    <input type="text" placeholder="{{ 'TO_DATE' | translate }}" #toDate formControlName="toDate"
+                      (focus)="toDatePicker.open()" [matDatepicker]="toDatePicker"
+                      class="form-control form-control-sm" />
+                    <mat-datepicker #toDatePicker (closed)="toDate.blur()"></mat-datepicker>
+                  </div>
+                </div>
+                <div class="col-lg-2 col-md-4 col-sm-12">
+                  <div class="form-group">
+                    <label>{{ 'SELECT_PRODUCT' | translate }} </label>
+                    <mat-select [dir]="langDir" formControlName="productId" panelClass="mat-select-control"
+                      placeholder="{{ 'SELECT_PRODUCT' | translate }} " class="form-control form-control-sm">
+                      <input class="form-control form-control-sm" formControlName="filterProductValue" focused="'true'"
+                        type="text" autocomplete="off" placeholder="{{ 'SEARCH_OTHER_PRODUCTS' | translate }}" />
+                      <mat-divider></mat-divider>
+                      @for(a of products; track a.id){
+                      <mat-option [dir]="langDir" [value]="a.id">
+                        {{ a.name }}
+                      </mat-option>
+                      } @if(products.length==0){
+                      <mat-option value="">
+                        {{ 'NO_RECORDS' | translate }}
+                      </mat-option>
+                      }
+                    </mat-select>
+                  </div>
+                </div>
+                <div class="col-lg-6 col-md-12 col-sm-12 mt-4 d-flex flex-wrap">
+                  <button class="primary me-1" matButton="filled" (click)="onSearch()">
+                    <mat-icon class="medium-icon fs-5 align-middle">search</mat-icon>
+                    <span class="d-none d-sm-inline"> {{ 'SEARCH' | translate }} </span>
+                  </button>
+                  <button class="error me-1" matButton="filled" (click)="onClear()">
+                    <mat-icon class="medium-icon fs-5 align-middle">cancel</mat-icon>
+                    <span class="d-none d-sm-inline"> {{ 'CLEAR' | translate }} </span>
+                  </button>
+                  <button class="warning me-1" matButton="filled" [matMenuTriggerFor]="menu">
+                    <mat-icon class="medium-icon fs-5 align-middle">download</mat-icon>
+                    <span class="d-none d-sm-inline"> {{ 'EXPORT' | translate }} </span>
+                  </button>
+                  <mat-menu #menu="matMenu" class="mat-menu-control-sm">
+                    <button mat-menu-item (click)="onDownloadReport('csv')">
+                      <mat-icon class="medium-icon fs-5 align-middle">table_chart</mat-icon>
+                      CSV
+                    </button>
+                    <button mat-menu-item (click)="onDownloadReport('xlsx')">
+                      <mat-icon class="medium-icon fs-5 align-middle">grid_on</mat-icon>
+                      Excel
+                    </button>
+                    <button mat-menu-item (click)="onDownloadReport('pdf')">
+                      <mat-icon class="medium-icon fs-5 align-middle">picture_as_pdf</mat-icon>
+                      PDF
+                    </button>
+                  </mat-menu>
+                  <button *hasClaim="'REP_SEND_EMAIL'" matButton="filled" class="secondary"
+                    (click)="onDownloadReport('email')">
+                    <mat-icon class="medium-icon fs-5 align-middle">email</mat-icon>
+                    <span class="d-none d-sm-inline"> {{ 'SEND_EMAIL' | translate }} </span>
+                  </button>
+                </div>
+              </div>
+              @if(searchForm.errors?.['dateRange']){
+              <div class="row">
+                <div class="text-danger">
+                  {{ 'DATE_RANGE_VALIDATION_MSG' | translate }}
+                </div>
+              </div>
+              }
+            </form>
+          </div>
+        </div>
+        <div class="table-responsive">
+          <div class="grid-height-medium">
+            <table [dir]="langDir" mat-table matSortDisableClear [dataSource]="dataSource" matSort
+              matSortActive="poCreatedDate" matSortDirection="desc">
+              <ng-container matColumnDef="productName">
+                <th mat-header-cell mat-sort-header *matHeaderCellDef>
+                  {{ 'PRODUCT_NAME' | translate }}
+                </th>
+                <td mat-cell *matCellDef="let element">
+                  {{ element.productName }}
+                </td>
+              </ng-container>
+              <ng-container matColumnDef="purchaseOrderNumber">
+                <th mat-header-cell mat-sort-header *matHeaderCellDef>
+                  {{ 'ORDER_NUMBER' | translate }}
+                </th>
+                <td mat-cell *matCellDef="let element">
+                  <a [routerLink]="['/purchase-order/detail', element.purchaseOrderId]">{{ element.purchaseOrderNumber
+                    }}
+                  </a>
+                </td>
+              </ng-container>
+              <ng-container matColumnDef="supplierName">
+                <th mat-header-cell mat-sort-header *matHeaderCellDef>
+                  {{ 'SUPPLIER' | translate }}
+                </th>
+                <td mat-cell *matCellDef="let element">
+                  {{ element.supplierName }}
+                </td>
+              </ng-container>
+              <ng-container matColumnDef="poCreatedDate">
+                <th mat-header-cell mat-sort-header *matHeaderCellDef>
+                  {{ 'PURCHASE_DATE' | translate }}
+                </th>
+                <td mat-cell *matCellDef="let element">
+                  {{ element.poCreatedDate | utcToLocalTime : 'short' }}
+                </td>
+              </ng-container>
+              <ng-container matColumnDef="unitName">
+                <th mat-header-cell *matHeaderCellDef>{{ 'UNIT' | translate }}</th>
+                <td mat-cell *matCellDef="let element">
+                  {{ element.unitName }}
+                </td>
+              </ng-container>
+              <ng-container matColumnDef="unitPrice">
+                <th mat-header-cell *matHeaderCellDef>{{ 'UNIT_PER_PRICE' | translate }}</th>
+                <td mat-cell *matCellDef="let element">
+                  {{ element.unitPrice | customCurrency }}
+                </td>
+              </ng-container>
+              <ng-container matColumnDef="quantity">
+                <th mat-header-cell *matHeaderCellDef>{{ 'QUANTITY' | translate }}</th>
+                <td mat-cell *matCellDef="let element">
+                  {{ element.status === 1 ? -1 * element.quantity : element.quantity }}
+                </td>
+              </ng-container>
+              <ng-container matColumnDef="totalDiscount">
+                <th mat-header-cell *matHeaderCellDef>{{ 'TOTAL_DISCOUNT' | translate }}</th>
+                <td mat-cell *matCellDef="let element">
+                  {{ element.discount | customCurrency }}
+                  (
+                  @if(element.discountType==='percentage'){
+                  {{element.discountPercentage}}%
+                  }@else {
+                  {{element.discountType }}
+                  }
+                  )
+                </td>
+              </ng-container>
+              <ng-container matColumnDef="taxes">
+                <th mat-header-cell *matHeaderCellDef>{{ 'TAX' | translate }}</th>
+                <td mat-cell *matCellDef="let element">
+                  @for(item of element.purchaseOrderItemTaxes;let last = $last; track $index){
+                  <span>
+                    {{ item.taxName }}({{ item.taxPercentage }}%) @if(!last){
+                    <span> ,</span>
+                    }
+                  </span>
+                  }
+                </td>
+              </ng-container>
+              <ng-container matColumnDef="totalTax">
+                <th mat-header-cell *matHeaderCellDef>{{ 'TOTAL_TAX' | translate }}</th>
+                <td mat-cell *matCellDef="let element">
+                  {{ element.taxValue | customCurrency }}
+                </td>
+              </ng-container>
+              <ng-container matColumnDef="totalAmount">
+                <th mat-header-cell *matHeaderCellDef>{{ 'TOTAL' | translate }}</th>
+                <td mat-cell *matCellDef="let element">
+                  {{
+                  element.unitPrice * element.quantity - element.discount + element.taxValue
+                  | customCurrency
+                  }}
+                </td>
+              </ng-container>
+              <ng-container matColumnDef="footer">
+                <td mat-footer-cell colspan="12" *matFooterCellDef>
+                  <mat-paginator [length]="purchaseOrderResource.totalCount" [pageSize]="purchaseOrderResource.pageSize"
+                    [pageSizeOptions]="[10, 20, 30, 50]">
+                  </mat-paginator>
+                </td>
+              </ng-container>
+              <tr *matNoDataRow>
+                <td colspan="9">
+                  <span class="p-4 mt-4">
+                    <b> {{ 'NO_DATA_FOUND' | translate }}</b>
+                  </span>
+                </td>
+              </tr>
+              <tr class="grid-header-color" mat-header-row *matHeaderRowDef="displayedColumns; sticky: true"></tr>
+              <tr mat-row *matRowDef="let row; columns: displayedColumns" [ngClass]="{
+                              'odd-row': isOddDataRow(getDataIndex(row)),
+                              'even-row': !isOddDataRow(getDataIndex(row))
+                            }" [class.bg-warning1]="row.status === 1"></tr>
+              <tr mat-footer-row *matFooterRowDef="footerToDisplayed; sticky: true"></tr>
+            </table>
+          </div>
+        </div>
+      </mat-card-content>
+    </mat-card>
+  </div>
+</section>

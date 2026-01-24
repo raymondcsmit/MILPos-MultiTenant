@@ -1,0 +1,89 @@
+.drawer {
+  position: fixed;
+  top: 0;
+  left: -480px;
+  width: 480px;
+  background: #fff;
+  color: #fff;
+  transition: left 0.3s ease;
+  box-shadow: 2px 0 5px rgba(0, 0, 0, 0.3);
+  padding: 1rem;
+  z-index: 1000;
+}
+
+.drawer.open {
+  left: 0;
+}
+
+.drawer .close-btn {
+  background: none;
+  border: none;
+  font-size: 1.5rem;
+  color: #fff;
+}
+
+.list-group-item {
+  transition: border 0.3s;
+}
+
+.list-group-item:hover {
+  border: 2px solid #0d6efd !important;
+}
+
+.selected-category {
+  .category {
+    color: #fff !important;
+  }
+
+  background-color: #3f51b5 !important;
+  color: #fff !important;
+}
+
+@media screen and (max-width: 1024px) {
+  .drawer {
+    width: 320px;
+    left: -320px;
+  }
+
+  .drawer.open {
+    left: 0;
+  }
+
+  .card-pos,
+  .card-pos .card-body,
+  .list-group-item,
+  .selected-category .category {
+    font-size: 0.95rem;
+  }
+}
+
+@media screen and (max-width: 768px) {
+
+  .card-pos,
+  .card-pos .card-body,
+  .mat-card-header-text,
+  .list-group-item,
+  .selected-category .category {
+    font-size: 0.85rem;
+  }
+}
+
+@media screen and (max-width: 1024px) {
+  .card-pos {
+    height: 100px;
+  }
+
+  .card-pos .card-body {
+    overflow-y: visible;
+  }
+}
+
+@media screen and (max-width: 480px) {
+  .card-pos {
+    height: 70px;
+  }
+
+  .card-pos .card-body {
+    overflow-y: visible;
+  }
+}

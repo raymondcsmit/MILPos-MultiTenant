@@ -1,0 +1,114 @@
+<section class="content">
+  <div class="container-fluid">
+    <div class="d-flex mb-2">
+      <div class="me-auto">
+        <span class="mb-0 page-title">{{ "CITIES" | translate }}
+          <app-page-help-text code="CITIES"></app-page-help-text>
+        </span>
+      </div>
+      <div class="d-flex justify-content-end">
+        <button *hasClaim="'SUPP_ADD_SUPPLIER'" class="primary me-2" matButton="filled" (click)="manageCity(null)">
+          <mat-icon class="medium-icon fs-5 align-middle">add</mat-icon>
+          {{ "ADD_CITY" | translate }}
+        </button>
+      </div>
+    </div>
+    <mat-card appearance="outlined">
+      <mat-card-content>
+        <div class="table-responsive">
+          <div class="grid-height-large">
+            <table [dir]="langDir" mat-table matSortDisableClear [dataSource]="dataSource" multiTemplateDataRows matSort
+              matSortActive="cityName">
+              <ng-container matColumnDef="action">
+                <th class="table-column-200" mat-header-cell *matHeaderCellDef> {{"ACTION" |
+                  translate}}
+                </th>
+                <td class="table-column-200" mat-cell *matCellDef="let element">
+                  <div class="d-flex gap-2">
+                    <button matMiniFab *hasClaim="'SETT_MANAGE_CITY'" (click)="manageCity(element)" class="primary">
+                      <mat-icon class="medium-icon fs-5 align-middle">edit</mat-icon>
+                    </button>
+                    <button matMiniFab *hasClaim="'SETT_MANAGE_CITY'" (click)="deleteCity(element)" class="error">
+                      <mat-icon class="medium-icon fs-5 align-middle">delete</mat-icon>
+                    </button>
+                  </div>
+                  <!-- <button *hasClaim="'SETT_MANAGE_CITY'" (click)="manageCity(element)" class="primary me-2"
+                    matButton="filled" type="button">
+                    <mat-icon class="medium-icon fs-5 align-middle">edit</mat-icon>
+                    <span class="d-none d-sm-inline"> {{"EDIT" | translate}}</span>
+                  </button>
+                  <button *hasClaim="'SETT_MANAGE_CITY'" (click)="deleteCity(element)" class="error me-2"
+                    matButton="filled" type="button">
+                    <mat-icon class="medium-icon fs-5 align-middle">delete</mat-icon>
+                    <span class="d-none d-sm-inline"> {{"DELETE" | translate}}</span>
+                  </button> -->
+                </td>
+              </ng-container>
+              <ng-container matColumnDef="cityName">
+                <th class="table-column-300" mat-header-cell *matHeaderCellDef mat-sort-header>
+                  {{'CITY' | translate}} </th>
+                <td class="table-column-300" mat-cell *matCellDef="let city"> {{city.cityName}}
+                </td>
+              </ng-container>
+              <ng-container matColumnDef="countryName">
+                <th class="table-column-150" mat-header-cell mat-sort-header *matHeaderCellDef>
+                  {{'COUNTRY' | translate}}
+                </th>
+                <td class="table-column-150" mat-cell *matCellDef="let city"> {{city.countryName}}
+                </td>
+              </ng-container>
+              <ng-container matColumnDef="action-search">
+                <th class="pr-5" mat-header-cell *matHeaderCellDef> </th>
+              </ng-container>
+              <ng-container matColumnDef="cityName-search">
+                <th mat-header-cell *matHeaderCellDef>
+                  <input placeholder="{{'CITY' | translate}}" type="text" class="form-control form-control-sm"
+                    [(ngModel)]="NameFilter">
+                </th>
+              </ng-container>
+              <ng-container matColumnDef="country-search">
+                <th mat-header-cell *matHeaderCellDef>
+                  <input type="text" placeholder="{{'COUNTRY' | translate}}" class="form-control form-control-sm"
+                    [formControl]="countryControl" [matAutocomplete]="auto">
+                  <mat-autocomplete [dir]="langDir" [autoActiveFirstOption]="true"
+                    (optionSelected)='CountryFilter = $event.option.value' #auto="matAutocomplete">
+                    <mat-option value="">{{'NONE' | translate}}</mat-option>
+                    @for (cont of filteredCountryList | async; track cont.countryName) {
+                    <mat-option [value]="cont.countryName">
+                      {{cont.countryName}}
+                    </mat-option>
+                    }
+                  </mat-autocomplete>
+                </th>
+              </ng-container>
+              <ng-container matColumnDef="footer">
+                <td mat-footer-cell colspan="8" *matFooterCellDef>
+                  <mat-paginator [length]="cityResource.totalCount" [pageSize]="cityResource.pageSize"
+                    [pageSizeOptions]="[10, 20, 30]">
+                  </mat-paginator>
+                </td>
+              </ng-container>
+              <tr *matNoDataRow>
+                <td colspan="9">
+                  <span class="p-4 mt-4">
+                    <b> {{'NO_DATA_FOUND' | translate}}</b>
+                  </span>
+                </td>
+              </tr>
+              <tr class="grid-header-color" mat-header-row *matHeaderRowDef="displayedColumns;sticky: true"></tr>
+              <tr mat-row *matRowDef="let row; columns: displayedColumns;" [ngClass]="{
+                              'odd-row': isOddDataRow(getDataIndex(row)),
+                              'even-row': !isOddDataRow(getDataIndex(row))
+                            }"></tr>
+              <tr style="height: 45px !important;" mat-header-row
+                *matHeaderRowDef="['action-search','cityName-search','country-search'];sticky: true"
+                class="example-second-header-row">
+              </tr>
+              <tr mat-footer-row *matFooterRowDef="columnsToDisplay;sticky: true"></tr>
+            </table>
+          </div>
+        </div>
+      </mat-card-content>
+    </mat-card>
+  </div>
+</section>

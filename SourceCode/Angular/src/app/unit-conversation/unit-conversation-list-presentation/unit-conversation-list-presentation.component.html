@@ -1,0 +1,85 @@
+<section class="content">
+  <div class="container-fluid">
+    <div class="d-flex mb-2">
+      <div class="me-auto">
+        <span class="mb-0 page-title">{{ "UNIT_CONVERSATION" | translate }}
+          <app-page-help-text code="UNIT_CONVERSATION"></app-page-help-text>
+        </span>
+      </div>
+      <div class="d-flex justify-content-end">
+        <button class="primary me-2" matButton="filled" (click)="manageUnitConversation(null)">
+          <mat-icon class="medium-icon fs-5 align-middle">add</mat-icon>
+          {{ "ADD_UNIT_CONVERSATION" | translate }}
+        </button>
+      </div>
+    </div>
+    <mat-card appearance="outlined">
+      <mat-card-content>
+        <div class="table-responsive">
+          <div class="grid-height-large">
+            @if(unitConversations){
+            <table [dir]="langDir" mat-table [dataSource]="unitConversations" multiTemplateDataRows>
+              <ng-container matColumnDef="action">
+                <th class="table-column-30" mat-header-cell *matHeaderCellDef>{{'ACTION' | translate}} </th>
+                <td class="table-column-30" mat-cell *matCellDef="let element">
+                  <div class="d-flex gap-2 my-1">
+                    <!-- <button (click)="manageUnitConversation(element)" class="primary me-2" matButton="filled"
+                      type="button">
+                      <mat-icon class="medium-icon fs-5 align-middle">edit</mat-icon>
+                      <span class="d-none d-sm-inline"> {{"EDIT" | translate}}</span>
+                    </button>
+                    <button (click)="deleteUnitConversation(element)" class="error" matButton="filled" type="button">
+                      <mat-icon class="medium-icon fs-5 align-middle">delete</mat-icon>
+                      <span class="d-none d-sm-inline"> {{"DELETE" | translate}}</span>
+                    </button> -->
+
+                    <button matMiniFab (click)="manageUnitConversation(element)" class="primary">
+                      <mat-icon class="medium-icon fs-5 align-middle">edit</mat-icon>
+                    </button>
+                    <button matMiniFab (click)="deleteUnitConversation(element)" class="error">
+                      <mat-icon class="medium-icon fs-5 align-middle">delete</mat-icon>
+                    </button>
+                  </div>
+                </td>
+              </ng-container>
+              <ng-container matColumnDef="name">
+                <th mat-header-cell *matHeaderCellDef> {{'NAME' | translate}} </th>
+                <td mat-cell *matCellDef="let element"> {{element.name}} </td>
+              </ng-container>
+              <ng-container matColumnDef="code">
+                <th mat-header-cell *matHeaderCellDef> {{'UNIT_CODE' | translate}} </th>
+                <td mat-cell *matCellDef="let element"> {{element.code}} </td>
+              </ng-container>
+              <ng-container matColumnDef="baseUnitName">
+                <th mat-header-cell *matHeaderCellDef> {{'BASE_UNIT' | translate}}</th>
+                <td mat-cell *matCellDef="let element"> {{element.baseUnitName}} </td>
+              </ng-container>
+              <ng-container matColumnDef="operator">
+                <th mat-header-cell *matHeaderCellDef>{{'OPERATOR' | translate}} </th>
+                <td mat-cell *matCellDef="let element"> {{element.operator | unitOperator}} </td>
+              </ng-container>
+              <ng-container matColumnDef="value">
+                <th mat-header-cell *matHeaderCellDef>{{'OPERATION_VALUE' | translate}} </th>
+                <td mat-cell *matCellDef="let element"> {{element.value}} </td>
+              </ng-container>
+              <tr *matNoDataRow>
+                <td colspan="9">
+                  <span class="p-4 mt-4">
+                    <b> {{'NO_DATA_FOUND' | translate}}</b>
+                  </span>
+                </td>
+              </tr>
+              <tr class="grid-header-color" mat-header-row *matHeaderRowDef="columnsToDisplay;sticky: true"></tr>
+              <tr mat-row *matRowDef="let row; columns: columnsToDisplay;" [ngClass]="{
+                              'odd-row': isOddDataRow(getDataIndex(row)),
+                              'even-row': !isOddDataRow(getDataIndex(row))
+                            }">
+              </tr>
+            </table>
+            }
+          </div>
+        </div>
+      </mat-card-content>
+    </mat-card>
+  </div>
+</section>

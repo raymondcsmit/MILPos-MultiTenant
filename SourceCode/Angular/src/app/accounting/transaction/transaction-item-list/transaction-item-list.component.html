@@ -1,0 +1,74 @@
+<mat-card appearance="outlined">
+  <mat-card-content>
+    <div class="row align-items-center justify-content-between">
+      <div class="col-md-auto col-sm-auto">
+        <div class="section-title">
+          <span class="mb-0 page-title-sub">
+            {{ 'TRANSACTION_ITEMS' | translate }}
+            <app-page-help-text code="TRANSACTION_ITEMS"></app-page-help-text>
+          </span>
+        </div>
+      </div>
+    </div>
+    <div class="table-responsive">
+      <table [dir]="langDir" mat-table [dataSource]="transactionItems">
+        <ng-container matColumnDef="productName">
+          <th mat-header-cell *matHeaderCellDef>{{ 'PRODUCT_NAME' | translate }}</th>
+          <td mat-cell *matCellDef="let element">
+            {{ element.productName }}
+          </td>
+        </ng-container>
+        <ng-container matColumnDef="quantity">
+          <th mat-header-cell *matHeaderCellDef>{{ 'QUANTITY' | translate }}</th>
+          <td mat-cell *matCellDef="let element">
+            {{ element.status === 1 ? -1 * element.quantity : element.quantity }}
+          </td>
+        </ng-container>
+        <ng-container matColumnDef="unitPrice">
+          <th mat-header-cell *matHeaderCellDef>{{ 'UNIT_PER_PRICE' | translate }}</th>
+          <td mat-cell *matCellDef="let element">
+            {{ element.unitPrice | customCurrency }}
+          </td>
+        </ng-container>
+        <!-- <ng-container matColumnDef="discountPercentage">
+          <th mat-header-cell *matHeaderCellDef>{{ 'DISCOUNT_PERCENTAGE' | translate }}</th>
+          <td mat-cell *matCellDef="let element">{{ element.discountPercentage }}%</td>
+        </ng-container> -->
+        <ng-container matColumnDef="discountAmount">
+          <th mat-header-cell *matHeaderCellDef>{{ 'DISCOUNT_AMOUNT' | translate }}</th>
+          <td mat-cell *matCellDef="let element">
+            {{ element.discountAmount | customCurrency }}
+            (
+            @if(element.discountType==='percentage'){
+            {{element.discountPercentage}}%
+            }@else {
+            {{element.discountType }}
+            }
+            )
+          </td>
+        </ng-container>
+        <ng-container matColumnDef="taxPercentage">
+          <th mat-header-cell *matHeaderCellDef>{{ 'TAX_PERCENTAGE' | translate }}</th>
+          <td mat-cell *matCellDef="let element">{{ element.taxPercentage }}%</td>
+        </ng-container>
+        <ng-container matColumnDef="taxAmount">
+          <th mat-header-cell *matHeaderCellDef>{{ 'TAX_AMOUNT' | translate }}</th>
+          <td mat-cell *matCellDef="let element">
+            {{ element.taxAmount | customCurrency }}({{ element.taxPercentage }}%)
+          </td>
+        </ng-container>
+        <ng-container matColumnDef="lineTotal">
+          <th mat-header-cell *matHeaderCellDef>{{ 'TOTAL' | translate }}</th>
+          <td mat-cell *matCellDef="let element">
+            {{ element.lineTotal | customCurrency }}
+          </td>
+        </ng-container>
+        <tr class="grid-header-color" mat-header-row *matHeaderRowDef="displayedColumns; sticky: true"></tr>
+        <tr mat-row *matRowDef="let row; columns: displayedColumns" [ngClass]="{
+                              'odd-row': isOddDataRow(getDataIndex(row)),
+                              'even-row': !isOddDataRow(getDataIndex(row))
+                            }" [class.bg-warning1]="row.status === 1"></tr>
+      </table>
+    </div>
+  </mat-card-content>
+</mat-card>

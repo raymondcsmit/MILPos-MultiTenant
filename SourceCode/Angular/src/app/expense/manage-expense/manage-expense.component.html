@@ -1,0 +1,183 @@
+<section class="content">
+  <div class="container-fluid">
+    <div class="row align-items-center">
+      <div class="col-md-6 mb-2">
+        <span class="mb-0 page-title">{{'MANAGE_EXPENSE' | translate}}
+          <app-page-help-text code="EXPENSE_LIST"></app-page-help-text>
+        </span>
+      </div>
+    </div>
+
+    <form autocomplete="off" [formGroup]="expenseForm" (ngSubmit)="onExpenseSubmit()">
+      <mat-card appearance="outlined">
+        <mat-card-content>
+          <div class="row">
+            <div class="col-lg-4 col-sm-6">
+              <div class="form-group">
+                <label class="text-danger form-label" for="expenseDate">{{'DATE' | translate}} *</label>
+                <input type="text" #expenseDate formControlName="expenseDate" (focus)="expenseDatePicker.open()"
+                  [matDatepicker]="expenseDatePicker" class="form-control input-with-clear">
+                <mat-datepicker #expenseDatePicker (closed)="expenseDate.blur()"></mat-datepicker>
+                @if(expenseForm.get('expenseDate')?.touched && expenseForm.get('expenseDate')?.errors &&
+                expenseForm.get('expenseDate')?.errors?.['required']){
+                <div class="text-danger">
+                  {{'EXPENSE_DATE_IS_REQUIRED' | translate}}
+                </div>
+                }
+              </div>
+            </div>
+            <div class="col-lg-4 col-sm-6">
+              <div class="form-group">
+                <label class="form-label">{{'REFERENCE' | translate}} </label>
+                <input formControlName="reference" class="form-control" [readOnly]="expenseForm.get('id')?.value"
+                  type="text">
+              </div>
+            </div>
+            <div class="col-lg-4 col-sm-6">
+              <div class="form-group">
+                <label class="text-danger form-label">{{'BUSINESS_LOCATION' | translate}} *</label>
+                <div class="input-group">
+                  <mat-select [dir]="langDir" formControlName="locationId" panelClass="mat-select-control"
+                    placeholder="{{'BUSINESS_LOCATION' | translate}}" class="form-control">
+                    @for (location of locations; track $index) {
+                    <mat-option [value]="location.id">
+                      {{location.name}}
+                    </mat-option>
+                    }
+                    @if(locations.length==0){
+                    <mat-option value="">
+                      {{'NO_RECORDS' | translate}}
+                    </mat-option>
+                    }
+                  </mat-select>
+                </div>
+                @if(expenseForm.get('locationId')?.touched && expenseForm.get('locationId')?.errors
+                && expenseForm.get('locationId')?.errors?.['required'] ){
+                <div class="text-danger">
+                  {{'BUSINESS_LOCATION_IS_REQUIRED' | translate}}
+                </div>
+                }
+              </div>
+            </div>
+            <div class="col-lg-4 col-sm-6">
+              <div class="form-group">
+                <label class="text-danger form-label">{{'AMOUNT' | translate}} * </label>
+                <input formControlName="amount" class="form-control" type="number">
+                @if(expenseForm.get('amount')?.touched && expenseForm.get('amount')?.errors &&
+                (expenseForm.get('amount')?.errors?.['required'] || expenseForm.get('amount')?.errors?.['min'])){
+                <div class="text-danger">
+                  {{'AMOUNT_IS_REQUIRED' | translate}}
+                </div>
+                }
+              </div>
+            </div>
+            <div class="col-lg-4 col-sm-6">
+              <div class="form-group">
+                <label class="text-danger form-label">{{'EXPENSE_CATEGORY' | translate}} * </label>
+                <div class="input-group">
+                  <mat-select [dir]="langDir" placeholder="{{'EXPENSE_CATEGORY' | translate}}" class="form-control"
+                    formControlName="expenseCategoryId" panelClass="mat-select-control">
+                    <mat-option value="">{{'NONE' | translate}}</mat-option>
+                    @for(category of expenseCategories; track category.id){
+                    <mat-option [value]="category.id">
+                      {{category.name}}
+                    </mat-option>
+                    }
+                  </mat-select>
+                  <button class="btn blue-btn btn btn-primary" type="button" (click)="addExpenseCategory()">
+                    <mat-icon class="fs-4 align-middle">add</mat-icon>
+                  </button>
+                </div>
+                @if(expenseForm.get('expenseCategoryId')?.touched &&
+                expenseForm.get('expenseCategoryId')?.errors?.['required']){
+                <div class="text-danger">
+                  {{'EXPENSE_CATEGORY_IS_REQUIRED' | translate}}
+                </div>
+                }
+              </div>
+            </div>
+            <div class="col-lg-4 col-sm-6">
+              <div class="form-group">
+                <label class="form-label">{{'USER' | translate}} </label>
+                <mat-select [dir]="langDir" placeholder="{{'USER' | translate}}" class="form-control"
+                  formControlName="expenseById" panelClass="mat-select-control">
+                  <mat-option>{{'NONE' | translate}}</mat-option>
+                  @for(user of users; track user.id){
+                  <mat-option [value]="user.id">
+                    {{user.firstName}} {{user.lastName}}
+                  </mat-option>
+                  }
+                </mat-select>
+              </div>
+            </div>
+            <div class="col-lg-4 col-sm-6">
+              <div class="form-group">
+                <label class="form-label">{{"TAX" | translate}} </label>
+                <mat-select [dir]="langDir" placeholder="{{'TAX' | translate}}" dir='rtl'
+                  formControlName="expenseTaxIds" multiple class="form-control" panelClass="mat-select-control">
+                  @for(tax of taxes; track tax.id){
+                  <mat-option [value]="tax.id"> {{tax.name}}
+                    ({{tax.percentage |
+                    customCurrency}}%)
+                  </mat-option>
+                  }
+                </mat-select>
+              </div>
+            </div>
+            <div class="row">
+              <div class="col-sm-12">
+                <label class="form-label">{{'NOTE' | translate}} </label>
+                <textarea formControlName="description" class="form-control w-100" cols="30" rows="5"></textarea>
+              </div>
+            </div>
+            @if(!ReceiptName){
+            <div class="col-lg-4 col-sm-6">
+              <div class="form-group">
+                <label for="txtName" class="form-label"> {{'ATTACH_RECEIPT' | translate}} </label>
+                <input class="form-control" (change)="fileEvent($event)" #fileInput name="file" type="file"
+                  name="Upload File">
+              </div>
+            </div>
+            }
+            @if(ReceiptName){
+            @if(expenseForm.get('id')?.value){
+            <div class="col-sm-12  mt-4">
+              <span class="mr-3"> <b>{{'RECEIPT' | translate}} : </b>
+                @if(!isReceiptDeleted){
+                <a href="javascript:;" (click)="downloadReceipt()"> {{ReceiptName}}</a>
+                }@else {
+                {{ReceiptName}}
+                }
+              </span>
+              <span class="btn btn-sm" (click)="removeReceipt()">
+                <mat-icon class="medium-icon fs-5 align-middle text-danger">delete</mat-icon>
+              </span>
+            </div>
+            }
+            @if(!expenseForm.get('id')?.value){
+            <div class="col-sm-12 mt-4">
+              <span class="mr-3"> <b>{{'RECEIPT' | translate}}:</b> {{ReceiptName}}</span>
+              <span class="btn btn-sm" (click)="removeReceipt()">
+                <mat-icon class="medium-icon fs-5 align-middle text-danger">delete</mat-icon>
+              </span>
+            </div>
+            }
+            }
+          </div>
+          <div class="row mt-3">
+            <div class="col-md-12 mb-1">
+              <button *hasClaim="['EXP_ADD_EXPENSE','EXP_UPDATE_EXPENSE']" type="submit" class="success me-2"
+                matButton="filled">
+                <mat-icon class="medium-icon fs-5 align-middle">save</mat-icon> {{'SAVE' | translate}}
+              </button>
+              <button type="button" class="error" matButton="filled" [routerLink]="['/expense']">
+                <mat-icon class="medium-icon fs-5 align-middle">cancel</mat-icon> {{'CANCEL' | translate}}
+              </button>
+            </div>
+          </div>
+        </mat-card-content>
+      </mat-card>
+    </form>
+
+  </div>
+</section>

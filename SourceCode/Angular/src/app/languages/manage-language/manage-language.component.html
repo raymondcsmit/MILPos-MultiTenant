@@ -1,0 +1,122 @@
+<section class="content">
+  <div class="container-fluid">
+    <div class="row align-items-center">
+      <div class="col-md-6 mb-2">
+        <span class="mb-0 page-title">{{"MANAGE_LANGUAGE" | translate}}
+          <app-page-help-text code="LANGUAGES"></app-page-help-text>
+        </span>
+      </div>
+    </div>
+
+    @if(languageForm){
+    <form [formGroup]="languageForm">
+      <mat-card appearance="outlined" class="mb-2">
+        <mat-card-content>
+          <div class="row">
+            <div class="col-sm-12">
+              <div class="row">
+                <div class="col-md-6">
+                  <div class="form-group">
+                    <label class="form-label">{{'NAME' | translate}}</label>
+                    <input class="form-control form-control-sm" type="text" formControlName="languageName" />
+                    @if(languageForm.get('languageName')?.touched && languageForm.get('languageName')?.errors &&
+                    languageForm.get('languageName')?.errors?.['required']){
+                    <div class="text-danger">
+                      {{"REQUIRED_FIELD" | translate}}
+                    </div>
+                    }
+                  </div>
+                </div>
+                <div class="col-md-6">
+                  <div class="form-group">
+                    <label class="form-label">{{'ORDER' | translate}}</label>
+                    <input class="form-control form-control-sm" type="number" />
+                    @if(languageForm.get('order')?.touched && languageForm.get('order')?.errors &&
+                    languageForm.get('order')?.errors?.['required']){
+                    <div class="text-danger">
+                      {{"REQUIRED_FIELD" | translate}}
+                    </div>
+                    }
+                  </div>
+                </div>
+                <div class="col-sm-4 mt-2">
+                  <mat-checkbox [dir]="langDir" color="primary" formControlName="isrtl">{{'IS_RTL' |
+                    translate}}
+                  </mat-checkbox>
+                </div>
+                <div class="col-sm-8 mt-2">
+                  <div class="row">
+                    <div class="col-md-2">
+                      <mat-card [dir]="langDir" class="cus-mat-card text-center border shadow-sm bg-white">
+                        <input hidden (change)="onProductImageSelect($event)" #fileInput name="logo" type="file"
+                          name="{{'IMAGE' | translate}}" fxFlex="30">
+                        @if(languageImgSrc){
+                        <img class="full-width img-fluid rounded mb-2 border" [src]="languageImgSrc" />
+                        }@else {
+                        <img class="full-width img-fluid rounded mb-2 border" src="/images/no-preview.jpg" />
+                        }
+                        <mat-card-actions class="d-flex justify-content-center mt-1">
+                          @if(languageImgSrc){
+                          <a type="button" (click)="fileInput.click()" class="btn btn-primary btn-sm">
+                            {{"CHANGE" | translate}}
+                          </a>
+                          }@else {
+                          <a type="button" (click)="fileInput.click()" class="btn btn-primary btn-sm">
+                            {{"ADD" | translate}}
+                          </a>
+                          }
+                        </mat-card-actions>
+                      </mat-card>
+                    </div>
+                  </div>
+                </div>
+                <div class="d-flex mt-3">
+                  <button type="button" (click)="onLanguageSubmit()" class="success me-2" matButton="filled">
+                    <mat-icon class="medium-icon fs-5 align-middle">save</mat-icon>
+                    {{"SAVE" | translate}}
+                  </button>
+                  <button type="button" class="error" matButton="filled" [routerLink]="['/languages']">
+                    <mat-icon class="medium-icon fs-5 align-middle">cancel</mat-icon>
+                    {{"CANCEL" | translate}}
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </mat-card-content>
+      </mat-card>
+      <mat-card appearance="outlined" class="mt-3">
+        <mat-card-content>
+          <div class="row">
+            @for(field of fields; track $index){
+            <div class="col-lg-4 col-sm-6">
+              <div class="form-group">
+                <label class="form-label">{{defaultLanguage[field]}}</label>
+                <input class="form-control form-control-sm" type="text" [formControlName]="field" />
+                @if(languageForm.get(field)?.touched && languageForm.get(field)?.errors &&
+                languageForm.get(field)?.errors?.['required']){
+                <div class="text-danger">
+                  {{"REQUIRED_FIELD" | translate}}
+                </div>
+                }
+              </div>
+            </div>
+            }
+          </div>
+
+          <div class="d-flex mt-2">
+            <button type="button" (click)="onLanguageSubmit()" class="success me-2" matButton="filled">
+              <mat-icon class="medium-icon fs-5 align-middle">save</mat-icon>
+              {{ "SAVE" | translate }}
+            </button>
+            <button type="button" class="error" matButton="filled" [routerLink]="['/languages']">
+              <mat-icon class="medium-icon fs-5 align-middle">cancel</mat-icon>
+              {{"CANCEL" | translate}}
+            </button>
+          </div>
+        </mat-card-content>
+      </mat-card>
+    </form>
+    }
+  </div>
+</section>

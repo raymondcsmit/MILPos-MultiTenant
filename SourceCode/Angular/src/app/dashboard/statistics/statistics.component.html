@@ -1,0 +1,106 @@
+<mat-card appearance="outlined" class="mb-4">
+  <mat-card-content>
+    <div class="row">
+      <div class="col-lg-6 col-sm-12">
+        <span class="mb-0 page-title">{{ "DASHBOARD" | translate }}
+        </span>
+      </div>
+      <div class="col-lg-6 col-sm-12 d-flex flex-row-reverse mb-0" [formGroup]="searchForm">
+        <div class="row">
+          <div class="col-sm-4">
+            <label for="fromDate">{{'BUSINESS_LOCATION' | translate}}</label>
+            <mat-select [dir]="langDir" formControlName="locationId" panelClass="mat-select-control"
+              class="form-control form-control-sm">
+              @for(location of locations; track location.id){
+              <mat-option [value]="location.id">
+                {{location.name}}
+              </mat-option>
+              }
+            </mat-select>
+          </div>
+          <div class="col-sm-4">
+            <div class="form-group">
+              <label for="fromDate">{{'FROM_DATE' | translate}}</label>
+              <div class="input-group input-group-sm">
+                <input type="text" placeholder="{{'FROM_DATE' | translate}}" #fromDate formControlName="fromDate"
+                  (focus)="fromDatePicker.open()" [matDatepicker]="fromDatePicker" class="form-control form-control-sm">
+                <span class="input-group-text btn-primary" (click)="fromDatePicker.open()" style="cursor:pointer;">
+                  <mat-icon class="medium-icon fs-6 align-middle">calendar_today</mat-icon>
+                </span>
+              </div>
+              <mat-datepicker #fromDatePicker (closed)="fromDate.blur()"></mat-datepicker>
+            </div>
+          </div>
+          <div class="col-sm-4">
+            <div class="form-group">
+              <label for="toDate">{{'TO_DATE' | translate}} </label>
+              <div class="input-group input-group-sm">
+                <input type="text" placeholder="{{'TO_DATE' | translate}}" #toDate formControlName="toDate"
+                  (focus)="toDatePicker.open()" [matDatepicker]="toDatePicker" class="form-control form-control-sm">
+                <span class="input-group-text btn-primary" (click)="toDatePicker.open()" style="cursor:pointer;">
+                  <mat-icon class="medium-icon fs-6 align-middle">calendar_today</mat-icon>
+                </span>
+              </div>
+              <mat-datepicker #toDatePicker (closed)="toDate.blur()"></mat-datepicker>
+            </div>
+          </div>
+        </div>
+      </div>
+      @if(searchForm.errors?.['dateRange']){
+      <div class="col-sm-12 d-flex flex-row-reverse mt-0">
+        <div class="text-danger">
+          {{'DATE_RANGE_VALIDATION_MSG' | translate}}
+        </div>
+      </div>
+      }
+    </div>
+    <div class="row mt-4">
+      <div class="col-lg-3 col-sm-6">
+        <div class="small-box bg-teal">
+          <div class="inner">
+            <h3>{{dashboardStaticatics.totalPurchase | customCurrency}}</h3>
+            <p>{{'TOTAL_PURCHASE' | translate }}</p>
+          </div>
+          <div [ngClass]="{'icon-rtl': langDir === 'rtl' , 'icon': langDir === 'ltr'}">
+            <mat-icon class="dashboard-icon">shopping_cart</mat-icon>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-lg-3 col-sm-6">
+        <div class="small-box bg-pink">
+          <div class="inner">
+            <h3>{{dashboardStaticatics.totalSales | customCurrency}}</h3>
+            <p>{{'TOTAL_SALES' | translate }}</p>
+          </div>
+          <div [ngClass]="{'icon-rtl': langDir === 'rtl' , 'icon': langDir === 'ltr'}">
+            <mat-icon class="dashboard-icon">bar_chart</mat-icon>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-lg-3 col-sm-6">
+        <div class="small-box bg-yellow">
+          <div class="inner">
+            <h3>{{dashboardStaticatics.totalPurchaseReturn | customCurrency}}</h3>
+            <p>{{'TOTAL_PURCHASE_RETURN' | translate}}</p>
+          </div>
+          <div [ngClass]="{'icon-rtl': langDir === 'rtl' , 'icon': langDir === 'ltr'}">
+            <mat-icon class="dashboard-icon">autorenew</mat-icon>
+          </div>
+        </div>
+      </div>
+      <div class="col-lg-3 col-sm-6">
+        <div class="small-box bg-danger">
+          <div class="inner">
+            <h3>{{dashboardStaticatics.totalSalesReturn | customCurrency}}</h3>
+            <p>{{'TOTAL_SALES_RETURN' | translate}}</p>
+          </div>
+          <div [ngClass]="{'icon-rtl': langDir === 'rtl' , 'icon': langDir === 'ltr'}">
+            <mat-icon class="dashboard-icon">assignment_return</mat-icon>
+          </div>
+        </div>
+      </div>
+    </div>
+  </mat-card-content>
+</mat-card>

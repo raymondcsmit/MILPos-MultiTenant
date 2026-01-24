@@ -1,0 +1,24 @@
+﻿SqlServer
+	dotnet ef migrations add MainInit -c POSDbContext -p POS.Domain/POS.Domain.csproj --startup-project POS.API/POS.API.csproj -o Migrations/SqlServer
+    dotnet ef database update 20250223073420_Initial -c POSDbContext -p POS.Domain/POS.Domain.csproj --startup-project POS.API/POS.API.csproj		
+     dotnet ef database update 20250223073432_Initial_Data -c POSDbContext -p POS.Domain/POS.Domain.csproj --startup-project POS.API/POS.API.csproj		
+
+    
+
+    dotnet ef migrations add MainInit-update01 -c POSDbContext -p POS.Domain/POS.Domain.csproj --startup-project POS.API/POS.API.csproj -o Migrations/SqlServer
+    dotnet ef migrations add MainInit-update02 -c POSDbContext -p POS.Domain/POS.Domain.csproj --startup-project POS.API/POS.API.csproj -o Migrations/SqlServer
+  
+  Sqlite
+	dotnet ef migrations add MainInit-Sqlite -c POSDbContext -p POS.Domain/POS.Domain.csproj --startup-project POS.API/POS.API.csproj -o Migrations/Sqlite
+    dotnet ef database update 20260120072200_Initial_Data_Sqlite -c POSDbContext -p POS.Domain/POS.Domain.csproj --startup-project POS.API/POS.API.csproj
+    
+    
+    
+    dotnet ef database update 20250223073420_Initial -c POSDbContext -p POS.Domain/POS.Domain.csproj --startup-project POS.API/POS.API.csproj
+    dotnet ef database update 20250223073432_Initial_Data -c POSDbContext -p POS.Domain/POS.Domain.csproj --startup-project POS.API/POS.API.csproj
+    dotnet ef database update 20251002094155_Version_V1 -c POSDbContext -p POS.Domain/POS.Domain.csproj --startup-project POS.API/POS.API.csproj
+    dotnet ef database update 20251002094214_Version_V1_Data -c POSDbContext -p POS.Domain/POS.Domain.csproj --startup-project POS.API/POS.API.csproj
+
+
+dotnet ef database update --project POS.Domain --startup-project POS.API
+dotnet run --project POS.API/POS.API.csproj

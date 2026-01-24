@@ -1,0 +1,8 @@
+<app-loading-indicator></app-loading-indicator>
+<div [dir]="direction">
+    <app-header></app-header>
+    @if(!hideSidebar) {
+    <app-sidebar></app-sidebar>
+    }
+    <router-outlet></router-outlet>
+</div>

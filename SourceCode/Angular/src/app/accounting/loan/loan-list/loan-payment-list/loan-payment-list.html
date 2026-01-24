@@ -1,0 +1,68 @@
+<mat-card appearance="outlined">
+  <mat-card-content>
+    <div class="row mb-3">
+      <div class="col-md-12 col-sm-auto">
+        <div class="section-title">
+          <span class="mb-2 page-title">
+            {{ 'LOAN_PAYMENT' | translate }}
+            <app-page-help-text code="LOAN_PAYMENT"></app-page-help-text>
+          </span>
+        </div>
+        <div class="table-responsive">
+          <div class="grid-height-large">
+            <table [dir]="langDir" mat-table [dataSource]="loanPayments">
+              <ng-container matColumnDef="principalAmount">
+                <th mat-header-cell *matHeaderCellDef mat-sort-header>
+                  {{ 'PRINCIPAL_AMOUNT' | translate }}
+                </th>
+                <td mat-cell *matCellDef="let payment">
+                  {{ payment.principalAmount | customCurrency }}
+                </td>
+              </ng-container>
+              <ng-container matColumnDef="interestAmount">
+                <th mat-header-cell *matHeaderCellDef mat-sort-header>
+                  {{ 'INTEREST_AMOUNT' | translate }}
+                </th>
+                <td mat-cell *matCellDef="let payment">
+                  {{ payment.interestAmount | customCurrency }}
+                </td>
+              </ng-container>
+              <ng-container matColumnDef="paymentDate">
+                <th mat-header-cell *matHeaderCellDef mat-sort-header>
+                  {{ 'PAYMENT_DATE' | translate }}
+                </th>
+                <td mat-cell *matCellDef="let payment">
+                  {{ payment.paymentDate | utcToLocalTime : 'shortDate' }}
+                </td>
+              </ng-container>
+              <ng-container matColumnDef="note">
+                <th mat-header-cell *matHeaderCellDef>
+                  {{ 'NOTE' | translate }}
+                </th>
+                <td mat-cell *matCellDef="let payment">
+                  @if(payment.note){
+                  {{ payment.note | limitTo:'50' }}
+                  } @else {
+                  -
+                  }
+                </td>
+              </ng-container>
+              <tr *matNoDataRow>
+                <td colspan="9">
+                  <span class="p-4 mt-4">
+                    <b> {{ 'NO_DATA_FOUND' | translate }}</b>
+                  </span>
+                </td>
+              </tr>
+              <tr class="grid-header-color" mat-header-row *matHeaderRowDef="displayedColumns; sticky: true"></tr>
+              <tr mat-row *matRowDef="let row; columns: displayedColumns" [ngClass]="{
+                              'odd-row': isOddDataRow(getDataIndex(row)),
+                              'even-row': !isOddDataRow(getDataIndex(row))
+                            }"></tr>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+  </mat-card-content>
+</mat-card>

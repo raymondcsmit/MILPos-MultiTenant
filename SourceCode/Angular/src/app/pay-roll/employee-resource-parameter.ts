@@ -1,0 +1,6 @@
+import { ResourceParameter } from "@core/domain-classes/resource-parameter";
+
+export class EmployeeResourceParameter extends ResourceParameter {
+  id?: string = '';
+  override name: string = '';
+}

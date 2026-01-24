@@ -1,0 +1,118 @@
+<section class="content">
+  <div class="container-fluid">
+    <div class="d-flex">
+      <div class="me-auto mb-2">
+        <span class="mb-0 page-title">{{ 'STOCK_REPORT' | translate }}
+          <app-page-help-text code="STOCK_REPORT"></app-page-help-text>
+        </span>
+      </div>
+      <div class="d-flex align-items-center">
+        <button class="warning me-1" matButton="filled" [matMenuTriggerFor]="menu">
+          <mat-icon class="medium-icon fs-5 align-middle">download</mat-icon>
+          <span class="d-none d-sm-inline"> {{ 'EXPORT' | translate }} </span>
+        </button>
+        <mat-menu #menu="matMenu" class="mat-menu-control-sm">
+          <button mat-menu-item (click)="onDownloadReport('csv')">
+            <mat-icon class="medium-icon fs-5 align-middle">table_chart</mat-icon>
+            CSV
+          </button>
+          <button mat-menu-item (click)="onDownloadReport('xlsx')">
+            <mat-icon class="medium-icon fs-5 align-middle">grid_on</mat-icon>
+            Excel
+          </button>
+          <button mat-menu-item (click)="onDownloadReport('pdf')">
+            <mat-icon class="medium-icon fs-5 align-middle">picture_as_pdf</mat-icon>
+            PDF
+          </button>
+        </mat-menu>
+        <button *hasClaim="'REP_SEND_EMAIL'" matButton="filled" class="secondary" (click)="onDownloadReport('email')">
+          <mat-icon class="medium-icon fs-5 align-middle">email</mat-icon>
+          <span class="d-none d-sm-inline"> {{ 'SEND_EMAIL' | translate }}</span>
+        </button>
+      </div>
+    </div>
+    <mat-card appearance="outlined">
+      <mat-card-content>
+        <div class="table-responsive">
+          <div class="col-md-4 mb-4">
+            <div class="form-group">
+              <label>{{ 'BUSINESS_LOCATION' | translate }}</label>
+              <div class="input-group">
+                <mat-select [dir]="langDir" [(ngModel)]="LocationFilter" panelClass="mat-select-control"
+                  placeholder="{{ 'BUSINESS_LOCATION' | translate }}" class="form-control form-control-sm">
+                  @for(location of locations; track location.id){
+                  <mat-option [value]="location.id">
+                    {{ location.name }}
+                  </mat-option>
+                  } @if(locations.length==0){
+                  <mat-option value="">
+                    {{ 'NO_RECORDS' | translate }}
+                  </mat-option>
+                  }
+                </mat-select>
+              </div>
+            </div>
+          </div>
+          <div class="grid-height-medium">
+            <table [dir]="langDir" mat-table matSortDisableClear [dataSource]="dataSource" matSort multiTemplateDataRows
+              matSortActive="productName">
+              <ng-container matColumnDef="productName">
+                <th class="table-column-150" mat-header-cell *matHeaderCellDef mat-sort-header>
+                  {{ 'PRODUCT_NAME' | translate }}
+                </th>
+                <td class="table-column-150" mat-cell *matCellDef="let row">
+                  {{ row.productName }}
+                </td>
+              </ng-container>
+              <ng-container matColumnDef="stock">
+                <th class="table-column-200" mat-header-cell *matHeaderCellDef mat-sort-header>
+                  {{ 'STOCK' | translate }}
+                </th>
+                <td class="table-column-200" mat-cell *matCellDef="let row">
+                  {{ row.stock }} -{{ row.unitName }}
+                </td>
+              </ng-container>
+
+              <ng-container matColumnDef="productName-search">
+                <th mat-header-cell *matHeaderCellDef>
+                  <input type="text" class="form-control form-control-sm w-50" [(ngModel)]="ProductNameFilter" />
+                </th>
+              </ng-container>
+              <ng-container matColumnDef="stock-search">
+                <th class="pr-5" mat-header-cell *matHeaderCellDef></th>
+              </ng-container>
+
+              <ng-container matColumnDef="footer">
+                <td mat-footer-cell colspan="5" *matFooterCellDef>
+                  <mat-paginator [dir]="langDir" [length]="inventoryResource.totalCount"
+                    [pageSize]="inventoryResource.pageSize" [pageSizeOptions]="[10, 20, 30]">
+                  </mat-paginator>
+                </td>
+              </ng-container>
+              <tr *matNoDataRow>
+                <td colspan="9">
+                  <span class="p-4 mt-4">
+                    <b> {{ 'NO_DATA_FOUND' | translate }}</b>
+                  </span>
+                </td>
+              </tr>
+              <tr class="grid-header-color" mat-header-row *matHeaderRowDef="displayedColumns; sticky: true"></tr>
+              <tr mat-row *matRowDef="let row; columns: displayedColumns" [ngClass]="{
+                              'odd-row': isOddDataRow(getDataIndex(row)),
+                              'even-row': !isOddDataRow(getDataIndex(row))
+                            }"></tr>
+              <tr style="height: 45px !important;" mat-header-row *matHeaderRowDef="
+                  [
+                   'productName-search',
+                    'stock-search'
+                  ];
+                  sticky: true
+                " class="example-second-header-row"></tr>
+              <tr mat-footer-row *matFooterRowDef="columnsToDisplay; sticky: true"></tr>
+            </table>
+          </div>
+        </div>
+      </mat-card-content>
+    </mat-card>
+  </div>
+</section>

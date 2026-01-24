@@ -1,0 +1,19 @@
+.progress-bar-container {
+  position: fixed;
+  top: 0;
+  left: 0;
+  height: 4px;
+  width: 100%;
+  background: transparent;
+  z-index: 9999;
+}
+
+::ng-deep .mat-mdc-progress-bar .mdc-linear-progress__bar-inner {
+  animation-duration: 1.1s !important;
+  /* default ~2.5s */
+}
+
+/* buffer effect (secondary animation, if enabled) */
+::ng-deep .mat-mdc-progress-bar .mdc-linear-progress__buffer-dots {
+  animation-duration: 1.1s !important;
+}

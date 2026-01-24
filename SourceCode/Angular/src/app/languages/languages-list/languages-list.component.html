@@ -1,0 +1,81 @@
+<section class="content">
+  <div class="container-fluid">
+    <div class="d-flex mb-2">
+      <div class="me-auto">
+        <span class="mb-0 page-title">{{"LANGUAGES" | translate}}
+          <app-page-help-text code="LANGUAGES"></app-page-help-text>
+        </span>
+      </div>
+      <div class="d-flex justify-content-end">
+        <button *hasClaim="'PRO_ADD_PRODUCT'" class="primary me-2" matButton="filled" [routerLink]="['/languages/add']">
+          <mat-icon class="medium-icon fs-5 align-middle">add</mat-icon>
+          <span class="d-none d-sm-inline"> {{"ADD_LANGUAGE" | translate}} </span>
+        </button>
+      </div>
+    </div>
+    <mat-card appearance="outlined">
+      <mat-card-content>
+        <div class="table-responsive">
+          <div class="grid-height-large">
+            <table [dir]="langDir" mat-table [dataSource]="languages">
+              <ng-container matColumnDef="action">
+                <th class="table-column-200" mat-header-cell *matHeaderCellDef> {{"ACTION" | translate}}
+                </th>
+                <td class="table-column-200" mat-cell *matCellDef="let element">
+                  <!-- <button [routerLink]="['/languages/manage',element.id]" class="primary me-2" matButton="filled"
+                    type="button">
+                    <mat-icon class="medium-icon fs-5 align-middle">edit</mat-icon>
+                    <span class="d-none d-sm-inline"> {{"EDIT" | translate}}</span>
+                  </button>
+                  <button (click)="deleteLanguage(element)" class="error" matButton="filled" type="button">
+                    <mat-icon class="medium-icon fs-5 align-middle">delete</mat-icon>
+                    <span class="d-none d-sm-inline"> {{"DELETE" | translate}}</span>
+                  </button> -->
+
+                  <div class="d-flex gap-2">
+                    <button matMiniFab [routerLink]="['/languages/manage',element.id]" class="primary">
+                      <mat-icon class="medium-icon fs-5 align-middle">edit</mat-icon>
+                    </button>
+                    <button matMiniFab (click)="deleteLanguage(element)" class="error">
+                      <mat-icon class="medium-icon fs-5 align-middle">delete</mat-icon>
+                    </button>
+                  </div>
+
+                </td>
+              </ng-container>
+              <ng-container matColumnDef="imageUrl">
+                <th mat-header-cell *matHeaderCellDef> {{"IMAGE" | translate}} </th>
+                <td mat-cell *matCellDef="let element">
+                  @if(element.imageUrl){
+                  <img class="img-thumbnail grid-img-thumbnail my-2" [src]="element.imageUrl"
+                    alt="{{'PRODUCT_IMAGE' | translate}}">
+                  }@else {
+                  <img class="img-thumbnail grid-img-thumbnail my-2" src="/images/no-preview.jpg"
+                    alt="{{'PRODUCT_IMAGE' | translate}}">
+                  }
+                </td>
+              </ng-container>
+              <ng-container matColumnDef="name">
+                <th mat-header-cell *matHeaderCellDef> {{"NAME" | translate}} </th>
+                <td mat-cell *matCellDef="let element"> {{element.name}} </td>
+              </ng-container>
+              <ng-container matColumnDef="code">
+                <th mat-header-cell *matHeaderCellDef> {{"CODE" | translate}} </th>
+                <td mat-cell *matCellDef="let element"> {{element.code}} </td>
+              </ng-container>
+              <ng-container matColumnDef="order">
+                <th mat-header-cell *matHeaderCellDef> {{"ORDER" | translate}} </th>
+                <td mat-cell *matCellDef="let element"> {{element.order}} </td>
+              </ng-container>
+              <tr class="grid-header-color" mat-header-row *matHeaderRowDef="displayedColumns;sticky: true"></tr>
+              <tr mat-row *matRowDef="let row; columns: displayedColumns;" [ngClass]="{
+                              'odd-row': isOddDataRow(getDataIndex(row)),
+                              'even-row': !isOddDataRow(getDataIndex(row))
+                            }"></tr>
+            </table>
+          </div>
+        </div>
+      </mat-card-content>
+    </mat-card>
+  </div>
+</section>

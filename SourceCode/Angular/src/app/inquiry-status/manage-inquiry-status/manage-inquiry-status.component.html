@@ -1,0 +1,35 @@
+<mat-dialog-content>
+  <div class="mb-0 d-flex justify-content-between">
+    <span class="mb-4 page-title">
+      {{ "MANAGE_INQUIRY_STATUS" | translate }}
+      <app-page-help-text code="INQUIRY_STATUSES"></app-page-help-text>
+    </span>
+    <mat-icon class="close-icon text-danger cursor-pointer" (click)="onCancel()">cancel</mat-icon>
+  </div>
+  <form [formGroup]="inquiryStatusForm">
+    <div class="row">
+      <div class="col-md-12">
+        <div class="form-group">
+          <label class="text-danger" for="inquiryStatusName">{{'NAME' | translate}}
+            *</label>
+          <input formControlName="name" type="text" class="form-control" id="inquiryStatusName">
+          @if(inquiryStatusForm.get('name')?.touched && inquiryStatusForm.get('name')?.errors &&
+          inquiryStatusForm.get('name')?.errors?.['required']){
+          <div class="text-danger">
+            {{'NAME_IS_REQUIRED' | translate}}
+          </div>
+          }
+        </div>
+      </div>
+    </div>
+    <div class="mt-2 col-md-12">
+      <button *hasClaim="'INQ_MANAGE_INQ_STATUS'" class="success me-2" matButton="filled" (click)="saveInquiryStatus()"
+        cdkFocusInitial>
+        <mat-icon class="medium-icon fs-5 align-middle">save</mat-icon> {{'SAVE' | translate}}
+      </button>
+      <button type="button" class="error" matButton="filled" (click)="onCancel()">
+        <mat-icon class="medium-icon fs-5 align-middle">cancel</mat-icon> {{'CANCEL' | translate}}
+      </button>
+    </div>
+  </form>
+</mat-dialog-content>

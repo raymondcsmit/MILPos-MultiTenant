@@ -1,0 +1,70 @@
+<section class="content">
+  <div class="container-fluid">
+    <div class="d-flex mb-2">
+      <div class="me-auto">
+        <span class="mb-0 page-title">{{ "BRANDS" | translate }}
+          <app-page-help-text code="BRANDS"></app-page-help-text>
+        </span>
+      </div>
+      <div class="d-flex justify-content-end">
+        <button *hasClaim="'PRO_MANAGE_BRAND'" class="primary" matButton="filled" (click)="manageBrand(null)">
+          <mat-icon class="medium-icon fs-5 align-middle">add</mat-icon>
+          <span class="d-none d-sm-inline"> {{ "ADD_BRAND" | translate }} </span>
+        </button>
+      </div>
+    </div>
+    <mat-card appearance="outlined">
+      <mat-card-content>
+        <div class="table-responsive">
+          <div class="grid-height-large">
+            <table mat-table [dir]="langDir" [dataSource]="brands">
+              <ng-container matColumnDef="action">
+                <th mat-header-cell *matHeaderCellDef> {{"ACTION" | translate}}
+                </th>
+                <td mat-cell *matCellDef="let element">
+                  <!-- <button *hasClaim="'PRO_MANAGE_BRAND'" (click)="manageBrand(element)" class="primary me-2"
+                    matButton="filled" type="button">
+                    <mat-icon class="medium-icon fs-5 align-middle">edit</mat-icon>
+                    <span class="d-none d-sm-inline"> {{"EDIT" | translate}}</span>
+                  </button>
+                  <button *hasClaim="'PRO_MANAGE_BRAND'" (click)="deleteBrand(element)" class="error" matButton="filled"
+                    type="button">
+                    <mat-icon class="medium-icon fs-5 align-middle">delete</mat-icon>
+                    <span class="d-none d-sm-inline"> {{"DELETE" | translate}}</span>
+                  </button> -->
+                  <div class="d-flex gap-2 my-1">
+                    <button *hasClaim="'PRO_MANAGE_BRAND'" matMiniFab (click)="manageBrand(element)" class="primary">
+                      <mat-icon class="medium-icon fs-5 align-middle">edit</mat-icon>
+                    </button>
+                    <button *hasClaim="'PRO_MANAGE_BRAND'" matMiniFab (click)="deleteBrand(element)" class="error">
+                      <mat-icon class="medium-icon fs-5 align-middle">delete</mat-icon>
+                    </button>
+                  </div>
+                </td>
+              </ng-container>
+              <ng-container matColumnDef="imageUrl">
+                <th mat-header-cell *matHeaderCellDef> </th>
+                <td mat-cell *matCellDef="let brand">
+                  @if(brand.imageUrl){
+                  <img class="img-thumbnail grid-img-thumbnail" [src]="baseUrl + brand.imageUrl" alt="Brand Image">
+                  }@else {
+                  <img class="img-thumbnail grid-img-thumbnail" src="/images/no-preview.jpg" alt="Brand Image">
+                  }
+                </td>
+              </ng-container>
+              <ng-container matColumnDef="name">
+                <th mat-header-cell *matHeaderCellDef> {{"NAME" | translate}} </th>
+                <td mat-cell *matCellDef="let element"> {{element.name}} </td>
+              </ng-container>
+              <tr class="grid-header-color" mat-header-row *matHeaderRowDef="displayedColumns;sticky: true"></tr>
+              <tr mat-row *matRowDef="let row; columns: displayedColumns;" [ngClass]="{
+                              'odd-row': isOddDataRow(getDataIndex(row)),
+                              'even-row': !isOddDataRow(getDataIndex(row))
+                            }"></tr>
+            </table>
+          </div>
+        </div>
+      </mat-card-content>
+    </mat-card>
+  </div>
+</section>

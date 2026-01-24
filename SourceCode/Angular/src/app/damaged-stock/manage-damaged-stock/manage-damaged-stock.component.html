@@ -1,0 +1,274 @@
+<section class="content">
+  <div class="container-fluid">
+    <div class="row align-items-center">
+      <div class="col-md-6 mb-2">
+        <span class="mb-0 page-title">{{ "MANAGE_DAMAGED_STOCK" | translate }}
+          <app-page-help-text code="DAMAGED_STOCK"></app-page-help-text>
+        </span>
+      </div>
+    </div>
+
+    <form autocomplete="off" [formGroup]="damagedForm" (ngSubmit)="onDamagedSubmit()">
+      <mat-card appearance="outlined">
+        <mat-card-content>
+          <div class="row mb-3">
+            <div class="col-md-6">
+              <label class="text-danger form-label">{{ "BUSINESS_LOCATION" | translate }} *</label>
+              <div class="input-group">
+                <mat-select [dir]="langDir" formControlName="locationId" (valueChange)="onLocationChange()"
+                  panelClass="mat-select-control" placeholder="{{ 'BUSINESS_LOCATION' | translate }}"
+                  class="form-control">
+                  @for (location of locations; track location.id) {
+                  <mat-option [value]="location.id">
+                    {{ location.name }}
+                  </mat-option>
+                  }
+                  @if (locations.length == 0) {
+                  <mat-option value="">
+                    {{ "NO_RECORDS" | translate }}
+                  </mat-option>
+                  }
+                </mat-select>
+              </div>
+              @if (
+              damagedForm.get('locationId')?.touched &&
+              damagedForm.get('locationId')?.errors?.['required']
+              ) {
+              <div class="text-danger">
+                {{ "BUSINESS_LOCATION_IS_REQUIRED" | translate }}
+              </div>
+              }
+            </div>
+          </div>
+          <div class="row mb-3">
+            <div class="col-md-6 mt-1">
+              <div class="input-group">
+                <button class="btn btn-primary" type="button">
+                  <mat-icon class="fs-4 align-middle">search</mat-icon>
+                </button>
+                <input placeholder="{{ 'SEARCH_BY_NAME' | translate }}" type="text" class="form-control"
+                  [formControl]="productNameControl" [matAutocomplete]="autoProduct" />
+                <mat-autocomplete [autoActiveFirstOption]="true"
+                  (optionSelected)="onProductSelection($event.option.value)" #autoProduct="matAutocomplete">
+                  @for (product of productList$ | async; track product.id) {
+                  <mat-option [value]="product">
+                    {{ product.name }}
+                  </mat-option>
+                  }
+                </mat-autocomplete>
+              </div>
+            </div>
+            <div class="col-md-6 mt-1">
+              <div class="input-group">
+                <button class="btn blue-btn btn btn-primary" type="button">
+                  <mat-icon class="fs-4 align-middle">view_week</mat-icon>
+                </button>
+                <input class="form-control" [formControl]="barCodeNameControl" type="text"
+                  placeholder="{{ 'SCAN_BARCODE' | translate }}" />
+              </div>
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-sm-12" formArrayName="damagedStockItems">
+              <div class="row">
+                <div class="col">
+                  <div class="table-responsive">
+                    <table class="table table-pos table-bordered table-sm">
+                      <thead>
+                        <tr class="grid-header-color">
+                          <th class="table-column-10">&nbsp;</th>
+                          <th class="table-column-200">
+                            {{ "PRODUCT" | translate }}
+                          </th>
+
+                          <th class="table-column-150">
+                            {{ "UNIT" | translate }}
+                          </th>
+                          <th class="table-column-130">
+                            {{ "STOCK" | translate }}
+                          </th>
+                          <th class="table-column-120">
+                            {{ "DAMAGED_QUANTITY" | translate }}
+                          </th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        @if (damagedStockItemsArray.controls.length === 0) {
+                        <tr>
+                          <td colspan="5" class="fw-semibold text-center">
+                            {{ "NO_DAMAGED_ITEMS" | translate }}
+                          </td>
+                        </tr>
+                        } @else {
+                        @for (stockTransferItem of damagedStockItemsArray.controls; track
+                        stockTransferItem.value.id;
+                        let i = $index) {
+                        <tr [formGroupName]="i">
+                          <td>
+                            @if (damagedStockItemsArray.controls.length !== 1) {
+                            <!-- <button type="button" class="btn btn-outline-danger btn-sm"
+                              (click)="onRemoveDamagedStockItem(i)">
+                              <mat-icon class="medium-icon fs-5 align-middle">delete</mat-icon>
+                            </button> -->
+
+                            <button matMiniFab class="error" (click)="onRemoveDamagedStockItem(i)">
+                              <mat-icon class="medium-icon fs-5 align-middle">delete</mat-icon>
+                            </button>
+                            }
+                          </td>
+
+                          <td class="align-middle">
+                            @if (stockTransferItem.get('productUrl')?.value) {
+                            <img class="img-thumbnail grid-img-thumbnail"
+                              [src]="baseUrl + stockTransferItem.get('productUrl')?.value"
+                              alt="{{ 'PRODUCT_IMAGE' | translate }}" />
+                            } @else {
+                            <img class="img-thumbnail grid-img-thumbnail" src="/images/no-preview.jpg"
+                              alt="{{ 'PRODUCT_IMAGE' | translate }}" />
+                            }
+                            <span class="ms-1">
+                              {{
+                              stockTransferItem.get("productName")?.value
+                              }}</span>
+                            @if (stockTransferItem.get('productId')?.touched &&
+                            stockTransferItem.get('productId')?.errors) {
+                            @if (stockTransferItem.get('productId')?.errors?.['required']) {
+                            <div class="text-danger">
+                              {{ "PRODUCT_IS_REQUIRED" | translate }}
+                            </div>
+                            }
+                            }
+                          </td>
+                          <td>
+                            <mat-select [dir]="langDir" formControlName="unitId" panelClass="mat-select-control"
+                              class="form-control form-control-sm">
+                              @for (a of unitsMap[i]; track a.id) {
+                              <mat-option [dir]="langDir" [value]="a.id">
+                                {{ a.name }}
+                              </mat-option>
+                              }
+                            </mat-select>
+                            @if (stockTransferItem.get('unitId')?.touched &&
+                            stockTransferItem.get('unitId')?.errors) {
+                            @if (stockTransferItem.get('unitId')?.errors?.['required']) {
+                            <div class="text-danger">
+                              {{ "UNIT_IS_REQUIRED" | translate }}
+                            </div>
+                            }
+                            }
+                          </td>
+                          <td>
+                            <input class="form-control form-control-sm" type="number" formControlName="stock"
+                              placeholder="{{ 'UNIT_PER_PRICE' | translate }}" />
+                            @if (stockTransferItem.get('stock')?.touched && stockTransferItem.get('stock')?.errors)
+                            {
+                            @if (stockTransferItem.get('stock')?.errors?.['required']) {
+                            <div class="text-danger">
+                              {{ "UNIT_PER_PRICE_IS_REQUIRED" | translate }}
+                            </div>
+                            }
+                            @if (stockTransferItem.get('stock')?.errors?.['min']) {
+                            <div class="text-danger">
+                              {{ "PRICE_SHOULD_BE_MORE_THEN_0" | translate }}
+                            </div>
+                            }
+                            }
+                          </td>
+                          <td>
+                            <input class="form-control form-control-sm" type="number" formControlName="damagedQuantity"
+                              placeholder="{{ 'DAMAGED_QUANTITY' | translate }}" />
+
+                            @if (stockTransferItem.get('damagedQuantity')?.touched &&
+                            stockTransferItem.get('damagedQuantity')?.errors) {
+                            @if (stockTransferItem.get('damagedQuantity')?.errors?.['required']) {
+                            <div class="text-danger">
+                              {{ "QUANTITY_IS_REQUIRED" | translate }}
+                            </div>
+                            }
+                            @if (stockTransferItem.get('damagedQuantity')?.errors?.['min']) {
+                            <div class="text-danger">
+                              {{ "QUANTITY_SHOULD_BE_MORE_THEN_0" | translate }}
+                            </div>
+                            }
+                            @if (stockTransferItem.get('damagedQuantity')?.errors?.['maxStockExceeded']) {
+                            <div class="text-danger">
+                              {{ "QUANTITY_CANNOT_BE_MORE_THAN_STOCK" | translate }}
+                            </div>
+                            }
+                            }
+                          </td>
+
+                        </tr>
+                        }
+                        }
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-md-4">
+              <div class="form-group">
+                <label class="text-danger form-label" for="damagedDate">{{ "DAMAGED_DATE" | translate }} *</label>
+                <input type="text" #damagedDate formControlName="damagedDate" [max]="CurrentDate"
+                  (focus)="damagedDatePicker.open()" [matDatepicker]="damagedDatePicker"
+                  class="form-control input-with-clear" />
+                <mat-datepicker #damagedDatePicker (closed)="damagedDate.blur()"></mat-datepicker>
+                @if (damagedForm.get('damagedDate')?.touched &&
+                damagedForm.get('damagedDate')?.errors?.['required']) {
+                <div class="text-danger">
+                  {{ "DAMAGED_DATE_IS_REQUIRED" | translate }}
+                </div>
+                }
+              </div>
+            </div>
+            <div class="col-md-4">
+              <div class="form-group">
+                <label class="text-danger form-label">{{ "REPORTED_BY" | translate }} *</label>
+                <mat-select [dir]="langDir" placeholder="{{ 'REPORTED_BY' | translate }}" class="form-control"
+                  formControlName="reportedId" panelClass="mat-select-control">
+                  <mat-option>{{ "NONE" | translate }}</mat-option>
+                  @for (user of users; track user.id) {
+                  <mat-option [value]="user.id">
+                    {{ user.firstName }} {{ user.lastName }}
+                  </mat-option>
+                  }
+                </mat-select>
+              </div>
+              @if (
+              damagedForm.get('reportedId')?.touched &&
+              damagedForm.get('reportedId')?.errors?.['required']
+              ) {
+              <div class="text-danger">
+                {{ "REPORTED_BY_IS_REQUIRED" | translate }}
+              </div>
+              }
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-md-12">
+              <label class="form-label">{{ "REASON" | translate }} </label>
+              <textarea formControlName="reason" class="form-control w-100" cols="30" rows="5"></textarea>
+            </div>
+          </div>
+          <div class="row mt-3">
+            <div class="col-md-12 mb-1">
+              <button *hasClaim="['EXP_ADD_EXPENSE', 'EXP_UPDATE_EXPENSE']" type="submit" class="success me-2"
+                matButton="filled">
+                <mat-icon class="medium-icon fs-5 align-middle">save</mat-icon>
+                {{ "SAVE" | translate }}
+              </button>
+              <button type="button" class="error" matButton="filled" [routerLink]="['/damaged-stock/list']">
+                <mat-icon class="medium-icon fs-5 align-middle">cancel</mat-icon>
+                {{ "CANCEL" | translate }}
+              </button>
+            </div>
+          </div>
+        </mat-card-content>
+      </mat-card>
+    </form>
+
+  </div>
+</section>

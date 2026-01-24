@@ -1,0 +1,91 @@
+<section class="content">
+  <div class="container-fluid">
+    <div class="row align-items-center">
+      <div class="col-md-6 mb-2">
+        <span class="mb-0 page-title">{{'NOTIFICATIONS' | translate}}</span>
+      </div>
+    </div>
+    <mat-card appearance="outlined">
+      <mat-card-content>
+        <div class="table-responsive">
+          <div class="grid-height-large">
+            <table [dir]="langDir" mat-table [dataSource]="dataSource" matSort matSortActive="createdDate"
+              matSortDirection="desc">
+              <ng-container matColumnDef="createdDate">
+                <th class="table-column-150" mat-header-cell *matHeaderCellDef mat-sort-header> {{'CREATED_DATE' |
+                  translate}}
+                </th>
+                <td class="table-column-150" mat-cell *matCellDef="let reminder"> {{reminder.createdDate |
+                  utcToLocalTime:'short'}} </td>
+              </ng-container>
+              <ng-container matColumnDef="subject">
+                <th class="table-column-300" mat-header-cell *matHeaderCellDef mat-sort-header> {{'SUBJECT' |
+                  translate}}
+                </th>
+                <td class="table-column-300" mat-cell *matCellDef="let reminder">
+                  @switch (reminder.application) {
+                  @case (1) {
+                  <b>
+                    <a [routerLink]="['/sales-order/detail',reminder.referenceId]">
+                      {{reminder.subject}}</a>
+                  </b>- {{'SALES_ORDER_EXPECTED_SHIPMENT_DATE' | translate}}.
+                  }
+                  @case (1) {
+                  <b>
+                    <a [routerLink]="['/purchase-order/detail',reminder.referenceId]"> {{reminder.subject}}</a>
+                  </b>-{{'PURCHASE_ORDER_EXPECTED_DELIVERY_DATE' | translate}}.
+                  }
+                  @default {
+                  {{reminder.subject}}
+                  }
+                  }
+                </td>
+              </ng-container>
+              <ng-container matColumnDef="message">
+                <th class="table-column-500" mat-header-cell *matHeaderCellDef mat-sort-header> {{'MESSAGE' |
+                  translate}}
+                </th>
+                <td class="table-column-500" mat-cell *matCellDef="let reminder">
+                  @switch (reminder.application) {
+                  @case (1) {
+                  <b> {{reminder.subject}}</b>-{{'SALES_ORDER_EXPECTED_SHIPMENT_DATE_IS' | translate}}
+                  <b> {{reminder.duration | utcToLocalTime:'shortDate'}}</b>
+                  }
+                  @case (1) {
+                  <b> {{reminder.subject}}</b>-{{'PURCHASE_ORDER_EXPECTED_DELIVERY_DATE_IS' | translate}}
+                  <b> {{reminder.duration | utcToLocalTime:'shortDate'}}</b>
+                  }
+                  @default {
+                  {{reminder.subject}}
+                  }
+                  }
+                </td>
+              </ng-container>
+              <ng-container matColumnDef="footer">
+                <td mat-footer-cell colspan="6" *matFooterCellDef>
+                  <mat-paginator [length]="reminderResource.totalCount" [pageSize]="reminderResource.pageSize"
+                    [pageSizeOptions]="[15, 20, 30]">
+                  </mat-paginator>
+                </td>
+              </ng-container>
+              <tr *matNoDataRow>
+                <td colspan="9">
+                  <span class="p-4 mt-4">
+                    <b> {{'NO_DATA_FOUND' | translate}}</b>
+                  </span>
+                </td>
+              </tr>
+              <tr class="grid-header-color" mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+              <tr mat-row *matRowDef="let row; columns: displayedColumns;" [ngClass]="{
+                              'odd-row': isOddDataRow(getDataIndex(row)),
+                              'even-row': !isOddDataRow(getDataIndex(row))
+                            }"></tr>
+
+              <tr mat-footer-row *matFooterRowDef="footerToDisplayed"></tr>
+            </table>
+          </div>
+        </div>
+      </mat-card-content>
+    </mat-card>
+  </div>
+</section>

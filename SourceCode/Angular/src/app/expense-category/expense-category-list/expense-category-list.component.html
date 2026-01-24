@@ -1,0 +1,69 @@
+<section class="content">
+  <div class="container-fluid">
+    <div class="d-flex mb-2">
+      <div class="me-auto">
+        <span class="mb-0 page-title">{{'EXPENSE_CATEGORIES' | translate}}
+          <app-page-help-text code="EXPENSE_CATEGORIES"></app-page-help-text>
+        </span>
+      </div>
+      <div class="d-flex justify-content-end">
+        <button *hasClaim="'EXP_MANAGE_EXP_CATEGORY'" class="primary" matButton="filled"
+          (click)="manageExpenseCategory(null)">
+          <mat-icon class="medium-icon fs-5 align-middle">add</mat-icon>
+          <span class="d-none d-sm-inline"> {{'ADD_EXPENSE_CATEGORY' | translate}}</span>
+        </button>
+      </div>
+    </div>
+    <mat-card appearance="outlined">
+      <mat-card-content>
+        <div class="grid-height-large">
+          <table [dir]="langDir" mat-table [dataSource]="expenseCategories">
+            <ng-container matColumnDef="action">
+              <th class="table-column-200 w-25" mat-header-cell *matHeaderCellDef> {{"ACTION" | translate}}
+              </th>
+              <td class="table-column-200" mat-cell *matCellDef="let element">
+                <!-- <button *hasClaim="'EXP_MANAGE_EXP_CATEGORY'" class="primary me-2" matButton="filled" type="button">
+                  <mat-icon class="medium-icon fs-5 align-middle">edit</mat-icon>
+                  <span class="d-none d-sm-inline"> {{"EDIT" | translate}}</span>
+                </button>
+                <button *hasClaim="'EXP_MANAGE_EXP_CATEGORY'" (click)="deleteExpenseCategory(element)" class="error"
+                  matButton="filled" type="button">
+                  <mat-icon class="medium-icon fs-5 align-middle">delete</mat-icon>
+                  <span class="d-none d-sm-inline"> {{"DELETE" | translate}}</span>
+                </button> -->
+                <div class="d-flex gap-2">
+                  <button matMiniFab (click)="manageExpenseCategory(element)" *hasClaim="'EXP_MANAGE_EXP_CATEGORY'"
+                    class="primary">
+                    <mat-icon class="medium-icon fs-5 align-middle">edit</mat-icon>
+                  </button>
+                  <button matMiniFab (click)="deleteExpenseCategory(element)" *hasClaim="'EXP_MANAGE_EXP_CATEGORY'"
+                    class="error">
+                    <mat-icon class="medium-icon fs-5 align-middle">delete</mat-icon>
+                  </button>
+                </div>
+              </td>
+            </ng-container>
+            <!-- Name Column -->
+            <ng-container matColumnDef="name">
+              <th mat-header-cell *matHeaderCellDef> {{"NAME" | translate}} </th>
+              <td mat-cell *matCellDef="let element"> {{element.name}} </td>
+            </ng-container>
+
+            <tr *matNoDataRow>
+              <td colspan="11">
+                <span class="p-4 mt-4">
+                  <b> {{'NO_DATA_FOUND' | translate}}</b>
+                </span>
+              </td>
+            </tr>
+            <tr class="grid-header-color" mat-header-row *matHeaderRowDef="displayedColumns;sticky: true"></tr>
+            <tr mat-row *matRowDef="let row; columns: displayedColumns;" [ngClass]="{
+                              'odd-row': isOddDataRow(getDataIndex(row)),
+                              'even-row': !isOddDataRow(getDataIndex(row))
+                            }"></tr>
+          </table>
+        </div>
+      </mat-card-content>
+    </mat-card>
+  </div>
+</section>

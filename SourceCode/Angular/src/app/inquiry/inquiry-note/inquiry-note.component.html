@@ -1,0 +1,57 @@
+<mat-card appearance="outlined" class="mb-4">
+  <mat-card-header>
+    <div class="col-md-12 mb-0 d-flex justify-content-between">
+      <span class="mb-4 page-title">
+        {{ "NOTES" | translate }}
+      </span>
+    </div>
+  </mat-card-header>
+  <mat-card-content>
+    <div class="row">
+      <div class="col-sm-12">
+        <div class="list-group">
+          @for(inquiryNote of inquiryNotes; track $index){
+          <div class="list-group-item list-group-item-action" aria-current="true">
+            <p class="mb-1">
+              {{inquiryNote.note}}
+              <span role="button" class="badge" (click)="onDelete(inquiryNote.id ?? '')">
+                <mat-icon class="medium-icon fs-5 align-middle text-danger">delete</mat-icon>
+              </span>
+            </p>
+            <div class="w-100">
+              @if(inquiryNote.createdDate){
+              <small class="mr-2">
+                {{inquiryNote.createdDate | utcToLocalTime:'shortDate'}}
+              </small>
+              }
+              <small class="text-primary">{{inquiryNote?.createdByUser?.firstName}}
+                {{inquiryNote?.createdByUser?.lastName}}
+              </small>
+            </div>
+          </div>
+          }
+        </div>
+      </div>
+      <div class="row">
+        <div class="col-sm-12">
+          <form [formGroup]="commentForm" class="mt-3">
+            <div class="form-group">
+              <textarea class="form-control" formControlName="note" rows="3"></textarea>
+              @if(commentForm.get('note')?.touched && commentForm.get('note')?.errors &&
+              commentForm.get('note')?.errors?.['required'] ){
+              <div class="text-danger">
+                {{'NOTE_IS_REQUIRED' | translate}}
+              </div>
+              }
+            </div>
+            <div class="mt-2 col-md-12">
+              <button type="submit" class="primary me-2" matButton="filled" (click)="addComment()">
+                <mat-icon class="medium-icon fs-5 align-middle">add</mat-icon> {{'ADD_NOTE' | translate}}
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </mat-card-content>
+</mat-card>

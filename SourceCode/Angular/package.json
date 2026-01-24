@@ -1,0 +1,125 @@
+{
+  "name": "pos",
+  "version": "0.0.0",
+  "main": "main.js",
+  "scripts": {
+    "ng": "ng",
+    "start": "ng serve",
+    "electron": "electron . --dev",
+    "electron:prod": "electron .",
+    "electron:build": "ng build --configuration=electron --base-href ./ && electron-builder",
+    "build:api": "dotnet publish ../SQLAPI/POS.API/POS.API.csproj -c Release -r win-x64 --self-contained true",
+    "electron:package": "npm run build:api && npm run electron:build",
+    "build": "ng build",
+    "watch": "ng build --watch --configuration development",
+    "test": "ng test"
+  },
+  "build": {
+    "appId": "com.pos.app",
+    "productName": "POS System",
+    "directories": {
+      "output": "release"
+    },
+    "files": [
+      "main.js",
+      {
+        "from": "../SQLAPI/POS.API/ClientApp/browser",
+        "to": "dist",
+        "filter": [
+          "**/*"
+        ]
+      }
+    ],
+    "extraResources": [
+      {
+        "from": "../SQLAPI/POS.API/bin/Release/net10.0/win-x64/publish",
+        "to": "api",
+        "filter": [
+          "**/*"
+        ]
+      }
+    ],
+    "win": {
+      "target": "nsis"
+    },
+    "nsis": {
+      "oneClick": false,
+      "perMachine": false,
+      "allowToChangeInstallationDirectory": true
+    }
+  },
+  "prettier": {
+    "printWidth": 100,
+    "singleQuote": true,
+    "overrides": [
+      {
+        "files": "*.html",
+        "options": {
+          "parser": "angular"
+        }
+      }
+    ]
+  },
+  "private": true,
+  "dependencies": {
+    "@angular/animations": "^20.2.4",
+    "@angular/cdk": "^20.2.2",
+    "@angular/common": "^20.2.4",
+    "@angular/compiler": "^20.2.4",
+    "@angular/core": "^20.2.4",
+    "@angular/forms": "^20.2.4",
+    "@angular/material": "^20.2.2",
+    "@angular/platform-browser": "^20.2.4",
+    "@angular/router": "^20.2.4",
+    "@auth0/angular-jwt": "^5.2.0",
+    "@fullcalendar/angular": "^6.1.19",
+    "@fullcalendar/core": "^6.1.19",
+    "@fullcalendar/daygrid": "^6.1.19",
+    "@fullcalendar/interaction": "^6.1.19",
+    "@microsoft/signalr": "^9.0.6",
+    "@mlglobtech/license-validator-pos": "^2.0.1",
+    "@ngrx/effects": "^20.0.1",
+    "@ngrx/entity": "^20.0.1",
+    "@ngrx/operators": "^20.0.1",
+    "@ngrx/signals": "^20.0.1",
+    "@ngrx/store": "^20.0.1",
+    "@ngrx/store-devtools": "^20.0.1",
+    "@ngx-translate/core": "^17.0.0",
+    "@ngx-translate/http-loader": "^17.0.0",
+    "angular-feather": "^6.5.1",
+    "bootstrap": "^5.3.8",
+    "chart.js": "^4.4.7",
+    "clone": "^2.1.2",
+    "crypto-js": "^4.2.0",
+    "dayjs": "^1.11.13",
+    "echarts": "^5.4.3",
+    "html2canvas": "^1.4.1",
+    "jsbarcode": "^3.11.6",
+    "jspdf": "^3.0.3",
+    "jspdf-autotable": "^5.0.2",
+    "ngx-echarts": "^20.0.2",
+    "ngx-editor": "^19.0.0-beta.1",
+    "ngx-scrollbar": "^18.0.0",
+    "rxjs": "~7.8.0",
+    "subsink": "^1.0.2",
+    "tslib": "^2.3.0",
+    "xlsx": "^0.18.5",
+    "zone.js": "~0.15.0"
+  },
+  "devDependencies": {
+    "@angular/build": "^20.2.2",
+    "@angular/cli": "^20.2.2",
+    "@angular/compiler-cli": "^20.2.4",
+    "@types/clone": "^2.1.4",
+    "@types/jasmine": "~5.1.0",
+    "electron": "^40.0.0",
+    "electron-builder": "^26.4.0",
+    "jasmine-core": "~5.9.0",
+    "karma": "~6.4.0",
+    "karma-chrome-launcher": "~3.2.0",
+    "karma-coverage": "~2.2.0",
+    "karma-jasmine": "~5.1.0",
+    "karma-jasmine-html-reporter": "~2.1.0",
+    "typescript": "~5.9.2"
+  }
+}

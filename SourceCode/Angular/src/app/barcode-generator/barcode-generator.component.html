@@ -1,0 +1,150 @@
+<section class="content">
+  <div class="container-fluid">
+    <div class="row align-items-center">
+      <div class="col-md-6 mb-2">
+        <span class="mb-0 page-title">{{'PRINT_LABELS' | translate}}
+          <app-page-help-text code="PRINT_LABELS"></app-page-help-text>
+        </span>
+      </div>
+    </div>
+    <mat-card>
+      <mat-card-content>
+        <div class="col-md-6">
+          <div class="input-group">
+            <button class="btn btn-primary btn-sm" type="button">
+              <mat-icon class="medium-icon fs-4 align-top">search</mat-icon>
+            </button>
+            <input placeholder="{{'SEARCH_BY_NAME' | translate}}" type="text" class="form-control"
+              [formControl]="productNameControl" [matAutocomplete]="autoSupplier">
+            <mat-autocomplete [autoActiveFirstOption]="true" (optionSelected)='onProductSelection($event.option.value)'
+              #autoSupplier="matAutocomplete">
+              @let products= productList$ | async;
+              @for (product of products; track $index) {
+              <mat-option [value]="product">
+                {{product.name}}
+              </mat-option>
+              }
+              @if(products && products.length==0){
+              <mat-option disabled>
+                {{'NO_DATA_FOUND' | translate}}
+              </mat-option>
+              }
+            </mat-autocomplete>
+          </div>
+        </div>
+        <form [formGroup]="barcodeForm">
+          <mat-card appearance="outlined" class="mt-3">
+            <mat-card-content>
+              <table class="table table-pos table-bordered table-sm">
+                <thead>
+                  <tr class="grid-header-color">
+                    <th>
+                      #
+                    </th>
+                    <th>
+                      {{'PRODUCT_NAME' | translate}}
+                    </th>
+                    <th>
+                      {{'NO_OF_LABELS' | translate}}
+                    </th>
+                    <th>
+                      {{'PACKAGING_DATE' | translate}}
+                    </th>
+                    <th>
+                      {{'SALES_PRICE' | translate}}
+                    </th>
+                  </tr>
+                </thead>
+                <tbody formArrayName="products">
+                  @if(productFormArray && productFormArray.controls && productFormArray.controls.length==0){
+                  <tr>
+                    <td colspan="5">
+                      <span class="ms-3"> {{'NO_PRODUCT_SELECTED' | translate}}</span>
+                    </td>
+                  </tr>
+                  }@else{
+                  @for(productItem of productFormArray.controls; let i = $index; track $index){
+                  <tr [formGroupName]="i">
+                    <td class="align-middle text-center">
+                      @if(productFormArray.controls.length !==1){
+                      <!-- <button type="button" class="btn btn-outline-danger btn-sm" (click)="onRemoveProduct(i)">
+                        <mat-icon class="medium-icon fs-5 align-middle">delete</mat-icon>
+                      </button> -->
+                      <button matMiniFab class="error" (click)="onRemoveProduct(i)">
+                        <mat-icon class="medium-icon fs-5 align-middle">delete</mat-icon>
+                      </button>
+                      }
+                    </td>
+                    <td class="align-middle">
+                      @if(productItem.get('productUrl')?.value){
+                      <img class="img-thumbnail grid-img-thumbnail"
+                        [src]="baseUrl + productItem.get('productUrl')?.value" alt="{{'PRODUCT_IMAGE' | translate}}">
+                      }@else {
+                      <img class="img-thumbnail grid-img-thumbnail" src="/images/no-preview.jpg"
+                        alt="{{'PRODUCT_IMAGE' | translate}}">
+                      }
+                      <span class="ms-1"> {{productItem.get('productName')?.value}}</span>
+                    </td>
+                    <td>
+                      <input type="number" class="form-control form-control-sm" formControlName="noOfLabels">
+                    </td>
+                    <td>
+                      <div class="form-group">
+                        <input type="text" #packageDate_i formControlName="packageingDate"
+                          (focus)="packageDatePicker_i.open()" [matDatepicker]="packageDatePicker_i"
+                          class="form-control form-control-sm input-with-clear">
+                        <mat-datepicker #packageDatePicker_i (closed)="packageDate_i.blur()"></mat-datepicker>
+                      </div>
+                    </td>
+                    <td>
+                      <input type="number" class="form-control form-control-sm" formControlName="salesPrice">
+                    </td>
+                  </tr>
+                  }
+                  }
+                </tbody>
+              </table>
+              <hr>
+              <span class="mb-0 page-title">{{'LABEL_SETTINGS' | translate}}
+              </span>
+              <div class="row">
+                <div class="col-md-4">
+                  <mat-checkbox [dir]="langDir" color="primary" formControlName="isPrintProudctName">
+                    {{'PRINT_PRODUCT_NAME' | translate}}
+                  </mat-checkbox>
+                </div>
+                <div class="col-md-4">
+                  <mat-checkbox [dir]="langDir" color="primary" formControlName="isPrintPackagingDate">
+                    {{'PRINT_PACKING_DATE' | translate}}
+                  </mat-checkbox>
+                </div>
+                <div class="col-md-4">
+                  <mat-checkbox [dir]="langDir" color="primary" formControlName="isPrintPrice">
+                    {{'PRINT_PRICE' | translate}}
+                  </mat-checkbox>
+                </div>
+                <div class="col-md-4">
+                  <label>{{'LABELS_PER_SHEET' | translate}}</label>
+                  <mat-select [dir]="langDir" class="form-control form-control-sm" formControlName="noOfLabelsPerPage"
+                    panelClass="mat-select-control">
+                    <mat-option value="20">20</mat-option>
+                    <mat-option value="30">30</mat-option>
+                    <mat-option value="40">40</mat-option>
+                  </mat-select>
+                </div>
+              </div>
+              <div class="mt-3 col-md-12">
+                <button (click)="generateBarcode()" class="success me-2" matButton="filled" cdkFocusInitial>
+                  <mat-icon class="medium-icon fs-5 align-middle">print</mat-icon> {{'PRINT_LABELS' | translate}}
+                </button>
+              </div>
+            </mat-card-content>
+          </mat-card>
+        </form>
+      </mat-card-content>
+    </mat-card>
+  </div>
+</section>
+@if(barCodeData){
+<app-generate-barcode [barCodeData]="barCodeData"></app-generate-barcode>
+}

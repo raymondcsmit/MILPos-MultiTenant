@@ -1,0 +1,185 @@
+<section class="content">
+  <div class="container-fluid">
+    <div class="d-flex mb-2">
+      <div class="me-auto">
+        <span class="mb-0 page-title">{{ "STOCK_TRANSFER" | translate }}
+          <app-page-help-text code="STOCK_TRANSFER"></app-page-help-text>
+        </span>
+      </div>
+      <div class="d-flex justify-content-end">
+        <button *hasClaim="'STTFR_MANAGE_STTFR'" class="primary" matButton="filled"
+          [routerLink]="['/stock-transfer/add']">
+          <mat-icon class="medium-icon align-middle">add</mat-icon>
+          <span class="d-none d-sm-inline"> {{ "ADD_STOCK_TRANSFER" | translate }}</span>
+        </button>
+      </div>
+    </div>
+    <mat-card appearance="outlined">
+      <mat-card-content>
+        <div class="table-responsive">
+          <div class="grid-height-large">
+            <table [dir]="langDir" mat-table matSortDisableClear [dataSource]="dataSource" matSort
+              matSortActive="createdDate" matSortDirection="desc">
+              <ng-container matColumnDef="action">
+                <th mat-header-cell *matHeaderCellDef>
+                </th>
+                <td mat-cell *matCellDef="let stockTransfer">
+                  <button matMiniFab class="primary" [matMenuTriggerFor]="menu" aria-label="Action">
+                    <mat-icon>more_vert</mat-icon>
+                  </button>
+                  <mat-menu #menu="matMenu" [dir]="langDir">
+                    <button mat-menu-item (click)="viewInvoice(stockTransfer)">
+                      <mat-icon>receipt</mat-icon>
+                      <span>{{'VIEW' | translate}}</span>
+                    </button>
+                    <button *hasClaim="'STTFR_MANAGE_STTFR'" routerLinkActive="active" [routerLink]="['/stock-transfer/manage',stockTransfer.id]"
+                      mat-menu-item>
+                      <mat-icon>edit</mat-icon>
+                      <span>{{'EDIT' | translate}}</span>
+                    </button>
+                    <button *hasClaim="'STTFR_MANAGE_STTFR'" mat-menu-item (click)="deleteStockTransfer(stockTransfer)">
+                      <mat-icon>delete</mat-icon>
+                      <span>{{'DELETE' | translate}}</span>
+                    </button>
+                  </mat-menu>
+                </td>
+              </ng-container>
+
+              <ng-container matColumnDef="transferDate">
+                <th class="table-column-300" mat-header-cell *matHeaderCellDef mat-sort-header>
+                  {{'TRANSFER_DATE' |
+                  translate}}
+                </th>
+                <td class="table-column-300" mat-cell *matCellDef="let stockTransfer">
+                  {{stockTransfer.transferDate | utcToLocalTime:'shortDate'}} </td>
+              </ng-container>
+              <ng-container matColumnDef="referenceNo">
+                <th class="table-column-200" mat-header-cell *matHeaderCellDef mat-sort-header>
+                  {{"REFERENCE_NO" |
+                  translate}}
+                </th>
+                <td class="table-column-200" mat-cell *matCellDef="let stockTransfer">
+                  {{stockTransfer.referenceNo}}
+                </td>
+              </ng-container>
+              <ng-container matColumnDef="fromLocationName">
+                <th class="table-column-200" mat-header-cell *matHeaderCellDef mat-sort-header>
+                  {{"FROM_LOCATION" |
+                  translate}} </th>
+                <td class="table-column-200" mat-cell *matCellDef="let stockTransfer">
+                  {{stockTransfer.fromLocationName}} </td>
+              </ng-container>
+              <ng-container matColumnDef="toLocationName">
+                <th class="table-column-200" mat-header-cell *matHeaderCellDef mat-sort-header>
+                  {{"TO_LOCATION" |
+                  translate}}
+                </th>
+                <td class="table-column-200" mat-cell *matCellDef="let stockTransfer">
+                  {{stockTransfer.toLocationName}}
+                </td>
+              </ng-container>
+
+              <ng-container matColumnDef="totalAmount">
+                <th class="table-column-200" mat-header-cell *matHeaderCellDef mat-sort-header>
+                  {{"TOTAL_AMOUNT" | translate}}
+                </th>
+                <td class="table-column-200" mat-cell *matCellDef="let stockTransfer">
+                  {{stockTransfer.totalAmount | customCurrency}}
+                </td>
+              </ng-container>
+
+              <ng-container matColumnDef="totalShippingCharge">
+                <th class="table-column-200" mat-header-cell *matHeaderCellDef mat-sort-header>
+                  {{"SHIPPING_CHARGE" | translate}}
+                </th>
+                <td class="table-column-200" mat-cell *matCellDef="let stockTransfer">
+                  {{stockTransfer.totalShippingCharge | customCurrency}}
+                </td>
+              </ng-container>
+
+              <ng-container matColumnDef="status">
+                <th class="table-column-150" mat-header-cell *matHeaderCellDef mat-sort-header>
+                  {{'STATUS' | translate}} </th>
+                <td class="table-column-150" mat-cell *matCellDef="let so" style="text-align: center;">
+                  <span class="badge" [ngClass]="{'bg-success': so.status == 0 ,'bg-danger' : so.status == 1}">
+                    {{so.status | salesDeliveryStatus }}</span>
+                </td>
+              </ng-container>
+              <ng-container matColumnDef="action-search">
+                <th mat-header-cell *matHeaderCellDef> </th>
+              </ng-container>
+
+              <ng-container matColumnDef="transferDate-search">
+                <th mat-header-cell *matHeaderCellDef>
+                </th>
+              </ng-container>
+              <ng-container matColumnDef="referenceNo-search">
+                <th mat-header-cell *matHeaderCellDef>
+                  <input type="text" class="form-control form-control-sm" [(ngModel)]="ReferenceNoFilterFilter">
+                </th>
+              </ng-container>
+              <ng-container matColumnDef="fromLocation-search">
+                <th mat-header-cell *matHeaderCellDef>
+                  <mat-select [dir]="langDir" placeholder="{{'FROM_LOCATION' | translate}}"
+                    class="form-control form-control-sm" [(ngModel)]="FromFilter" panelClass="mat-select-control">
+                    <mat-option value="">{{'NONE' | translate}}</mat-option>
+                    @for(location of locations; track location.id){
+                    <mat-option [value]="location.id">
+                      {{location.name}}
+                    </mat-option>
+                    }
+                  </mat-select>
+                </th>
+              </ng-container>
+
+              <ng-container matColumnDef="toLocation-search">
+                <th mat-header-cell *matHeaderCellDef>
+                  <mat-select [dir]="langDir" placeholder="{{'TO_LOCATION' | translate}}"
+                    class="form-control form-control-sm" [(ngModel)]="ToFilter" panelClass="mat-select-control">
+                    <mat-option value="">{{'NONE' | translate}}</mat-option>
+                    @for(location of locations; track location.id){
+                    <mat-option [value]="location.id">
+                      {{location.name}}
+                    </mat-option>
+                    }
+                  </mat-select>
+                </th>
+              </ng-container>
+              <ng-container matColumnDef="totalAmount-search">
+                <th mat-header-cell *matHeaderCellDef> </th>
+              </ng-container>
+              <ng-container matColumnDef="totalShippingCharge-search">
+                <th mat-header-cell *matHeaderCellDef> </th>
+              </ng-container>
+              <ng-container matColumnDef="status-search">
+                <th mat-header-cell *matHeaderCellDef> </th>
+              </ng-container>
+              <ng-container matColumnDef="footer">
+                <td mat-footer-cell colspan="8" *matFooterCellDef>
+                  <mat-paginator [dir]="langDir" [length]="stockTransferResource.totalCount"
+                    [pageSize]="stockTransferResource.pageSize" [pageSizeOptions]="[15, 20, 30]">
+                  </mat-paginator>
+                </td>
+              </ng-container>
+              <tr *matNoDataRow>
+                <td colspan="8">
+                  <span class="p-4 mt-4">
+                    <b> {{'NO_DATA_FOUND' | translate}}</b>
+                  </span>
+                </td>
+              </tr>
+              <tr class="grid-header-color" mat-header-row *matHeaderRowDef="displayedColumns;sticky: true"></tr>
+              <tr mat-row *matRowDef="let row; columns: displayedColumns;" [ngClass]="{
+                              'odd-row': isOddDataRow(getDataIndex(row)),
+                              'even-row': !isOddDataRow(getDataIndex(row))
+                            }"></tr>
+              <tr style="height: 45px !important;" mat-header-row *matHeaderRowDef="searchColumns;sticky: true">
+              </tr>
+              <tr mat-footer-row *matFooterRowDef="footerToDisplayed;sticky: true"></tr>
+            </table>
+          </div>
+        </div>
+      </mat-card-content>
+    </mat-card>
+  </div>
+</section>

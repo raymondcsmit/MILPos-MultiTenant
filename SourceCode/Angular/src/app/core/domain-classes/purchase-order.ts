@@ -1,0 +1,45 @@
+import { BusinessLocation } from './business-location';
+import { PaymentStatusEnum } from './paymentaStatus';
+import { PurchaseDeliveryStatusEnum } from './purchase-delivery-status';
+import { PurchaseOrderItem } from './purchase-order-item';
+import { PurchaseOrderPayment } from './purchase-order-payment';
+import { PurchaseOrderStatusEnum } from './purchase-order-status';
+import { Supplier } from './supplier';
+
+export interface PurchaseOrder {
+  id?: string;
+  orderNumber: string;
+  poCreatedDate: Date;
+  note?: string;
+  termAndCondition?: string;
+  isPurchaseOrderRequest: boolean;
+  purchaseOrderStatus: PurchaseOrderStatusEnum;
+  deliveryDate: Date;
+  deliveryStatus: PurchaseDeliveryStatusEnum;
+  supplierId: string;
+  totalAmount: number;
+  totalTax: number;
+  totalQuantity?: number;
+  totalDiscount: number;
+  totalPaidAmount?: number;
+  supplier?: Supplier;
+  supplierName?: string;
+  paymentStatus?: PaymentStatusEnum;
+  purchaseOrderItems: PurchaseOrderItem[];
+  status?: number;
+  locationId: string;
+  location?: BusinessLocation;
+  businessLocation?: string;
+  supplierTaxNumber?: string;
+  isAllowPayment?: boolean;
+  createdByName?: string;
+  modifiedDate?: Date;
+  purchaseOrderPayments?: PurchaseOrderPayment[];
+  returnitemcount?: number;
+  returnItemPrice?: number;
+  totalItemQuantities?: number;
+  totalRoundOff?: number;
+  isSelectPaymentMethod?: boolean;
+  totalRefundAmount: number;
+  paymentMethod?: number;
+}

@@ -1,0 +1,52 @@
+<div class="d-flex">
+  <span mat-dialog-title class="dialog-title"> {{ 'PAGE' | translate }} </span>
+  <button mat-icon-button class="ms-auto" (click)="onNoClick()">
+    <mat-icon class="close-icon" color="warn">close</mat-icon>
+  </button>
+</div>
+<mat-dialog-content>
+  <form [formGroup]="pageForm">
+    <div class="modal-body">
+      <div class="row">
+        <div class="col-md-12">
+          <div class="form-group">
+            <label class="text-danger" for="pageName">{{ 'NAME' | translate }} *</label>
+            <input formControlName="name" type="text" class="form-control" id="pageName" />
+            @if(pageForm.get('name')?.touched && pageForm.get('name')?.errors &&
+            pageForm.get('name')?.errors?.['required']){
+            <div class="text-danger">
+              {{ 'NAME_IS_REQUIRED' | translate }}
+            </div>
+            }
+          </div>
+        </div>
+      </div>
+      <div class="row">
+        <div class="col-md-12">
+          <div class="form-group">
+            <label class="text-danger" for="order"> {{ 'ORDER_NUMBER' | translate }}*</label>
+            <input formControlName="order" type="number" class="form-control" id="order" />
+            @if(pageForm.get('order')?.touched && pageForm.get('order')?.errors &&
+            pageForm.get('order')?.errors?.['required']){
+            <div class="text-danger">
+              {{ 'ORDER_IS_REQUIRED' | translate }}
+            </div>
+            }
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="row">
+      <div class="col-md-12">
+        <button class="btn btn-success btn-sm me-2 mt-1" (click)="savePage()" cdkFocusInitial>
+          <mat-icon class="medium-icon fs-5 align-middle">save</mat-icon>
+          {{ 'SAVE' | translate }}
+        </button>
+        <button class="btn btn-danger btn-sm" (click)="onNoClick()">
+          <mat-icon class="medium-icon fs-5 align-middle">cancel</mat-icon>
+          {{ 'CANCEL' | translate }}
+        </button>
+      </div>
+    </div>
+  </form>
+</mat-dialog-content>

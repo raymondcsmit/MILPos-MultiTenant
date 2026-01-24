@@ -1,0 +1,147 @@
+@use 'sass:map';
+@use '@angular/material' as mat;
+@use './theme-colors' as theme-colors;
+
+//mat.$cyan-palette,
+html {
+  @include mat.theme((color: mat.$cyan-palette,
+      typography: Roboto,
+      density: -2));
+}
+
+:root {
+  @include mat.card-overrides((title-text-size: 1.2rem,
+      title-text-line-height: 1.6rem));
+
+  @include mat.tooltip-overrides((container-color: map.get(theme-colors.$primary-palette, 20),
+      container-shape: 16px,
+    ));
+
+  @include mat.table-overrides((header-headline-color: #fff,
+      // row-item-outline-color:#e5e7eb,
+      row-item-outline-color: #e5e7eb,
+      row-item-container-height:35px,
+      header-container-height:30px));
+
+  @include mat.datepicker-overrides((calendar-date-selected-state-background-color: map.get(theme-colors.$primary-palette, 30),
+      calendar-date-selected-state-text-color: map.get(theme-colors.$primary-palette, 100),
+      calendar-date-today-outline-color: map.get(theme-colors.$primary-palette, 30),
+      calendar-date-hover-state-background-color: map.get(theme-colors.$primary-palette, 30),
+      calendar-date-in-comparison-range-state-background-color : map.get(theme-colors.$primary-palette, 30),
+      calendar-date-in-overlap-range-selected-state-background-color : map.get(theme-colors.$primary-palette, 30),
+      calendar-date-in-overlap-range-state-background-color : map.get(theme-colors.$primary-palette, 30),
+      calendar-date-today-selected-state-outline-color : map.get(theme-colors.$primary-palette, 30),
+      calendar-date-in-range-state-background-color : map.get(theme-colors.$primary-palette, 30),
+      calendar-date-preview-state-outline-color : map.get(theme-colors.$primary-palette, 30)));
+
+  @include mat.option-overrides((selected-state-label-text-color: #f9faf4,
+      selected-state-layer-color: map.get(theme-colors.$primary-palette, 30),
+      hover-state-layer-color: #f9faf4,
+    ));
+
+  @include mat.pseudo-checkbox-overrides((full-selected-icon-color: map.get(theme-colors.$primary-palette, 30),
+    ));
+
+  @include mat.progress-bar-overrides((active-indicator-color: map.get(theme-colors.$primary-palette, 10),
+      track-color: map.get(theme-colors.$primary-palette, 90)));
+
+}
+
+.primary {
+
+  @include mat.button-overrides((filled-container-color: map.get(theme-colors.$primary-palette, 20), // background
+      filled-label-text-color: map.get(theme-colors.$primary-palette, 100), // text
+      filled-container-shape: 4px));
+
+  @include mat.card-overrides(( // border color
+      elevated-container-color: #e7e8e4, // bg color
+    ));
+
+  @include mat.snack-bar-overrides((container-color: map.get(theme-colors.$primary-palette, 20), // background
+      supporting-text-color: map.get(theme-colors.$primary-palette, 100),
+      button-color : map.get(theme-colors.$primary-palette, 100)));
+
+  @include mat.datepicker-overrides((calendar-container-background-color: map.get(theme-colors.$primary-palette, 20),
+      calendar-body-label-text-color: map.get(theme-colors.$primary-palette, 100),
+    ));
+
+  @include mat.fab-overrides((small-container-color: map.get(theme-colors.$primary-palette, 20),
+      small-foreground-color: map.get(theme-colors.$primary-palette, 100)));
+}
+
+
+.tertiary {
+  @include mat.button-overrides((filled-container-color: map.get(theme-colors.$tertiary-palette, 20), // background
+      filled-label-text-color: map.get(theme-colors.$tertiary-palette, 100),
+      filled-container-shape: 4px // text
+    ));
+  @include mat.fab-overrides((small-container-color: map.get(theme-colors.$tertiary-palette, 20),
+      small-foreground-color: map.get(theme-colors.$tertiary-palette, 100)));
+}
+
+.secondary {
+  @include mat.button-overrides((filled-container-color: map.get(theme-colors.$secondary-palette, 20), // background
+      filled-label-text-color: map.get(theme-colors.$secondary-palette, 100),
+      filled-container-shape: 4px // text
+    ));
+  @include mat.card-overrides(( // border color
+      outlined-container-shape: 12px, // corner radius
+      elevated-container-color: #f9faf4, // bg color
+    ));
+  @include mat.fab-overrides((small-container-color: map.get(theme-colors.$secondary-palette, 20),
+      small-foreground-color: map.get(theme-colors.$secondary-palette, 100)));
+}
+
+.neutral {
+  @include mat.button-overrides((filled-container-color: map.get(theme-colors.$neutral-palette, 20), // background
+      filled-label-text-color: map.get(theme-colors.$neutral-palette, 100),
+      filled-container-shape: 4px // text
+    ));
+  @include mat.fab-overrides((small-container-color: map.get(theme-colors.$neutral-palette, 100),
+      small-foreground-color: map.get(theme-colors.$neutral-palette, 20)));
+}
+
+.warning {
+  @include mat.button-overrides((filled-container-color: map.get(mat.$yellow-palette, 60), // background
+      filled-label-text-color: map.get(mat.$yellow-palette, 100),
+      filled-container-shape: 4px // text
+    ));
+  @include mat.snack-bar-overrides((container-color: map.get(theme-colors.$warning-palette, 30), // background
+      supporting-text-color: map.get(theme-colors.$neutral-palette, 20),
+      button-color : map.get(mat.$yellow-palette, 100)));
+
+  @include mat.fab-overrides((small-container-color: map.get(theme-colors.$warning-palette, 30),
+      small-foreground-color: map.get(theme-colors.$neutral-palette, 20)));
+}
+
+.error {
+  @include mat.button-overrides((filled-container-color: map.get(mat.$red-palette, 30), // background
+      filled-label-text-color: map.get(mat.$red-palette, 100), // text
+      filled-container-shape: 4px));
+
+  @include mat.icon-button-overrides((icon-color: map.get(mat.$red-palette, 30),
+      // text
+    ));
+
+  @include mat.snack-bar-overrides((container-color: map.get(mat.$red-palette, 30), // background
+      supporting-text-color: map.get(mat.$yellow-palette, 100),
+      button-color : map.get(mat.$yellow-palette, 100)));
+
+
+  @include mat.fab-overrides((small-container-color: map.get(mat.$red-palette, 100),
+      small-foreground-color: map.get(mat.$red-palette, 30)));
+
+}
+
+.success {
+  @include mat.button-overrides((filled-container-color: map.get(mat.$spring-green-palette, 50), // background
+      filled-label-text-color: map.get(mat.$spring-green-palette, 100), // text
+      filled-container-shape: 4px));
+
+  @include mat.snack-bar-overrides((container-color: map.get(mat.$spring-green-palette, 40), // background
+      supporting-text-color: map.get(mat.$spring-green-palette, 100),
+      button-color : map.get(mat.$spring-green-palette, 100))); // text
+
+  @include mat.fab-overrides((small-container-color: map.get(mat.$spring-green-palette, 50),
+      small-foreground-color: map.get(mat.$spring-green-palette, 100)));
+}

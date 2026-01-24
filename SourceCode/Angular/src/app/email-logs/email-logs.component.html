@@ -1,0 +1,150 @@
+<section class="content">
+  <div class="container-fluid">
+    <div class="row align-items-center">
+      <div class="col-md-6 mb-2">
+        <span class="mb-0 page-title">{{'EMAIL_LOGS' | translate}}
+          <app-page-help-text code="EMAIL_LOGS"></app-page-help-text>
+        </span>
+      </div>
+    </div>
+    <mat-card appearance="outlined">
+      <mat-card-content>
+        <div class="table-responsive">
+          <div class="grid-height-large">
+            <table [dir]="langDir" mat-table matSortDisableClear [dataSource]="dataSource" matSort
+              matSortActive="sentAt" matSortDirection="desc">
+              <ng-container matColumnDef="action">
+                <th class="table-column-150" mat-header-cell *matHeaderCellDef>
+                  {{'ACTION' | translate}}
+                </th>
+                <td class="table-column-150" mat-cell *matCellDef="let log">
+                  <button type="button" class="btn btn-primary btn-sm" (click)="openEmailLogDetails(log)">
+                    <mat-icon class="medium-icon fs-5 align-middle">info</mat-icon>
+                  </button>
+                  <button *hasClaim="'LOGS_DELETE_EMAIL_LOG'" type="button" class="btn btn-danger btn-sm ms-2"
+                    (click)="deleteLog(log)">
+                    <mat-icon class="medium-icon fs-5 align-middle">delete</mat-icon>
+                  </button>
+                </td>
+              </ng-container>
+              <ng-container matColumnDef="sentAt">
+                <th class="table-column-190" mat-header-cell *matHeaderCellDef mat-sort-header>
+                  {{'DATE'| translate}}
+                </th>
+                <td class="table-column-190" mat-cell *matCellDef="let log">
+                  {{log?.sentAt | utcToLocalTime:'short'}} </td>
+              </ng-container>
+
+              <ng-container matColumnDef="senderEmail">
+                <th class="table-column-190" mat-header-cell *matHeaderCellDef mat-sort-header>
+                  {{'FROM' | translate}} </th>
+                <td class="table-column-190" mat-cell *matCellDef="let log">
+                  {{log.senderEmail}}
+                </td>
+              </ng-container>
+              <ng-container matColumnDef="recipientEmail">
+                <th class="table-column-150" mat-header-cell *matHeaderCellDef mat-sort-header>
+                  {{'TO' | translate}}
+                </th>
+                <td class="table-column-150" mat-cell *matCellDef="let log">
+                  {{log.recipientEmail}}
+                </td>
+              </ng-container>
+              <ng-container matColumnDef="subject">
+                <th class="table-column-150" mat-header-cell *matHeaderCellDef mat-sort-header>
+                  {{'SUBJECT'| translate}}
+                </th>
+                <td class="table-column-150" mat-cell *matCellDef="let log">
+                  {{log.subject}}
+                </td>
+              </ng-container>
+              <ng-container matColumnDef="status">
+                <th class="table-column-150" mat-header-cell *matHeaderCellDef mat-sort-header>
+                  {{'STATUS'| translate}}
+                </th>
+                <td class="table-column-150" mat-cell *matCellDef="let log">
+                  @if (log?.statusName.toLocaleLowerCase() == 'sent') {
+                  <span class="badge bg-success">{{'SUCCESS' | translate}}</span>
+                  } @else if (log?.statusName.toLocaleLowerCase() == 'failed') {
+                  <span class="badge bg-danger">{{'FAILED' | translate}}</span>
+                  }
+                </td>
+              </ng-container>
+              <ng-container matColumnDef="attachment">
+                <th class="table-column-150" mat-header-cell *matHeaderCellDef>
+                  {{'ATTACHMENTS'| translate}}
+                </th>
+                <td class="table-column-150" mat-cell *matCellDef="let log">
+                  {{log.emailLogAttachments.length}}
+                </td>
+              </ng-container>
+
+              <ng-container matColumnDef="action-search">
+                <th class="table-column-50" class="pr-5" mat-header-cell *matHeaderCellDef> </th>
+              </ng-container>
+
+              <ng-container matColumnDef="sentAt-search">
+                <th class="table-column-50" class="pr-5" mat-header-cell *matHeaderCellDef>
+
+                </th>
+              </ng-container>
+
+              <ng-container matColumnDef="senderEmail-search">
+                <th class="table-column-50" class="pr-5" mat-header-cell *matHeaderCellDef>
+                  <input placeholder="{{'FROM' | translate}}" type="text" class="form-control form-control-sm"
+                    [(ngModel)]="SenderFilter">
+                </th>
+              </ng-container>
+
+              <ng-container matColumnDef="recipientEmail-search">
+                <th class="table-column-50" class="pr-5" mat-header-cell *matHeaderCellDef>
+                  <input placeholder="{{'TO' | translate}}" type="text" class="form-control form-control-sm"
+                    [(ngModel)]="RecipientFilter">
+                </th>
+              </ng-container>
+
+              <ng-container matColumnDef="subject-search">
+                <th class="table-column-50" class="pr-5" mat-header-cell *matHeaderCellDef>
+                  <input placeholder="{{'SUBJECT' | translate}}" type="text" class="form-control form-control-sm"
+                    [(ngModel)]="SubjectFilter">
+                </th>
+              </ng-container>
+
+              <ng-container matColumnDef="status-search">
+                <th class="table-column-50" class="pr-5" mat-header-cell *matHeaderCellDef>
+                </th>
+              </ng-container>
+              <ng-container matColumnDef="attachment-search">
+                <th class="table-column-50" class="pr-5" mat-header-cell *matHeaderCellDef>
+                </th>
+              </ng-container>
+
+              <ng-container matColumnDef="footer">
+                <td mat-footer-cell colspan="7" *matFooterCellDef>
+                  <mat-paginator [length]="emailLogResource.totalCount" [pageSize]="emailLogResource.pageSize"
+                    [pageSizeOptions]="[10, 20, 30]">
+                  </mat-paginator>
+                </td>
+              </ng-container>
+              <tr *matNoDataRow>
+                <td colspan="9">
+                  <span class="p-4 mt-4">
+                    <b> {{'NO_DATA_FOUND' | translate}}</b>
+                  </span>
+                </td>
+              </tr>
+              <tr class="grid-header-color" mat-header-row *matHeaderRowDef="displayedColumns;sticky: true"></tr>
+              <tr mat-row *matRowDef="let row; columns: displayedColumns;" [ngClass]="{
+                              'odd-row': isOddDataRow(getDataIndex(row)),
+                              'even-row': !isOddDataRow(getDataIndex(row))
+                            }"></tr>
+              <tr style="height: 45px !important;" mat-header-row
+                *matHeaderRowDef="displayedSearchColumns;sticky: true"> </tr>
+              <tr mat-footer-row *matFooterRowDef="footerToDisplayed"></tr>
+            </table>
+          </div>
+        </div>
+      </mat-card-content>
+    </mat-card>
+  </div>
+</section>

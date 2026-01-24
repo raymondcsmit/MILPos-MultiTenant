@@ -1,0 +1,201 @@
+<section class="content">
+  <div class="container-fluid">
+    <div class="d-flex mb-2">
+      <div class="me-auto">
+        <span class="mb-0 page-title">{{ 'CUSTOMER_LADGER_LIST' | translate }}
+          <app-page-help-text code="CUSTOMER_LADGER_LIST"></app-page-help-text>
+        </span>
+      </div>
+      <div class="d-flex justify-content-end">
+        <button matButton="filled" class="primary me-2" (click)="addPendingPayment()">
+          <mat-icon class="medium-icon fs-5 align-middle">add</mat-icon>
+          <span class="d-none d-sm-inline">{{ 'ADD_CUSTOMER_LADGER' | translate }}</span>
+        </button>
+        <button class="error me-2" matButton="filled" (click)="refresh()">
+          <mat-icon class="medium-icon fs-5 align-middle">refresh</mat-icon>
+          <span class="d-none d-sm-inline">{{ 'REFRESH' | translate }}</span>
+        </button>
+      </div>
+    </div>
+    <mat-card appearance="outlined">
+      <mat-card-content>
+        <div class="row">
+          <div class="col-sm-12">
+            <div class="table-responsive">
+              <div class="grid-height-large">
+                <table [dir]="langDir" mat-table matSortDisableClear
+                  [dataSource]="customerLadgerStore.customerLadgers()" matSort matSortActive="date"
+                  matSortDirection="desc">
+                  <ng-container matColumnDef="date">
+                    <th mat-header-cell *matHeaderCellDef mat-sort-header class="table-column-130">
+                      {{ 'DATE' | translate }}
+                    </th>
+                    <td mat-cell *matCellDef="let account" class="table-column-130">
+                      {{ account.date | utcToLocalTime : 'shortDate' }}
+                    </td>
+                  </ng-container>
+                  <ng-container matColumnDef="amount">
+                    <th mat-header-cell *matHeaderCellDef mat-sort-header class="table-column-150 pl-3">
+                      {{ 'AMOUNT' | translate }}
+                    </th>
+                    <td mat-cell *matCellDef="let account" class="table-column-150 pl-3">
+                      {{ account.amount | customCurrency }}
+                    </td>
+                  </ng-container>
+                  <ng-container matColumnDef="balance">
+                    <th mat-header-cell *matHeaderCellDef mat-sort-header class="table-column-150 pl-3">
+                      {{ 'BALANCE' | translate }}
+                    </th>
+                    <td mat-cell *matCellDef="let account" class="table-column-150 pl-3" [ngClass]="{
+                        'text-success': account.balance > 0,
+                        'text-danger': account.balance < 0
+                      }">
+                      {{ account.balance | customCurrency }}
+                    </td>
+                  </ng-container>
+                  <ng-container matColumnDef="overdue">
+                    <th mat-header-cell *matHeaderCellDef mat-sort-header class="table-column-150 pl-3">
+                      {{ 'OVERDUE' | translate }}
+                    </th>
+                    <td mat-cell *matCellDef="let account" class="table-column-150 pl-3">
+                      {{ account.overdue | customCurrency }}
+                    </td>
+                  </ng-container>
+                  <ng-container matColumnDef="reference">
+                    <th mat-header-cell *matHeaderCellDef mat-sort-header class="table-column-150 pl-3">
+                      {{ 'REFERENCE' | translate }}
+                    </th>
+                    <td mat-cell *matCellDef="let account" class="table-column-150 pl-3">
+                      {{ account.reference }}
+                    </td>
+                  </ng-container>
+                  <ng-container matColumnDef="accountId">
+                    <th mat-header-cell *matHeaderCellDef class="table-column-200">
+                      {{ 'CUSTOMER' | translate }}
+                    </th>
+                    <td mat-cell *matCellDef="let account" class="table-column-200">
+                      {{ account.accountName }}
+                    </td>
+                  </ng-container>
+                  <ng-container matColumnDef="location">
+                    <th mat-header-cell *matHeaderCellDef mat-sort-header class="table-column-200">
+                      {{ 'BUSINESS_LOCATION' | translate }}
+                    </th>
+                    <td mat-cell *matCellDef="let account" class="table-column-200">
+                      {{ account.locationName }}
+                    </td>
+                  </ng-container>
+                  <ng-container matColumnDef="description">
+                    <th mat-header-cell *matHeaderCellDef mat-sort-header class="table-column-200">
+                      {{ 'DESCRIPTION' | translate }}
+                    </th>
+                    <td mat-cell *matCellDef="let account" class="table-column-200">
+                      {{ account.description }}
+                    </td>
+                  </ng-container>
+                  <ng-container matColumnDef="note">
+                    <th mat-header-cell *matHeaderCellDef mat-sort-header class="table-column-200">
+                      {{ 'NOTE' | translate }}
+                    </th>
+                    <td mat-cell *matCellDef="let account" class="table-column-200">
+                      {{ account.note }}
+                    </td>
+                  </ng-container>
+                  <ng-container matColumnDef="date-search">
+                    <th mat-header-cell *matHeaderCellDef>
+                      <div class="date-filter-container">
+                        <input type="text" placeholder="{{ 'DATE' | translate }}" #fromDate (focus)="DatePicker.open()"
+                          [matDatepicker]="DatePicker" [(ngModel)]="AccountDateFilter"
+                          class="form-control form-control-sm" />
+                        <mat-datepicker #DatePicker (closed)="fromDate.blur()"></mat-datepicker>
+                        @if(AccountDateFilter){
+                        <button type="button" class="clear-btn" (click)="clearDate()">
+                          <mat-icon class="medium-icon text-danger fs-6 align-middle">cancel</mat-icon>
+                        </button>
+                        }
+                      </div>
+                    </th>
+                  </ng-container>
+                  <ng-container matColumnDef="amount-search">
+                    <th mat-header-cell *matHeaderCellDef></th>
+                  </ng-container>
+                  <ng-container matColumnDef="balance-search">
+                    <th mat-header-cell *matHeaderCellDef></th>
+                  </ng-container>
+                  <ng-container matColumnDef="overdue-search">
+                    <th mat-header-cell *matHeaderCellDef></th>
+                  </ng-container>
+                  <ng-container matColumnDef="reference-search">
+                    <th mat-header-cell *matHeaderCellDef>
+                      <input placeholder="{{ 'REFERENCE' | translate }}" type="text"
+                        class="form-control form-control-sm" [(ngModel)]="ReferenceFilter" />
+                    </th>
+                  </ng-container>
+                  <ng-container matColumnDef="accountId-search">
+                    <th mat-header-cell *matHeaderCellDef>
+                      <mat-select [dir]="langDir" [(ngModel)]="AccountFilter" panelClass="mat-select-control"
+                        placeholder="{{ 'SELECT_CUSTOMER' | translate }} " class="form-control">
+                        <input class="form-control form-control-sm" [formControl]="accountNameControl" focused="'true'"
+                          type="text" autocomplete="off" placeholder="{{ 'SEARCH_OTHER_CUSTOMERS' | translate }}" />
+                        <mat-divider></mat-divider>
+                        @for (account of accounts; track $index) {
+                        <mat-option [dir]="langDir" [value]="account.id">
+                          {{ account.name }}
+                        </mat-option>
+                        } @if(accounts.length == 0){
+                        <mat-option value="">
+                          {{ 'NO_RECORDS' | translate }}
+                        </mat-option>
+                        }
+                      </mat-select>
+                    </th>
+                  </ng-container>
+                  <ng-container matColumnDef="location-search">
+                    <th mat-header-cell *matHeaderCellDef>
+                      <mat-select [dir]="langDir" placeholder="{{ 'LOCATION' | translate }}"
+                        class="form-control form-control-sm" [(ngModel)]="LocationFilter"
+                        panelClass="mat-select-control">
+                        <mat-option value="">{{ 'NONE' | translate }}</mat-option>
+                        @for (location of locations; track $index) {
+                        <mat-option [value]="location.id">
+                          {{ location.name }}
+                        </mat-option>
+                        }
+                      </mat-select>
+                    </th>
+                  </ng-container>
+                  <ng-container matColumnDef="footer">
+                    <td mat-footer-cell colspan="12" *matFooterCellDef>
+                      <mat-paginator [length]="customerLadgerStore.customerLadgerResourceParameter().totalCount"
+                        [pageSize]="customerLadgerStore.customerLadgerResourceParameter().pageSize"
+                        [pageSizeOptions]="[10, 20, 30, 50]">
+                      </mat-paginator>
+                    </td>
+                  </ng-container>
+                  <ng-container matColumnDef="note-search">
+                    <th mat-header-cell *matHeaderCellDef></th>
+                  </ng-container>
+                  <ng-container matColumnDef="description-search">
+                    <th mat-header-cell *matHeaderCellDef></th>
+                  </ng-container>
+                  <tr *matNoDataRow>
+                    <td colspan="11">
+                      <span class="p-4 mt-4">
+                        <b> {{ 'NO_DATA_FOUND' | translate }}</b>
+                      </span>
+                    </td>
+                  </tr>
+                  <tr class="grid-header-color" mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+                  <tr mat-row *matRowDef="let row; columns: displayedColumns"></tr>
+                  <tr style="height: 45px !important;" mat-header-row *matHeaderRowDef="filteredColoumns; sticky: true">
+                  </tr>
+                  <tr mat-footer-row *matFooterRowDef="footerToDisplayed"></tr>
+                </table>
+              </div>
+            </div>
+          </div>
+        </div>
+      </mat-card-content>
+    </mat-card>
+  </div>
+</section>

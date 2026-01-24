@@ -1,0 +1,99 @@
+<section class="content">
+  <div class="container-fluid">
+    <div class="row align-items-center">
+      <div class="col-md-6 mb-2">
+        <span class="mb-0 page-title">{{'LOG_DETAIL' | translate}}</span>
+      </div>
+      <div class="col-md-6 d-flex justify-content-end mb-2">
+        <button mat-raised-button color="primary" class="error me-2" matButton="filled" [routerLink]="['/logs']">
+          <mat-icon class="medium-icon fs-5 align-middle">arrow_back</mat-icon>
+          {{'BACK' | translate}}
+        </button>
+      </div>
+    </div>
+    <mat-card>
+      <mat-card-content>
+        <div class="col-md-12">
+          <mat-card appearance="outlined">
+            <mat-card-content>
+              <div class="row pb-2">
+                <label for="staticEmail" class="col-sm-2 col-form-label font-weight-bold">
+                  {{"DATE_TIME" | translate}}
+                </label>
+                <div class="col-sm-4">
+                  <span readonly class="form-control">{{log.logged | date:"dd/MM/yyyy hh:mm:ss"}}</span>
+                </div>
+                @if (log.source) {
+                <label for="source" class="col-sm-1 col-form-label font-weight-bold">
+                  {{"SOURCE" | translate}}
+                </label>
+                <div class="col-sm-5">
+                  <input type="text" readonly class="form-control" [value]="log.source">
+                </div>
+                }
+              </div>
+              <div class="form-group row mb-2">
+                <label for="inputPassword" class="col-sm-2 col-form-label font-weight-bold">
+                  {{"LEVEL" | translate}}
+                </label>
+                <div class="col-sm-10">
+                  <input type="text" readonly class="form-control" [value]="log.level">
+                </div>
+              </div>
+              @if (log.message) {
+              <div class="form-group row mb-2">
+                <label for="inputPassword" class="col-sm-2 col-form-label font-weight-bold">
+                  {{"MESSAGE" | translate}}
+                </label>
+                <div class="col-sm-10">
+                  <textarea type="text" readonly class="form-control">{{log.message}}</textarea>
+                </div>
+              </div>
+              }
+              @if (log.logger) {
+              <div class="form-group row mb-3">
+                <label for="inputPassword" class="col-sm-2 col-form-label font-weight-bold">
+                  {{"LOGGER" | translate}}
+                </label>
+                <div class="col-sm-10">
+                  <textarea type="text" readonly class="form-control">{{log.logger}}</textarea>
+                </div>
+              </div>
+              }
+              @if (log.properties) {
+              <div class="form-group row mb-2">
+                <label for="inputPassword" class="col-sm-2 col-form-label font-weight-bold">
+                  {{"PROPERTIES" | translate}}
+                </label>
+                <div class="col-sm-10">
+                  <textarea type="text" readonly class="form-control">{{log.properties}}</textarea>
+                </div>
+              </div>
+              }
+              @if (log.callsite) {
+              <div class="form-group row mb-2">
+                <label for="inputPassword" class="col-sm-2 col-form-label font-weight-bold">
+                  {{"CALLSITE" | translate}}
+                </label>
+                <div class="col-sm-10">
+                  <textarea type="text" readonly class="form-control">{{log.callsite}}</textarea>
+                </div>
+              </div>
+              }
+              @if (log.exception) {
+              <div class="form-group row mb-2">
+                <label for="inputPassword" class="col-sm-2 col-form-label font-weight-bold">
+                  {{"EXCEPTION" | translate}}
+                </label>
+              </div>
+              }
+              <div class="col-sm-10">
+                <textarea type="text" rows="10" readonly class="form-control" value="{{log.exception}}"></textarea>
+              </div>
+            </mat-card-content>
+          </mat-card>
+        </div>
+      </mat-card-content>
+    </mat-card>
+  </div>
+</section>

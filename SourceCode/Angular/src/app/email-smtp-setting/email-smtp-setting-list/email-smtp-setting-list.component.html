@@ -1,0 +1,92 @@
+<section class="content">
+  <div class="container-fluid">
+    <div class="d-flex mb-2">
+      <div class="me-auto">
+        <span class="mb-0 page-title">{{'EMAIL_SMTP_SETTING' | translate }}
+          <app-page-help-text code="EMAIL_SMTP_SETTINGS"></app-page-help-text>
+        </span>
+      </div>
+      <div class="d-flex justify-content-end">
+        <button *hasClaim="'EMAIL_MANAGE_EMAIL_SMTP_SETTINS'" [routerLink]="['/email-smtp/manage']" class="primary me-2"
+          matButton="filled">
+          <mat-icon class="medium-icon fs-5 align-middle">add</mat-icon>
+          <span class="d-none d-sm-inline"> {{'ADD_SMTP_SETTING' | translate }}
+          </span>
+        </button>
+      </div>
+    </div>
+    <mat-card appearance="outlined">
+      <mat-card-content>
+        <div class="grid-height-large">
+          <table [dir]="langDir" mat-table [dataSource]="emailSMTPSettings">
+            <!-- Action Column -->
+            <ng-container matColumnDef="action">
+              <th class="table-column-300" mat-header-cell *matHeaderCellDef>{{'ACTION' | translate}} </th>
+              <td class="table-column-300" mat-cell *matCellDef="let emailSMTPSetting">
+                <div class="d-flex gap-2">
+                  <!-- <button *hasClaim="'EMAIL_MANAGE_EMAIL_SMTP_SETTINS'"
+                    [routerLink]="['/email-smtp/manage', emailSMTPSetting.id]" class="primary me-2" matButton="filled"
+                    type="button">
+                    <mat-icon class="medium-icon fs-5 align-middle">edit</mat-icon>
+                    <span class="d-none d-sm-inline"> {{'EDIT' | translate }}</span>
+                  </button>
+                  <button *hasClaim="'EMAIL_MANAGE_EMAIL_SMTP_SETTINS'" class="error" matButton="filled" type="button"
+                    (click)="deleteEmailSMTPSetting(emailSMTPSetting)">
+                    <mat-icon class="medium-icon fs-5 align-middle">delete</mat-icon>
+                    <span class="d-none d-sm-inline"> {{'DELETE' | translate }}</span>
+                  </button> -->
+                  <button matMiniFab [routerLink]="['/email-smtp/manage', emailSMTPSetting.id]"
+                    *hasClaim="'EMAIL_MANAGE_EMAIL_SMTP_SETTINS'" class="primary">
+                    <mat-icon class="medium-icon fs-5 align-middle">edit</mat-icon>
+                  </button>
+                  <button matMiniFab (click)="deleteEmailSMTPSetting(emailSMTPSetting)"
+                    *hasClaim="'EMAIL_MANAGE_EMAIL_SMTP_SETTINS'" class="error">
+                    <mat-icon class="medium-icon fs-5 align-middle">delete</mat-icon>
+                  </button>
+                </div>
+              </td>
+            </ng-container>
+
+            <ng-container matColumnDef="host">
+              <th class="table-column-200" mat-header-cell *matHeaderCellDef> {{'HOST' | translate }} </th>
+              <td class="table-column-200" mat-cell *matCellDef="let emailSMTPSetting"> {{emailSMTPSetting.host}}
+              </td>
+            </ng-container>
+
+            <ng-container matColumnDef="userName">
+              <th class="table-column-300" mat-header-cell *matHeaderCellDef> {{'USER_NAME' | translate }}</th>
+              <td class="table-column-300" mat-cell *matCellDef="let emailSMTPSetting"> {{emailSMTPSetting.userName}}
+              </td>
+            </ng-container>
+
+            <ng-container matColumnDef="port">
+              <th class="table-column-100" mat-header-cell *matHeaderCellDef> {{'PORT' | translate }} </th>
+              <td class="table-column-100" mat-cell *matCellDef="let emailSMTPSetting"> {{emailSMTPSetting.port}}
+              </td>
+            </ng-container>
+
+            <ng-container matColumnDef="isDefault">
+              <th class="table-column-100" mat-header-cell *matHeaderCellDef> {{'IS_DEFAULT' | translate }} </th>
+              <td class="table-column-100" mat-cell *matCellDef="let emailSMTPSetting"> {{emailSMTPSetting.isDefault ?
+                "Yes" :
+                "No"}} </td>
+            </ng-container>
+
+            <tr *matNoDataRow>
+              <td colspan="5">
+                <span class="p-4 mt-4">
+                  <b> {{ "NO_DATA_FOUND" | translate }}</b>
+                </span>
+              </td>
+            </tr>
+            <tr class="grid-header-color" mat-header-row *matHeaderRowDef="displayedColumns;sticky: true"></tr>
+            <tr mat-row *matRowDef="let row; columns: displayedColumns;" [ngClass]="{
+                              'odd-row': isOddDataRow(getDataIndex(row)),
+                              'even-row': !isOddDataRow(getDataIndex(row))
+                            }"></tr>
+          </table>
+        </div>
+      </mat-card-content>
+    </mat-card>
+  </div>
+</section>

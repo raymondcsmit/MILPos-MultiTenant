@@ -1,0 +1,66 @@
+<section class="content">
+  <div class="container-fluid">
+    <div class="d-flex mb-2">
+      <div class="me-auto">
+        <span class="mb-0 page-title">{{'ROLES' | translate}}
+          <app-page-help-text code="ROLES"></app-page-help-text>
+        </span>
+      </div>
+      <div class="d-flex justify-content-end">
+        <button *hasClaim="'ROLES_ADD_ROLE'" class="primary me-2" matButton="filled" [routerLink]="['/roles/manage']">
+          <mat-icon class="medium-icon fs-5 align-middle">add</mat-icon>
+          {{'ADD_ROLE' | translate}}
+        </button>
+      </div>
+    </div>
+    <mat-card appearance="outlined">
+      <mat-card-content>
+        <div class="table-responsive">
+          <div class="grid-height-large">
+            <table [dir]="langDir" mat-table [dataSource]="roles">
+              <!-- Action Column -->
+              <ng-container matColumnDef="action">
+                <th mat-header-cell *matHeaderCellDef>{{'ACTION' | translate}}
+                </th>
+                <td mat-cell *matCellDef="let role">
+                  <div class="d-flex gap-2 my-1">
+                    <button matMiniFab [routerLink]="['/roles/manage',role.id]" *hasClaim="'ROLES_UPDATE_ROLE'"
+                      class="primary">
+                      <mat-icon class="medium-icon fs-5 align-middle">edit</mat-icon>
+                    </button>
+                    <button matMiniFab (click)="deleteRole(role)" *hasClaim="'ROLES_DELETE_ROLE'" class="error">
+                      <mat-icon class="medium-icon fs-5 align-middle">delete</mat-icon>
+                    </button>
+                  </div>
+
+                  <!-- <button *hasClaim="'ROLES_UPDATE_ROLE'" [routerLink]="['/roles/manage',role.id]" class="primary me-2"
+                    matButton="filled" type="button">
+                    <mat-icon class="medium-icon fs-5 align-middle">edit</mat-icon>
+                    <span class="d-none d-sm-inline"> {{'EDIT' | translate}}</span>
+                  </button>
+                  <button *hasClaim="'ROLES_DELETE_ROLE'" (click)="deleteRole(role)" class="error" matButton="filled"
+                    type="button">
+                    <mat-icon class="medium-icon fs-5 align-middle">delete</mat-icon>
+                    <span class="d-none d-sm-inline"> {{'DELETE' | translate}}</span>
+                  </button> -->
+                </td>
+              </ng-container>
+
+              <!-- Name Column -->
+              <ng-container matColumnDef="name">
+                <th mat-header-cell *matHeaderCellDef> {{'NAME' | translate}} </th>
+                <td mat-cell *matCellDef="let role"> {{role.name}} </td>
+              </ng-container>
+
+              <tr class="grid-header-color" mat-header-row *matHeaderRowDef="displayedColumns;sticky: true"></tr>
+              <tr mat-row *matRowDef="let row; columns: displayedColumns;" [ngClass]="{
+                              'odd-row': isOddDataRow(getDataIndex(row)),
+                              'even-row': !isOddDataRow(getDataIndex(row))
+                            }"></tr>
+            </table>
+          </div>
+        </div>
+      </mat-card-content>
+    </mat-card>
+  </div>
+</section>

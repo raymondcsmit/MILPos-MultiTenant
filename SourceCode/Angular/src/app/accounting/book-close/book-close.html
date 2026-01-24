@@ -1,0 +1,128 @@
+<section class="content">
+  <mat-card appearance="outlined">
+    <mat-card-content>
+      <!-- Header -->
+      <div class="bg-danger text-white d-flex flex-column align-items-center rounded-top-4 p-4">
+        <mat-icon class="mb-3 medium-icon fs-4 text-center">lock</mat-icon>
+        <h3 class="card-title fw-bold mb-1">{{ 'FINANCIAL_YEAR_CLOSURE' | translate }}</h3>
+        <p class="mb-0 small opacity-75">
+          {{ 'FINALIZE_BOOKS_WARNING' | translate }}
+        </p>
+      </div>
+
+      <!-- Warning -->
+      <div
+        class="alert mt-5 alert-warning d-flex align-items-center rounded-4 mb-4 shadow-sm"
+        role="alert"
+      >
+        <mat-icon class="me-3 text-warning">warning</mat-icon>
+        <div>
+          <strong>{{ 'FINAL_WARNING' | translate }}:</strong>
+          {{ 'CLOSURE_IRREVERSIBLE_WARNING' | translate }}
+        </div>
+      </div>
+
+      <div class="row g-4">
+        <!-- Main Content -->
+        <div class="col-lg-8">
+          <!-- Affected Areas -->
+          <h5 class="fw-bold mb-3">{{ 'AFFECTED_AREAS' | translate }}</h5>
+          <ul class="list-group list-group-flush mb-4">
+            <li class="list-group-item bg-transparent">
+              <mat-icon class="me-2 text-muted">lock</mat-icon>
+              {{ 'LOCKED_TRANSACTIONS_NOTE' | translate }}
+            </li>
+            <li class="list-group-item bg-transparent">
+              <mat-icon class="me-2 text-muted">analytics</mat-icon>
+              {{ 'FINALIZED_REPORTS_NOTE' | translate }}
+            </li>
+            <li class="list-group-item bg-transparent">
+              <mat-icon class="me-2 text-muted">undo</mat-icon>
+              {{ 'REOPEN_MANUAL_ADJUSTMENTS_NOTE' | translate }}
+            </li>
+          </ul>
+
+          <ul class="list-group list-group-flush mb-4">
+            <li class="list-group-item bg-transparent d-flex align-items-center">
+              <mat-icon class="me-2 text-muted">date_range</mat-icon>
+              <span>
+                {{ 'CURRENT_FINANCIAL_YEAR' | translate }}:
+                <strong>
+                  {{ financialYearStore.currentFinancialYear()?.startDate | utcToLocalTime : 'shortDate'}}
+                  -
+                  {{ financialYearStore.currentFinancialYear()?.endDate | utcToLocalTime : 'shortDate' }}
+                </strong>
+              </span>
+            </li>
+          </ul>
+
+          <!-- Confirmation -->
+          <div class="mb-3">
+            <label class="form-label small text-muted">
+              {{ 'TYPE_CLOSE_TO_CONFIRM' | translate }}
+            </label>
+            <input
+              id="confirmInput"
+              class="form-control rounded-3"
+              placeholder="{{ 'PLACEHOLDER_TYPE_CLOSE' | translate }}"
+              [ngModel]="confirmText"
+              (ngModelChange)="onConfirmTextChange($event)"
+              name="confirmText"
+            />
+            <div class="form-text">
+              {{ 'CONFIRMATION_CASE_SENSITIVE_NOTE' | translate }}
+            </div>
+            @if (showConfirmError) {
+            <div class="text-danger small mt-1">
+              {{ 'PLEASE_TYPE_CLOSE' | translate }}
+            </div>
+            } @else if (confirmText === 'CLOSE') {
+            <div class="text-success small mt-1">
+              {{ 'CONFIRMATION_ACCEPTED' | translate }}
+            </div>
+            }
+          </div>
+
+          <!-- Buttons -->
+          <div class="d-flex justify-content-between mt-4">
+            <button
+              class="warning me-2"
+              matButton="filled"
+              type="button"
+              [routerLink]="['/dashboard']"
+            >
+              <mat-icon class="me-2">cancel</mat-icon>{{ 'CANCEL' | translate }}
+            </button>
+            <button class="error" matButton="filled" type="button" (click)="closeFinancialYear()">
+              <mat-icon class="me-2">lock</mat-icon>{{ 'CLOSE_FINANCIAL_YEAR' | translate }}
+            </button>
+          </div>
+        </div>
+
+        <!-- Side / Quick actions -->
+        <aside class="col-lg-4 border-start ps-4 d-none d-lg-block">
+          <div class="mb-4">
+            <h6 class="fw-bold d-flex align-items-center">
+              <mat-icon class="me-1 text-secondary">assignment</mat-icon>
+              {{ 'BEFORE_YOU_CLOSE' | translate }}
+            </h6>
+            <p class="text-muted small">
+              {{ 'BEFORE_CLOSE_NOTE' | translate }}
+            </p>
+          </div>
+          <div class="mb-4">
+            <h6 class="fw-bold d-flex align-items-center">
+              <mat-icon class="me-1 text-secondary">bolt</mat-icon>
+              {{ 'IMMEDIATE_EFFECTS' | translate }}
+            </h6>
+            <ul class="small mb-2 ps-3">
+              <li>{{ 'NO_EDITS_LOCKED_TRANSACTIONS' | translate }}</li>
+              <li>{{ 'YEAR_END_JOURNALS_POSTED' | translate }}</li>
+              <li>{{ 'AUDIT_TRAIL_ENTRY_CREATED' | translate }}</li>
+            </ul>
+          </div>
+        </aside>
+      </div>
+    </mat-card-content>
+  </mat-card>
+</section>

@@ -1,0 +1,205 @@
+// Logo Upload Section Enhancements
+.logo-upload-container {
+  background: #f8fafc;
+  border: 2px dashed #cbd5e0;
+  border-radius: 12px;
+  padding: 24px;
+  transition: all 0.3s ease;
+  margin-left: 16px;
+
+  &:hover {
+    border-color: #667eea;
+    background: #f0f4ff;
+  }
+
+  &.drag-over {
+    border-color: #667eea;
+    background: #f0f4ff;
+    transform: scale(1.02);
+    box-shadow: 0 8px 25px rgba(102, 126, 234, 0.2);
+  }
+
+  .image-preview-area {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+
+    .image-container {
+      position: relative;
+      cursor: pointer;
+      border-radius: 8px;
+      overflow: hidden;
+      transition: all 0.3s ease;
+      min-height: 200px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: white;
+      border: 1px solid #e2e8f0;
+
+      &:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+      }
+
+      .preview-image {
+        max-width: 100%;
+        max-height: 200px;
+        object-fit: contain;
+        border-radius: 4px;
+      }
+
+      .image-overlay {
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: rgba(0, 0, 0, 0.7);
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        color: white;
+        opacity: 0;
+        transition: opacity 0.3s ease;
+
+        mat-icon {
+          font-size: 32px;
+          width: 32px;
+          height: 32px;
+        }
+
+        span {
+          font-size: 14px;
+          font-weight: 500;
+        }
+      }
+
+      &:hover .image-overlay {
+        opacity: 1;
+      }
+
+      .no-image-placeholder {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 16px;
+        padding: 48px 24px;
+        color: #718096;
+        text-align: center;
+
+        .upload-icon {
+          font-size: 48px;
+          width: 48px;
+          height: 48px;
+          color: #a0aec0;
+        }
+
+        .upload-text {
+          font-size: 18px;
+          font-weight: 500;
+          color: #4a5568;
+        }
+
+        .upload-hint {
+          font-size: 14px;
+          color: #718096;
+          font-weight: 500;
+        }
+
+        .upload-formats {
+          font-size: 12px;
+          color: #a0aec0;
+        }
+      }
+    }
+
+    &.has-image .image-container {
+      background: transparent;
+      border: none;
+    }
+
+    .image-actions {
+      display: flex;
+      gap: 12px;
+      justify-content: center;
+
+      .action-btn {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        padding: 12px 24px;
+        border-radius: 8px;
+        transition: all 0.3s ease;
+        font-weight: 500;
+
+        &.change-btn {
+          border-color: #667eea;
+          color: #667eea;
+
+          &:hover {
+            background: #667eea;
+            color: white;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+          }
+        }
+
+        &.remove-btn {
+          border-color: #e53e3e;
+          color: #e53e3e;
+
+          &:hover {
+            background: #e53e3e;
+            color: white;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(229, 62, 62, 0.3);
+          }
+        }
+
+        mat-icon {
+          font-size: 18px;
+          width: 18px;
+          height: 18px;
+        }
+      }
+    }
+  }
+}
+
+// Responsive Design for Logo Upload
+@media (max-width: 640px) {
+  .logo-upload-container {
+    margin-left: 0;
+    margin-top: 16px;
+    padding: 16px;
+
+    .image-preview-area .image-container {
+      min-height: 150px;
+
+      .no-image-placeholder {
+        padding: 32px 16px;
+
+        .upload-icon {
+          font-size: 36px;
+          width: 36px;
+          height: 36px;
+        }
+      }
+    }
+  }
+}
+
+// RTL Support for Logo Upload
+[dir="rtl"] {
+  .logo-upload-container {
+    margin-left: 0;
+    margin-right: 16px;
+  }
+
+  .image-actions {
+    flex-direction: row-reverse;
+  }
+}

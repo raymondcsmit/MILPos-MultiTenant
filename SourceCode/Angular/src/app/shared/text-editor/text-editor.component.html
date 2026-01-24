@@ -1,0 +1,9 @@
+<div class="editor">
+  @if(!hideToolBar){
+  <ngx-editor-menu [editor]="editor" [toolbar]="toolbar">
+  </ngx-editor-menu>
+  }
+  <ngx-editor placeholder="{{'TYPE_HERE' | translate}}" [editor]="editor" [disabled]="disabled"
+    (ngModelChange)="onChange($event)" [(ngModel)]="value">
+  </ngx-editor>
+</div>

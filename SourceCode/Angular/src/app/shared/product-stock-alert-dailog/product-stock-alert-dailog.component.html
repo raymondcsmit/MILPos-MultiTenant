@@ -1,0 +1,47 @@
+<mat-dialog-content>
+  <div class="mb-0 d-flex justify-content-between">
+    <span class="mb-4 page-title">
+      {{ "PRODUCT_STOCK_ALERT" | translate }}
+    </span>
+    <mat-icon class="close-icon text-danger cursor-pointer" (click)="onNoClick()">cancel</mat-icon>
+  </div>
+  <div class="table-responsive">
+    <table class="table table-bordered">
+      <thead>
+        <tr>
+          <th>{{'NAME' | translate}}</th>
+          <th>{{"AVAILABLE_STOCK" | translate}}</th>
+          <th>{{"ITEM_SELECTED" | translate}}</th>
+        </tr>
+      </thead>
+      <tbody>
+        @for(product of data; track $index){
+        <tr>
+          <td>{{product.name}}</td>
+          <td>{{product.stock}}
+            @if(product.unitName){
+            <small>({{product.unitName}})</small>
+            }
+          </td>
+          <td>{{product.itemCount}}
+            @if(product.selectedUnitName){
+            <small>({{product.selectedUnitName}})</small>
+            }
+          </td>
+        </tr>
+        }
+      </tbody>
+    </table>
+  </div>
+  <h6 class="text-danger">{{"STOCK_ALERT_MESSAGE" | translate}} </h6>
+  <div class="mt-2 d-flex" [dir]="langDir">
+    <button (click)="proceed()" class="success me-2" matButton="filled">
+      <mat-icon class="medium-icon fs-5 align-middle">save</mat-icon>
+      {{'YES' | translate}}
+    </button>
+    <button type="button" class="error" matButton="filled" (click)="onNoClick()">
+      <mat-icon class="medium-icon fs-5 align-middle">cancel</mat-icon>
+      {{'CANCEL' | translate}}
+    </button>
+  </div>
+</mat-dialog-content>

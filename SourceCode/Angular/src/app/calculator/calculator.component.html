@@ -1,0 +1,37 @@
+<div class="container py-">
+    <div class="calculator-header calculator-header-modern">
+        <mat-icon class="medium-icon fs-5" aria-hidden="true">calculate</mat-icon>
+        <span class="calc-title">Calculator</span>
+    </div>
+
+    <div class="calculator-display text-end p-2">
+        <div class="small-text">{{display || '0'}}</div>
+        <div class="large-text">{{result || '0'}}</div>
+    </div>
+
+    <div class="calculator-buttons">
+    <button class="btn function" (click)="clear()" title="All Clear">AC</button>
+    <button class="btn function" (click)="delete()" title="Backspace">C</button>
+        <button class="btn function" (click)="append('%')">%</button>
+        <button class="btn operator" (click)="append('/')">÷</button>
+
+        <button class="btn" (click)="append('7')">7</button>
+        <button class="btn" (click)="append('8')">8</button>
+        <button class="btn" (click)="append('9')">9</button>
+        <button class="btn operator" (click)="append('*')">×</button>
+
+        <button class="btn" (click)="append('4')">4</button>
+        <button class="btn" (click)="append('5')">5</button>
+        <button class="btn" (click)="append('6')">6</button>
+        <button class="btn operator" (click)="append('-')">-</button>
+
+        <button class="btn " (click)="append('1')">1</button>
+        <button class="btn" (click)="append('2')">2</button>
+        <button class="btn" (click)="append('3')">3</button>
+        <button class="btn operator" (click)="append('+')">+</button>
+
+        <button class="btn zero" (click)="append('0')">0</button>
+        <button class="btn" (click)="append('.')">.</button>
+        <button class="btn operator" (click)="calculate()">=</button>
+    </div>
+</div>

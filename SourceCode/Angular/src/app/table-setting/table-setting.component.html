@@ -1,0 +1,81 @@
+<section class="content">
+  <div class="container-fluid">
+    <div class="row align-items-center">
+      <!-- Left-hand side: Title -->
+      <div class="col-md-6 mb-2">
+         <span class="mb-0 page-title"
+          >{{ 'TABLE_SETTINGS' | translate }}
+          <app-page-help-text code="TABLE_SETTINGS"></app-page-help-text>
+        </span>
+      </div>
+    </div>
+    <mat-card appearance="outlined">
+      <mat-card-content>
+        <form [formGroup]="tableSettingsForm">
+          <div class="row">
+            <div class="col-sm-12 mt-4">
+              <table class="table table-bordered">
+                <thead>
+                  <tr>
+                    <th style="width: 40%">{{ 'HEADER_TITLE' | translate }}</th>
+                    <th style="width: 20%">{{ 'WIDTH' | translate }}</th>
+                    <th style="width: 10%">{{ 'ISVISIBLE' | translate }}</th>
+                    <th style="width: 20%">{{ 'ORDERNUMBER' | translate }}</th>
+                  </tr>
+                </thead>
+                <tbody formArrayName="settingsArray">
+                  @for(settings of settingsArray.controls; let i=$index; track $index){
+                  <tr>
+                    <ng-container [formGroupName]="i">
+                      <td>
+                        {{ settings.get('header')?.value | translate }}
+                      </td>
+                      <td>
+                        <input formControlName="width" class="form-control" type="number" />
+                        @if(settings.get('width')?.touched && settings.get('width')?.errors &&
+                        settings.get('width')?.errors?.['required']){
+                        <div class="text-danger">
+                          {{ 'WIDTH_IS_REQUIRED' | translate }}
+                        </div>
+                        }
+                      </td>
+                      <td>
+                        <mat-checkbox color="primary" formControlName="isVisible"> </mat-checkbox>
+                      </td>
+                      <td>
+                        <input formControlName="orderNumber" class="form-control" type="number" />
+                        @if(settings.get('orderNumber')?.touched &&
+                        settings.get('orderNumber')?.errors &&
+                        settings.get('orderNumber')?.errors?.['required']){
+                        <div class="text-danger">
+                          {{ 'ORDERNUMBER_IS_REQUIRED' | translate }}
+                        </div>
+                        }
+                      </td>
+                    </ng-container>
+                  </tr>
+                  }
+                </tbody>
+              </table>
+            </div>
+            <div class="mt-2 col-md-12">
+              <button
+                class="success me-2"
+                matButton="filled"
+                cdkFocusInitial
+                (click)="saveTableSettings()"
+              >
+                <mat-icon class="medium-icon fs-5 align-middle">save</mat-icon>
+                {{ 'SAVE' | translate }}
+              </button>
+              <button type="button" class="error" matButton="filled" (click)="onSeetingsClose()">
+                <mat-icon class="medium-icon fs-5 align-middle">cancel</mat-icon>
+                {{ 'CANCEL' | translate }}
+              </button>
+            </div>
+          </div>
+        </form>
+      </mat-card-content>
+    </mat-card>
+  </div>
+</section>

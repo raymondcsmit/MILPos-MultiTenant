@@ -1,0 +1,18 @@
+.date-filter-container {
+  position: relative;
+  display: flex;
+  align-items: center;
+
+  input {
+    padding-right: 28px; // space for clear button
+  }
+
+  .clear-btn {
+    position: absolute;
+    right: 6px;
+    background: transparent;
+    border: none;
+    padding: 0;
+    cursor: pointer;
+  }
+}

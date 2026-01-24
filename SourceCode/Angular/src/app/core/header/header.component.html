@@ -1,0 +1,255 @@
+<nav #navbar class="navbar active">
+  <div class="container-fluid">
+    @if(!isMobile ){
+    @if(!isPosPage ){
+    <div class="navbar-header d-flex d-none d-lg-block" #navbarHeader>
+      <a class="bars" onClick="return false;" (click)="mobileMenuSidebarOpen($event,'overlay-open')"></a>
+      <a class="navbar-brand" routerLink="/">
+        @if(logoImage){
+        <img [src]="logoImage" alt="Logo" class="logo-img" />
+        }@else {
+        <img src="/images/logo.png" alt="Lofo" class="logo-img">
+        }
+      </a>
+      <!-- mobile menu bars -->
+      <a onClick="return false;" class="navbar-toggle collapsed" (click)="isNavbarCollapsed = !isNavbarCollapsed"
+        aria-expanded="false"></a>
+    </div>
+    }
+    }
+    @if(isMobile){
+    <div class="navbar-header1 d-flex">
+      <a class="bars" (click)="mobileMenuSidebarOpen($event,'overlay-open')"></a>
+      <a class="navbar-brand" routerLink="/">
+        @if(logoImage){
+        <img [src]="logoImage" alt="Logo" class="logo-img" />
+        }@else {
+        <img src="/images/logo.png" alt="Lofo" class="logo-img">
+        }
+      </a>
+      <!-- mobile menu bars -->
+      <a onClick="return false;" class="navbar-toggle collapsed" (click)="isNavbarCollapsed = !isNavbarCollapsed"
+        aria-expanded="false"></a>
+    </div>
+    }
+    <div class="collapse navbar-collapse" [ngClass]="isNavbarCollapsed ? '' : 'show'">
+      <ul class="pull-left collapse-menu-icon">
+        <li>
+          <div class="d-flex gap-2">
+            @if(isMobile || isTablet){
+            <button matMiniFab class="natural mt-4" (click)="mobileMenuSidebarOpen($event,'overlay-open')">
+              <mat-icon [ngClass]="{'rotated': isOpenSidebar}" [class]="'header-icon'"> {{isOpenSidebar ? 'menu_close' :
+                'menu_open'}}</mat-icon>
+            </button>
+            }
+            <button matMiniFab class="warning mt-4"
+              *hasClaim="['SO_ADD_SO','PO_ADD_PO','CUST_ADD_CUSTOMER','SUPP_ADD_SUPPLIER','PRO_ADD_PRODUCT','EXP_ADD_EXPENSE']"
+              [matMenuTriggerFor]="sortmenu">
+              <mat-icon class="medium-icon">add</mat-icon>
+            </button>
+            <mat-menu #sortmenu="matMenu" class="lang-item-menu">
+              <div class="lang-item">
+                <button mat-menu-item class="dropdown-item p-2 lang-item-list" type="button" *hasClaim="'SO_ADD_SO'">
+                  <a class="text-decoration-none" [routerLink]="['/sales-order/add']">
+                    <mat-icon class="medium-icon fs-5 align-middle">add</mat-icon>
+                    {{'SALES_ORDER' | translate}}
+                  </a>
+                </button>
+              </div>
+              <div class="lang-item">
+                <button mat-menu-item class="dropdown-item p-2 lang-item-list" type="button" *hasClaim="'PO_ADD_PO'">
+                  <a class="text-decoration-none" [routerLink]="['/purchase-order/add']">
+                    <mat-icon class="medium-icon fs-5 align-middle">add</mat-icon>
+                    {{'PURCHASE_ORDER' | translate}}
+                  </a>
+                </button>
+              </div>
+              <div class="lang-item">
+                <button mat-menu-item class="dropdown-item p-2 lang-item-list" type="button"
+                  *hasClaim="'CUST_ADD_CUSTOMER'">
+                  <a class="text-decoration-none" [routerLink]="['/customer/addItem']">
+                    <mat-icon class="medium-icon fs-5 align-middle">add</mat-icon>
+                    {{'CUSTOMER' | translate}}
+                  </a>
+                </button>
+              </div>
+              <div class="lang-item">
+                <button mat-menu-item class="dropdown-item p-2 lang-item-list" type="button"
+                  *hasClaim="'SUPP_ADD_SUPPLIER'">
+                  <a class="text-decoration-none" [routerLink]="['/supplier/manage/addItem']">
+                    <mat-icon class="medium-icon fs-5 align-middle">add</mat-icon>
+                    {{'SUPPLIER' | translate}}
+                  </a>
+                </button>
+              </div>
+              <div class="lang-item">
+                <button mat-menu-item class="dropdown-item p-2 lang-item-list" type="button"
+                  *hasClaim="'PRO_ADD_PRODUCT'">
+                  <a class="text-decoration-none" [routerLink]="['/products/add']">
+                    <mat-icon class="medium-icon fs-5 align-middle">add</mat-icon>
+                    {{'PRODUCT' | translate}}
+                  </a>
+                </button>
+              </div>
+              <div class="lang-item">
+                <button mat-menu-item class="dropdown-item p-2 lang-item-list" type="button"
+                  *hasClaim="'EXP_ADD_EXPENSE'">
+                  <a class="text-decoration-none" [routerLink]="'/expense/add'">
+                    <mat-icon class="medium-icon fs-5 align-middle">add</mat-icon>
+                    {{'EXPENSE' | translate}}
+                  </a>
+                </button>
+              </div>
+            </mat-menu>
+            <button class="primary mt-4" matButton="filled" *hasClaim="'POS_POS'" [routerLink]="['/pos']">
+              <mat-icon class="medium-icon text-white">point_of_sale</mat-icon>
+              {{'POS' | translate }}
+            </button>
+            @if(locations.length > 0){
+            <div class="form-group location-dropdown mt-1" style="max-width: 150px;">
+              <label class="label_color" for="">{{"BUSINESS_LOCATION" | translate}}</label>
+              <mat-select panelClass="mat-select-control" [(ngModel)]="selectedLocation"
+                (selectionChange)="onChangeBusinssLocation($event.value)" [dir]="langDir"
+                panelClass="mat-select-control" class="form-control form-control-sm">
+                @for(location of locations; track location.id){
+                <mat-option [value]="location.id">
+                  {{location.name}}
+                </mat-option>
+                }
+              </mat-select>
+            </div>
+            }
+          </div>
+        </li>
+      </ul>
+      <ul class="nav navbar-nav navbar-right">
+        <li>
+          <div class="d-flex gap-2">
+            <button matTooltip="Today's Summary Report" matMiniFab class="error">
+              <mat-icon class="header-icon fs-4" (click)="openDailyReport()">assignment</mat-icon>
+            </button>
+            @if(!hasOnlyPOSPermission){
+            <button matTooltip="Reminders" matMiniFab class="primary" routerLink="/calendar-view">
+              <mat-icon class="fs-4">event_note</mat-icon>
+            </button>
+            }
+            <button matTooltip="Calculator" matMiniFab class="warning" [matMenuTriggerFor]="calculatorMenu">
+              <mat-icon class=" fs-4">calculate</mat-icon>
+            </button>
+            <mat-menu #calculatorMenu="matMenu" class="calculator-menu nfc-menu" [overlapTrigger]="false">
+              <app-calculator (click)="$event.stopPropagation()"></app-calculator>
+            </mat-menu>
+            <button matMiniFab class="neutral" (click)="callFullscreen()">
+              <mat-icon class="header-icon">fullscreen</mat-icon>
+            </button>
+            <button matMiniFab [matMenuTriggerFor]="languagemenu" class="neutral">
+              <mat-icon class="header-icon">language</mat-icon>
+            </button>
+            <mat-menu #languagemenu="matMenu" class="lang-item-menu">
+              @for (item of languages; track item) {
+              <div class="lang-item">
+                <button mat-menu-item class="dropdown-item lang-item-list" (click)="setNewLanguageRefresh(item)"
+                  [ngClass]="{'active': language?.code === item.code}">
+                  <img src="{{item.imageUrl}}" class="flag-img" height="12"> <span
+                    class="align-middle">{{item.name}}</span>
+                </button>
+              </div>
+              }
+            </mat-menu>
+            @if(!hasOnlyPOSPermission){
+            <button matBadge="{{notificationCount}}" matMiniFab [matMenuTriggerFor]="notificationMenu" class="error">
+              <mat-icon class="header-icon">notifications_none</mat-icon>
+            </button>
+            <mat-menu #notificationMenu="matMenu" class="nfc-menu">
+              <div class="nfc-header">
+                <h5 class="mb-0">{{'NOTIFICATIONS' | translate}}</h5>
+                <a (click)="markAllAsReadNotification()" class="nfc-mark-as-read cursor-pointer">
+                  {{'MARK_ALL_AS_READ' | translate}}
+                </a>
+              </div>
+              <div class="nfc-dropdown">
+                <ng-scrollbar style="height: 350px" visibility="hover">
+                  <div class="noti-list header-menu">
+                    <div class="menu">
+                      @for (notificationUser of notificationUserList; track notificationUser) {
+                      <div class="dropdown-item cursor-pointer  m-2"
+                        title="{{notificationUser.createdDate | utcToLocalTime:'short' }}">
+                        @switch(notificationUser?.application){
+                        @case (1) {
+                        <mat-icon class="medium-icon fs-5 align-middle">mail</mat-icon>
+                        <a (click)="onNotificationClick(notificationUser,'/sales-order/detail')">
+                          {{notificationUser.subject}}
+                          -{{'SALES_ORDER_EXPECTED_SHIPMENT_DATE_IS' |
+                          translate}}
+                          {{notificationUser.duration | utcToLocalTime:'shortDate'}}.
+                        </a>
+                        }
+                        @case (2) {
+                        <mat-icon class="medium-icon fs-5 align-middle">mail</mat-icon>
+                        <a (click)="onNotificationClick(notificationUser,'/purchase-order/detail')">
+                          {{notificationUser.subject}}-{{'PURCHASE_ORDER_EXPECTED_DELIVERY_DATE_IS'
+                          |
+                          translate}}
+                          {{notificationUser.duration | utcToLocalTime:'shortDate'}}.
+                        </a>
+                        }
+                        @case (3) {
+                        <mat-icon class="medium-icon fs-5 align-middle">help</mat-icon>
+                        <a (click)="onNotificationClick(notificationUser,'/inquiry/manage')">
+                          {{notificationUser.subject}}
+                        </a>
+                        }
+                        @default{
+                        <mat-icon class="medium-icon fs-5 align-middle">schedule</mat-icon>
+                        {{notificationUser.subject}}
+                        }
+                        }
+                        <small class="float-right text-muted text-sm">
+                          {{notificationUser.createdDate | dateAgo }}
+                        </small>
+                      </div>
+                      <hr class="mb-0">
+                      }
+                    </div>
+                  </div>
+                </ng-scrollbar>
+              </div>
+              <div class="nfc-footer">
+                <a class="nfc-read-all" [routerLink]="['/notifications']">
+                  {{'VIEW_ALL' | translate}}
+                </a>
+              </div>
+            </mat-menu>
+            }
+            <button mat-button [matMenuTriggerFor]="profilemenu">
+              <div class="chip dropdown-toggle">
+                @if(profilePath){
+                <img [src]="profilePath" class="rounded-circle border" width="32" height="32" alt="User">
+                }@else {
+                <img src="/images/user-profile.jpg" class="rounded-circle border mt-1app-pos" width="32" height="32"
+                  alt="User">
+                }
+              </div>
+            </button>
+            <mat-menu #profilemenu="matMenu" class="profile-menu">
+              <div class="noti-list">
+                <div class="menu ">
+                  <div class="user_dw_menu">
+                    <button mat-menu-item class="user-item-list" routerLink="my-profile">
+                      <mat-icon class="user-menu-icons">person</mat-icon>
+                      {{'MY_PROFILE' | translate}}
+                    </button>
+                    <button mat-menu-item (click)="onLogout()" class="user-item-list">
+                      <mat-icon class="user-menu-icons">logout</mat-icon>
+                      {{'LOGOUT' | translate}}
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </mat-menu>
+          </div>
+        </li>
+      </ul>
+    </div>
+  </div>
+</nav>

@@ -1,0 +1,53 @@
+<mat-dialog-content>
+  <div class="mb-0 d-flex justify-content-between">
+    <span class="mb-4 page-title">
+      {{ "PRODUCT_LIST" | translate }}
+    </span>
+    <mat-icon class="close-icon text-danger cursor-pointer" (click)="closeDialog()">cancel</mat-icon>
+  </div>
+  <div class="table-responsive">
+    <table [dir]="langDir" mat-table [dataSource]="products">
+      <!-- Name Column -->
+      <ng-container matColumnDef="name">
+        <th class="table-column-150" mat-header-cell *matHeaderCellDef> {{'NAME' | translate}} </th>
+        <td class="table-column-150" mat-cell *matCellDef="let product">
+          {{product.name}}
+        </td>
+      </ng-container>
+      <ng-container matColumnDef="brand">
+        <th class="table-column-150" mat-header-cell *matHeaderCellDef>{{'BRANDS' | translate}} </th>
+        <td class="table-column-150" mat-cell *matCellDef="let product"> {{product.brandName}} </td>
+      </ng-container>
+      <ng-container matColumnDef="category">
+        <th class="table-column-150" mat-header-cell *matHeaderCellDef>{{'PRODUCT_CATEGORY' |
+          translate}} </th>
+        <td class="table-column-150" mat-cell *matCellDef="let product"> {{product.categoryName}} </td>
+      </ng-container>
+      <ng-container matColumnDef="salesPrice">
+        <th class="table-column-150" mat-header-cell *matHeaderCellDef> {{'SALES_PRICE' | translate}}
+        </th>
+        <td class="table-column-150" mat-cell *matCellDef="let product">
+          {{product.salesPrice ? (product.salesPrice | customCurrency) : '--'}}
+        </td>
+      </ng-container>
+      <ng-container matColumnDef="purchasePrice">
+        <th class="table-column-150" mat-header-cell *matHeaderCellDef> {{'PURCHASE_PRICE' | translate}}
+        </th>
+        <td class="table-column-150" mat-cell *matCellDef="let product">
+          {{product.purchasePrice ? (product.purchasePrice | customCurrency) : '--'}}
+        </td>
+      </ng-container>
+      <ng-container matColumnDef="mrp">
+        <th class="table-column-150" mat-header-cell *matHeaderCellDef>{{'MRP' | translate}} </th>
+        <td class="table-column-150" mat-cell *matCellDef="let product">
+          {{product.mrp ? (product.mrp | customCurrency) : '--'}}
+        </td>
+      </ng-container>
+      <tr class="grid-header-color" mat-header-row *matHeaderRowDef="displayedColumns;sticky: true"></tr>
+      <tr mat-row *matRowDef="let row; columns: displayedColumns;" [ngClass]="{
+                              'odd-row': isOddDataRow(getDataIndex(row)),
+                              'even-row': !isOddDataRow(getDataIndex(row))
+                            }"></tr>
+    </table>
+  </div>
+</mat-dialog-content>

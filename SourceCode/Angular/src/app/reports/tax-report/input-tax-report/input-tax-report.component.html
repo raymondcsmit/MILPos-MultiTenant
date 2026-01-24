@@ -1,0 +1,328 @@
+<section class="content">
+  <div class="container-fluid">
+    <mat-card appearance="outlined">
+      <mat-card-content>
+        <div class="row align-items-center">
+          <div class="col-md-8 mb-2">
+            <span class="mb-0 page-title">
+              {{ 'INPUT_TAX_REPORT' | translate }} ({{ 'PURCHASE_ORDER' | translate }})
+              <app-page-help-text code="INPUT_TAX_REPORT"></app-page-help-text>
+            </span>
+          </div>
+        </div>
+        <div class="row">
+          <div class="col-sm-12 mb-2">
+            <form [formGroup]="searchForm">
+              <div class="row">
+                <div class="col-lg-2 col-md-4 col-sm-12">
+                  <div class="form-group">
+                    <label>{{ 'BUSINESS_LOCATION' | translate }}</label>
+                    <mat-select [dir]="langDir" formControlName="locationId" panelClass="mat-select-control"
+                      placeholder="{{ 'BUSINESS_LOCATION' | translate }}" class="form-control form-control-sm">
+                      @for(location of locations; track location.id){
+                      <mat-option [value]="location.id">
+                        {{ location.name }}
+                      </mat-option>
+                      } @if(locations.length == 0){
+                      <mat-option value="">
+                        {{ 'NO_RECORDS' | translate }}
+                      </mat-option>
+                      }
+                    </mat-select>
+                  </div>
+                </div>
+                <div class="col-lg-2 col-md-4 col-sm-12">
+                  <div class="form-group">
+                    <label for="fromDate">{{ 'FROM_DATE' | translate }}</label>
+                    <input type="text" placeholder="{{ 'FROM_DATE' | translate }}" #fromDate formControlName="fromDate"
+                      (focus)="fromDatePicker.open()" [matDatepicker]="fromDatePicker"
+                      class="form-control form-control-sm" />
+                    <mat-datepicker #fromDatePicker (closed)="fromDate.blur()"></mat-datepicker>
+                  </div>
+                </div>
+                <div class="col-lg-2 col-md-4 col-sm-12">
+                  <div class="form-group">
+                    <label for="toDate">{{ 'TO_DATE' | translate }} </label>
+                    <input type="text" placeholder="{{ 'TO_DATE' | translate }}" #toDate formControlName="toDate"
+                      (focus)="toDatePicker.open()" [matDatepicker]="toDatePicker"
+                      class="form-control form-control-sm" />
+                    <mat-datepicker #toDatePicker (closed)="toDate.blur()"></mat-datepicker>
+                  </div>
+                </div>
+                <div class="col-lg-6 col-sm-12 mt-4 d-flex flex-wrap">
+                  <button class="primary me-1" matButton="filled" (click)="onSearch()">
+                    <mat-icon class="medium-icon fs-5 align-middle">search</mat-icon>
+                    <span class="d-none d-sm-inline"> {{ 'SEARCH' | translate }} </span>
+                  </button>
+                  <button class="error me-1" matButton="filled" (click)="onClear()">
+                    <mat-icon class="medium-icon fs-5 align-middle">cancel</mat-icon>
+                    <span class="d-none d-sm-inline"> {{ 'CLEAR' | translate }} </span>
+                  </button>
+                  <button class="warning me-1" matButton="filled" [matMenuTriggerFor]="menu">
+                    <mat-icon class="medium-icon fs-5 align-middle">download</mat-icon>
+                    <span class="d-none d-sm-inline"> {{ 'EXPORT' | translate }} </span>
+                  </button>
+                  <mat-menu #menu="matMenu" class="mat-menu-control-sm">
+                    <button mat-menu-item (click)="onDownloadReport('csv')">
+                      <mat-icon class="medium-icon fs-5 align-middle">table_chart</mat-icon>
+                      CSV
+                    </button>
+                    <button mat-menu-item (click)="onDownloadReport('xlsx')">
+                      <mat-icon class="medium-icon fs-5 align-middle">grid_on</mat-icon>
+                      Excel
+                    </button>
+                    <button mat-menu-item (click)="onDownloadReport('pdf')">
+                      <mat-icon class="medium-icon fs-5 align-middle">picture_as_pdf</mat-icon>
+                      PDF
+                    </button>
+                  </mat-menu>
+                  <button *hasClaim="'REP_SEND_EMAIL'" matButton="filled" class="secondary"
+                    (click)="onDownloadReport('email')">
+                    <mat-icon class="medium-icon fs-5 align-middle">email</mat-icon>
+                    <span class="d-none d-sm-inline">{{ 'SEND_EMAIL' | translate }}</span>
+                  </button>
+                </div>
+              </div>
+              @if(searchForm.errors?.['dateRange']){
+              <div class="row">
+                <div class="text-danger">
+                  {{ 'DATE_RANGE_VALIDATION_MSG' | translate }}
+                </div>
+              </div>
+              }
+            </form>
+          </div>
+        </div>
+        <div class="row">
+          <div class="col-sm-12">
+            <div class="table-responsive">
+              <div class="grid-height-small">
+                <table [dir]="langDir" mat-table matSortDisableClear [dataSource]="dataSource" multiTemplateDataRows
+                  matSort matSortActive="poCreatedDate">
+                  <ng-container matColumnDef="action">
+                    <th class="table-column-50" mat-header-cell *matHeaderCellDef></th>
+                    <td class="table-column-50" mat-cell *matCellDef="let po">
+                      <div class="d-flex my-1">
+                        <button matMiniFab class="neutral" (click)="toggleRow(po)">
+                          @if(po == expandedElement){
+                          <mat-icon>expand_more</mat-icon>
+                          }@else {
+                          <mat-icon>chevron_right</mat-icon>
+                          }
+                        </button>
+                      </div>
+                    </td>
+                  </ng-container>
+                  <ng-container matColumnDef="poCreatedDate">
+                    <th class="table-column-100" mat-header-cell *matHeaderCellDef mat-sort-header>
+                      {{ 'CREATED_DATE' | translate }}
+                    </th>
+                    <td class="table-column-100" mat-cell *matCellDef="let po">
+                      {{ po.poCreatedDate | utcToLocalTime : 'shortDate' }}
+                    </td>
+                  </ng-container>
+                  <ng-container matColumnDef="orderNumber">
+                    <th class="table-column-150" mat-header-cell *matHeaderCellDef mat-sort-header>
+                      {{ 'ORDER_NUMBER' | translate }}
+                    </th>
+                    <td class="table-column-150" mat-cell *matCellDef="let po">
+                      {{ po.orderNumber }}
+                    </td>
+                  </ng-container>
+                  <ng-container matColumnDef="supplierName">
+                    <th class="table-column-200" mat-header-cell mat-sort-header *matHeaderCellDef>
+                      {{ 'SUPPLIER_NAME' | translate }}
+                    </th>
+                    <td class="table-column-200" mat-cell *matCellDef="let po">
+                      {{ po.supplierName }}
+                    </td>
+                  </ng-container>
+                  <ng-container matColumnDef="supplierTaxNumber">
+                    <th mat-header-cell *matHeaderCellDef mat-sort-header>
+                      {{ 'TAX_NUMBER' | translate }}
+                    </th>
+                    <td mat-cell *matCellDef="let po">
+                      {{ po.supplierTaxNumber }}
+                    </td>
+                  </ng-container>
+                  <ng-container matColumnDef="businessLocation">
+                    <th mat-header-cell *matHeaderCellDef mat-sort-header>
+                      {{ 'BUSINESS_LOCATION' | translate }}
+                    </th>
+                    <td mat-cell *matCellDef="let po">
+                      {{ po.businessLocation }}
+                    </td>
+                  </ng-container>
+                  <ng-container matColumnDef="totalTax">
+                    <th mat-header-cell *matHeaderCellDef mat-sort-header>
+                      {{ 'TOTAL_TAX' | translate }}
+                    </th>
+                    <td mat-cell *matCellDef="let po">
+                      {{ po.totalTax | customCurrency }}
+                    </td>
+                  </ng-container>
+                  <ng-container matColumnDef="action-search">
+                    <th mat-header-cell *matHeaderCellDef></th>
+                  </ng-container>
+                  <ng-container matColumnDef="poCreatedDate-search">
+                    <th mat-header-cell *matHeaderCellDef></th>
+                  </ng-container>
+                  <ng-container matColumnDef="orderNumber-search">
+                    <th mat-header-cell *matHeaderCellDef>
+                      <input placeholder="{{ 'ORDER_NO' | translate }}" type="text" class="form-control form-control-sm"
+                        [(ngModel)]="OrderNumberFilter" />
+                    </th>
+                  </ng-container>
+                  <ng-container matColumnDef="supplier-search">
+                    <th mat-header-cell *matHeaderCellDef>
+                      <input placeholder="{{ 'SUPPLIER' | translate }}" type="text" class="form-control form-control-sm"
+                        [formControl]="supplierNameControl" [matAutocomplete]="autoSupplier" />
+                      <mat-autocomplete [dir]="langDir" [autoActiveFirstOption]="true"
+                        (optionSelected)="SupplierFilter = $event.option.value" #autoSupplier="matAutocomplete">
+                        <mat-option value="">{{ 'NONE' | translate }}</mat-option>
+                        @let suppliers = supplierList$ | async; @for(supplier of suppliers; track
+                        supplier.id){
+                        <mat-option [dir]="langDir" [value]="supplier.supplierName">
+                          {{ supplier.supplierName }}
+                        </mat-option>
+                        }
+                      </mat-autocomplete>
+                    </th>
+                  </ng-container>
+                  <ng-container matColumnDef="supplierTaxNumber-search">
+                    <th mat-header-cell *matHeaderCellDef></th>
+                  </ng-container>
+                  <ng-container matColumnDef="businessLocation-search">
+                    <th mat-header-cell *matHeaderCellDef></th>
+                  </ng-container>
+                  <ng-container matColumnDef="totalTax-search">
+                    <th mat-header-cell *matHeaderCellDef></th>
+                  </ng-container>
+                  <ng-container matColumnDef="footer">
+                    <td mat-footer-cell colspan="5" *matFooterCellDef>
+                      <mat-paginator [length]="purchaseOrderResource.totalCount"
+                        [pageSize]="purchaseOrderResource.pageSize" [pageSizeOptions]="[10, 20, 30]">
+                      </mat-paginator>
+                    </td>
+                  </ng-container>
+                  <ng-container matColumnDef="totalLabel">
+                    <td mat-footer-cell *matFooterCellDef>
+                      <strong>
+                        {{ 'TOTAL' | translate }}
+                      </strong>
+                    </td>
+                  </ng-container>
+                  <ng-container matColumnDef="grandTotalTaxAmount">
+                    <td mat-footer-cell *matFooterCellDef>
+                      <strong>
+                        {{ purchaseOrderTotal.grandTotalTaxAmount | customCurrency }}</strong>
+                    </td>
+                  </ng-container>
+
+                  <ng-container matColumnDef="expandedDetail">
+                    <td mat-cell *matCellDef="let poObject" [attr.colspan]="displayedColumns.length">
+                      @if(poObject.id == expandedElement?.id){
+                      <div animate.enter="expandanimation" animate.leave="collapseanimation" class="expandable-panel">
+                        <div class="my-2 mx-5">
+                          <app-input-tax-report-item [purchaseOrder]="poObject">
+                          </app-input-tax-report-item>
+                        </div>
+                      </div>
+                      }
+                    </td>
+                  </ng-container>
+                  <tr *matNoDataRow>
+                    <td colspan="8">
+                      <span class="p-4 mt-4">
+                        <b> {{ 'NO_DATA_FOUND' | translate }}</b>
+                      </span>
+                    </td>
+                  </tr>
+                  <tr class="grid-header-color" mat-header-row *matHeaderRowDef="displayedColumns; sticky: true"></tr>
+                  <tr mat-row *matRowDef="let row; columns: displayedColumns" [ngClass]="{
+                              'odd-row': isOddDataRow(getDataIndex(row)),
+                              'even-row': !isOddDataRow(getDataIndex(row))
+                            }"></tr>
+                  <tr style="height: 45px !important;" mat-header-row *matHeaderRowDef="filterColumns; sticky: true">
+                  </tr>
+
+                  <tr mat-footer-row *matFooterRowDef="footerToDisplayed; sticky: true"></tr>
+                  <tr mat-row *matRowDef="let row; columns: ['expandedDetail']" class="example-detail-row"></tr>
+                </table>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="row">
+          <span class="mb-0 page-title">
+            {{ 'SUMMARY' | translate }}
+          </span>
+          <div class="col-md-6">
+            <div class="box box-info">
+              <div class="table-responsive">
+                <div class="grid-height-medium">
+                  <table class="table table-bordered table-hover" id="report-data">
+                    <tbody>
+                      <tr>
+                        <td colspan="2" class="text-bold text-primary">
+                          <span>
+                            <strong> {{ 'TAXES' | translate }}</strong>
+                          </span>
+                          <div class="float-end">
+                            <button class="warning me-1" matButton="filled" [matMenuTriggerFor]="menu">
+                              <mat-icon class="medium-icon fs-5 align-middle">download</mat-icon>
+                              <span class="d-none d-sm-inline"> {{ 'EXPORT' | translate }}</span>
+                            </button>
+                            <mat-menu #menu="matMenu" class="mat-menu-control-sm">
+                              <button mat-menu-item (click)="onDownloadReport('csv')">
+                                <mat-icon class="medium-icon fs-5 align-middle">table_chart</mat-icon>
+                                CSV
+                              </button>
+                              <button mat-menu-item (click)="onDownloadReport('xlsx')">
+                                <mat-icon class="medium-icon fs-5 align-middle">grid_on</mat-icon>
+                                Excel
+                              </button>
+                              <button mat-menu-item (click)="onDownloadReport('pdf')">
+                                <mat-icon class="medium-icon fs-5 align-middle">picture_as_pdf</mat-icon>
+                                PDF
+                              </button>
+                            </mat-menu>
+                            <button *hasClaim="'REP_SEND_EMAIL'" matButton="filled" class="secondary"
+                              (click)="onDownloadReport('email')">
+                              <mat-icon class="medium-icon fs-5 align-middle">email</mat-icon>
+                              <span class="d-none d-sm-inline"> {{ 'SEND_EMAIL' | translate }}</span>
+                            </button>
+                          </div>
+                        </td>
+                      </tr>
+
+                      @for (tax of totalsByTax; track tax) {
+                      <tr>
+                        <td>
+                          {{ tax.name }}
+                        </td>
+                        <td class="text-end pur_total">
+                          {{ tax.totalAmount | customCurrency }}
+                        </td>
+                      </tr>
+                      }
+                      <tr class="profite">
+                        <td>
+                          <strong> {{ 'TOTAL' | translate }}</strong>
+                        </td>
+                        <td class="text-end text-primary">
+                          {{ purchaseOrderTotal.grandTotalTaxAmount | customCurrency }}
+                        </td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </mat-card-content>
+    </mat-card>
+  </div>
+</section>

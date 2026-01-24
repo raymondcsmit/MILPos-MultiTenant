@@ -1,0 +1,25 @@
+<section class="content">
+    <div class="container-fluid">
+        <div class="row">
+            <div class="header">
+                <span class="mb-0 page-title">{{'REMINDERS' | translate}} </span>
+                <app-page-help-text code="REMINDERS"></app-page-help-text>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col">
+                <div class="card">
+                    <div class="body">
+                        <full-calendar #calendar [events]="events" [options]="calendarOptions">
+                            <ng-template #eventContent let-arg>
+                                <b class="cursor-pointer" (click)="openReminderDialog(arg.event, $event)">
+                                    {{ arg.event.title }}
+                                </b>
+                            </ng-template>
+                        </full-calendar>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>

@@ -1,0 +1,74 @@
+<div class="login-container">
+  <form [formGroup]="loginFormGroup" (submit)="onLoginSubmit()" class="login-form validate-form">
+    <div class="row">
+      @if(logoImage){
+      <img class="login-logo mb-5" [src]="logoImage" alt="Logo">
+      }@else {
+      <img class="login-logo mb-5" src="/images/logo.png" alt="Logo">
+      }
+    </div>
+    <div class="row">
+      <div class="col-md-12 col-sm-12 col-12">
+        <div class="form-group ">
+          <label class="text-danger">
+            {{'EMAIL' | translate }} *
+          </label>
+          <input formControlName="userName" class="form-control" type="text">
+          @if(loginFormGroup.get('userName')?.touched && loginFormGroup.get('userName')?.errors ){
+          @if(loginFormGroup.get('userName')?.errors?.['required']){
+          <div class="text-danger">
+            {{'EMAIL_IS_REQUIRED' | translate }}
+          </div>
+          }
+          @if(loginFormGroup.get('userName')?.errors?.['email']){
+          <div class="text-danger">
+            {{'PLEASE_ENTER_VALID_EMAIL' | translate }}
+          </div>
+          }
+          }
+        </div>
+      </div>
+      <div class="col-md-12 col-sm-12 col-12 mt-2">
+        <div class="form-group">
+          <label class="text-danger">
+            {{'PASSWORD' | translate }} *
+          </label>
+          <div class="input-group">
+            <input formControlName="password" class="form-control" [type]="fieldTextType ? 'text' : 'password'">
+            @if(fieldTextType){
+            <button class="btn blue-btn btn btn-primary" type="button" (click)="fieldTextType=!fieldTextType">
+              <mat-icon class="medium-icon fs-5 align-middle">visibility</mat-icon>
+            </button>
+            }@else {
+            <button class="btn blue-btn btn btn-primary" type="button" (click)="fieldTextType=!fieldTextType">
+              <mat-icon class="medium-icon fs-5 align-middle">visibility_off</mat-icon>
+            </button>
+            }
+          </div>
+          @if(loginFormGroup.get('password')?.touched && loginFormGroup.get('password')?.errors?.['required']){
+          <div class="text-danger">
+            {{'PASSWORD_IS_REQUIRED' | translate }}
+          </div>
+          }
+        </div>
+      </div>
+    </div>
+    <div class="row">
+      <div class="col-md-12">
+        <a class="link-primary float-end" [routerLink]="['/forgot-password']">{{'FORGOT_PASSWORD' | translate}}?</a>
+      </div>
+    </div>
+    <div class="col-md-12 col-12 mt-4">
+      <button type="button" class="login-btn primary mb-2" matButton="filled" (click)="onLoginSubmit()">
+        {{ 'LOGIN' | translate }}
+      </button>
+    </div>
+  </form>
+</div>
+@if(isLoading){
+<div class="spinner-container">
+  <div class="spinner-border text-primary" role="status">
+    <span class="visually-hidden">Loading...</span>
+  </div>
+</div>
+}

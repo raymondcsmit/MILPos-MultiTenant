@@ -1,0 +1,69 @@
+<section class="content">
+  <div class="container-fluid">
+    <div class="d-flex mb-2">
+      <div class="me-auto">
+        <span class="mb-0 page-title">{{ "VARIANTS" | translate }}
+          <app-page-help-text code="VARIANTS"></app-page-help-text>
+        </span>
+      </div>
+      <div class="d-flex justify-content-end">
+        <button class="primary me-2" matButton="filled" (click)="manageVariant(null)">
+          <mat-icon class="medium-icon fs-5 align-middle">add</mat-icon>
+          {{ "ADD_VARIANT" | translate }}
+        </button>
+      </div>
+    </div>
+    <mat-card appearance="outlined">
+      <mat-card-content>
+        <div class="grid-height-large">
+          <table [dir]="langDir" mat-table [dataSource]="variants">
+            <ng-container matColumnDef="action">
+              <th class="table-column-200" mat-header-cell *matHeaderCellDef> {{"ACTION" | translate}}
+              </th>
+              <td class="table-column-200" mat-cell *matCellDef="let element">
+                <div class="d-flex mt-1 gap-2 mb-1">
+                  <button matMiniFab (click)="manageVariant(element)" class="primary">
+                    <mat-icon class="medium-icon fs-5 align-middle">edit</mat-icon>
+                  </button>
+                  <button matMiniFab (click)="deleteVariant(element)" class="error">
+                    <mat-icon class="medium-icon fs-5 align-middle">delete</mat-icon>
+                  </button>
+                </div>
+              </td>
+            </ng-container>
+            <!-- Name Column -->
+            <ng-container matColumnDef="name">
+              <th mat-header-cell *matHeaderCellDef> {{"NAME" | translate}} </th>
+              <td mat-cell *matCellDef="let element"> {{element.name}} </td>
+            </ng-container>
+            <ng-container matColumnDef="variantItems">
+              <th mat-header-cell *matHeaderCellDef> {{'VARIANT_ITEM' | translate}} </th>
+              <td mat-cell *matCellDef="let element">
+                @for(variantItem of element.variantItems;let last = $last; track $index){
+                <span>
+                  {{variantItem?.name}}
+                  @if(!last){
+                  <span> ,</span>
+                  }
+                </span>
+                }
+              </td>
+            </ng-container>
+            <tr *matNoDataRow>
+              <td colspan="3">
+                <span class="p-4 mt-4">
+                  <b> {{'NO_DATA_FOUND' | translate}}</b>
+                </span>
+              </td>
+            </tr>
+            <tr class="grid-header-color" mat-header-row *matHeaderRowDef="displayedColumns;sticky: true"></tr>
+            <tr mat-row *matRowDef="let row; columns: displayedColumns;" [ngClass]="{
+                              'odd-row': isOddDataRow(getDataIndex(row)),
+                              'even-row': !isOddDataRow(getDataIndex(row))
+                            }"></tr>
+          </table>
+        </div>
+      </mat-card-content>
+    </mat-card>
+  </div>
+</section>

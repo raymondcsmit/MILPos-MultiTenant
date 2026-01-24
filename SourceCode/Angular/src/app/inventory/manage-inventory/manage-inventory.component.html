@@ -1,0 +1,201 @@
+<mat-dialog-content>
+  <div class="mb-0 d-flex justify-content-between">
+    <span class="mb-4 page-title">
+      {{'MANAGE_INVENTORY' | translate}}
+      @if(data.inventory.productName){
+      <span class="text-primary">
+        {{'FOR' | translate}} {{data.inventory.productName}}
+      </span>
+      }
+      <app-page-help-text code="INVENTORIES"></app-page-help-text>
+    </span>
+    <mat-icon class="close-icon text-danger cursor-pointer" (click)="onCancel()">cancel</mat-icon>
+  </div>
+  <form [formGroup]="inventoryForm">
+    <div class="row">
+      @if (!data.inventory.productId) {
+      <div class="col-md-12">
+        <div class="form-group">
+          <label class="text-danger form-label">{{'PRODUCT' | translate}} *</label>
+          <div class="input-group">
+            <mat-select formControlName="productId" [dir]="langDir" placeholder="{{'SELECT_PRODUCT' | translate}}"
+              (selectionChange)="onSelectionChange($event.value)" class="form-control" panelClass="mat-select-control">
+              <input class="form-control form-control-sm" formControlName="filerProduct" focused="'true'" type="text"
+                autocomplete="off" placeholder="{{'SEARCH_OTHER_PRODUCTS' | translate}}">
+              <mat-divider></mat-divider>
+              @for (product of products; track product.id) {
+              <mat-option [value]="product.id">
+                {{product.name}}
+              </mat-option>
+              }
+            </mat-select>
+          </div>
+          @if (inventoryForm.get('productId')?.touched && inventoryForm.get('productId')?.errors?.['required']) {
+          <div class="text-danger">
+            {{'SELECT_PRODUCT' | translate}}
+          </div>
+          }
+        </div>
+      </div>
+      }
+      <div class="col-md-12">
+        <div class="row mt-1">
+          <div class="col-md-6">
+            <div class="form-group">
+              <label for="referenceNumber" class="text-danger form-label">{{'REFERENCE_NUMBER' | translate}}
+                <sup>*</sup></label>
+              <input formControlName="referenceNumber" placeholder="{{'REFERENCE_NUMBER' | translate}}" type="text" class="form-control" id="referenceNumber"
+                autocomplete="off">
+              @if (inventoryForm.get('referenceNumber')?.touched &&
+              inventoryForm.get('referenceNumber')?.errors?.['required']) {
+              <div class="text-danger">
+                {{'REFERENCE_NUMBER_IS_REQUIRED' | translate}}
+              </div>
+              }
+            </div>
+          </div>
+          <div class="col-md-6">
+            <div class="form-group">
+              <label class="text-danger form-label">{{'BUSINESS_LOCATION' | translate}} <sup>*</sup></label>
+              <div class="input-group">
+                <mat-select [dir]="langDir" formControlName="locationId"
+                  placeholder="{{'BUSINESS_LOCATION' | translate}}" class="form-control"
+                  panelClass="mat-select-control">
+                  @for (location of locations; track location.id) {
+                  <mat-option [value]="location.id">
+                    {{location.name}}
+                  </mat-option>
+                  }
+                  @if (locations.length==0) {
+                  <mat-option value="">
+                    {{'NO_RECORDS' | translate}}
+                  </mat-option>
+                  }
+                </mat-select>
+              </div>
+              @if (inventoryForm.get('locationId')?.touched && inventoryForm.get('locationId')?.errors?.['required']) {
+              <div class="text-danger">
+                {{'BUSINESS_LOCATION_IS_REQUIRED' | translate}}
+              </div>
+              }
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-12">
+        <div class="row my-1">
+          <div class="col-md-4">
+            <label class="form-label">{{"ADD" | translate}}/{{"REMOVE" | translate}}</label>
+            <mat-select [dir]="langDir" class="form-control" formControlName="type" panelClass="mat-select-control">
+              <mat-option value="add">
+                {{'ADD' | translate}}
+              </mat-option>
+              <mat-option value="remove">
+                {{'REMOVE' | translate}}
+              </mat-option>
+            </mat-select>
+          </div>
+          <div class="col-md-8">
+            <div class="form-group">
+              <label for="stock" class="text-danger form-label">{{'STOCK' | translate}} <sup>*</sup></label>
+              <input formControlName="currentStock" type="number" class="form-control" id="currentStock" min="1">
+              @if (inventoryForm.get('currentStock')?.touched && inventoryForm.get('currentStock')?.errors) {
+              @if(inventoryForm.get('currentStock')?.touched &&
+              (inventoryForm.get('currentStock')?.errors?.['required'] ||
+              inventoryForm.get('currentStock')?.errors?.['min'])) {
+              <div class="text-danger">
+                {{'STOCK_IS_REQUIRED' | translate}}.
+              </div>
+              }
+              }
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-12 my-1">
+        <div class="form-group">
+          <label class="text-danger form-label"> {{'BASE_UNIT' | translate}} <sup>*</sup></label>
+          <mat-select [dir]="langDir" placeholder="{{'SELECT_UNIT' | translate}}" class="form-control"
+            formControlName="unitId" panelClass="mat-select-control">
+            <mat-option value="">{{'NONE' | translate}}</mat-option>
+            @for (unit of unitConversationForproduct; track unit.id) {
+            <mat-option [value]="unit.id">
+              {{unit.name}}
+            </mat-option>
+            }
+          </mat-select>
+          @if (inventoryForm.get('unitId')?.touched && inventoryForm.get('unitId')?.errors?.['required']) {
+          <div class="text-danger">
+            {{'UNIT_IS_REQUIRED' | translate}}
+          </div>
+          }
+        </div>
+      </div>
+      @if(inventoryForm.get('type')?.value=='add'){
+      <div class="col-md-12">
+        <div class="form-group">
+          <mat-label [dir]="langDir">{{"TAX" | translate}}</mat-label>
+          <mat-select [dir]="langDir" placeholder="{{'TAX' | translate}}" dir='rtl' formControlName="taxIds" multiple
+            class="form-control" panelClass="mat-select-control">
+            @for (tax of taxes; track tax.id) {
+            <mat-option [value]="tax.id"> {{tax.name}}
+              ({{tax.percentage | customCurrency}}%)
+            </mat-option>
+            }
+          </mat-select>
+        </div>
+      </div>
+      }
+      <div class="row mt-1">
+        <div class="col-md-6 m-0">
+          <div class="form-group">
+            <label for="pricePerUnit" class="text-danger form-label">{{'UNIT_PER_PRICE' | translate}} <sup>*</sup></label>
+            <input formControlName="pricePerUnit" type="number" class="form-control" id="pricePerUnit">
+            @if (inventoryForm.get('pricePerUnit')?.touched &&
+            inventoryForm.get('pricePerUnit')?.errors?.['required']) {
+            <div class="text-danger">
+              {{'UNIT_PER_PRICE_IS_REQUIRED' | translate}}.
+            </div>
+            }
+            @if (inventoryForm.get('pricePerUnit')?.touched &&
+            inventoryForm.get('pricePerUnit')?.errors?.['min']) {
+            <div class="text-danger">
+              {{'UNIT_PER_PRICE_MUST_BE_POSITIVE' | translate}}.
+            </div>
+            }
+          </div>
+        </div>
+        <div class="col-md-6 m-0">
+          <div class="form-group">
+            <label for="paymentMethod" class="text-danger form-label">{{'PAYMENT_METHOD' | translate}} <sup>*</sup></label>
+            <mat-select formControlName="paymentMethod" [dir]="langDir"
+              placeholder="{{'SELECT_PAYMENT_METHOD' | translate}}" class="form-control"
+              panelClass="mat-select-control">
+              @for (method of paymentMethodslist; track method.id) {
+              <mat-option [value]="method.id">
+                {{method.id | paymentmethod}}
+              </mat-option>
+              }
+            </mat-select>
+            @if (inventoryForm.get('paymentMethod')?.touched &&
+            inventoryForm.get('paymentMethod')?.errors?.['required']) {
+            <div class="text-danger">
+              {{'PAYMENT_METHOD_IS_REQUIRED' | translate}}
+            </div>
+            }
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="mt-2 col-md-12">
+      <button class="success me-2" matButton="filled" (click)="addInventory()" cdkFocusInitial>
+        <mat-icon class="medium-icon fs-5 align-middle">save</mat-icon>
+        {{"SAVE" | translate}}
+      </button>
+      <button class="error" matButton="filled" (click)="onCancel()">
+        <mat-icon class="medium-icon fs-5 align-middle">cancel</mat-icon>
+        {{"CANCEL" | translate}}
+      </button>
+    </div>
+  </form>
+</mat-dialog-content>

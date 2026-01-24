@@ -1,0 +1,79 @@
+<section class="content">
+  <div class="container-fluid">
+    <div class="d-flex mb-2">
+      <div class="me-auto">
+        <span class="mb-0 page-title">{{"COUNTRY" | translate}}
+          <app-page-help-text code="COUNTRY"></app-page-help-text>
+        </span>
+      </div>
+      <div class="d-flex justify-content-end">
+        <button class="primary me-2" matButton="filled" (click)="manageCountry(null)">
+          <mat-icon class="medium-icon fs-5 align-middle">add</mat-icon>
+          {{"ADD_COUNTRY" | translate}}
+        </button>
+      </div>
+    </div>
+    <mat-card appearance="outlined">
+      <mat-card-content>
+        <div class="table-responsive">
+          <div class="grid-height-large">
+            <table mat-table [dataSource]="dataSource" [dir]="langDir">
+              <ng-container matColumnDef="action">
+                <th class="table-column-200 w-50" mat-header-cell *matHeaderCellDef> {{"ACTION" | translate}}
+                </th>
+                <td class="table-column-200" mat-cell *matCellDef="let element">
+                  <div class="d-flex gap-2">
+                    <button *hasClaim="'SETT_MANAGE_COUNTRY'" matMiniFab (click)="manageCountry(element)"
+                      class="primary">
+                      <mat-icon class="medium-icon fs-5 align-middle">edit</mat-icon>
+                    </button>
+                    <button *hasClaim="'SETT_MANAGE_COUNTRY'" matMiniFab (click)="deleteCountry(element)" class="error">
+                      <mat-icon class="medium-icon fs-5 align-middle">delete</mat-icon>
+                    </button>
+                  </div>
+                  <!-- <button *hasClaim="'SETT_MANAGE_COUNTRY'" class="primary me-2" matButton="filled"
+                    (click)="manageCountry(element)" aria-label="Edit Country">
+                    <mat-icon class="medium-icon fs-5 align-middle">edit</mat-icon>
+                    {{"EDIT" | translate}}
+                  </button>
+                  <button *hasClaim="'SETT_MANAGE_COUNTRY'" class="error" matButton="filled"
+                    (click)="deleteCountry(element)" aria-label="Delete Country">
+                    <mat-icon class="medium-icon fs-5 align-middle">delete</mat-icon>
+                    {{"DELETE" | translate}}
+                  </button> -->
+                </td>
+              </ng-container>
+              <!-- Name Column -->
+              <ng-container matColumnDef="countryName">
+                <th mat-header-cell *matHeaderCellDef>{{"COUNTRY_NAME" | translate}} </th>
+                <td mat-cell *matCellDef="let element"> {{element.countryName}} </td>
+              </ng-container>
+
+              <ng-container matColumnDef="footer">
+                <td mat-footer-cell colspan="12" *matFooterCellDef>
+                  <mat-paginator [pageSize]="20" [pageSizeOptions]="[20, 30, 50]">
+                  </mat-paginator>
+                </td>
+              </ng-container>
+
+              <tr *matNoDataRow>
+                <td colspan="12">
+                  <span class="p-4 mt-4">
+                    <b> {{'NO_DATA_FOUND' | translate}}</b>
+                  </span>
+                </td>
+              </tr>
+
+              <tr class="grid-header-color" mat-header-row *matHeaderRowDef="displayedColumns;sticky: true"></tr>
+              <tr mat-row *matRowDef="let row; columns: displayedColumns;" [ngClass]="{
+                              'odd-row': isOddDataRow(getDataIndex(row)),
+                              'even-row': !isOddDataRow(getDataIndex(row))
+                            }"></tr>
+              <tr mat-footer-row *matFooterRowDef="footerToDisplayed;sticky:true"></tr>
+            </table>
+          </div>
+        </div>
+      </mat-card-content>
+    </mat-card>
+  </div>
+</section>

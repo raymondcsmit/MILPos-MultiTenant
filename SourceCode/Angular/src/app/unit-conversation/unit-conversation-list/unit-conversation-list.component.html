@@ -1,0 +1,4 @@
+<app-unit-conversation-list-presentation [unitConversations]="unitConversations$ | async"
+  (addEditUnitConversationHandler)="manageUnitConversation($event)"
+  (deleteUnitConversationHandler)="deleteUnitConversation($event)">
+</app-unit-conversation-list-presentation>

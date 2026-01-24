@@ -1,0 +1,70 @@
+<mat-dialog-content>
+  <div class=" mb-0 d-flex justify-content-between">
+    <span class="mb-4 page-title">
+      {{ "MANAGE_FINANCIAL_YEAR" | translate }}
+      <app-page-help-text [code]="'MANAGE_FINANCIAL_YEAR'"></app-page-help-text>
+    </span>
+    <mat-icon class="close-icon text-danger cursor-pointer" (click)="close()">cancel</mat-icon>
+  </div>
+
+  <form [formGroup]="financialYearForm" (ngSubmit)="saveFinancialYear()">
+    <div class="row">
+      <div class="col-md-12">
+        <div class="form-group">
+          <label class="text-danger form-label" for="startDate">{{ "START_DATE" | translate }} <sup>*</sup></label>
+          <div class="input-group">
+            <input type="text" #startDate formControlName="startDate" (focus)="startDatePicker.open()"
+              [matDatepicker]="startDatePicker" class="form-control input-with-clear" />
+            <button class="btn btn-primary btn-sm" (click)="startDatePicker.open()" tabindex="-1" type="button">
+              <mat-icon class="medium-icon fs-5 align-middle">calendar_today</mat-icon>
+            </button>
+          </div>
+          <mat-datepicker #startDatePicker (closed)="startDate.blur()"></mat-datepicker>
+        </div>
+        @if(financialYearForm.get('startDate')?.touched &&
+        financialYearForm.get('startDate')?.errors){
+        <ng-container>
+          @if(financialYearForm.get('startDate')?.errors?.['required']){
+          <div class="text-danger">
+            {{ "START_DATE_IS_REQUIRED" | translate }}
+          </div>
+          }
+        </ng-container>
+        }
+      </div>
+      <div class="col-md-12">
+        <div class="form-group">
+          <label class="text-danger form-label" for="endDate">{{ "END_DATE" | translate }} <sup>*</sup></label>
+          <div class="input-group">
+            <input type="text" #endDate formControlName="endDate" (focus)="endDatePicker.open()"
+              [matDatepicker]="endDatePicker" class="form-control input-with-clear" />
+            <button class="btn btn-primary btn-sm" (click)="endDatePicker.open()" tabindex="-1" type="button">
+              <mat-icon class="medium-icon fs-5 align-middle">calendar_today</mat-icon>
+            </button>
+          </div>
+          <mat-datepicker #endDatePicker (closed)="endDate.blur()"></mat-datepicker>
+        </div>
+        @if(financialYearForm.get('endDate')?.touched &&
+        financialYearForm.get('endDate')?.errors){
+        <ng-container>
+          @if(financialYearForm.get('endDate')?.errors?.['required']){
+          <div class="text-danger">
+            {{ "END_DATE_IS_REQUIRED" | translate }}
+          </div>
+          }
+        </ng-container>
+        }
+      </div>
+      <div class="col-md-12 my-2">
+        <button class="success me-2" matButton="filled" cdkFocusInitial>
+          <mat-icon class="medium-icon fs-5 align-middle">save</mat-icon>
+          {{ "SAVE" | translate }}
+        </button>
+        <button type="button" class="error" matButton="filled" (click)="close()">
+          <mat-icon class="medium-icon fs-5 align-middle">cancel</mat-icon>
+          {{ "CANCEL" | translate }}
+        </button>
+      </div>
+    </div>
+  </form>
+</mat-dialog-content>

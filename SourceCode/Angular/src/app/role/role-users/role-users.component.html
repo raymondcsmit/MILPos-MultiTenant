@@ -1,0 +1,71 @@
+<section class="content">
+  <div class="container-fluid">
+    <div class="row align-items-center">
+      <div class="col-md-6 mb-2">
+        <span class="mb-0 page-title">{{'ROLE_USER' | translate}}
+          <app-page-help-text code="ROLE_USER"></app-page-help-text>
+        </span>
+      </div>
+    </div>
+    <mat-card appearance="outlined">
+      <mat-card-content>
+        <div class="page-header-main">
+          <div class="row align-items-center justify-content-between">
+            <div class="col-md-auto col-sm-auto">
+              <div class="content-header">
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="row">
+          <div class="col-sm-6">
+            <div class="form-group">
+              <mat-label [dir]="langDir">{{'SELECT_ROLE' | translate}}</mat-label>
+              <mat-select [dir]="langDir" class="form-control form-control-sm" name="selectedRole"
+                panelClass="mat-select-control" [(ngModel)]="selectedRoleId" (selectionChange)="onRoleChange()">
+                @for(role of roles; track role.id){
+                <mat-option [value]="role.id">
+                  {{role.name}}
+                </mat-option>
+                }
+              </mat-select>
+            </div>
+          </div>
+        </div>
+        <div class="row">
+          <div class="col-sm-12">
+            <span class="fw-bolder text-danger">
+              {{'NOTE_IN_ORDER_TO_ADD_USER_TO_ROLE_PLEASE_DRAG_IT_FROM_ALL_USERS_TO_ROLE_USERS' | translate}}
+            </span>
+          </div>
+        </div>
+        @if(selectedRole){
+        <div class="row mt-3">
+          <div class="col-sm-5">
+            <h5 class="text-primary">{{'ALL_USERS' | translate}}</h5>
+            <div cdkDropList #doneList="cdkDropList" DragAxis="true" [cdkDropListData]="otherUsers"
+              [cdkDropListConnectedTo]="[todoList]" class="example-list" (cdkDropListDropped)="removeUser($event)">
+              @for(item of otherUsers; track $index){
+              <div class="example-box" cdkDrag>
+                <span>{{item.firstName}} {{item.lastName}} ({{item.userName}}) </span>
+              </div>
+              }
+            </div>
+          </div>
+          <div class="col-sm-5">
+            <h5 class="text-primary">{{'ROLE_USERS' | translate}}</h5>
+            <div cdkDropList #todoList="cdkDropList" [cdkDropListData]="roleUsers" [cdkDropListConnectedTo]="[doneList]"
+              class="example-list" (cdkDropListDropped)="addUser($event)">
+              @for(item of roleUsers; track $index){
+              <div class="example-box" cdkDrag>
+                <span>{{item.firstName}} {{item.lastName}} ({{item.userName}})</span>
+              </div>
+              }
+            </div>
+          </div>
+        </div>
+        }
+      </mat-card-content>
+    </mat-card>
+  </div>
+</section>

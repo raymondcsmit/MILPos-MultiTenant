@@ -1,0 +1,24 @@
+<section class="content">
+  <div class="container-fluid">
+    <app-statistics *hasClaim="'DB_STATISTICS'"></app-statistics>
+
+    <div class="row">
+      <div class="col-lg-6 col-sm-12" *hasClaim="'DB_RECENT_SO_SHIPMENT'">
+        <app-sales-order-expected-shipment></app-sales-order-expected-shipment>
+      </div>
+      <div class="col-lg-6 col-sm-12" *hasClaim="'DB_RECENT_PO_DELIVERY'">
+        <app-purchase-order-expected-delivery></app-purchase-order-expected-delivery>
+      </div>
+    </div>
+    <div class="row">
+      <div class="col mb-2">
+        <app-product-stock-alert *hasClaim="'DB_PROD_STOCK_ALERT'"></app-product-stock-alert>
+      </div>
+    </div>
+    <div class="row">
+      <div class="col mb-2">
+        <app-best-selling-product *hasClaim="'DB_BEST_SELLING_PROS'"></app-best-selling-product>
+      </div>
+    </div>
+  </div>
+</section>

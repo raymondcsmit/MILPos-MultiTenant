@@ -1,0 +1,451 @@
+<section class="content">
+  <div class="container-fluid">
+    <div class="row align-items-center">
+      <div class="col-md-6 mb-2">
+        <span class="mb-0 page-title">
+          {{ "PURCHASE_ORDER_RETURN" | translate }}
+          <app-page-help-text code="PURCHASE_ORDER_RETURN"></app-page-help-text>
+        </span>
+      </div>
+    </div>
+    <mat-card appearance="outlined">
+      <mat-card-content>
+        @if(purchaseOrder){
+        <form autocomplete="off" [formGroup]="purchaseOrderForm" (ngSubmit)="onPurchaseOrderSubmit()">
+          <div class="row">
+            <div class="col-lg-3 col-sm-6">
+              <div class="form-group">
+                <label class="text-danger form-label">{{"PO_NUMBER" | translate}} <span>*</span></label>
+                <input formControlName="orderNumber" class="form-control w-100" type="text">
+                @if(purchaseOrderForm.get('orderNumber')?.touched && purchaseOrderForm.get('orderNumber')?.errors &&
+                purchaseOrderForm.get('orderNumber')?.errors?.['required']){
+                <div class="text-danger">
+                  {{'PO_ORDER_NUMBER_IS_REQUIRED' | translate}}
+                </div>
+                }
+              </div>
+            </div>
+            <div class="col-lg-3 col-sm-6">
+              <div class="form-group">
+                <label class="text-danger form-label" for="poCreatedDate">{{'ORDER_DATE' | translate}} *</label>
+                <input type="text" #poCreatedDate formControlName="poCreatedDate" class="form-control input-with-clear">
+              </div>
+            </div>
+            <div class="col-lg-3 col-sm-6">
+              <div class="form-group">
+                <label class="text-danger form-label" for="deliveryDate">{{'DELIVERY_DATE' | translate}} *</label>
+                <input type="text" #deliveryDate formControlName="deliveryDate" (focus)="deliveryDatePicker.open()"
+                  [matDatepicker]="deliveryDatePicker" class="form-control input-with-clear">
+                <mat-datepicker #deliveryDatePicker (closed)="deliveryDate.blur()"></mat-datepicker>
+                @if(purchaseOrderForm.get('deliveryDate')?.touched && purchaseOrderForm.get('deliveryDate')?.errors &&
+                purchaseOrderForm.get('deliveryDate')?.errors?.['required']){
+                <div class="text-danger">
+                  {{'DELIVERY_DATE_REQUIRED' | translate}}
+                </div>
+                }
+              </div>
+            </div>
+            <div class="col-sm-6 col-md-4">
+              <div class="form-group">
+                <label class="text-danger form-label">{{'SUPPLIER_NAME' | translate}} *</label>
+                <div class="input-group">
+                  <mat-select [dir]="langDir" formControlName="supplierId" placeholder="Select Supplier"
+                    class="form-control">
+                    <input class="form-control w-100" formControlName="filerSupplier" focused="'true'" type="text"
+                      autocomplete="off" placeholder="Search other suppliers">
+                    <mat-divider></mat-divider>
+                    @for(supplier of suppliers; track supplier.id){
+                    <mat-option [dir]="langDir" [value]="supplier.id">
+                      {{supplier.supplierName}}
+                    </mat-option>
+                    }
+                    @if(suppliers.length==0){
+                    <mat-option value="">
+                      {{'NO_RECORDS' | translate}}
+                    </mat-option>
+                    }
+                  </mat-select>
+                </div>
+                @if(purchaseOrderForm.get('supplierId')?.touched && purchaseOrderForm.get('supplierId')?.errors &&
+                purchaseOrderForm.get('supplierId')?.errors?.['required']){
+                <div class="text-danger">
+                  {{'SUPPLIER_NAME_IS_REQUIRED' | translate}}
+                </div>
+                }
+              </div>
+            </div>
+            <div class="col-sm-6 col-md-4">
+              <div class="form-group">
+                <label class="text-danger form-label">{{'BUSINESS_LOCATION' | translate}} *</label>
+                <div class="input-group">
+                  <mat-select [dir]="langDir" formControlName="locationId"
+                    placeholder="{{'BUSINESS_LOCATION' | translate}}" class="form-control">
+                    @for(location of locations; track location.id){
+                    <mat-option [value]="location.id">
+                      {{location.name}}
+                    </mat-option>
+                    }
+                    @if(locations.length==0){
+                    <mat-option value="">
+                      {{'NO_RECORDS' | translate}}
+                    </mat-option>
+                    }
+                  </mat-select>
+                </div>
+                @if(purchaseOrderForm.get('locationId')?.touched && purchaseOrderForm.get('locationId')?.errors &&
+                purchaseOrderForm.get('locationId')?.errors?.['required'] ){
+                <div class="text-danger">
+                  {{'BUSINESS_LOCATION_IS_REQUIRED' | translate}}
+                </div>
+                }
+              </div>
+            </div>
+          </div>
+          <div class="row mb-3">
+            <div class="col-sm-12">
+              <div class="form-group">
+                <label class="form-label">{{'RETURN_NOTES' | translate}} </label>
+                <div class="input-group">
+                  <textarea formControlName="note" class="form-control w-100">
+                      </textarea>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-sm-12" formArrayName="purchaseOrderItems">
+              <div class="row">
+                <div class="col">
+                  <div class="table-responsive">
+                    <table class="table table-pos table-bordered table-sm">
+                      <thead>
+                        <tr class="grid-header-color">
+                          <th class="table-column-150">
+                            <span class="fw-semibold small"> {{'PRODUCT' | translate}} </span>
+                          </th>
+                          <th class="table-column-130">
+                            <span class="fw-semibold small"> {{'PRICE' | translate}} or {{'UNIT' | translate}}</span>
+                          </th>
+                          <th class="table-column-120">
+                            <span class="fw-semibold small"> {{'QUANTITY' | translate}}</span>
+                          </th>
+                          <!-- <th class="table-column-120">
+                            <span class="fw-semibold small"> {{'RETURN_QUANTITY' | translate}}</span>
+                          </th> -->
+                          <!-- <th class="table-column-100">
+                            <span class="fw-semibold small"> {{'SUBTOTAL_BEFORE_DISCOUNT' | translate}}</span>
+                          </th> -->
+                          <th class="table-column-100">
+                            <span class="fw-semibold small"> {{'DISCOUNT' | translate}}</span>
+                          </th>
+                          <th class="table-column-100">
+                            <span class="fw-semibold small"> {{'SUBTOTAL' | translate}}</span>
+                          </th>
+                          <!-- <th class="table-column-300">
+                            <span class="fw-semibold small"> {{'TAX' | translate}}</span>
+                          </th> -->
+                          <th class="table-column-150">
+                            <span class="fw-semibold small"> {{'TOTAL' | translate}}</span>
+                          </th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        @for(purchaseOrderItem of purchaseOrderItemsArray.controls; let i = $index; track $index){
+                        <tr [formGroupName]="i">
+                          <td>
+                            <div class="d-flex flex-column gap-1">
+                              @if(purchaseOrderItem.get('productUrl')?.value){
+                              <img class="img-thumbnail grid-img-thumbnail"
+                                [src]="baseUrl + purchaseOrderItem.get('productUrl')?.value"
+                                alt="{{'PRODUCT_IMAGE' | translate}}">
+                              }@else {
+                              <img class="img-thumbnail grid-img-thumbnail" src="/images/no-preview.jpg"
+                                alt="{{'PRODUCT_IMAGE' | translate}}">
+                              }
+                              <span class="ms-1"> {{purchaseOrderItem.get('productName')?.value}}</span>
+                              @if(purchaseOrderItem.get('productId')?.touched &&
+                              purchaseOrderItem.get('productId')?.errors
+                              && purchaseOrderItem.get('productId')?.errors?.['required']){
+                              <div class="text-danger">
+                                {{'PRODUCT_IS_REQUIRED' | translate}}
+                              </div>
+                              }
+                            </div>
+                          </td>
+                          <td>
+                            <div class="d-flex flex-column gap-1">
+                              <span class="fw-semibold small"> {{'PRICE' | translate}}</span>
+                              <input class="form-control max-width-120" type="number" formControlName="unitPrice"
+                                placeholder="{{'UNIT_PER_PRICE' | translate}}">
+                              @if(purchaseOrderItem.get('unitPrice')?.touched &&
+                              purchaseOrderItem.get('unitPrice')?.errors
+                              && purchaseOrderItem.get('unitPrice')?.errors?.['required']){
+                              <div class="text-danger">
+                                {{'UNIT_IS_REQUIRED' | translate}}
+                              </div>
+                              }
+                              <span class="fw-semibold small"> {{'UNIT' | translate}}</span>
+                              <mat-select [dir]="langDir" formControlName="unitId" class="form-control max-width-120">
+                                @for(a of unitsMap[i]; track a.id){
+                                <mat-option [dir]="langDir" [value]="a.id">
+                                  {{a.name}}
+                                </mat-option>
+                                }
+                              </mat-select>
+                            </div>
+                          </td>
+                          <td>
+                            <div class="d-flex flex-column gap-1">
+                              <span class="fw-semibold small"> {{ 'RETURN_QUANTITIES' | translate }}:</span>
+                              <input class="form-control" type="number" (change)="onQuantityChange()"
+                                formControlName="returnquantity" placeholder="{{ 'RETURN_QUANTITY' | translate }}" />
+                              @if(purchaseOrderItem.get('returnquantity')?.touched &&
+                              purchaseOrderItem.get('returnquantity')?.errors) {
+                              @if(purchaseOrderItem.get('returnquantity')?.errors?.['required']) {
+                              <div class="text-danger">
+                                {{ 'QUANTITY_IS_REQUIRED' | translate }}
+                              </div>
+                              } @if(purchaseOrderItem.get('returnquantity')?.errors?.['max']) {
+                              <div class="text-danger">
+                                {{ 'QUANTITY_IS_MAX' | translate }}
+                              </div>
+                              } @if(purchaseOrderItem.get('returnquantity')?.errors?.['min']) {
+                              <div class="text-danger">
+                                {{ 'QUANTITY_IS_MIN' | translate }}
+                              </div>
+                              }
+                              }
+                              <span class="fw-semibold small"> {{ 'TOTAL_QUANTITY' | translate }}</span>
+                              <input class="form-control" type="number" formControlName="quantity"
+                                placeholder="{{ 'QUANTITY' | translate }}" />
+                              @if(purchaseOrderItem.get('returnItemsQuantities')?.value>0){
+                              <span class="fw-semibold small text-danger"> {{ 'PREVIOUSLY_RETURN_QUANTITIES' |
+                                translate
+                                }}: {{purchaseOrderItem.get('returnItemsQuantities')?.value}}
+                              </span>
+                              }
+                            </div>
+                          </td>
+                          <td>
+                            <div class="d-flex flex-column gap-1">
+                              <mat-radio-group aria-label="Select Discount Type" formControlName="discountType">
+                                <mat-radio-button value="fixed">{{ 'FIXED' | translate }}</mat-radio-button>
+                                <mat-radio-button value="percentage">{{ 'PERCENTAGE' | translate
+                                  }}</mat-radio-button>
+                              </mat-radio-group>
+                              @if(purchaseOrderItem.get('discountType')?.value =='fixed'){
+                              <span class="fw-semibold small">{{"TOTAL_DISCOUNT" | translate}}:</span>
+                              <span>{{purchaseOrderItem.get('discountPercentage')?.value | customCurrency}}</span>
+                              } @else {
+                              <span>{{"DISCOUNT" | translate}}:</span>  
+                              {{purchaseOrderItem.get('discountPercentage')?.value}}%
+                              }
+                              <span class="fw-semibold small">{{"RETURN_ITEMS_DISCOUNT" | translate}}:</span>
+                              {{
+                              purchaseOrderItem.get('returnquantity')?.value
+                              | quantitiesunitpricediscountreturn
+                              : purchaseOrderItem.get('discountPercentage')?.value
+                              : purchaseOrderItem.get('discountType')?.value
+                              : purchaseOrderItem.get('quantity')?.value
+                              : purchaseOrderItem.get('unitPrice')?.value
+                              | customCurrency
+                              }}
+                            </div>
+                          </td>
+                          <td>
+                            <label class="fw-semibold small"> {{ 'SUBTOTAL_BEFORE_DISCOUNT' | translate }}:</label>
+                            <div class="fw-semibold small">
+                              {{
+                              purchaseOrderItem.get('returnquantity')?.value
+                              | quantitiesunitpricereturn
+                              : purchaseOrderItem.get('unitPrice')?.value
+                              : purchaseOrderItem.get('quantity')?.value
+                              | customCurrency
+                              }}
+                            </div>
+                            <label class="fw-semibold small"> {{ 'SUBTOTAL_AFTER_DISCOUNT' | translate }}</label>
+                            <div class="fw-semibold small">
+                              {{
+                              purchaseOrderItem.get('returnquantity')?.value
+                              | quantitiesunitpricereturn
+                              : purchaseOrderItem.get('unitPrice')?.value
+                              : purchaseOrderItem.get('discountPercentage')?.value
+                              : purchaseOrderItem.get('discountType')?.value
+                              : purchaseOrderItem.get('quantity')?.value
+                              | customCurrency
+                              }}
+                            </div>
+                            @if(purchaseOrderItem.get('discountPercentage')?.value != 0) {
+                            <div class="text-danger">
+                              {{ 'DISCOUNT_AMOUNT' | translate }}:
+                              {{
+                              purchaseOrderItem.get('returnquantity')?.value
+                              | quantitiesunitpriceTaxReturn
+                              : purchaseOrderItem.get('unitPrice')?.value
+                              : purchaseOrderItem.get('discountPercentage')?.value
+                              : purchaseOrderItem.get('discountType')?.value
+                              : purchaseOrderItem.get('quantity')?.value
+                              | customCurrency
+                              }}
+                            </div>
+                            }
+                          </td>
+                          <td>
+                            {{ purchaseOrderItem.get('returnquantity')?.value | quantitiesunitpricereturn :
+                            purchaseOrderItem.get('unitPrice')?.value :
+                            purchaseOrderItem.get('discountPercentage')?.value:
+                            purchaseOrderItem.get('taxIds')?.value: taxsMap[i]
+                            : purchaseOrderItem.get('discountType')?.value
+                            : purchaseOrderItem.get('quantity')?.value
+                            | customCurrency}}
+                            @if(purchaseOrderItem.get('taxIds')?.value){
+                            <div class="text-danger">
+                              {{'TAX_AMOUNT' | translate}}:: {{ purchaseOrderItem.get('returnquantity')?.value |
+                              quantitiesunitpriceTaxReturn : purchaseOrderItem.get('unitPrice')?.value :
+                              purchaseOrderItem.get('discountPercentage')?.value :
+                              purchaseOrderItem.get('taxIds')?.value:
+                              taxsMap[i] | customCurrency }}
+                            </div>
+                            }
+                          </td>
+                        </tr>
+                        }
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="row mt-2">
+            <div class="col-10 text-end fw-bolder">
+              {{'SUB_TOTAL_BEFORE_DISCOUNT' | translate}}:
+            </div>
+            <div class="col-2 text-start  fw-bolder">
+              {{totalBeforeDiscount | customCurrency}}
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-10 text-end fw-bolder">
+              {{'TOTAL_DISCOUNT' | translate}}:
+            </div>
+            <div class="col-2 text-start text-danger  fw-bolder">
+              {{totalDiscount | customCurrency}}
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-10 text-end fw-bolder">
+              {{'TOTAL_TAX' | translate}}:
+            </div>
+            <div class="col-2 text-start  fw-bolder">
+              {{totalTax | customCurrency}}
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-10 text-end fw-bolder">{{ 'ROUND_OFF' | translate }}:</div>
+            <div class="col-2 text-start text-danger fw-bolder">
+              {{ totalRoundOff | customCurrency }}
+            </div>
+          </div>
+          @if(purchaseOrderForm.get('isSelectPaymentMethod')?.value){
+          <div class="row">
+            <div class="col-10 text-end fw-bolder">{{ 'REFUND_PAYMENT_METHOD' | translate }}:</div>
+            <div class="col-2 text-start text-danger fw-bolder">
+              <mat-select [dir]="langDir" panelClass="mat-select-control"
+                placeholder="{{ 'SELECT_PAYING_BY' | translate }}" class="form-control form-control-sm"
+                formControlName="paymentMethod">
+                @for (paymentMethod of paymentMethodslist; track paymentMethod.id) {
+                <mat-option [dir]="langDir" [value]="paymentMethod?.id">
+                  {{ paymentMethod?.id | paymentmethod }}
+                </mat-option>
+                }
+              </mat-select>
+            </div>
+          </div>
+          }
+          <div class="row">
+            <div class="col-12">
+              <mat-divider></mat-divider>
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-10 text-end fw-bolder">
+              {{'GRAND_TOTAL' | translate}} :
+            </div>
+            <div class="col-2 text-start fw-bolder">
+              {{grandTotal | customCurrency}}
+            </div>
+          </div>
+
+          <div class="row">
+            <div class="col-md-12 mb-3">
+              <button *hasClaim="'PO_RETURN_PO'" type="submit" class="success me-2" matButton="filled">
+                <mat-icon class="medium-icon fs-5 align-middle">save</mat-icon>
+                {{'RETURN' | translate}}
+              </button>
+              <button type="button" (click)="cancel()" class="error" matButton="filled">
+                <mat-icon class="medium-icon fs-5 align-middle">cancel</mat-icon>
+                {{'CANCEL' | translate}}
+              </button>
+            </div>
+          </div>
+        </form>
+        }@else {
+        <form autocomplete="off" [formGroup]="purchaseOrderReturnForm">
+          <div class="row">
+            <div class="col-sm-6 col-md-4">
+              <div class="form-group">
+                <label>{{'SELECT_SUPPLIER' | translate}}</label>
+                <div class="input-group">
+                  <mat-select [dir]="langDir" formControlName="supplierId" panelClass="mat-select-control"
+                    placeholder="{{'SELECT_SUPPLIER' | translate}}" class="form-control">
+                    <input class="form-control form-control-sm" formControlName="filerSupplier" focused="'true'"
+                      type="text" autocomplete="off" placeholder="{{'SEARCH_OTHER_SUPPLIERS' | translate}}">
+                    <mat-divider></mat-divider>
+                    @for(supplier of suppliersForSearch; track supplier.id){
+                    <mat-option [dir]="langDir" [value]="supplier.id">
+                      {{supplier.supplierName}}
+                    </mat-option>
+                    }
+                    @if(suppliersForSearch.length > 0){
+                    <mat-option value="">{{'NONE' | translate}}</mat-option>
+                    }
+                    @if(suppliersForSearch.length==0){
+                    <mat-option value="">
+                      {{'NO_RECORDS' | translate}}
+                    </mat-option>
+                    }
+                  </mat-select>
+                </div>
+              </div>
+            </div>
+            <div class="col-sm-6 col-md-4">
+              <div class="form-group">
+                <label>{{'SELECT_PURCHASE_ORDER' | translate}} </label>
+                <div class="input-group">
+                  <mat-select [dir]="langDir" formControlName="purchaseOrderId" panelClass="mat-select-control"
+                    placeholder="{{'SELECT_PURCHASE_ORDER' | translate}}" class="form-control">
+                    <input class="form-control form-control-sm" formControlName="filerPurchaseOrder" focused="'true'"
+                      type="text" autocomplete="off" placeholder=" {{'SEARCH_OTHER_PURCHASE_ORDER' | translate}}">
+                    <mat-divider></mat-divider>
+                    @for(po of purchaseorders; track po.id){
+                    <mat-option [dir]="langDir" [value]="po.id">
+                      {{po.orderNumber}}
+                    </mat-option>
+                    }
+                    @if(purchaseorders.length==0){
+                    <mat-option value="">
+                      {{'NO_RECORDS' | translate}}
+                    </mat-option>
+                    }
+                  </mat-select>
+                </div>
+              </div>
+            </div>
+          </div>
+        </form>
+        }
+      </mat-card-content>
+    </mat-card>
+  </div>
+</section>

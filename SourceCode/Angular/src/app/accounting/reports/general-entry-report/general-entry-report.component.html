@@ -1,0 +1,225 @@
+<section class="content">
+  <div class="container-fluid">
+    <div class="d-flex mb-2">
+      <div class="me-auto">
+        <span class="mb-0 page-title">{{ 'GENERAL_ENTRY_REPORT' | translate }}
+          <app-page-help-text code="GENERAL_ENTRY_REPORT"></app-page-help-text>
+        </span>
+      </div>
+      <div class="d-flex justify-content-end">
+        <button *hasClaim="'ACCOUNTING_ADD_GENERAL_ENTRY'" class="primary me-2" matButton="filled"
+          (click)="addGeneralEntry()">
+          <mat-icon class="medium-icon fs-5 align-middle">add</mat-icon>
+          <span class="d-none d-sm-inline"> {{ 'ADD_GENERAL_ENTRY' | translate }} </span>
+        </button>
+        <button class="error me-2" matButton="filled" (click)="refresh()">
+          <mat-icon class="medium-icon fs-5 align-middle">refresh</mat-icon>
+          <span class="d-none d-sm-inline"> {{ 'REFRESH' | translate }} </span>
+        </button>
+      </div>
+    </div>
+    <mat-card appearance="outlined">
+      <mat-card-content>
+        <!-- 🔍 Search Filters -->
+        <div class="row" [formGroup]="searchForm">
+          <div class="col-lg-3 col-sm-6">
+            <div class="form-group">
+              <label>{{ 'TRANSACTION_NUMBER' | translate }}</label>
+              <div class="input-group">
+                <input placeholder="{{ 'TRANSACTION_NO' | translate }}" type="text" class="form-control form-control-sm"
+                  formControlName="transactionNumber" />
+              </div>
+            </div>
+          </div>
+          <div class="col-lg-3 col-sm-6">
+            <div class="form-group">
+              <label>{{ 'CRATED_DATE' | translate }}</label>
+
+              <div class="input-group">
+                <mat-date-range-input class="form-control form-control-sm input-with-clear" [rangePicker]="picker">
+                  <input matStartDate (focus)="picker.open()" formControlName="fromDate"
+                    placeholder="{{ 'FROM_DATE' | translate }}" />
+                  <input matEndDate (focus)="picker.open()" formControlName="toDate"
+                    placeholder="{{ 'TO_DATE' | translate }}" />
+                </mat-date-range-input>
+                <mat-date-range-picker #picker></mat-date-range-picker>
+                <button style="margin-left: -34px; z-index: 100" (click)="clearDates()"
+                  class="btn btn-sm bg-transparent" type="button">
+                  <mat-icon class="medium-icon text-danger fs-6 align-middle">cancel</mat-icon>
+                </button>
+              </div>
+            </div>
+          </div>
+          <!-- Business Location -->
+          <div class="col-lg-3 col-sm-6">
+            <div class="form-group">
+              <label>{{ 'BUSINESS_LOCATION' | translate }}</label>
+              <div class="input-group">
+                <mat-select [dir]="langDir" formControlName="branchId" panelClass="mat-select-control"
+                  placeholder="{{ 'BUSINESS_LOCATION' | translate }}" class="form-control form-control-sm">
+                  @for (location of locations; track $index) {
+                  <mat-option [value]="location.id">
+                    {{ location.name }}
+                  </mat-option>
+                  } @if (locations.length == 0) {
+                  <mat-option value="">
+                    {{ 'NO_RECORDS' | translate }}
+                  </mat-option>
+                  }
+                </mat-select>
+              </div>
+            </div>
+          </div>
+          <!-- Financial Year -->
+          <div class="col-lg-3 col-sm-6">
+            <div class="form-group">
+              <label>{{ 'FINANCIAL_YEAR' | translate }}</label>
+              <div class="input-group">
+                <mat-select [dir]="langDir" formControlName="financialYearId" panelClass="mat-select-control"
+                  placeholder="{{ 'FINANCIAL_YEAR' | translate }}" class="form-control form-control-sm">
+                  @for (financialYear of financialYearStore.financialYears(); track $index) {
+                  <mat-option [value]="financialYear.id">
+                    {{ financialYear.startDate | utcToLocalTime : 'shortDate' }}
+                    -
+                    {{ financialYear.endDate | utcToLocalTime : 'shortDate' }}
+                  </mat-option>
+                  } @if (financialYearStore.financialYears().length == 0) {
+                  <mat-option value="">
+                    {{ 'NO_RECORDS' | translate }}
+                  </mat-option>
+                  }
+                </mat-select>
+              </div>
+            </div>
+          </div>
+          <!-- Buttons -->
+          <div class="col-sm-12 report-tool-bar mt-4">
+            <button class="primary me-1" matButton="filled" (click)="onSearch()">
+              <mat-icon class="medium-icon fs-5 align-middle">search</mat-icon>
+              <span class="d-none d-sm-inline"> {{ 'SEARCH' | translate }} </span>
+            </button>
+            <button class="error me-1" matButton="filled" (click)="onClear()">
+              <mat-icon class="medium-icon fs-5 align-middle">cancel</mat-icon>
+              <span class="d-none d-sm-inline"> {{ 'CLEAR' | translate }}</span>
+            </button>
+            <button class="warning me-1" matButton="filled" [matMenuTriggerFor]="menu">
+              <mat-icon class="medium-icon fs-5 align-middle">download</mat-icon>
+              <span class="d-none d-sm-inline">{{ 'EXPORT' | translate }}</span>
+            </button>
+            <mat-menu #menu="matMenu" class="mat-menu-control-sm">
+              <button mat-menu-item (click)="onDownloadReport('csv')">
+                <mat-icon class="medium-icon fs-5 align-middle">table_chart</mat-icon>
+                CSV
+              </button>
+              <button mat-menu-item (click)="onDownloadReport('xlsx')">
+                <mat-icon class="medium-icon fs-5 align-middle">grid_on</mat-icon>
+                Excel
+              </button>
+              <button mat-menu-item (click)="onDownloadReport('pdf')">
+                <mat-icon class="medium-icon fs-5 align-middle">picture_as_pdf</mat-icon>
+                PDF
+              </button>
+            </mat-menu>
+            <button *hasClaim="'ACCOUNTING_SEND_EMAIL'" matButton="filled" class="secondary"
+              (click)="onDownloadReport('email')">
+              <mat-icon class="medium-icon fs-5 align-middle">email</mat-icon>
+              <span class="d-none d-sm-inline"> {{ 'SEND_EMAIL' | translate }}</span>
+            </button>
+          </div>
+        </div>
+        <div class="table-responsive mt-3">
+          <div class="grid-height-medium">
+            <table [dir]="langDir" mat-table matSortDisableClear [dataSource]="generalEntryStore.generalEntrys()"
+              multiTemplateDataRows matSort [matSortActive]="orderByColumn" [matSortDirection]="orderByDirection">
+              <ng-container matColumnDef="createdDate">
+                <th class="table-column-200" mat-header-cell *matHeaderCellDef mat-sort-header>
+                  {{ 'CREATED_DATE' | translate }}
+                </th>
+                <td class="table-column-200" mat-cell *matCellDef="let ga">
+                  {{ ga.createdDate | utcToLocalTime : 'short' }}
+                </td>
+              </ng-container>
+              <ng-container matColumnDef="transactionNumber">
+                <th class="table-column-200" mat-header-cell *matHeaderCellDef mat-sort-header>
+                  {{ 'TRANSACTION_NUMBER' | translate }}
+                </th>
+                <td class="table-column-200" mat-cell *matCellDef="let ga">
+                  {{ ga.transactionNumber }}
+                </td>
+              </ng-container>
+              <ng-container matColumnDef="transactionType">
+                <th class="table-column-200" mat-header-cell *matHeaderCellDef>
+                  {{ 'TRANSACTION_TYPE' | translate }}
+                </th>
+                <td class="table-column-200" mat-cell *matCellDef="let ga">
+                  {{ ga.transactionType | transactionType}}
+                </td>
+              </ng-container>
+              <ng-container matColumnDef="accountCode">
+                <th class="table-column-150" mat-header-cell *matHeaderCellDef>
+                  {{ 'ACCOUNT_CODE' | translate }}
+                </th>
+                <td class="table-column-150" mat-cell *matCellDef="let ga">
+                  {{ ga.accountCode }}
+                </td>
+              </ng-container>
+              <ng-container matColumnDef="accountName">
+                <th class="table-column-150" mat-header-cell *matHeaderCellDef>
+                  {{ 'ACCOUNT_NAME' | translate }}
+                </th>
+                <td class="table-column-150" mat-cell *matCellDef="let ga">
+                  {{ ga.accountName }}
+                </td>
+              </ng-container>
+              <ng-container matColumnDef="debitAmount">
+                <th class="table-column-150" mat-header-cell *matHeaderCellDef mat-sort-header>
+                  {{ 'DEBIT_AMOUNT' | translate }}
+                </th>
+                <td class="table-column-150" mat-cell *matCellDef="let ga">
+                  {{ ga.debitAmount | customCurrency }}
+                </td>
+              </ng-container>
+              <ng-container matColumnDef="creditAmount">
+                <th class="table-column-150" mat-header-cell *matHeaderCellDef mat-sort-header>
+                  {{ 'CREDIT_AMOUNT' | translate }}
+                </th>
+                <td class="table-column-150" mat-cell *matCellDef="let ga">
+                  {{ ga.creditAmount | customCurrency }}
+                </td>
+              </ng-container>
+              <ng-container matColumnDef="accountType">
+                <th class="table-column-150" mat-header-cell *matHeaderCellDef>
+                  {{ 'ACCOUNT_TYPE' | translate }}
+                </th>
+                <td class="table-column-150" mat-cell *matCellDef="let la">
+                  {{ la.accountType | accountType }}
+                </td>
+              </ng-container>
+              <ng-container matColumnDef="footer">
+                <td mat-footer-cell colspan="9" *matFooterCellDef>
+                  <mat-paginator [length]="generalEntryStore.generalEntryResourceParameter().totalCount"
+                    [pageSize]="generalEntryStore.generalEntryResourceParameter().pageSize"
+                    [pageSizeOptions]="[10, 20, 30, 50]">
+                  </mat-paginator>
+                </td>
+              </ng-container>
+              <tr *matNoDataRow>
+                <td colspan="9">
+                  <span class="p-4 mt-4">
+                    <b> {{ 'NO_DATA_FOUND' | translate }}</b>
+                  </span>
+                </td>
+              </tr>
+              <tr class="grid-header-color" mat-header-row *matHeaderRowDef="displayedColumns; sticky: true"></tr>
+              <!-- <tr mat-row *matRowDef="let row; columns: displayedColumns"></tr> -->
+              <tr mat-row *matRowDef="let row; columns: displayedColumns"
+                [ngClass]="row.creditAmount > 0 ? 'credit-row' : 'debit-row'"></tr>
+              <tr mat-footer-row *matFooterRowDef="footerToDisplayed; sticky: true"></tr>
+            </table>
+          </div>
+        </div>
+      </mat-card-content>
+    </mat-card>
+  </div>
+  <!-- </div> -->
+</section>

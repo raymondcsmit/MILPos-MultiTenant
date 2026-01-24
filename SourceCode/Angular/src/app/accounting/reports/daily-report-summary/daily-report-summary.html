@@ -1,0 +1,179 @@
+<mat-dialog-content class="p-4">
+  <!-- Header Row -->
+  <div class="row align-items-center mb-3">
+    <div class="col-md-12 d-flex justify-content-between align-items-center">
+      <h4 class="fw-bold mb-0">
+        {{ "DAILY_REPORT_SUMMARY" | translate }}
+        <app-page-help-text code="DAILY_REPORT_SUMMARY"></app-page-help-text>
+      </h4>
+      <mat-icon class="close-icon text-danger cursor-pointer fs-4" (click)="onCancel()">cancel</mat-icon>
+    </div>
+  </div>
+
+  <!-- Sales Summary -->
+  <div class="row">
+    <div class="col-md-6">
+      <div class="card shadow-sm rounded-3 border-0">
+        <div class="card-header text-light fw-bold" style="background-color: #4B5563;">
+          {{ "SALES_SUMMARY" | translate }}
+        </div>
+        <div class="card-body p-2">
+          <table class="table table-sm table-hover mb-0">
+            <tbody>
+              <tr>
+                <th>{{ "TRANSACTION_COUNT" | translate }}</th>
+                <td>{{ salesSummary.transactionCount }}</td>
+              </tr>
+              <tr>
+                <th matTooltip="Gross Sale  = Σ (Item Selling Price * Qty)" class="cursor-pointer">
+                  {{ "GROSS_SALES" | translate }}
+                </th>
+                <td>{{ salesSummary.grossSales | customCurrency }}</td>
+              </tr>
+              <tr>
+                <th matTooltip="Discount = Trade / Promotional Discounts" class="cursor-pointer">
+                  {{ "DISCOUNTS" | translate }}
+                </th>
+                <td>{{ salesSummary.discounts }}</td>
+              </tr>
+              <tr>
+                <th matTooltip="Taxable Amt = Gross Sale – Discounts" class="cursor-pointer">
+                  {{ "TAXABLE_AMOUNT" | translate }}
+                </th>
+                <td>{{ salesSummary.taxableAmount | customCurrency }}</td>
+              </tr>
+              <tr>
+                <th matTooltip="Tax = Taxable Amt × Tax Rate" class="cursor-pointer">
+                  {{ "TAX" | translate }}
+                </th>
+                <td>{{ salesSummary.totalTax | customCurrency }}</td>
+              </tr>
+              <tr class="table-info fw-semibold">
+                <th matTooltip="Net Sale = Taxable Amt + Tax" class="cursor-pointer">
+                  {{ "NET_SALES" | translate }}
+                </th>
+                <td>{{ salesSummary.netSales | customCurrency }}</td>
+              </tr>
+              <tr>
+                <th>{{ "ITEMS_SOLD_COUNT" | translate }}</th>
+                <td>{{ salesSummary.itemsSoldCount }}</td>
+              </tr>
+              <tr>
+                <th>{{ "ITEMS_RETURN" | translate }}</th>
+                <td>{{ salesSummary.itemsReturn }}</td>
+              </tr>
+              <tr>
+                <th>{{ "AVERAGE_SALE" | translate }}</th>
+                <td>{{ salesSummary.averageSale | customCurrency }}</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- Purchase Summary -->
+    <div class="col-md-6">
+      <div class="card shadow-sm rounded-3 border-0">
+        <div class="card-header text-light fw-bold" style="background-color: #4B5563;">
+          {{ "PURCHASE_SUMMARY" | translate }}
+        </div>
+        <div class="card-body p-2">
+          <table class="table table-sm table-hover mb-0">
+            <tbody>
+              <tr>
+                <th>{{ "TRANSACTION_COUNT" | translate }}</th>
+                <td>{{ purchaseSummary.transactionCount }}</td>
+              </tr>
+              <tr>
+                <th matTooltip="Gross Purchase  = Σ (Item Purchase Price * Qty)" class="cursor-pointer">
+                  {{ "GROSS_PURCHASE" | translate }}
+                </th>
+                <td>{{ purchaseSummary.grossPurchase | customCurrency }}</td>
+              </tr>
+              <tr>
+                <th matTooltip="Discount = Trade/Promotional Discounts (if any)" class="cursor-pointer">
+                  {{ "DISCOUNTS" | translate }}
+                </th>
+                <td>{{ purchaseSummary.discounts }}</td>
+              </tr>
+              <tr>
+                <th matTooltip="Taxable Amount = Gross Purchase – Discounts" class="cursor-pointer">
+                  {{ "TAXABLE_AMOUNT" | translate }}
+                </th>
+                <td>{{ purchaseSummary.taxableAmount | customCurrency }}</td>
+              </tr>
+              <tr>
+                <th matTooltip="Tax = Taxable Amount × Tax Rate" class="cursor-pointer">
+                  {{ "TAX" | translate }}
+                </th>
+                <td>{{ purchaseSummary.totalTax | customCurrency }}</td>
+              </tr>
+              <tr class="table-info fw-semibold">
+                <th matTooltip="Net Purchase = Taxable Amount + Tax" class="cursor-pointer">
+                  {{ "NET_PURCHASE" | translate }}
+                </th>
+                <td>{{ purchaseSummary.netPurchase | customCurrency }}</td>
+              </tr>
+              <tr>
+                <th>{{ "PURCHASED_ITEMS_COUNT" | translate }}</th>
+                <td>{{ purchaseSummary.purchasedItemsCount }}</td>
+              </tr>
+              <tr>
+                <th>{{ "ITEMS_RETURN" | translate }}</th>
+                <td>{{ purchaseSummary.itemsReturn }}</td>
+              </tr>
+              <tr>
+                <th>{{ "AVERAGE_PURCHASE" | translate }}</th>
+                <td>{{ purchaseSummary.averagePurchase | customCurrency }}</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Payment Breakdown -->
+  <div class="row mt-4">
+    <div class="col-md-12">
+      <div class="card shadow-sm rounded-3 border-0">
+        <div class="card-header text-light fw-bold" style="background-color: #4B5563;">
+          {{ "PAYMENT_BREAKDOWN" | translate }}
+        </div>
+        <div class="card-body pt-3">
+          <table class="table table-sm table-hover mb-0 text-center align-middle">
+            <thead class="table-light">
+              <tr>
+                <th></th>
+                <th>{{ "CASH" | translate }}</th>
+                <th>{{ "BANK" | translate }}</th>
+                <th>{{ "TOTAL" | translate }}</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <th class="text-start">{{ "RECEIVED" | translate }}</th>
+                <td>{{ paymentSummary.cashReceived | customCurrency }}</td>
+                <td>{{ paymentSummary.bankReceived | customCurrency }}</td>
+                <td>{{ paymentSummary.totalCollected | customCurrency }}</td>
+              </tr>
+              <tr>
+                <th class="text-start">{{ "GIVEN" | translate }}</th>
+                <td>{{ paymentSummary.cashGiven | customCurrency }}</td>
+                <td>{{ paymentSummary.bankGiven | customCurrency }}</td>
+                <td>{{ paymentSummary.totalGiven | customCurrency }}</td>
+              </tr>
+              <tr class="table-success fw-semibold">
+                <th class="text-start">{{ "NET" | translate }}</th>
+                <td>{{ paymentSummary.netCash| customCurrency }}</td>
+                <td>{{ paymentSummary.netBank| customCurrency }}</td>
+                <td>{{ paymentSummary.netTotal| customCurrency }}</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+</mat-dialog-content>

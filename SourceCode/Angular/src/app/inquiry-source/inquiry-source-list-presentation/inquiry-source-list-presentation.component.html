@@ -1,0 +1,70 @@
+<section class="content">
+  <div class="container-fluid">
+    <div class="d-flex mb-2">
+      <div class="me-auto">
+        <span class="mb-0 page-title">{{'INQUIRY_SOURCES' | translate}}
+          <app-page-help-text code="INQUIRY_SOURCES"></app-page-help-text>
+        </span>
+      </div>
+      <div class="d-flex justify-content-end">
+        <button *hasClaim="'INQ_MANAGE_INQ_SOURCE'" class="primary me-2" matButton="filled"
+          (click)="manageInquirySource(null)">
+          <mat-icon class="medium-icon fs-5 align-middle">add</mat-icon>{{'ADD_INQUIRY_SOURCE' | translate}}
+        </button>
+      </div>
+    </div>
+    <mat-card appearance="outlined">
+      <mat-card-content>
+        <div class="grid-height-large">
+          <table [dir]="langDir" mat-table [dataSource]="inquirySources">
+            <ng-container matColumnDef="action">
+              <th class="table-column-20" mat-header-cell *matHeaderCellDef> {{"ACTION" | translate}}
+              </th>
+              <td class="table-column-20" mat-cell *matCellDef="let element">
+                <!-- <button *hasClaim="'INQ_MANAGE_INQ_SOURCE'" (click)="manageInquirySource(element)" class="primary me-2"
+                  matButton="filled" type="button">
+                  <mat-icon class="medium-icon fs-5 align-middle">edit</mat-icon>
+                  <span class="d-none d-sm-inline"> {{"EDIT" | translate}}</span>
+                </button>
+                <button *hasClaim="'INQ_MANAGE_INQ_SOURCE'" (click)="deleteInquirySource(element)" class="error"
+                  matButton="filled" type="button">
+                  <mat-icon class="medium-icon fs-5 align-middle">delete</mat-icon>
+                  <span class="d-none d-sm-inline"> {{"DELETE" | translate}}</span>
+                </button> -->
+                <div class="d-flex gap-2">
+                  <button matMiniFab (click)="manageInquirySource(element)" *hasClaim="'INQ_MANAGE_INQ_SOURCE'"
+                    class="primary">
+                    <mat-icon class="medium-icon fs-5 align-middle">edit</mat-icon>
+                  </button>
+                  <button matMiniFab (click)="deleteInquirySource(element)" *hasClaim="'INQ_MANAGE_INQ_SOURCE'"
+                    class="error">
+                    <mat-icon class="medium-icon fs-5 align-middle">delete</mat-icon>
+                  </button>
+                </div>
+              </td>
+            </ng-container>
+            <!-- Name Column -->
+            <ng-container matColumnDef="name">
+              <th mat-header-cell *matHeaderCellDef> {{"NAME" | translate}} </th>
+              <td mat-cell *matCellDef="let element"> {{element.name}} </td>
+            </ng-container>
+
+            <tr *matNoDataRow>
+              <td colspan="12">
+                <span class="p-4 mt-4">
+                  <b> {{'NO_DATA_FOUND' | translate}}</b>
+                </span>
+              </td>
+            </tr>
+
+            <tr class="grid-header-color" mat-header-row *matHeaderRowDef="displayedColumns;sticky: true"></tr>
+            <tr mat-row *matRowDef="let row; columns: displayedColumns;" [ngClass]="{
+                              'odd-row': isOddDataRow(getDataIndex(row)),
+                              'even-row': !isOddDataRow(getDataIndex(row))
+                            }"></tr>
+          </table>
+        </div>
+      </mat-card-content>
+    </mat-card>
+  </div>
+</section>

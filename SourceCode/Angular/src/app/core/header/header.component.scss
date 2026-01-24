@@ -1,0 +1,26 @@
+.location-dropdown {
+  line-height: normal !important;
+}
+
+.notification-count {
+  position: absolute;
+  top: 3px;
+  right: 0px;
+  font-size: 10px;
+  z-index: 1;
+}
+
+.hidden-navbar {
+  display: none !important;
+}
+
+.label_color {
+  color: black !important;
+}
+
+//mobile view fix
+@media screen and (max-width: 600px) {
+  .label_color {
+    color: #fff !important;
+  }
+}

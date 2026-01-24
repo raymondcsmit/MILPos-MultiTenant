@@ -1,0 +1,57 @@
+<mat-dialog-content>
+  <div class="col-md-12 mb-0 d-flex justify-content-between">
+    <span class="mb-4 page-title">
+      {{ "MANAGE_CITY" | translate }}
+      <app-page-help-text code="CITIES"></app-page-help-text>
+    </span>
+    <mat-icon class="close-icon text-danger cursor-pointer" (click)="onCancel()">cancel</mat-icon>
+  </div>
+  <form [formGroup]="cityForm">
+    <div class="row">
+      <div class="col-sm-12">
+        <div class="form-group">
+          <label for="categoryName" class="form-label text-danger">{{'COUNTRY' | translate}} <sup>*</sup></label>
+          <mat-select [dir]="langDir" placeholder="{{'COUNTRY' | translate}}" class="form-control form-control-sm"
+            formControlName="countryId" panelClass="mat-select-control">
+            <input type="text" name="" id="" class="form-control form-control-sm" placeholder="{{'SEARCH' | translate}}"
+              (input)="filterName($event.target.value)">
+            @for(country of filteredCountryList; track $index){
+            <mat-option [value]="country.id">
+              {{country.countryName}}
+            </mat-option>
+            }
+          </mat-select>
+          @if(cityForm.get('countryId')?.touched && cityForm.get('countryId')?.errors?.['required']){
+          <mat-error [dir]="langDir" class="text-danger">
+            {{'PLEASE_SELECT_COUNTRY' | translate}}
+          </mat-error>
+          }
+        </div>
+      </div>
+    </div>
+    <div class="row">
+      <div class="col-sm-12 mt-2">
+        <div class="form-group">
+          <label for="cityName1" class="form-label text-danger">{{'NAME' | translate}} <sup>*</sup></label>
+          <input formControlName="cityName" type="text" class="form-control form-control-sm" id="cityName">
+          @if(cityForm.get('cityName')?.touched && cityForm.get('cityName')?.errors &&
+          cityForm.get('cityName')?.errors?.['required'])
+          {
+          <div class="text-danger">
+            {{'NAME_IS_REQUIRED' | translate}}
+          </div>
+          }
+        </div>
+      </div>
+    </div>
+    <div class="mt-2 d-flex">
+      <button *hasClaim="'SETT_MANAGE_CITY'" (click)="saveCity()" class="success me-2" matButton="filled"
+        cdkFocusInitial>
+        <mat-icon class="medium-icon fs-5 align-middle">save</mat-icon> {{'SAVE' | translate}}
+      </button>
+      <button type="button" class="error" matButton="filled" (click)="onCancel()">
+        <mat-icon class="medium-icon fs-5 align-middle">cancel</mat-icon> {{'CANCEL' | translate}}
+      </button>
+    </div>
+  </form>
+</mat-dialog-content>

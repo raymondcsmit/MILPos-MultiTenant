@@ -1,0 +1,81 @@
+<nav #navbar class="navbar active">
+  <div class="container-fluid">
+    <div class="navbar-header">
+      <!-- mobile menu bars -->
+      <a class="navbar-brand" routerLink="/">
+        <img [src]="logoUrl" alt="Logo" class="logo-img" />
+      </a>
+    </div>
+  </div>
+</nav>
+<section class="content">
+  <div class="container">
+    <div class="row align-items-center mb-2">
+      <!-- Left-hand side: Title -->
+      <div class="col-md-12 col">
+        <span class="mb-0 page-title">{{ "ACTIVATE_LICENSE" | translate }}</span>
+      </div>
+    </div>
+    <div class="card">
+      <div class="body" [formGroup]="activatedForm">
+        <div class="row">
+          <div class="col-md-12">
+            <p class="card-text font-bold">To activate your Production license, please follow the instructions below:
+            </p>
+            <ul class="list-group">
+              <li class="list-group-item">
+                Please enter the purchase code from your CodeCanyon account for this item.
+                <a href="https://help.market.envato.com/hc/en-us/articles/202822600-Where-Is-My-Purchase-Code"
+                  target="_blank" class="text-primary text-bold">Click here to find your purchase code.</a>
+              </li>
+              <li class="list-group-item">Click on the "Activate License" button below.</li>
+              <li class="list-group-item">Login with codecanyon purchase account or already login then click on
+                approve.
+              </li>
+              <li class="list-group-item">A token has been generated.
+              </li>
+              <li class="list-group-item">The system will redirect you to the login page. Kindly login again to
+                continue.
+              </li>
+              <li class="list-group-item">Enjoy full access to all features.</li>
+              <li class="list-group-item">
+                <span class="text-danger text-bold">
+                  Important: After activating the production license for a specific domain or sub-domain, token
+                  regeneration for another domain or sub-domain will not be permitted.
+                </span>
+              </li>
+            </ul>
+          </div>
+        </div>
+        <div class="row">
+          <div class="col-md-12">
+            <div class="form-group">
+              <label>{{'CODECANYON_PRUCHASE_CODE' | translate}}</label>
+              <input class="form-control" type="input" formControlName="purchaseCode" />
+              @if((activatedForm.get('purchaseCode')?.touched || activatedForm.get('purchaseCode')?.dirty) &&
+              activatedForm.get('purchaseCode')?.errors) {
+              @if(activatedForm.get('purchaseCode')?.errors?.['required']) {
+              <div class="text-danger">
+                {{'PURCHASE_CODE_IS_REQUIRED' | translate}}
+              </div>
+              }
+              @if(activatedForm.get('purchaseCode')?.errors?.['minlength']) {
+              <div class="text-danger">
+                {{'PLEASE_ENTER_VALID_PURCHASE_CODE' | translate}}
+              </div>
+              }
+              }
+            </div>
+          </div>
+        </div>
+        <div class="row mt-3">
+          <div class="col-md-12">
+            <button type="button" class="btn btn-danger btn-sm" (click)="onActivateLicense()">
+              {{'ACTIVATE_LICENSE' | translate}}
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>

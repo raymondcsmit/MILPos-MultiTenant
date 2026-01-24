@@ -1,0 +1,151 @@
+<section class="content">
+  <div class="container-fluid">
+    <div class="row align-items-center">
+      <div class="col-md-6 mb-2">
+        <span class="mb-0 page-title">
+          {{ 'CASH_FLOW_REPORT' | translate }}
+          <app-page-help-text code="CASH_FLOW_REPORT"></app-page-help-text>
+        </span>
+      </div>
+    </div>
+
+    <mat-card appearance="outlined">
+      <mat-card-content>
+        <!-- 🔍 Search Filters -->
+        <div class="row" [formGroup]="searchForm">
+          <!-- Date Range -->
+          <div class="col-lg-3 col-sm-6">
+            <div class="form-group">
+              <label>{{ 'CREATED_DATE' | translate }}</label>
+              <div class="input-group">
+                <mat-date-range-input class="form-control form-control-sm input-with-clear" [rangePicker]="picker">
+                  <input matStartDate (focus)="picker.open()" formControlName="fromDate"
+                    placeholder="{{ 'FROM_DATE' | translate }}" />
+                  <input matEndDate (focus)="picker.open()" formControlName="toDate"
+                    placeholder="{{ 'TO_DATE' | translate }}" />
+                </mat-date-range-input>
+                <mat-date-range-picker #picker></mat-date-range-picker>
+                <button style="margin-left: -34px; z-index: 100" (click)="clearDates()"
+                  class="btn btn-sm bg-transparent" type="button">
+                  <mat-icon class="medium-icon text-danger fs-6 align-middle">cancel</mat-icon>
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Business Location -->
+          <div class="col-lg-3 col-sm-6">
+            <div class="form-group">
+              <label>{{ 'BUSINESS_LOCATION' | translate }}</label>
+              <mat-select [dir]="langDir" formControlName="locationId" panelClass="mat-select-control"
+                placeholder="{{ 'BUSINESS_LOCATION' | translate }}" class="form-control form-control-sm">
+                @for (location of locations; track $index) {
+                <mat-option [value]="location.id">
+                  {{ location.name }}
+                </mat-option>
+                } @if (locations.length == 0) {
+                <mat-option value="">
+                  {{ 'NO_RECORDS' | translate }}
+                </mat-option>
+                }
+              </mat-select>
+            </div>
+          </div>
+
+          <!-- Buttons -->
+          <div class="col-lg-6 col-sm-12 report-tool-bar mt-4">
+            <button class="primary me-1" matButton="filled" (click)="getReportData()">
+              <mat-icon class="medium-icon fs-5 align-middle">search</mat-icon>
+              <span class="d-none d-sm-inline"> {{ 'SEARCH' | translate }} </span>
+            </button>
+            <button class="error me-1" matButton="filled" (click)="onClear()">
+              <mat-icon class="medium-icon fs-5 align-middle">cancel</mat-icon>
+              <span class="d-none d-sm-inline"> {{ 'CLEAR' | translate }}</span>
+            </button>
+            <button class="warning me-1" matButton="filled" [matMenuTriggerFor]="menu">
+              <mat-icon class="medium-icon fs-5 align-middle">download</mat-icon>
+              <span class="d-none d-sm-inline"> {{ 'EXPORT' | translate }}</span>
+            </button>
+            <mat-menu #menu="matMenu" class="mat-menu-control-sm">
+              <button mat-menu-item (click)="onDownloadReport('csv')">
+                <mat-icon class="medium-icon fs-5 align-middle">table_chart</mat-icon>
+                CSV
+              </button>
+              <button mat-menu-item (click)="onDownloadReport('xlsx')">
+                <mat-icon class="medium-icon fs-5 align-middle">grid_on</mat-icon>
+                Excel
+              </button>
+              <button mat-menu-item (click)="onDownloadReport('pdf')">
+                <mat-icon class="medium-icon fs-5 align-middle">picture_as_pdf</mat-icon>
+                PDF
+              </button>
+            </mat-menu>
+            <button *hasClaim="'ACCOUNTING_SEND_EMAIL'" matButton="filled" class="secondary"
+              (click)="onDownloadReport('email',true)">
+              <mat-icon class="medium-icon fs-5 align-middle">email</mat-icon>
+              <span class="d-none d-sm-inline"> {{ 'SEND_EMAIL' | translate }}</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- 📊 Cash Flow Report Table -->
+        <div class="row mt-3">
+          <div class="col-sm-12">
+            <div class="box box-info shadow-sm">
+              <div class="table-responsive">
+                <table class="table table-bordered table-hover" id="cash-flow-report">
+                  <thead class="table-light">
+                    <tr>
+                      <th class="w-50">{{ 'ACCOUNT_NAME' | translate }}</th>
+                      <th class="text-end w-25">
+                        {{ 'CASH_RECEIVED' | translate }}
+                      </th>
+                      <th class="text-end w-25">
+                        {{ 'CASH_PAID' | translate }}
+                      </th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <!-- Account Rows -->
+                    @for (acc of cashFlow?.cashFlowAccounts; track $index) {
+                    <tr>
+                      <td>{{ acc.accountName }}</td>
+                      <td class="text-end text-success">
+                        {{ acc.debitAmount | customCurrency }}
+                      </td>
+                      <td class="text-end text-danger">
+                        {{ acc.creditAmount | customCurrency }}
+                      </td>
+                    </tr>
+                    }
+
+                    <!-- Totals Row -->
+                    <tr class="table-active fw-bold">
+                      <td class="text-end">{{ 'TOTALS' | translate }}</td>
+                      <td class="text-end text-success">
+                        {{ cashFlow?.totalCashRecived | customCurrency }}
+                      </td>
+                      <td class="text-end text-danger">
+                        {{ cashFlow?.totalCashPaid | customCurrency }}
+                      </td>
+                    </tr>
+                    @if(cashFlow && cashFlow.netTotalMovement >= 0){
+                    <!-- Net Movement -->
+                    <tr class="fw-bold" [ngClass]="cashFlow.netTotalMovement >= 0 ? 'table-success' : 'table-danger'">
+                      <td class="text-end">{{ 'NET_MOVEMENT' | translate }}</td>
+                      <td colspan="2" class="text-center">
+                        {{ cashFlow.netTotalMovement | customCurrency }}
+                      </td>
+                    </tr>
+                    }
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        </div>
+        <!-- ✅ End of Report -->
+      </mat-card-content>
+    </mat-card>
+  </div>
+</section>

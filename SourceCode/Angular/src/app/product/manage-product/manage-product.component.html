@@ -1,0 +1,428 @@
+<section class="content">
+  <div class="container-fluid">
+    <div class="row align-items-center">
+      <div class="col-md-6 mb-2">
+        <span class="mb-0 page-title">{{ "MANAGE_PRODUCTS" | translate }}
+          <app-page-help-text code="PRODUCTS"></app-page-help-text>
+        </span>
+      </div>
+    </div>
+
+    <form autocomplete="off" [formGroup]="productForm">
+      <mat-card appearance="outlined">
+        <mat-card-content>
+          <div class="row">
+            <div class="col-sm-12">
+              <div class="row">
+                <div class="col-lg-4 col-sm-6">
+                  <div class="form-group ">
+                    <label class="text-danger">{{"NAME" | translate}} *</label>
+                    <input formControlName="name" class="form-control" type="text">
+                    @if (productForm.get('name')?.touched && productForm.get('name')?.errors) {
+                    @if (productForm.get('name')?.errors?.['required']) {
+                    <div class="text-danger">
+                      {{"PRODUCT_NAME_IS_REQUIRED" | translate}}.
+                    </div>
+                    }
+                    }
+                  </div>
+                </div>
+                <div class="col-lg-4 col-sm-6">
+                  <div class="form-group ">
+                    <label>{{"CODE" | translate}} </label>
+                    <input formControlName="code" class="form-control" type="text">
+                  </div>
+                </div>
+                <div class="col-lg-4 col-sm-6">
+                  <div class="form-group">
+                    <mat-label class="text-danger">{{"BRAND" | translate}} *</mat-label>
+                    <div class="input-group">
+                      <mat-select [dir]="langDir" placeholder="{{'BRAND' | translate}}" class="form-control"
+                        formControlName="brandId" panelClass="mat-select-control">
+                        @for (brand of brands; track brand.id) {
+                        <mat-option [value]="brand.id">
+                          {{brand.name}}
+                        </mat-option>
+                        }
+                      </mat-select>
+                      <button *hasClaim="'PRO_MANAGE_BRAND'" class="btn btn-primary btn-sm" type="button"
+                        (click)="addNewBrand()">
+                        <mat-icon class="fs-4 align-middle">add</mat-icon>
+                      </button>
+                    </div>
+                    @if (productForm.get('brandId')?.touched && productForm.get('brandId')?.errors) {
+                    @if (productForm.get('brandId')?.errors?.['required']) {
+                    <div class="text-danger">
+                      {{"BRAND_IS_REQUIRED" | translate}}
+                    </div>
+                    }
+                    }
+                  </div>
+                </div>
+                <div class="col-lg-4 col-sm-6">
+                  <div class="form-group">
+                    <mat-label [dir]="langDir" class="text-danger">{{"CATEGORY" | translate}}
+                      *</mat-label>
+                    <div class="input-group">
+                      <mat-select [dir]="langDir" placeholder="{{'SELECT_CATEGORY' | translate}}" class="form-control"
+                        formControlName="categoryId" panelClass="mat-select-control">
+                        @for (category of allCategories; track category.id) {
+                        <mat-option [value]="category.id">
+                          <div class="country-item"
+                            [ngStyle]="langDir == 'ltr' ? {'margin-left.px': (category.deafLevel ?? 0) * 20} : {'margin-right.px': (category.deafLevel ?? 0) * 30}">
+                            @if (!category.parentId) {
+                            <b> {{category.name}}</b>
+                            }
+                            @if (category.parentId) {
+                            {{category.name}}
+                            }
+                          </div>
+                        </mat-option>
+                        }
+                      </mat-select>
+                      <button *hasClaim="'PRO_MANAGE_PRO_CAT'" class="btn btn-primary btn-sm" type="button"
+                        (click)="addNewCategory()">
+                        <mat-icon class="fs-4 align-middle">add</mat-icon>
+                      </button>
+                    </div>
+                    @if (productForm.get('categoryId')?.touched && productForm.get('categoryId')?.errors) {
+                    @if (productForm.get('categoryId')?.errors?.['required']) {
+                    <div class="text-danger">
+                      {{"CATEGORY_IS_REQUIRED" | translate}}.
+                    </div>
+                    }
+                    }
+                  </div>
+                </div>
+                <div class="col-lg-4 col-sm-6">
+                  <div class="form-group">
+                    <mat-label [dir]="langDir" class="text-danger">{{'BASE_UNIT' | translate}}
+                      *</mat-label>
+                    <div class="input-group">
+                      <mat-select [dir]="langDir" placeholder="{{'SELECT_UNIT' | translate}}" class="form-control"
+                        formControlName="unitId" panelClass="mat-select-control">
+                        @for (unit of units; track unit.id) {
+                        <mat-option [value]="unit.id">
+                          {{unit.name}}
+                        </mat-option>
+                        }
+                      </mat-select>
+                      <button *hasClaim="'PRO_MANAGE_UNIT'" class="btn-sm btn btn-primary" type="button"
+                        (click)="addNewUnit()">
+                        <mat-icon class="fs-4 align-middle">add</mat-icon>
+                      </button>
+                    </div>
+                    @if (productForm.get('unitId')?.touched && productForm.get('unitId')?.errors) {
+                    @if (productForm.get('unitId')?.errors?.['required']) {
+                    <div class="text-danger">
+                      {{"UNIT_IS_REQUIRED" | translate}}.
+                    </div>
+                    }
+                    }
+                  </div>
+                </div>
+                <div class="col-lg-4 col-sm-6">
+                  <div class="form-group">
+                    <mat-label [dir]="langDir">{{"TAX" | translate}}</mat-label>
+                    <mat-select [dir]="langDir" placeholder="{{'TAX' | translate}}" dir='rtl'
+                      formControlName="productTaxIds" multiple class="form-control" panelClass="mat-select-control">
+                      @for (tax of taxes; track tax.id) {
+                      <mat-option [value]="tax.id"> {{tax.name}}
+                        ({{tax.percentage | customCurrency}}%)
+                      </mat-option>
+                      }
+                    </mat-select>
+                  </div>
+                </div>
+                <div class="col-lg-4 col-sm-6">
+                  <div class="form-group ">
+                    <label>{{"SKU_CODE" | translate}} </label>
+                    <input formControlName="skuCode" class="form-control" type="text">
+                  </div>
+                </div>
+                <div class="col-lg-4 col-sm-6">
+                  <div class="form-group">
+                    <label>{{"SKU_NAME" | translate}} </label>
+                    <input formControlName="skuName" class="form-control" type="text">
+                  </div>
+                </div>
+                <div class="col-lg-4 col-sm-6">
+                  <div class="form-group ">
+                    <label>{{"BARCODE_NUMBER" | translate}}</label>
+                    <input formControlName="barcode" class="form-control" type="text">
+                  </div>
+                </div>
+                <div class="col-lg-4 col-sm-6">
+                  <div class="form-group ">
+                    <label>{{"ALERT_QUANTITY" | translate}}</label>
+                    <input formControlName="alertQuantity" class="form-control" type="number">
+                  </div>
+                </div>
+                <div class="col-lg-4 col-sm-6">
+                  <div class="form-group ">
+                    <label>{{"MRP" | translate}} </label>
+                    <input formControlName="mrp" min="0" class="form-control" type="number">
+                  </div>
+                </div>
+                <div class="col-lg-4 col-sm-6">
+                  <div class="form-group">
+                    <mat-label [dir]="langDir" class="text-danger">{{'PURCHASE_PRICE' | translate}}
+                      *</mat-label>
+                    <input formControlName="purchasePrice" min="0" class="form-control" type="number">
+                  </div>
+                  @if (productForm.get('purchasePrice')?.touched && productForm.get('purchasePrice')?.errors )
+                  {
+                  @if(productForm.get('purchasePrice')?.errors?.['required']){
+                  <div class="text-danger">
+                    {{"PURCHASE_PRICE_IS_REQUIRED" | translate}}.
+                  </div>
+                  }
+                  @if(productForm.get('purchasePrice')?.errors?.['min']){
+                  <div class="text-danger">
+                    {{"MORE_THAN_0_1" | translate}}
+                  </div>
+                  }
+                  }
+                </div>
+                <div class="col-lg-4 col-sm-6">
+                  <div class="form-group ">
+                    <label>{{"MARGIN" | translate}} (%)</label>
+                    <input formControlName="margin" min="0" class="form-control" type="number">
+                  </div>
+                </div>
+                <!-- <div class="col-lg-4 col-sm-6">
+                  <div class="form-group mt-3 ms-2">
+                    <mat-checkbox [dir]="langDir" color="primary" formControlName="isMarginIncludeTax">
+                      {{'INC_TAX' | translate}}
+                    </mat-checkbox>
+                  </div>
+                </div> -->
+                <div class="col-lg-4 col-sm-6">
+                  <div class="form-group ">
+                    <label>{{"SALES_PRICE" | translate}} </label>
+                    <input formControlName="salesPrice" min="0" class="form-control" type="number">
+                  </div>
+                </div>
+                <div class="col-lg-4 col-sm-6">
+                  <div class="form-group">
+                    <label>{{"DESCRIPTION" | translate}} </label>
+                    <textarea formControlName="description" class="form-control"></textarea>
+                  </div>
+                </div>
+                <div class="col-lg-4 col-sm-6">
+                  <div class="row">
+                    <div class="col-md-12">
+                      <label>
+                        {{'PRODUCT_IMAGE' | translate}}
+                      </label>
+                      <mat-card [dir]="langDir" appearance="outlined" class="cus-mat-card text-center flex-row p-1">
+                        <input hidden (change)="onProductImageSelect($event)" #fileInput name="logo" type="file"
+                          name="{{'PRODUCT_IMAGE' | translate}}" fxFlex="30">
+                        @if (productImgSrc) {
+                        <img class="full-width img-fluid product-img" [src]="productImgSrc" />
+                        }
+                        @if (!productImgSrc) {
+                        <img class="full-width img-fluid product-img" src="/images/no-preview.jpg" />
+                        }
+                        <mat-card-actions>
+                          @if (!productImgSrc) {
+                          <button type="button" class="success me-2" matButton="filled" (click)="fileInput.click()">
+                            <mat-icon class="medium-icon fs-5 align-middle">image</mat-icon>
+                            {{"ADD" | translate}}
+                          </button>
+                          }
+                          @if (productImgSrc) {
+                          <button type="button" class="success me-2" matButton="filled" (click)="fileInput.click()">
+                            <mat-icon class="medium-icon fs-5 align-middle">image</mat-icon>
+                            {{"CHANGE" | translate}}
+                          </button>
+                          <button type="button" (click)="onProductImageRemove()" class="error" matButton="filled">
+                            <mat-icon class="medium-icon fs-5 align-middle">delete</mat-icon>
+                            {{"REMOVE" | translate}}
+                          </button>
+                          }
+                        </mat-card-actions>
+                      </mat-card>
+                    </div>
+                  </div>
+                </div>
+                <div class="col-sm-12">
+                  <mat-checkbox [dir]="langDir" color="primary" (change)="onHasVariantChange($event)"
+                    formControlName="hasVariant">
+                    {{'THIS_PRODUCT_HAS_MULTIPLE_VARIANTS' | translate}}
+                  </mat-checkbox>
+                  @if (productForm.get('hasVariant')?.value) {
+                  <div class="row my-3">
+                    <div class="col-md-4">
+                      <div class="form-group">
+                        <mat-label [dir]="langDir" class="text-danger">{{'VARIANT' |
+                          translate}}
+                          *</mat-label>
+                        <div class="input-group">
+                          <mat-select (selectionChange)="onVariantChange($event.value)" [dir]=" langDir"
+                            placeholder="{{'VARIANT' | translate}}" class="form-control" formControlName="variantId"
+                            panelClass="mat-select-control">
+                            @for (variant of variants; track variant?.id) {
+                            <mat-option [value]="variant?.id">
+                              {{variant?.name}}
+                            </mat-option>
+                            }
+                          </mat-select>
+                          <!-- TODO check permission-->
+                          <button class="btn btn-sm btn-primary" type="button"
+                            [disabled]="productForm.get('variantId')?.disabled" (click)="addNewVariant()">
+                            <mat-icon class="fs-4 align-middle">add</mat-icon>
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="col-md-4">
+                      <div class="form-group">
+                        <mat-label [dir]="langDir">{{'VARIANT_ITEM' | translate}}
+                        </mat-label>
+                        <mat-select (selectionChange)="onItemChange()" class="form-control"
+                          [(value)]="selectedVariantItems" multiple panelClass="mat-select-control">
+                          @for (item of variantItems; track item.id) {
+                          <mat-option [value]="item.id" [disabled]="copySelectedVariantItems.includes(item.id ?? '')">
+                            {{item.name}}
+                          </mat-option>
+                          }
+                        </mat-select>
+                      </div>
+                    </div>
+                    <div class="col-md-12 my-3" formArrayName="productVariants">
+                      <div class="row">
+                        <div class="col">
+                          <div class="table-responsive">
+                            <table class="table table-pos table-bordered table-sm">
+                              <thead>
+                                <tr class="grid-header-color">
+                                  @if(!productForm.get('id')?.value) {
+                                  <th class="table-column-50">
+                                    &nbsp;
+                                  </th>
+                                  }
+                                  <th class="table-column-200">
+                                    {{'NAME' | translate}}
+                                  </th>
+                                  <th class="table-column-100">
+                                    {{'MRP' | translate}}
+                                  </th>
+                                  <th class="table-column-100">
+                                    <mat-label [dir]="langDir" class="text-danger">{{"PURCHASE_PRICE" | translate}}
+                                      *</mat-label>
+                                  </th>
+                                  <!-- <th class="table-column-100">
+                                    {{'TAX_AMOUNT' | translate}}
+                                  </th> -->
+                                  <th class="table-column-100">
+                                    {{'MARGIN' | translate}} (%)
+                                  </th>
+                                  <!-- <th class="table-column-50">
+                                    {{'INC_TAX' | translate}}
+                                  </th> -->
+                                  <th class="table-column-100">
+                                    {{'SALES_PRICE' | translate}}
+                                  </th>
+                                  <th class="table-column-100">
+                                    {{'BARCODE_NUMBER' | translate}}
+                                  </th>
+                                </tr>
+                              </thead>
+                              <tbody>
+                                @if (variantsArray && variantsArray.controls.length === 0) {
+                                <tr>
+                                  <td colspan="8" class="text-center fw-bold">
+                                    {{"NO_DATA_FOUND" | translate}}
+                                  </td>
+                                </tr>
+                                }
+                                @for (variant of variantsArray.controls; let i = $index; track variant) {
+                                <tr [formGroupName]="i">
+                                  @if(!productForm.get('id')?.value) {
+                                  <td>
+                                    @if (variantsArray.controls.length !== 1) {
+                                    <button type="button" (click)="removeVariant(i)" class="error" matMiniFab>
+                                      <mat-icon class="medium-icon fs-5 align-middle">delete</mat-icon>
+                                    </button>
+                                    }
+                                  </td>
+                                  }
+                                  <td>
+                                    <input formControlName="name" class="form-control form-control-sm" type="text">
+                                    @if (variant.get('name')?.touched && variant.get('name')?.errors?.['required'])
+                                    {
+                                    <div class="text-danger">
+                                      {{"NAME_IS_REQUIRED" | translate}}
+                                    </div>
+                                    }
+                                  </td>
+                                  <td>
+                                    <input formControlName="mrp" min="0" class="form-control form-control-sm"
+                                      type="number">
+                                  </td>
+                                  <td>
+                                    <input formControlName="purchasePrice" min="0" class="form-control form-control-sm"
+                                      type="number">
+                                    @if (variant.get('purchasePrice')?.touched &&
+                                    variant.get('purchasePrice')?.errors ){
+                                    @if(variant.get('purchasePrice')?.errors?.['required']){
+                                    <div class="text-danger">
+                                      {{"PURCHASE_PRICE_IS_REQUIRED" | translate}}
+                                    </div>
+                                    }
+                                    @if(variant.get('purchasePrice')?.errors?.['min']){
+                                    <div class="text-danger">
+                                      {{"MORE_THAN_0_1" | translate}}
+                                    </div>
+                                    }
+                                    }
+                                  </td>
+                                  <!-- <td>
+                                    <input type="text" class="form-control form-control-sm" formControlName="taxAmount"
+                                      readonly>
+                                  </td> -->
+                                  <td>
+                                    <input formControlName="margin" min="0" class="form-control form-control-sm"
+                                      type="number">
+                                  </td>
+                                  <!-- <td>
+                                    <mat-checkbox [dir]="langDir" color="primary"
+                                      formControlName="isMarginIncludeTax"></mat-checkbox>
+                                  </td> -->
+                                  <td>
+                                    <input formControlName="salesPrice" min="0" class="form-control form-control-sm"
+                                      type="number">
+                                  </td>
+                                  <td>
+                                    <input formControlName="barcode" class="form-control form-control-sm">
+                                  </td>
+                                </tr>
+                                }
+                              </tbody>
+                            </table>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  }
+                  <div class="col-md-12 mt-3">
+                    <button type="button" (click)="onProductSubmit()"
+                      *hasClaim="['PRO_ADD_PRODUCT','PRO_UPDATE_PRODUCT']" class="success me-2" matButton="filled">
+                      <mat-icon class="medium-icon fs-5 align-middle">save</mat-icon> {{"SAVE" | translate}}
+                    </button>
+                    <button type="button" class="error" matButton="filled" [routerLink]="['/products']">
+                      <mat-icon class="medium-icon fs-5 align-middle">cancel</mat-icon> {{"CANCEL" | translate}}
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </mat-card-content>
+      </mat-card>
+    </form>
+
+  </div>
+</section>

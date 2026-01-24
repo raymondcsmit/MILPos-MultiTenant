@@ -1,0 +1,57 @@
+<section class="content">
+  <div class="container-fluid">
+    <div class="row align-items-center">
+      <div class="col-md-6 mb-2">
+        <span class="mb-0 page-title"> {{'USER_PAGE_PERMISSION_TO' | translate }} : </span>
+        <span class="text-primary me-2">{{user.firstName}} {{user.lastName}}</span>
+        <app-page-help-text code="USER_PAGE_PERMISSION_TO"></app-page-help-text>
+      </div>
+    </div>
+    <mat-card appearance="outlined">
+      <mat-card-content>
+        <div class="row align-items-center">
+          <div class="col-sm-12">
+            <h4 class="widget-title">{{'PERMISSION' | translate}}</h4>
+            <mat-checkbox [dir]="langDir" color="primary" (change)="selecetAll($event)" class="example-margin">
+              Select All
+            </mat-checkbox>
+          </div>
+        </div>
+        <div class="row">
+          <div class="col-sm-12">
+            @for(page of pages; let i=$index; track page.id){
+            <div class="d-flex flex-column border my-4" style="background-color: #fff;">
+              <div>
+                <mat-checkbox [dir]="langDir" color="primary" (change)="onPageSelect($event,page)">
+                  <b> {{page.name.replaceAll(' ', '_').toUpperCase() | translate}}</b>
+                </mat-checkbox>
+              </div>
+              <div class="d-flex gap-2  flex-wrap mt-2 mb-3">
+                @for(action of page.pageActions; track $index){
+                <mat-checkbox [dir]="langDir" color="primary" [checked]="checkPermission(action.id??'')"
+                  (change)="onPermissionChange($event,page,action)">
+                  {{action.name.replaceAll(' ', '_').toUpperCase() | translate}}
+                </mat-checkbox>
+                }
+              </div>
+            </div>
+            }
+          </div>
+        </div>
+        <div class="row mt-2">
+          <div class="col-sm-12">
+            <button *hasClaim="'USR_ASSIGN_USR_PERMISSIONS'" class="success me-2" matButton="filled"
+              (click)="saveUserClaim()" cdkFocusInitial>
+              <mat-icon class="medium-icon fs-5 align-middle">save</mat-icon>
+              {{'SAVE' | translate}}
+            </button>
+            <a mat-raised-button color="warn" class="error" matButton="filled" [routerLink]="['/users']">
+              <mat-icon class="medium-icon fs-5 align-middle">cancel</mat-icon>
+              {{'CANCEL' | translate}}
+            </a>
+          </div>
+        </div>
+      </mat-card-content>
+    </mat-card>
+  </div>
+</section>

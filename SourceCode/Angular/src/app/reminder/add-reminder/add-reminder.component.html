@@ -1,0 +1,370 @@
+<section [ngClass]="{ 'content': !isDialog }">
+  <div [ngClass]="{ 'container-fluid': !isDialog }">
+    @if(!isDialog) {
+    <div class="row align-items-center">
+      <div class="col-md-6 mb-2">
+        <span class="mb-0 page-title">{{'MANAGE_REMINDER' | translate}}</span>
+        <app-page-help-text [code]="'ADD_REMINDER'"></app-page-help-text>
+      </div>
+    </div>
+    }
+  </div>
+  <form [formGroup]="reminderForm">
+    <mat-card appearance="outlined">
+      @if (isDialog) {
+      <mat-card-header>
+        <div class="col-md-12 mb-2 d-flex justify-content-between">
+          <span class="page-title">
+            {{ 'MANAGE_REMINDER' | translate }}
+            <app-page-help-text code="ADD_REMINDER"></app-page-help-text>
+          </span>
+          <mat-icon class="close-icon text-danger cursor-pointer" (click)="onCancel()">cancel</mat-icon>
+        </div>
+      </mat-card-header>
+      }
+      <mat-card-content>
+        <div class="row">
+          <div class="form-group col-md-12">
+            <label for="subject" class="form-label text-danger"> {{'SUBJECT' | translate}} <sup>*</sup></label>
+            <input formControlName="subject" type="text" class="form-control" id="subject">
+            @if(reminderForm.get('subject')?.touched && reminderForm.get('subject')?.errors) {
+            <div class="text-danger">
+              @if(reminderForm.get('subject')?.errors?.['required']) {
+              {{'SUBJECT_IS_REQUIRED' | translate}}
+              }
+            </div>
+            }
+          </div>
+        </div>
+
+        <div class="row">
+          <div class="form-group col-md-12">
+            <label for="message" class="form-label text-danger"> {{'MESSAGE' | translate}} <sup>*</sup></label>
+            <textarea class="form-control" formControlName="message" id="message" cols="30"></textarea>
+            @if(reminderForm.get('message')?.touched && reminderForm.get('message')?.errors) {
+            <div class="text-danger">
+              @if(reminderForm.get('message')?.errors?.['required']) {
+              {{'MESSAGE_IS_REQUIRED' | translate}}
+              }
+            </div>
+            }
+          </div>
+        </div>
+
+        <div class="row my-3">
+          <div class="col-lg-2 col-md-4 col-sm-6">
+            <mat-checkbox color="primary" (change)="checkData($event)" formControlName="isRepeated">
+              {{'REPEATE_REMINDER' | translate}}
+            </mat-checkbox>
+          </div>
+          <div class="col-lg-2 col-md-4 col-sm-6">
+            <mat-checkbox color="primary" formControlName="isEmailNotification">
+              {{'SEND_EMAIL' | translate}}
+            </mat-checkbox>
+          </div>
+          <div class="col-lg-2 col-md-4 col-sm-6">
+            <mat-select panelClass="mat-select-control" placeholder="{{'SELECT_USERS' | translate}}"
+              class="form-control" [(value)]="selectedUsers" multiple [disabled]="data?.reminderId">
+              <mat-select-trigger>
+                @if(selectedUsers.length > 0) {
+                {{selectedUsers[0].firstName}} {{selectedUsers[0].lastName}}
+                }
+                @if(selectedUsers.length > 1) {
+                <span class="example-additional-selection">
+                  (+{{selectedUsers.length - 1}} {{selectedUsers.length === 2 ? 'other' : 'others'}})
+                </span>
+                }
+              </mat-select-trigger>
+              @for(user of users; track user.id) {
+              <mat-option color="primary" [value]="user">{{user.firstName}} {{user.lastName}}</mat-option>
+              }
+            </mat-select>
+          </div>
+        </div>
+
+        @if(reminderForm.get('isRepeated')?.value) {
+        <div class="row">
+          <div class="form-group col-lg-6 col-sm-12">
+            <label for="frequency" class="form-label text-danger"> {{'FREQUENCY' | translate}}
+              <sup>*</sup></label>
+            <mat-select class="form-control" (selectionChange)="onFrequencyChange()" formControlName="frequency"
+              id="frequency" placeholder="{{'SELECT_FREQUENCY' | translate}}">
+              <mat-option value="">{{'NONE' | translate}}</mat-option>
+              @for(frequencyItem of reminderFrequencies; track frequencyItem.id) {
+              <mat-option [value]="frequencyItem?.id">
+                {{frequencyItem?.name?.toUpperCase() | translate}}
+              </mat-option>
+              }
+            </mat-select>
+            @if(reminderForm.get('frequency')?.errors?.['required']) {
+            <div class="text-danger">
+              {{'FREQUENCY_IS_REQUIRED' | translate}}
+            </div>
+            }
+          </div>
+        </div>
+        }
+
+        @if(reminderForm.get('isRepeated')?.value) {
+        <div class="row my-3">
+          <div class="col-sm-12">
+            @if(reminderForm.get('frequency')?.value == '0') {
+            <div class="form-group">
+              <label for="weekDays">{{'WEEK_DAYS' | translate}}</label>
+              <div id="weekDays" class="row" formArrayName="dailyReminders">
+                @for(dailyReminder of dailyRemindersArray.controls; track $index) {
+                <div class="col-sm-auto mr-1" [formGroupName]="$index">
+                  <mat-checkbox color="primary" class="mr-1" formControlName="isActive">
+                    {{dailyReminder.get('name')?.value?.toUpperCase() | translate}}
+                  </mat-checkbox>
+                </div>
+                }
+              </div>
+            </div>
+            }
+
+            @if(reminderForm.get('frequency')?.value == '1') {
+            <div class="form-group">
+              <label for="weekDay">{{'WEEK_DAYS' | translate}}</label>
+              <div id="weekDay">
+                <mat-radio-group formControlName="dayOfWeek">
+                  @for(day of dayOfWeek; track day.id) {
+                  <mat-radio-button class="mr-2" color="primary" [value]="day.id">{{day.name |
+                    translate}}</mat-radio-button>
+                  }
+                </mat-radio-group>
+              </div>
+            </div>
+            }
+
+            @if(reminderForm.get('frequency')?.value == '3') {
+            <div class="form-group">
+              <label for="Quarterly">{{'SELECT_QUARTER_DATE' | translate}}</label>
+              <table class="table" formArrayName="quarterlyReminders">
+                <thead>
+                  <tr>
+                    <th></th>
+                    <th>{{'MONTH' | translate}}</th>
+                    <th>{{'DAY' | translate}}</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  @for(quarterlyReminder of quarterlyRemindersArray.controls; track $index) {
+                  <tr [formGroupName]="$index">
+                    <td>{{quarterlyReminder.get('name')?.value | translate}}</td>
+                    <td>
+                      <select (change)="onDateChange(quarterlyReminder)" class="form-control" formControlName="month">
+                        @for(mon of quarterlyReminder.get('monthValues')?.value; track mon.id) {
+                        <option [value]="mon.id">{{mon.name | translate}}</option>
+                        }
+                      </select>
+                    </td>
+                    <td>
+                      <select (change)="onDateChange(quarterlyReminder)" class="form-control" formControlName="day">
+                        @for(day of days; track day) {
+                        <option [value]="day">{{day}}</option>
+                        }
+                      </select>
+                      @if(quarterlyReminder.get('day')?.touched && quarterlyReminder?.hasError('invalidDate')) {
+                      <div class="text-danger">{{'PLEASE_SELECT_VALID_DAY' | translate}}</div>
+                      }
+                    </td>
+                  </tr>
+                  }
+                </tbody>
+              </table>
+            </div>
+            }
+
+            @if(reminderForm.get('frequency')?.value == '4') {
+            <div class="form-group ">
+              <label for="HalfYearly">{{'SELECT_DATE' | translate}}</label>
+              <table class="table" formArrayName="halfYearlyReminders">
+                <thead>
+                  <tr>
+                    <th></th>
+                    <th>{{'MONTH' | translate}}</th>
+                    <th>{{'DAY' | translate}}</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  @for(halfYearlyReminder of halfYearlyRemindersArray.controls; track $index) {
+                  <tr [formGroupName]="$index">
+                    <td>{{halfYearlyReminder.get('name')?.value | translate}}</td>
+                    <td>
+                      <select (change)="onDateChange(halfYearlyReminder)" class="form-control" formControlName="month">
+                        @for(mon of halfYearlyReminder.get('monthValues')?.value; track mon.id) {
+                        <option [value]="mon.id">{{mon.name | translate}}</option>
+                        }
+                      </select>
+                    </td>
+                    <td>
+                      <select (change)="onDateChange(halfYearlyReminder)" class="form-control" formControlName="day">
+                        @for(day of days; track day) {
+                        <option [value]="day">{{day}}</option>
+                        }
+                      </select>
+                      @if(halfYearlyReminder.get('day')?.touched && halfYearlyReminder?.hasError('invalidDate'))
+                      {
+                      <div class="text-danger">{{'PLEASE_SELECT_VALID_DAY' | translate}}</div>
+                      }
+                    </td>
+                  </tr>
+                  }
+                </tbody>
+              </table>
+            </div>
+            }
+          </div>
+        </div>
+        }
+
+        @if(!reminderForm.get('isRepeated')?.value) {
+        <div class="row">
+          <div class="col-lg-2 col-md-4 col-sm-6">
+            <label for="frequency"> {{'REMINDER_DATE' | translate}}</label>
+            <div class="input-group">
+              <input #ref class="form-control" formControlName="startDate" [matDatepicker]="startDatePicker"
+                placeholder="{{'REMINDER_DATE' | translate}}">
+              <div class="input-group-append">
+                <button class="btn btn-primary calendar-button" type="button" (click)="startDatePicker.open()"
+                  [disabled]="data?.reminderId">
+                  <mat-icon class="medium-icon fs-5 align-middle">calendar_today</mat-icon>
+                </button>
+              </div>
+              <mat-datepicker #startDatePicker></mat-datepicker>
+            </div>
+            @if(reminderForm.get('startDate')?.touched && reminderForm.get('startDate')?.errors) {
+            @if(reminderForm.get('startDate')?.errors?.['required']) {
+            <div class="text-danger">{{'DATE_IS_REQUIRED' | translate}}</div>
+            }
+            @if(reminderForm.get('startDate')?.errors?.['owlDateTimeMin']) {
+            <div class="text-danger">{{'START_DATE_SHOULD_BE_GREATER_THEN_CURRENT_DATE_TIME' | translate}}</div>
+            }
+            }
+          </div>
+
+          <div class="form-group col-lg-2 col-md-4 col-sm-6">
+            <label for="startTime">{{ 'REMINDER_TIME' | translate }}</label>
+            <div class="input-group">
+              <input class="form-control timepicker-input" formControlName="startTime" [matTimepicker]="startTime">
+              <div class="input-group-append">
+                <button class="btn btn-primary calendar-button" type="button" (click)="startTime.open()"
+                  [disabled]="data?.reminderId">
+                  <mat-icon class="medium-icon fs-5 align-middle">access_time</mat-icon>
+                </button>
+                <mat-timepicker #startTime />
+              </div>
+            </div>
+            @if(reminderForm.get('startTime')?.touched && reminderForm.get('startTime')?.errors) {
+            @if(reminderForm.get('startTime')?.errors?.['required']) {
+            <div class="text-danger">{{ 'TIME_IS_REQUIRED' | translate }}</div>
+            }
+            }
+          </div>
+        </div>
+        }
+
+        @if(reminderForm.get('isRepeated')?.value) {
+        <div class="row">
+          <div class="form-group col-lg-2 col-md-4 col-sm-6">
+            <label for="startDate">{{ 'REMINDER_START_DATE' | translate }}</label>
+            <div class="input-group">
+              <input #ref class="form-control" formControlName="startDate" [matDatepicker]="startDatePicker"
+                placeholder="{{'REMINDER_DATE' | translate}}">
+              <div class="input-group-append">
+                <button class="btn btn-primary calendar-button" type="button" (click)="startDatePicker.open()"
+                  [disabled]="data?.reminderId">
+                  <mat-icon class="medium-icon fs-5 align-middle">calendar_today</mat-icon>
+                </button>
+              </div>
+              <mat-datepicker #startDatePicker></mat-datepicker>
+            </div>
+            @if(reminderForm.get('startDate')?.touched && reminderForm.get('startDate')?.errors) {
+            @if(reminderForm.get('startDate')?.errors?.['required']) {
+            <div class="text-danger">{{ 'START_DATE_IS_REQUIRED' | translate }}</div>
+            }
+            @if(reminderForm.get('startDate')?.errors?.['owlDateTimeMin']) {
+            <div class="text-danger">{{ 'START_DATE_SHOULD_BE_GREATER_THEN_CURRENT_DATE_TIME' | translate }}
+            </div>
+            }
+            }
+          </div>
+
+          <div class="form-group col-lg-2 col-md-4 col-sm-6">
+            <label for="startTime">{{ 'REMINDER_TIME' | translate }}</label>
+            <div class="input-group">
+              <input class="form-control timepicker-input" formControlName="startTime" [matTimepicker]="startTime">
+              <div class="input-group-append">
+                <button class="btn btn-primary calendar-button" type="button" (click)="startTime.open()"
+                  [disabled]="data?.reminderId">
+                  <mat-icon class="medium-icon fs-5 align-middle">access_time</mat-icon>
+                </button>
+                <mat-timepicker #startTime />
+              </div>
+            </div>
+            @if(reminderForm.get('startTime')?.touched && reminderForm.get('startTime')?.errors) {
+            @if(reminderForm.get('startTime')?.errors?.['required']) {
+            <div class="text-danger">{{ 'TIME_IS_REQUIRED' | translate }}</div>
+            }
+            }
+          </div>
+
+          <div class="form-group col-lg-2 col-md-4 col-sm-6">
+            <label for="endDate">{{ 'REMINDER_END_DATE' | translate }}</label>
+            <div class="input-group">
+              <input #ref class="form-control" formControlName="endDate" [matDatepicker]="endDatePicker"
+                placeholder="{{'REMINDER_DATE' | translate}}">
+              <div class="input-group-append">
+                <button class="btn btn-primary calendar-button" type="button" (click)="endDatePicker.open()"
+                  [disabled]="data?.reminderId">
+                  <mat-icon class="medium-icon fs-5 align-middle">calendar_today</mat-icon>
+                </button>
+              </div>
+              <mat-datepicker #endDatePicker></mat-datepicker>
+            </div>
+          </div>
+
+          <div class="form-group col-lg-2 col-md-4 col-sm-6">
+            <label for="endTime">{{ 'REMINDER_END_TIME' | translate }}</label>
+            <div class="input-group">
+              <input class="form-control timepicker-input" formControlName="endTime" [matTimepicker]="endTime">
+              <div class="input-group-append">
+                <button class="btn btn-primary calendar-button" type="button" (click)="endTime.open()"
+                  [disabled]="data?.reminderId">
+                  <mat-icon class="medium-icon fs-5 align-middle">access_time</mat-icon>
+                </button>
+                <mat-timepicker #endTime />
+              </div>
+            </div>
+            @if(reminderForm.get('endTime')?.hasError('required') && reminderForm.get('endDate')?.touched) {
+            <div class="text-danger">{{ 'ENDTIME_IS_REQUIRED' | translate }}</div>
+            }
+          </div>
+        </div>
+        }
+        @if(!data?.reminderId) {
+        <div class="d-flex gap-2 mt-2">
+          <button (click)="createReminder()" type="submit" class="success me-2" matButton="filled">
+            <mat-icon class="medium-icon fs-5 align-middle">save</mat-icon>
+            {{'SAVE' | translate}}
+          </button>
+          <button type="button" class="error" matButton="filled" (click)="onCancel()">
+            <mat-icon class="medium-icon fs-5 align-middle">cancel</mat-icon>
+            {{'CANCEL' | translate}}
+          </button>
+        </div>
+        }
+      </mat-card-content>
+    </mat-card>
+
+  </form>
+</section>
+
+@if(isLoading) {
+<div class="spinner-container">
+  <div class="spinner-border text-primary" role="status">
+    <span class="visually-hidden">Loading...</span>
+  </div>
+</div>
+}

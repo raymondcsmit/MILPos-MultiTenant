@@ -1,0 +1,215 @@
+<section class="content">
+  <div class="container-fluid">
+    <div class="d-flex mb-2">
+      <div class="me-auto">
+        <span class="mb-0 page-title">{{ 'TRANSACTIONS' | translate }}
+          <app-page-help-text code="TRANSACTIONS"></app-page-help-text>
+        </span>
+      </div>
+      <div class="d-flex justify-content-end">
+        <button class="error me-2" matButton="filled" (click)="refresh()">
+          <mat-icon class="medium-icon fs-5 align-middle">refresh</mat-icon>
+          <span class="d-none d-sm-inline"> {{ 'REFRESH' | translate }} </span>
+        </button>
+        <button class="secondary me-2" matButton="filled" (click)="onTableRefresh()">
+          <mat-icon class="medium-icon fs-5 align-middle">settings</mat-icon>
+          <span class="d-none d-sm-inline"> {{ 'TABLE_SETTINGS' | translate }} </span>
+        </button>
+      </div>
+    </div>
+    <mat-card appearance="outlined">
+      <mat-card-content>
+        <div class="table-responsive">
+          <div class="grid-height-large">
+            <table [dir]="langDir" mat-table matSortDisableClear [dataSource]="transactionStore.transactions()"
+              multiTemplateDataRows matSort [matSortActive]="orderByColumn" [matSortDirection]="orderByDirection">
+              @for (column of tableSettingsStore.transactionsTableSettingsVisible(); track $index) {
+              <ng-container [matColumnDef]="column.key">
+                @if(column.key === 'action') {
+                <th [ngStyle]="{ 'min-width.px': column.width }" mat-header-cell *matHeaderCellDef></th>
+                <td [ngStyle]="{ 'min-width.px': column.width }" mat-cell *matCellDef="let po">
+                  <div class="d-flex align-items-center my-1">
+                    <button matMiniFab class="neutral" (click)="toggleRow(po)">
+                      @if(po != expandedElement){
+                      <mat-icon>chevron_right</mat-icon>
+                      } @if(po == expandedElement){
+                      <mat-icon>expand_more</mat-icon>
+                      }
+                    </button>
+
+                  </div>
+                </td>
+                } @else if(column.type === 'datetime'){
+                <th [ngStyle]="{ 'min-width.px': column.width }" mat-header-cell *matHeaderCellDef mat-sort-header
+                  [disabled]="!column.allowSort">
+                  {{ column.header | translate }}
+                </th>
+                <td [ngStyle]="{ 'min-width.px': column.width }" mat-cell *matCellDef="let po">
+                  {{ po[column.key] | utcToLocalTime : 'short' }}
+                </td>
+                } @else if(column.type === 'currency'){
+                <th [ngStyle]="{ 'min-width.px': column.width }" mat-header-cell *matHeaderCellDef mat-sort-header
+                  [disabled]="!column.allowSort">
+                  {{ column.header | translate }}
+                </th>
+                <td [ngStyle]="{ 'min-width.px': column.width }" mat-cell *matCellDef="let po">
+                  {{ po[column.key] | customCurrency }}
+                </td>
+                } @else if(column.key === 'transactionType'){
+                <th [ngStyle]="{ 'min-width.px': column.width }" mat-header-cell *matHeaderCellDef mat-sort-header
+                  [disabled]="!column.allowSort">
+                  {{ column.header | translate }}
+                </th>
+                <td [ngStyle]="{ 'min-width.px': column.width }" mat-cell *matCellDef="let po"
+                  style="text-align: center">
+                  {{ po.transactionType | transactionType }}
+                </td>
+                } @else if(column.key === 'paymentStatus'){
+                <th [ngStyle]="{ 'min-width.px': column.width }" mat-header-cell *matHeaderCellDef mat-sort-header
+                  [disabled]="!column.allowSort">
+                  {{ column.header | translate }}
+                </th>
+                <td [ngStyle]="{ 'min-width.px': column.width }" mat-cell *matCellDef="let po"
+                  style="text-align: center">
+                  <span class="badge cursor-pointer" [ngClass]="{
+                      'bg-warning': po.paymentStatus == ACCPaymentStatus.Pending,
+                      'bg-info': po.paymentStatus == ACCPaymentStatus.Partial,
+                      'bg-success': po.paymentStatus == ACCPaymentStatus.Completed,
+                      'bg-danger': po.paymentStatus == ACCPaymentStatus.Overdue,
+                      'bg-secondary': po.paymentStatus == ACCPaymentStatus.Cancelled
+                    }">
+                    {{ po.paymentStatus | paymentStatus }}
+                  </span>
+                </td>
+                } @else {
+                <th [ngStyle]="{ 'min-width.px': column.width }" mat-header-cell mat-sort-header
+                  [disabled]="!column.allowSort" *matHeaderCellDef>
+                  {{ column.header | translate }}
+                </th>
+                <td [ngStyle]="{ 'min-width.px': column.width }" mat-cell *matCellDef="let po">
+                  {{ po[column.key] }}
+                </td>
+                }
+              </ng-container>
+              } @for (column of tableSettingsStore.transactionsTableSettingsVisible(); track $index)
+              {
+              <ng-container [matColumnDef]="column.key + '-search'">
+                @if(column.key === 'transactionDate') {
+                <th mat-header-cell *matHeaderCellDef class="table-column-220">
+                  <div class="form-group">
+                    <div class="input-group">
+                      <mat-date-range-input class="form-control form-control-sm input-with-clear"
+                        [rangePicker]="picker">
+                        <input matStartDate (focus)="picker.open()" [(ngModel)]="TransactionFromDateFilter"
+                          placeholder="{{ 'FROM_DATE' | translate }}" />
+                        <input matEndDate (focus)="picker.open()" [(ngModel)]="TransactionToDateFilter"
+                          placeholder="{{ 'TO_DATE' | translate }}" />
+                      </mat-date-range-input>
+                      <mat-date-range-picker #picker></mat-date-range-picker>
+                      <button style="margin-left: -34px; z-index: 100" (click)="clearTransactionDates()"
+                        class="btn btn-sm bg-transparent" type="button">
+                        <mat-icon class="medium-icon text-danger fs-6 align-middle">cancel</mat-icon>
+                      </button>
+                    </div>
+                  </div>
+                </th>
+                }@else if (column.key === 'transactionNumber') {
+                <th mat-header-cell *matHeaderCellDef>
+                  <input placeholder="{{ 'TRANSACTION_NO' | translate }}" type="text"
+                    class="form-control form-control-sm" [(ngModel)]="TransactionNumberFilter" />
+                </th>
+                } @else if (column.key === 'referenceNumber') {
+                <th mat-header-cell *matHeaderCellDef>
+                  <input placeholder="{{ 'REFERENCE_NO' | translate }}" type="text" class="form-control form-control-sm"
+                    [(ngModel)]="ReferenceNumberFilter" />
+                </th>
+                }@else if (column.key === 'transactionType') {
+                <th mat-header-cell *matHeaderCellDef>
+                  <mat-select [dir]="langDir" [(ngModel)]="TransactionTypeFilter" panelClass="mat-select-control"
+                    placeholder="{{ 'TRANSACTION_TYPE' | translate }}"
+                    class="form-control form-control-sm table-column-140">
+                    <mat-option value="">{{ 'NONE' | translate }}</mat-option>
+                    @for (transactionType of transactionType; track $index) {
+                    <mat-option [value]="transactionType.label">{{
+                      transactionType.value| transactionType
+                      }}</mat-option>
+                    }
+                  </mat-select>
+                </th>
+                } @else if (column.key === 'paymentStatus') {
+                <th mat-header-cell *matHeaderCellDef class="table-column-160">
+                  <mat-select [dir]="langDir" [(ngModel)]="PaymentStatusFilter" panelClass="mat-select-control"
+                    placeholder="{{ 'PAYMENT_STATUS' | translate }}" class="form-control form-control-sm">
+                    <mat-option value="">{{ 'NONE' | translate }}</mat-option>
+                    @for (paymentStatus of accPaymentStatus; track $index) {
+                    <mat-option [value]="paymentStatus.label">{{
+                      paymentStatus.value | paymentStatus
+                      }}</mat-option>
+                    }
+                  </mat-select>
+                </th>
+                } @else if (column.key === 'branchName') {
+                <th mat-header-cell *matHeaderCellDef>
+                  <mat-select [dir]="langDir" [(ngModel)]="locationFilter" panelClass="mat-select-control"
+                    placeholder="{{ 'BUSINESS_LOCATION' | translate }}" class="form-control form-control-sm">
+                    @for (location of locations; track $index) {
+                    <mat-option [value]="location.id">
+                      {{ location.name }}
+                    </mat-option>
+                    } @if(locations.length == 0){
+                    <mat-option value="">
+                      {{ 'NO_RECORDS' | translate }}
+                    </mat-option>
+                    }
+                  </mat-select>
+                </th>
+                }@else {
+                <th mat-header-cell *matHeaderCellDef></th>
+                }
+              </ng-container>
+              }
+              <ng-container matColumnDef="footer">
+                <td mat-footer-cell [attr.colspan]="visibleTableKeys.length" *matFooterCellDef>
+                  <mat-paginator [length]="transactionStore.transactionResourceParameter().totalCount"
+                    [pageSize]="transactionStore.transactionResourceParameter().pageSize"
+                    [pageSizeOptions]="[10, 20, 30]">
+                  </mat-paginator>
+                </td>
+              </ng-container>
+              <ng-container matColumnDef="expandedDetail">
+                <td mat-cell *matCellDef="let poObject" [attr.colspan]="visibleTableKeys.length">
+                  @if(poObject == expandedElement){
+                  <div animate.enter="expandanimation" animate.leave="collapseanimation" class="expandable-panel">
+                    <div class="my-2 mx-5">
+                      <app-transaction-item-list [transaction]="poObject">
+                      </app-transaction-item-list>
+                    </div>
+                  </div>
+                  }
+                </td>
+              </ng-container>
+              <tr *matNoDataRow>
+                <td [attr.colspan]="visibleTableKeys.length">
+                  <span class="p-4 mt-4">
+                    <b> {{ 'NO_DATA_FOUND' | translate }}</b>
+                  </span>
+                </td>
+              </tr>
+              <tr class="grid-header-color" mat-header-row *matHeaderRowDef="visibleTableKeys; sticky: true"></tr>
+              <tr mat-row *matRowDef="let row; let i = index; columns: visibleTableKeys"
+                [class.bg-warning1]="row.status === 1" [ngClass]="{
+                              'odd-row': isOddDataRow(getDataIndex(row)),
+                              'even-row': !isOddDataRow(getDataIndex(row))
+                            }">
+              </tr>
+              <tr style="height: 45px !important;" mat-header-row
+                *matHeaderRowDef="visibleTableKeysSearch;  sticky: true"></tr>s
+              <tr mat-footer-row *matFooterRowDef="footerToDisplayed  sticky: true"></tr>
+              <tr mat-row *matRowDef="let row; columns: ['expandedDetail']" class="example-detail-row"></tr>
+            </table>
+          </div>
+        </div>
+      </mat-card-content>
+    </mat-card>
+  </div>
+</section>
