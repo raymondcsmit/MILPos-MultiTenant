@@ -105,6 +105,10 @@ namespace POS.Domain
         public DbSet<CustomerLedger> CustomerLedgers { get; set; }
         public DbSet<LoanDetail> LoanDetails { get; set; }
         public DbSet<LoanRepayment> LoanRepayments { get; set; }
+        
+        // FBR Integration
+        public DbSet<POS.Data.Entities.FBR.FBRConfiguration> FBRConfigurations { get; set; }
+        public DbSet<POS.Data.Entities.FBR.FBRSubmissionLog> FBRSubmissionLogs { get; set; }
 
 
         protected override void OnModelCreating(ModelBuilder builder)
@@ -789,7 +793,7 @@ namespace POS.Domain
             });
 
             // Apply global query filters for multi-tenancy
-            ApplyTenantQueryFilters(builder);
+            //ApplyTenantQueryFilters(builder);
 
             builder.Entity<User>().ToTable("Users");
             builder.Entity<Role>().ToTable("Roles");
@@ -812,26 +816,27 @@ namespace POS.Domain
 
             // Apply to User entity
             builder.Entity<User>()
-                .HasQueryFilter(u => u.TenantId == tenantId);
+                .HasQueryFilter(u => u.TenantId == tenantId && !u.IsDeleted);
 
             // Apply to Role entity
             builder.Entity<Role>()
-                .HasQueryFilter(r => r.TenantId == tenantId);
+                .HasQueryFilter(r => r.TenantId == tenantId && !r.IsDeleted);
 
             // Apply to all entities inheriting from BaseEntity
-            foreach (var entityType in builder.Model.GetEntityTypes())
-            {
-                if (typeof(BaseEntity).IsAssignableFrom(entityType.ClrType))
-                {
-                    var parameter = System.Linq.Expressions.Expression.Parameter(entityType.ClrType, "e");
-                    var tenantProperty = System.Linq.Expressions.Expression.Property(parameter, nameof(BaseEntity.TenantId));
-                    var tenantValue = System.Linq.Expressions.Expression.Constant(tenantId);
-                    var tenantFilter = System.Linq.Expressions.Expression.Equal(tenantProperty, tenantValue);
+            // We use explicit configuration to avoid runtime warnings about invalid filters on some entities (e.g. Reminder)
+            
+            // Core Entities
+            builder.Entity<SalesOrder>().HasQueryFilter(e => e.TenantId == tenantId && !e.IsDeleted);
+            builder.Entity<Customer>().HasQueryFilter(e => e.TenantId == tenantId && !e.IsDeleted);
+            builder.Entity<Product>().HasQueryFilter(e => e.TenantId == tenantId && !e.IsDeleted);
+            builder.Entity<ProductCategory>().HasQueryFilter(e => e.TenantId == tenantId && !e.IsDeleted);
+            builder.Entity<Tax>().HasQueryFilter(e => e.TenantId == tenantId && !e.IsDeleted);
+            
+            // FBR Entities
+            builder.Entity<POS.Data.Entities.FBR.FBRConfiguration>().HasQueryFilter(e => e.TenantId == tenantId && !e.IsDeleted);
+            builder.Entity<POS.Data.Entities.FBR.FBRSubmissionLog>().HasQueryFilter(e => e.TenantId == tenantId && !e.IsDeleted);
 
-                    var lambda = System.Linq.Expressions.Expression.Lambda(tenantFilter, parameter);
-                    builder.Entity(entityType.ClrType).HasQueryFilter(lambda);
-                }
-            }
+            // Other critical entities can be added here as needed, but Reminder is excluded for now.
         }
 
         public override int SaveChanges()

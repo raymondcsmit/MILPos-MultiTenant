@@ -1,4 +1,8 @@
 import {
+  outputFromObservable,
+  outputToObservable
+} from "./chunk-TIVRQT3Y.js";
+import {
   Directive,
   ElementRef,
   NgModule,
@@ -11,16 +15,12 @@ import {
   ɵɵdefineNgModule
 } from "./chunk-BOEYOKWK.js";
 import {
-  outputFromObservable,
-  outputToObservable
-} from "./chunk-TIVRQT3Y.js";
-import {
   InjectionToken,
   inject,
   ɵɵdefineInjector
 } from "./chunk-NMUC745S.js";
-import "./chunk-JRFR6BLO.js";
 import "./chunk-HWYXSU2G.js";
+import "./chunk-JRFR6BLO.js";
 import {
   Observable,
   ReplaySubject,

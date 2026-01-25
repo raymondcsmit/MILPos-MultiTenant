@@ -15,7 +15,7 @@ import {
   UserLocations,
 } from '@core/domain-classes/business-location';
 import { TranslationService } from '@core/services/translation.service';
-import { LicenseValidatorService } from '@mlglobtech/license-validator-pos';
+import { WrLicenseService } from '@core/services/wr-license.service';
 import { FinancialYear } from '../../accounting/financial-year/financial-year';
 
 @Injectable({ providedIn: 'root' })
@@ -30,18 +30,18 @@ export class SecurityService {
   private _selectedLocation: string = '';
 
   public currencyCode = 'USD';
-  private licenseValidatorService: LicenseValidatorService = inject(LicenseValidatorService);
+  private wrLicenseService: WrLicenseService = inject(WrLicenseService);
 
   setCompany(companyProfile?: CompanyProfile) {
     if (companyProfile) {
       sessionStorage.setItem(
-        this.licenseValidatorService.keyValues.COMPANY_PROFILE,
+        this.wrLicenseService.keyValues.COMPANY_PROFILE,
         JSON.stringify(companyProfile)
       );
       this._companyProfile$.next(JSON.parse(JSON.stringify(companyProfile)));
     } else {
       const companyProfileJson = sessionStorage.getItem(
-        this.licenseValidatorService.keyValues.COMPANY_PROFILE
+        this.wrLicenseService.keyValues.COMPANY_PROFILE
       );
       if (
         companyProfileJson &&
@@ -74,7 +74,7 @@ export class SecurityService {
     if (this._token) {
       return this._token;
     }
-    this._token = this.licenseValidatorService.getJWtToken();
+    this._token = this.wrLicenseService.getJWtToken();
     return this._token ?? null;
   }
 
@@ -82,7 +82,7 @@ export class SecurityService {
     if (this._selectedLocation) {
       return this._selectedLocation;
     }
-    const authObj: User = this.licenseValidatorService.getAuthObject();
+    const authObj: User = this.wrLicenseService.getAuthObject();
     this._selectedLocation = authObj.selectedLocation ?? '';
     return this._selectedLocation;
   }
@@ -97,7 +97,7 @@ export class SecurityService {
         if (c) {
           return c;
         }
-        const currentData = localStorage.getItem(this.licenseValidatorService.keyValues.authObj);
+        const currentData = localStorage.getItem(this.wrLicenseService.keyValues.authObj);
         if (currentData) {
           this._securityObject$.next(JSON.parse(currentData));
           return JSON.parse(currentData);
@@ -233,11 +233,11 @@ export class SecurityService {
     return this.http.post<UserAuth>('authentication', entity).pipe(
       tap((resp: any) => {
         this.securityObject = this.clonerService.deepClone<UserAuth>(resp);
-        this.licenseValidatorService.setTokenValue(this.securityObject);
+        this.wrLicenseService.setTokenValue(this.securityObject);
         if (this.Token) {
           const userLocations = this.Token['locationIds']?.split(',').filter((id: string) => id?.toString() != '');
           if (userLocations == null || userLocations.length == 0) {
-            this.licenseValidatorService.removeToken();
+            this.wrLicenseService.removeToken();
             throw new Error('No location assigned to user.');
           }
           this.updateSelectedLocation(userLocations[0]);
@@ -248,7 +248,7 @@ export class SecurityService {
   }
 
   isLogin(): boolean {
-    const authStr = this.licenseValidatorService.getAuthObject();
+    const authStr = this.wrLicenseService.getAuthObject();
     if (authStr) return true;
     else return false;
   }
@@ -258,8 +258,8 @@ export class SecurityService {
   }
 
   resetSecurityObject(): void {
-    localStorage.removeItem(this.licenseValidatorService.keyValues.authObj);
-    localStorage.removeItem(this.licenseValidatorService.keyValues.bearerToken);
+    localStorage.removeItem(this.wrLicenseService.keyValues.authObj);
+    localStorage.removeItem(this.wrLicenseService.keyValues.BEARER_TOKEN);
     this._securityObject$.next(null);
     this._token = null;
     this._claims = [];
@@ -275,19 +275,19 @@ export class SecurityService {
   }
 
   updateSelectedLocation(selectedLocation: string) {
-    const authObj: User = this.licenseValidatorService.getAuthObject();
+    const authObj: User = this.wrLicenseService.getAuthObject();
     authObj.selectedLocation = selectedLocation;
-    localStorage.setItem(this.licenseValidatorService.keyValues.authObj, JSON.stringify(authObj));
+    localStorage.setItem(this.wrLicenseService.keyValues.authObj, JSON.stringify(authObj));
     this._selectedLocation = selectedLocation;
   }
 
   updateUserProfile(user: User) {
-    const authObj: User = this.licenseValidatorService.getAuthObject();
+    const authObj: User = this.wrLicenseService.getAuthObject();
     authObj.firstName = user.firstName;
     authObj.lastName = user.lastName;
     authObj.profilePhoto = user.profilePhoto;
     authObj.phoneNumber = user.phoneNumber;
-    localStorage.setItem(this.licenseValidatorService.keyValues.authObj, JSON.stringify(authObj));
+    localStorage.setItem(this.wrLicenseService.keyValues.authObj, JSON.stringify(authObj));
     this._securityObject$.next(this.clonerService.deepClone<User>(authObj));
   }
 
@@ -330,7 +330,7 @@ export class SecurityService {
       // Either get the claim value, or assume 'true'
       claimValue = claimValue ? claimValue : 'true';
     }
-    const token = this.licenseValidatorService.getJWtToken();
+    const token = this.wrLicenseService.getJWtToken();
     if (token) {
       const claims = Object.keys(token).filter((key) => token[key]);
       ret = claims?.find((c: any) => c.toLowerCase() == claimType) != null;
@@ -340,6 +340,6 @@ export class SecurityService {
   }
 
   getUserDetail(): User {
-    return this.licenseValidatorService.getAuthObject();
+    return this.wrLicenseService.getAuthObject();
   }
 }

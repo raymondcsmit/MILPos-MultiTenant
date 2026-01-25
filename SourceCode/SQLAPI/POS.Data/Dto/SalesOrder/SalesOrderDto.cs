@@ -36,5 +36,18 @@ namespace POS.Data.Dto
         public decimal ReturnItemCount { get; set; } = 0;
         public decimal ReturnItemPrice { get; set; } = 0;
         public decimal TotalItemQuantities { get; set; } = 0;
+        
+        // FBR Fields
+        public string BuyerNTN { get; set; }
+        public string BuyerCNIC { get; set; }
+        public string BuyerName { get; set; }
+        public string BuyerPhoneNumber { get; set; }
+        public string BuyerAddress { get; set; }
+        public string SaleType { get; set; }
+        public string FBRStatus { get; set; }
+        public string FBRInvoiceNumber { get; set; }
+        public string FBRUSIN { get; set; }
+        public string FBRQRCodeImagePath { get; set; }
+        public string FBRErrorMessage { get; set; }
     }
 }

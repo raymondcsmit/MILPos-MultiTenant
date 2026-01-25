@@ -1,4 +1,7 @@
 import {
+  toSignal
+} from "./chunk-TIVRQT3Y.js";
+import {
   SharedResizeObserver
 } from "./chunk-S5STWD3P.js";
 import "./chunk-YL66IE6N.js";
@@ -72,9 +75,6 @@ import {
   ɵɵviewQuerySignal
 } from "./chunk-BOEYOKWK.js";
 import {
-  toSignal
-} from "./chunk-TIVRQT3Y.js";
-import {
   DOCUMENT,
   InjectionToken,
   Injector,
@@ -89,12 +89,12 @@ import {
   ɵɵdefineInjector,
   ɵɵnamespaceSVG
 } from "./chunk-NMUC745S.js";
-import "./chunk-JRFR6BLO.js";
 import {
   animationFrameScheduler,
   fromEvent,
   merge
 } from "./chunk-HWYXSU2G.js";
+import "./chunk-JRFR6BLO.js";
 import {
   EMPTY,
   Observable,

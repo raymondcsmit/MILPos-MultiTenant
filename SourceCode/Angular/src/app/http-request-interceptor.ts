@@ -12,7 +12,7 @@ import { catchError, finalize } from 'rxjs/operators';
 import { Router } from '@angular/router';
 import { ToastrService } from '@core/services/toastr.service';
 import { TranslationService } from '@core/services/translation.service';
-import { LicenseValidatorService } from '@mlglobtech/license-validator-pos';
+import { WrLicenseService } from '@core/services/wr-license.service';
 import { LoadingProgressService } from '@shared/loading-indicator/loading-progress-service';
 
 export const HttpRequestInterceptor: HttpInterceptorFn = (
@@ -20,9 +20,9 @@ export const HttpRequestInterceptor: HttpInterceptorFn = (
   next: HttpHandlerFn,
 
 ): Observable<HttpEvent<unknown>> => {
-  const licenseValidatorService = inject(LicenseValidatorService);
+  const wrLicenseService = inject(WrLicenseService);
   const loadingService = inject(LoadingProgressService);
-  const token = licenseValidatorService.getBearerToken();
+  const token = wrLicenseService.getBearerToken();
   const baseUrl = environment.apiUrl;
   const envInjector = inject(EnvironmentInjector);
   loadingService.startRequest();

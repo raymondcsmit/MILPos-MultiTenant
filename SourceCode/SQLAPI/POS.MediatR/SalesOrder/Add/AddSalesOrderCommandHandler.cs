@@ -80,6 +80,31 @@ namespace POS.MediatR.Handlers
             {
                 salesOrder.PaymentStatus = PaymentStatus.Paid;
             }
+
+            // FBR Integration Logic
+            try 
+            {
+                var fbrConfig = await _uow.Context.Set<POS.Data.Entities.FBR.FBRConfiguration>()
+                    .FirstOrDefaultAsync(c => c.IsEnabled && !c.IsDeleted && c.TenantId == salesOrder.TenantId, cancellationToken);
+
+                if (fbrConfig != null && fbrConfig.AutoSubmitInvoices)
+                {
+                    salesOrder.FBRStatus = POS.Data.Entities.FBR.FBRSubmissionStatus.Queued;
+                    salesOrder.BuyerNTN = request.BuyerNTN;
+                    salesOrder.BuyerCNIC = request.BuyerCNIC;
+                    salesOrder.BuyerName = !string.IsNullOrEmpty(request.BuyerName) ? request.BuyerName : "Walk-in Customer";
+                    salesOrder.BuyerPhoneNumber = request.BuyerPhoneNumber;
+                    salesOrder.BuyerAddress = request.BuyerAddress;
+                    salesOrder.SaleType = !string.IsNullOrEmpty(request.SaleType) ? request.SaleType : "Retail";
+                    
+                    _logger.LogInformation("Sales Order {OrderNumber} queued for FBR submission", salesOrder.OrderNumber);
+                }
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error configuring FBR status for Sales Order {OrderNumber}", salesOrder.OrderNumber);
+            }
+
             _salesOrderRepository.Add(salesOrder);
 
             // Collect all productIds from salesOrder items

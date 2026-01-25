@@ -1,4 +1,4 @@
-# Build Cloud Version
+# Build Cloud Version - ASCII Version
 param(
     [string]$Version = "1.0.0",
     [string]$Configuration = "Release"
@@ -13,85 +13,86 @@ $ErrorActionPreference = "Stop"
 $SourceRoot = $PSScriptRoot
 
 try {
-    # Step 1: Build Angular for Cloud (production)
-    Write-Host "[1/3] Building Angular Frontend (Cloud)..." -ForegroundColor Green
-    Set-Location "$SourceRoot\..\..\Angular"
+    # Step 1: Build Angular
+    Write-Host "[1/3] Building Angular Frontend..." -ForegroundColor Green
+    $AngularPath = Join-Path $SourceRoot "..\Angular"
+    Push-Location $AngularPath
     
-    if (Test-Path "dist") {
-        Remove-Item -Recurse -Force "dist"
-    }
+    if (Test-Path "dist") { Remove-Item -Recurse -Force "dist" }
     
     npm install
-    npm run build -- --configuration production
-    
-    Write-Host "  ✓ Angular build complete" -ForegroundColor Green
-    Write-Host ""
-
-    # Step 2: Build API for Cloud deployment
-    Write-Host "[2/3] Building API (Cloud mode)..." -ForegroundColor Green
-    Set-Location "$SourceRoot"
-    
-    $env:ASPNETCORE_ENVIRONMENT = "Cloud"
-    
-    dotnet publish POS.API\POS.API.csproj `
-        -c $Configuration `
-        -o "publish\cloud\api" `
-        -p:EnvironmentName=Cloud
-    
-    # Copy Cloud-specific appsettings
-    Copy-Item -Path "POS.API\appsettings.Cloud.json" -Destination "publish\cloud\api\appsettings.json" -Force
-    
-    Write-Host "  ✓ API build complete" -ForegroundColor Green
-    Write-Host ""
-
-    # Step 3: Package Angular for separate hosting
-    Write-Host "[3/3] Packaging Angular for CDN/Static hosting..." -ForegroundColor Green
-    
-    $AngularDist = "$SourceRoot\..\..\Angular\dist"
-    $CloudAngular = "$SourceRoot\publish\cloud\angular"
-    
-    if (Test-Path $CloudAngular) {
-        Remove-Item -Recurse -Force $CloudAngular
+    npx ng build --configuration production
+    if ($LASTEXITCODE -ne 0) { 
+        Pop-Location
+        throw "Angular build failed" 
     }
     
-    New-Item -ItemType Directory -Force -Path $CloudAngular | Out-Null
-    Copy-Item -Path "$AngularDist\*" -Destination $CloudAngular -Recurse -Force
-    
-    Write-Host "  ✓ Angular packaged for static hosting" -ForegroundColor Green
+    Pop-Location
+    Write-Host "Done: Angular build complete" -ForegroundColor Green
     Write-Host ""
 
-    # Create deployment info
+    # Step 2: Build API
+    Write-Host "[2/3] Building API - Cloud mode..." -ForegroundColor Green
+    Set-Location $SourceRoot
+    
+    [System.Environment]::SetEnvironmentVariable("ASPNETCORE_ENVIRONMENT", "Cloud")
+    
+    $ProjFile = Join-Path $SourceRoot "POS.API\POS.API.csproj"
+    $OutputDir = Join-Path $SourceRoot "publish\cloud\api"
+    
+    dotnet publish $ProjFile -c $Configuration -o $OutputDir -p:EnvironmentName=Cloud
+    if ($LASTEXITCODE -ne 0) { throw "API publish failed" }
+    
+    # Copy Cloud-specific appsettings
+    $CloudSettings = Join-Path $SourceRoot "POS.API\appsettings.Cloud.json"
+    $TargetSettings = Join-Path $OutputDir "appsettings.json"
+    Copy-Item -Path $CloudSettings -Destination $TargetSettings -Force
+    
+    Write-Host "Done: API build complete" -ForegroundColor Green
+    Write-Host ""
+
+    # Step 3: Packaging
+    Write-Host "[3/3] Packaging Angular for Static hosting..." -ForegroundColor Green
+    
+    $AngularDist = Join-Path $SourceRoot "POS.API\ClientApp"
+    $CloudAngular = Join-Path $SourceRoot "publish\cloud\angular"
+    
+    if (Test-Path $CloudAngular) { Remove-Item -Recurse -Force $CloudAngular }
+    New-Item -ItemType Directory -Force -Path $CloudAngular | Out-Null
+    
+    if (Test-Path $AngularDist) {
+        Copy-Item -Path "$AngularDist\*" -Destination $CloudAngular -Recurse -Force
+    } else {
+        throw "Angular dist not found at $AngularDist"
+    }
+    
+    Write-Host "Done: Angular packaged for static hosting" -ForegroundColor Green
+    Write-Host ""
+
+    # Deployment info
+    $deployFile = Join-Path $SourceRoot "publish\cloud\deployment-info.json"
     $deploymentInfo = @{
         Version = $Version
         BuildDate = (Get-Date).ToString("yyyy-MM-dd HH:mm:ss")
         DeploymentMode = "Cloud"
         DatabaseProvider = "SqlServer"
-        ApiPath = "publish\cloud\api"
-        AngularPath = "publish\cloud\angular"
     } | ConvertTo-Json
     
-    $deploymentInfo | Out-File -FilePath "$SourceRoot\publish\cloud\deployment-info.json" -Encoding UTF8
+    $deploymentInfo | Out-File -FilePath $deployFile -Encoding ASCII
 
     Write-Host "========================================" -ForegroundColor Green
     Write-Host "Cloud build complete!" -ForegroundColor Green
     Write-Host "========================================" -ForegroundColor Green
-    Write-Host ""
-    Write-Host "API Output: $SourceRoot\publish\cloud\api" -ForegroundColor Yellow
-    Write-Host "Angular Output: $SourceRoot\publish\cloud\angular" -ForegroundColor Yellow
-    Write-Host ""
-    Write-Host "Next steps:" -ForegroundColor Cyan
-    Write-Host "  1. Deploy API to Azure App Service / IIS" -ForegroundColor White
-    Write-Host "  2. Deploy Angular to Azure Storage / CDN" -ForegroundColor White
-    Write-Host "  3. Update connection strings in production" -ForegroundColor White
-    Write-Host "  4. Configure CORS origins in appsettings.json" -ForegroundColor White
-    Write-Host ""
 }
 catch {
     Write-Host ""
     Write-Host "========================================" -ForegroundColor Red
     Write-Host "Build failed!" -ForegroundColor Red
     Write-Host "========================================" -ForegroundColor Red
-    Write-Host $_.Exception.Message -ForegroundColor Red
+    Write-Host "Error: $($_.Exception.Message)" -ForegroundColor Red
+    if ($_.InvocationInfo) {
+        Write-Host "Location: $($_.InvocationInfo.ScriptName) at line $($_.InvocationInfo.ScriptLineNumber)" -ForegroundColor Yellow
+    }
     Write-Host ""
     exit 1
 }

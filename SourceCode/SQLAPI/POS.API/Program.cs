@@ -73,22 +73,25 @@ builder.Services.AddHangfireServer();
 
 var app = builder.Build();
 
-//try
-//{
-//    using (var serviceScope = app.Services.GetService<IServiceScopeFactory>().CreateScope())
-//    {
-//        var context = serviceScope.ServiceProvider.GetRequiredService<POSDbContext>();
-//        context.Database.Migrate();
+try
+{
+    using (var serviceScope = app.Services.GetService<IServiceScopeFactory>().CreateScope())
+    {
+        var context = serviceScope.ServiceProvider.GetRequiredService<POSDbContext>();
+        context.Database.Migrate();
 
-//        // Seed data using SeedingService
-//        var seedingService = serviceScope.ServiceProvider.GetRequiredService<SeedingService>();
-//        await seedingService.SeedAsync();
-//    }
-//}
-//catch (System.Exception)
-//{
-//    throw;
-//}
+        // Seed data using SeedingService
+        var seedingService = serviceScope.ServiceProvider.GetRequiredService<SeedingService>();
+        await seedingService.SeedAsync();
+    }
+}
+catch (System.Exception ex)
+{
+    // Log error but allow app to start if possible, or rethrow
+    var logger = app.Services.GetRequiredService<ILogger<Program>>();
+    logger.LogError(ex, "An error occurred while upgrading the database.");
+    throw;
+}
 
 ILoggerFactory loggerFactory = app.Services.GetRequiredService<ILoggerFactory>();
 startup.Configure(app, app.Environment, loggerFactory);

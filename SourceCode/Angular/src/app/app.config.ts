@@ -1,5 +1,5 @@
 import { ApplicationConfig, importProvidersFrom, inject, provideAppInitializer, provideBrowserGlobalErrorListeners, provideZoneChangeDetection, } from '@angular/core';
-import { provideRouter } from '@angular/router';
+import { provideRouter, withHashLocation } from '@angular/router';
 import { routes } from './app.routes';
 import { provideTranslateService } from '@ngx-translate/core';
 import { provideTranslateHttpLoader } from '@ngx-translate/http-loader';
@@ -14,7 +14,6 @@ import { CurrencyPipe } from '@angular/common';
 import { MatSnackBarModule } from '@angular/material/snack-bar';
 import { loadingInterceptor } from '@core/services/loading.interceptor';
 import { initializeApp } from '@core/security/initialize-app-factory';
-import { LicenseInitializerService } from '@mlglobtech/license-validator-pos';
 import { ToastrService } from '@core/services/toastr.service';
 import { SecurityService } from '@core/security/security.service';
 
@@ -23,7 +22,7 @@ export const appConfig: ApplicationConfig = {
     provideBrowserGlobalErrorListeners(),
     provideZoneChangeDetection({ eventCoalescing: true }),
     provideTranslateService({
-      loader: provideTranslateHttpLoader({ prefix: "/i18n/" }),
+      loader: provideTranslateHttpLoader({ prefix: "./i18n/" }),
       fallbackLang: 'en',
       lang: 'en'
     }),
@@ -43,7 +42,7 @@ export const appConfig: ApplicationConfig = {
     { provide: JWT_OPTIONS, useValue: JWT_OPTIONS },
     JwtHelperService,
     provideAppInitializer(() =>
-      initializeApp(inject(LicenseInitializerService), inject(ToastrService), inject(SecurityService))()
+      initializeApp(inject(ToastrService), inject(SecurityService))()
     ),
     provideNativeDateAdapter(),
     provideStoreDevtools({
@@ -55,7 +54,7 @@ export const appConfig: ApplicationConfig = {
       MatSnackBarModule,
       FeatherModule.pick(allIcons)
     ),
-    provideRouter(routes),
+    provideRouter(routes, withHashLocation()),
 
   ]
 };

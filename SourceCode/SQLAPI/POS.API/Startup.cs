@@ -18,7 +18,6 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.OpenApi;
-using Microsoft.OpenApi.Models;
 using Newtonsoft.Json;
 using POS.API.Helpers;
 using POS.API.Helpers.Mapping;
@@ -31,6 +30,7 @@ using POS.Domain.ImportExport;
 using POS.Helper;
 using POS.MediatR.PipeLineBehavior;
 using POS.Repository;
+using Microsoft.OpenApi.Models;
 
 namespace POS.API
 {
@@ -86,6 +86,8 @@ namespace POS.API
             {
                 services.AddHostedService<POS.API.Services.ScheduledSyncService>();
             }
+            // Register FBR Sync Background Service
+            services.AddHostedService<POS.API.BackgroundServices.FBRSyncBackgroundService>();
             
             JwtSettings settings;
             settings = GetJwtSettings();
@@ -95,8 +97,8 @@ namespace POS.API
             services.AddSingleton<IConnectionMappingRepository, ConnectionMappingRepository>();
             services.AddScoped(c => new UserInfoToken() { Id = Guid.Parse(defaultUserId) });
             
-            // Configure DbContext Factory - properly handles scoped services
-            services.AddDbContextFactory<POSDbContext>((serviceProvider, options) =>
+            // Configure DbContext - Scoped lifetime
+            services.AddDbContext<POSDbContext>((serviceProvider, options) =>
             {
                 var provider = Configuration.GetValue<string>("DatabaseProvider") ?? "Sqlite";
                 if (provider == "Sqlite")
@@ -120,13 +122,6 @@ namespace POS.API
                     }
                 });
             });
-
-            // Also register DbContext for backward compatibility with existing code
-            services.AddScoped<POSDbContext>(serviceProvider =>
-            {
-                var factory = serviceProvider.GetRequiredService<IDbContextFactory<POSDbContext>>();
-                return factory.CreateDbContext();
-            });
             
             services.AddIdentity<User, Role>()
              .AddEntityFrameworkStores<POSDbContext>()
@@ -148,6 +143,12 @@ namespace POS.API
             services.AddScoped<IImportExportService<POS.Data.Product>, ProductImportExportService>();
             services.AddScoped<IImportExportService<POS.Data.Customer>, CustomerImportExportService>();
             services.AddScoped<IImportExportService<POS.Data.Supplier>, SupplierImportExportService>();
+            
+            // FBR Integration Services
+            services.AddScoped<POS.Domain.FBR.IFBRAuthenticationService, POS.Domain.FBR.FBRAuthenticationService>();
+            services.AddScoped<POS.Domain.FBR.IFBRQRCodeService, POS.Domain.FBR.FBRQRCodeService>();
+            services.AddHttpClient<POS.Domain.FBR.IFBRInvoiceService, POS.Domain.FBR.FBRInvoiceService>()
+                .SetHandlerLifetime(TimeSpan.FromMinutes(5)); // Prevent socket exhaustion
             
             services.AddDependencyInjection();
             services.AddJwtAutheticationConfiguration(settings);
@@ -257,29 +258,29 @@ namespace POS.API
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env, ILoggerFactory loggerFactory)
         {
-            if (env.IsDevelopment())
-            {
+            // if (env.IsDevelopment())
+            // {
                 app.UseDeveloperExceptionPage();
-            }
-            else
-            {
-                app.UseExceptionHandler(appBuilder =>
-                {
-                    appBuilder.Run(async context =>
-                    {
-                        var exceptionHandlerFeature = context.Features.Get<IExceptionHandlerFeature>();
-                        if (exceptionHandlerFeature != null)
-                        {
-                            var logger = loggerFactory.CreateLogger("Global exception logger");
-                            logger.LogError(500,
-                                exceptionHandlerFeature.Error,
-                                exceptionHandlerFeature.Error.Message);
-                        }
-                        context.Response.StatusCode = 500;
-                        await context.Response.WriteAsync("An unexpected fault happened. Try again later.");
-                    });
-                });
-            }
+            // }
+            // else
+            // {
+            //     app.UseExceptionHandler(appBuilder =>
+            //     {
+            //         appBuilder.Run(async context =>
+            //         {
+            //             var exceptionHandlerFeature = context.Features.Get<IExceptionHandlerFeature>();
+            //             if (exceptionHandlerFeature != null)
+            //             {
+            //                 var logger = loggerFactory.CreateLogger("Global exception logger");
+            //                 logger.LogError(500,
+            //                     exceptionHandlerFeature.Error,
+            //                     exceptionHandlerFeature.Error.Message);
+            //             }
+            //             context.Response.StatusCode = 500;
+            //             await context.Response.WriteAsync("An unexpected fault happened. Try again later.");
+            //         });
+            //     });
+            // }
             app.UseSwagger(c =>
             {
                 c.SerializeAsV2 = true;

@@ -1418,6 +1418,195 @@ namespace POS.Domain.Migrations
                     b.ToTable("ExpenseTaxes");
                 });
 
+            modelBuilder.Entity("POS.Data.Entities.FBR.FBRConfiguration", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("ApiBaseUrl")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("TEXT");
+
+                    b.Property<bool>("AutoSubmitInvoices")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<string>("BranchCode")
+                        .IsRequired()
+                        .HasMaxLength(20)
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("ClientId")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("ClientSecret")
+                        .IsRequired()
+                        .HasMaxLength(500)
+                        .HasColumnType("TEXT");
+
+                    b.Property<Guid>("CreatedBy")
+                        .HasColumnType("TEXT");
+
+                    b.Property<DateTime>("CreatedDate")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("CurrentAccessToken")
+                        .HasMaxLength(1000)
+                        .HasColumnType("TEXT");
+
+                    b.Property<Guid?>("DeletedBy")
+                        .HasColumnType("TEXT");
+
+                    b.Property<DateTime?>("DeletedDate")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("FBRKey")
+                        .IsRequired()
+                        .HasMaxLength(500)
+                        .HasColumnType("TEXT");
+
+                    b.Property<int>("FailedSubmissionsToday")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<bool>("IsEnabled")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<bool>("IsTestMode")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<DateTime?>("LastSuccessfulSubmission")
+                        .HasColumnType("TEXT");
+
+                    b.Property<DateTime?>("LastSyncedAt")
+                        .HasColumnType("TEXT");
+
+                    b.Property<DateTime?>("LastTokenRefresh")
+                        .HasColumnType("TEXT");
+
+                    b.Property<int>("MaxRetryAttempts")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int>("MaxRetryDelaySeconds")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<Guid>("ModifiedBy")
+                        .HasColumnType("TEXT");
+
+                    b.Property<DateTime>("ModifiedDate")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("POSID")
+                        .IsRequired()
+                        .HasMaxLength(20)
+                        .HasColumnType("TEXT");
+
+                    b.Property<int>("RetryDelaySeconds")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<string>("STRN")
+                        .IsRequired()
+                        .HasMaxLength(20)
+                        .HasColumnType("TEXT");
+
+                    b.Property<long>("SyncVersion")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<Guid>("TenantId")
+                        .HasColumnType("TEXT");
+
+                    b.Property<DateTime?>("TokenExpiresAt")
+                        .HasColumnType("TEXT");
+
+                    b.Property<int>("TotalSubmissionsToday")
+                        .HasColumnType("INTEGER");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CreatedBy");
+
+                    b.ToTable("FBRConfigurations");
+                });
+
+            modelBuilder.Entity("POS.Data.Entities.FBR.FBRSubmissionLog", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("TEXT");
+
+                    b.Property<DateTime>("AttemptedAt")
+                        .HasColumnType("TEXT");
+
+                    b.Property<Guid>("CreatedBy")
+                        .HasColumnType("TEXT");
+
+                    b.Property<DateTime>("CreatedDate")
+                        .HasColumnType("TEXT");
+
+                    b.Property<Guid?>("DeletedBy")
+                        .HasColumnType("TEXT");
+
+                    b.Property<DateTime?>("DeletedDate")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("ErrorMessage")
+                        .HasMaxLength(1000)
+                        .HasColumnType("TEXT");
+
+                    b.Property<int>("HttpStatusCode")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<DateTime?>("LastSyncedAt")
+                        .HasColumnType("TEXT");
+
+                    b.Property<Guid>("ModifiedBy")
+                        .HasColumnType("TEXT");
+
+                    b.Property<DateTime>("ModifiedDate")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("RequestPayload")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("ResponsePayload")
+                        .HasColumnType("TEXT");
+
+                    b.Property<TimeSpan>("ResponseTime")
+                        .HasColumnType("TEXT");
+
+                    b.Property<Guid>("SalesOrderId")
+                        .HasColumnType("TEXT");
+
+                    b.Property<int>("Status")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<string>("SubmittedBy")
+                        .HasMaxLength(50)
+                        .HasColumnType("TEXT");
+
+                    b.Property<long>("SyncVersion")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<Guid>("TenantId")
+                        .HasColumnType("TEXT");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CreatedBy");
+
+                    b.HasIndex("SalesOrderId");
+
+                    b.ToTable("FBRSubmissionLogs");
+                });
+
             modelBuilder.Entity("POS.Data.Entities.InquiryActivity", b =>
                 {
                     b.Property<Guid>("Id")
@@ -3628,6 +3817,21 @@ namespace POS.Domain.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("TEXT");
 
+                    b.Property<string>("BuyerAddress")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("BuyerCNIC")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("BuyerNTN")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("BuyerName")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("BuyerPhoneNumber")
+                        .HasColumnType("TEXT");
+
                     b.Property<Guid>("CreatedBy")
                         .HasColumnType("TEXT");
 
@@ -3648,6 +3852,39 @@ namespace POS.Domain.Migrations
 
                     b.Property<int>("DeliveryStatus")
                         .HasColumnType("INTEGER");
+
+                    b.Property<DateTime?>("FBRAcknowledgedAt")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("FBRErrorMessage")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("FBRInvoiceNumber")
+                        .HasColumnType("TEXT");
+
+                    b.Property<DateTime?>("FBRNextRetryAt")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("FBRQRCodeData")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("FBRQRCodeImagePath")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("FBRResponseJson")
+                        .HasColumnType("TEXT");
+
+                    b.Property<int>("FBRRetryCount")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int>("FBRStatus")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<DateTime?>("FBRSubmittedAt")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("FBRUSIN")
+                        .HasColumnType("TEXT");
 
                     b.Property<decimal>("FlatDiscount")
                         .HasColumnType("decimal(18,2)");
@@ -3683,6 +3920,9 @@ namespace POS.Domain.Migrations
                         .HasColumnType("TEXT");
 
                     b.Property<string>("SaleReturnNote")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("SaleType")
                         .HasColumnType("TEXT");
 
                     b.Property<int>("Status")
@@ -4840,6 +5080,36 @@ namespace POS.Domain.Migrations
                     b.Navigation("Tax");
                 });
 
+            modelBuilder.Entity("POS.Data.Entities.FBR.FBRConfiguration", b =>
+                {
+                    b.HasOne("POS.Data.User", "CreatedByUser")
+                        .WithMany()
+                        .HasForeignKey("CreatedBy")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("CreatedByUser");
+                });
+
+            modelBuilder.Entity("POS.Data.Entities.FBR.FBRSubmissionLog", b =>
+                {
+                    b.HasOne("POS.Data.User", "CreatedByUser")
+                        .WithMany()
+                        .HasForeignKey("CreatedBy")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("POS.Data.SalesOrder", "SalesOrder")
+                        .WithMany("FBRSubmissionLogs")
+                        .HasForeignKey("SalesOrderId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("CreatedByUser");
+
+                    b.Navigation("SalesOrder");
+                });
+
             modelBuilder.Entity("POS.Data.Entities.InquiryActivity", b =>
                 {
                     b.HasOne("POS.Data.User", "AssignUser")
@@ -5943,6 +6213,8 @@ namespace POS.Domain.Migrations
 
             modelBuilder.Entity("POS.Data.SalesOrder", b =>
                 {
+                    b.Navigation("FBRSubmissionLogs");
+
                     b.Navigation("SalesOrderItems");
 
                     b.Navigation("SalesOrderPayments");
