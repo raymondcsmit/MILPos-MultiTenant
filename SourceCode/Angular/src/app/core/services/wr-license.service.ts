@@ -53,12 +53,12 @@ export class WrLicenseService {
     return localStorage.getItem(this.keyValues.BEARER_TOKEN);
   }
 
-  getAuthObject(): User {
+  getAuthObject(): User | null {
     const authJson = localStorage.getItem(this.keyValues.authObj);
     if (authJson) {
       return JSON.parse(authJson);
     }
-    return {} as User;
+    return null;
   }
 
   setTokenValue(userAuth: any): void {

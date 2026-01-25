@@ -2,7 +2,7 @@ import { inject } from '@angular/core';
 import { ActivatedRouteSnapshot, ResolveFn, Router } from '@angular/router';
 import { CompanyProfileService } from './company-profile.service';
 import { of } from 'rxjs';
-import { take, mergeMap } from 'rxjs/operators';
+import { take, mergeMap, catchError } from 'rxjs/operators';
 import { CompanyProfile } from '@core/domain-classes/company-profile';
 import { environment } from '@environments/environment';
 
@@ -21,9 +21,12 @@ export const CompanyProfileResolver: ResolveFn<CompanyProfile | null> = (route: 
         }
         return of(companyProfile);
       } else {
-        router.navigate(['/dashboard']);
         return of(null);
       }
+    }),
+    catchError((err) => {
+      console.error('CompanyProfileResolver failed:', err);
+      return of(null);
     })
   );
 };

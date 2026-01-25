@@ -337,7 +337,7 @@ export class HeaderComponent extends BaseComponent implements OnInit {
   }
 
   setTopLogAndName() {
-    this.sub$.sink = this.securityService.securityObject$.subscribe((c) => {
+    this.sub$.sink = this.securityService.securityObject$.subscribe((c: User | null) => {
       if (c) {
         this.appUserAuth = c;
         if (this.appUserAuth.profilePhoto) {

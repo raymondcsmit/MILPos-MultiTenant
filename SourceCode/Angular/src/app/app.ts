@@ -51,7 +51,7 @@ export class App extends BaseComponent implements OnInit {
 
   getAuthObj() {
     this.sub$.sink = this.securityService.securityObject$.subscribe(
-      (c: User) => {
+      (c: User | null) => {
         if (c) {
           const online: OnlineUser = {
             email: c.email,

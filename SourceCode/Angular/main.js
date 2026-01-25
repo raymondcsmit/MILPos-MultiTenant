@@ -7,6 +7,17 @@ const fs = require('fs');
 let win;
 let apiProcess;
 
+// Shared logging function
+function logToFile(msg) {
+    try {
+        const userDataPath = app.getPath('userData');
+        const logTrace = path.join(userDataPath, 'api-debug.log');
+        fs.appendFileSync(logTrace, `[${new Date().toISOString()}] ${msg}\n`);
+    } catch(e) { 
+        console.error("Log failed", e); 
+    }
+}
+
 function startApi() {
   const isDev = process.argv.includes('--dev');
   if (isDev) return;
@@ -14,26 +25,21 @@ function startApi() {
   if (app.isPackaged) {
     const apiPath = path.join(process.resourcesPath, 'api', 'POS.API.exe');
     console.log(`Starting API from: ${apiPath}`);
-
+    
     // Determine the user data directory (writable)
     const userDataPath = app.getPath('userData');
     const dbPath = path.join(userDataPath, 'POSDb.db');
     const sourceDbPath = path.join(process.resourcesPath, 'api', 'POSDb.db');
     
-    // Setup logging first
-    const logTrace = path.join(userDataPath, 'api-debug.log');
     // Ensure log file exists or is created
+    const logTrace = path.join(userDataPath, 'api-debug.log');
     try {
         if (!fs.existsSync(logTrace)) {
              fs.writeFileSync(logTrace, `[${new Date().toISOString()}] LOG START\n`);
         }
     } catch(e) { console.error("Failed to init log", e); }
 
-    const appendLog = (msg) => {
-        try {
-            fs.appendFileSync(logTrace, `[${new Date().toISOString()}] ${msg}\n`);
-        } catch(e) { console.error("Log failed", e); }
-    };
+    const appendLog = logToFile; // Use shared logger
 
     appendLog(`STARTUP: API Path: ${apiPath}`);
     appendLog(`STARTUP: Resources Path: ${process.resourcesPath}`);
@@ -98,7 +104,18 @@ function startApi() {
            if (win) {
              console.log('API Server is ready. Reloading window...');
              appendLog('API Server is ready. Reloading window...');
-             win.reload();
+             
+             // If packaged, reload using loadFile to ensure correct protocol/path
+             if (app.isPackaged) {
+                 const indexPath = path.join(__dirname, 'dist/index.html');
+                 win.loadFile(indexPath).catch(e => {
+                     appendLog(`Reload failed: ${e}`);
+                     // Last resort fallback
+                     win.reload();
+                 });
+             } else {
+                 win.reload();
+             }
            }
         }
       });
@@ -146,21 +163,49 @@ function createWindow() {
   } else {
     let indexPath;
     if (app.isPackaged) {
-      // Use absolute path for packaged app
-      indexPath = path.join(process.resourcesPath, 'app.asar/dist/index.html');
+      // Use __dirname which resolves correctly inside ASAR
+      indexPath = path.join(__dirname, 'dist/index.html');
       console.log('Loading packaged index from:', indexPath);
+      logToFile(`Loading packaged index from: ${indexPath}`);
+      
+      // Debug: Check if file exists (fs works inside ASAR)
+      try {
+        if (fs.existsSync(indexPath)) {
+           console.log('Index file found at:', indexPath);
+           logToFile(`Index file found at: ${indexPath}`);
+        } else {
+           console.error('Index file NOT found at:', indexPath);
+           logToFile(`ERROR: Index file NOT found at: ${indexPath}`);
+           logToFile(`Root contents: ${fs.readdirSync(__dirname).join(', ')}`);
+           const distPath = path.join(__dirname, 'dist');
+           if (fs.existsSync(distPath)) {
+               logToFile(`Dist contents: ${fs.readdirSync(distPath).join(', ')}`);
+           }
+        }
+      } catch (e) {
+        console.error('Error checking file existence:', e);
+        logToFile(`Error checking file existence: ${e}`);
+      }
     } else {
       indexPath = path.join(__dirname, '../SQLAPI/POS.API/ClientApp/browser/index.html');
       console.log('Loading dev index from:', indexPath);
     }
 
-    win.loadFile(indexPath).catch(e => {
+    // Use loadFile for robust local file loading
+    // win.loadFile handles encoding and file:// protocol automatically
+    win.loadFile(indexPath).then(() => {
+        logToFile(`Successfully loaded file: ${indexPath}`);
+    }).catch(e => {
         console.error('Failed to load file:', e);
-        // Fallback for different path structures
-        if (app.isPackaged) {
-             const fallbackPath = path.join(__dirname, 'dist/index.html');
-             console.log('Trying fallback path:', fallbackPath);
-             win.loadFile(fallbackPath);
+        logToFile(`Failed to load file: ${e}`);
+        
+        // Fallback: try converting to file URL explicitly using node's url module
+        try {
+            const fileUrl = url.pathToFileURL(indexPath).toString();
+            logToFile(`Attempting fallback load with URL: ${fileUrl}`);
+            win.loadURL(fileUrl);
+        } catch (e2) {
+            logToFile(`Fallback failed: ${e2}`);
         }
     });
   }

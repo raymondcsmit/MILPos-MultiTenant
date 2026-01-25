@@ -82,8 +82,10 @@ export class SecurityService {
     if (this._selectedLocation) {
       return this._selectedLocation;
     }
-    const authObj: User = this.wrLicenseService.getAuthObject();
-    this._selectedLocation = authObj.selectedLocation ?? '';
+    const authObj = this.wrLicenseService.getAuthObject();
+    if (authObj) {
+      this._selectedLocation = authObj.selectedLocation ?? '';
+    }
     return this._selectedLocation;
   }
 
@@ -91,7 +93,7 @@ export class SecurityService {
     return this.Claims.length == 1 && this.Claims[0].toLowerCase() == 'pos_pos';
   }
 
-  public get securityObject$(): Observable<User> {
+  public get securityObject$(): Observable<User | null> {
     return this._securityObject$.pipe(
       map((c) => {
         if (c) {
@@ -249,8 +251,7 @@ export class SecurityService {
 
   isLogin(): boolean {
     const authStr = this.wrLicenseService.getAuthObject();
-    if (authStr) return true;
-    else return false;
+    return !!authStr;
   }
 
   logout(): void {
@@ -275,20 +276,24 @@ export class SecurityService {
   }
 
   updateSelectedLocation(selectedLocation: string) {
-    const authObj: User = this.wrLicenseService.getAuthObject();
-    authObj.selectedLocation = selectedLocation;
-    localStorage.setItem(this.wrLicenseService.keyValues.authObj, JSON.stringify(authObj));
-    this._selectedLocation = selectedLocation;
+    const authObj = this.wrLicenseService.getAuthObject();
+    if (authObj) {
+      authObj.selectedLocation = selectedLocation;
+      localStorage.setItem(this.wrLicenseService.keyValues.authObj, JSON.stringify(authObj));
+      this._selectedLocation = selectedLocation;
+    }
   }
 
   updateUserProfile(user: User) {
-    const authObj: User = this.wrLicenseService.getAuthObject();
-    authObj.firstName = user.firstName;
-    authObj.lastName = user.lastName;
-    authObj.profilePhoto = user.profilePhoto;
-    authObj.phoneNumber = user.phoneNumber;
-    localStorage.setItem(this.wrLicenseService.keyValues.authObj, JSON.stringify(authObj));
-    this._securityObject$.next(this.clonerService.deepClone<User>(authObj));
+    const authObj = this.wrLicenseService.getAuthObject();
+    if (authObj) {
+      authObj.firstName = user.firstName;
+      authObj.lastName = user.lastName;
+      authObj.profilePhoto = user.profilePhoto;
+      authObj.phoneNumber = user.phoneNumber;
+      localStorage.setItem(this.wrLicenseService.keyValues.authObj, JSON.stringify(authObj));
+      this._securityObject$.next(this.clonerService.deepClone<User>(authObj));
+    }
   }
 
   // This method can be called a couple of different ways
@@ -339,7 +344,7 @@ export class SecurityService {
     return ret;
   }
 
-  getUserDetail(): User {
+  getUserDetail(): User | null {
     return this.wrLicenseService.getAuthObject();
   }
 }
