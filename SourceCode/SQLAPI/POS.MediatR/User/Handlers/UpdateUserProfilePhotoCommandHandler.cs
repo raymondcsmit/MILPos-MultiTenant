@@ -48,6 +48,7 @@ namespace POS.MediatR.Handlers
         public async Task<ServiceResponse<UserDto>> Handle(UpdateUserProfilePhotoCommand request, CancellationToken cancellationToken)
         {
             var filePath = Path.Combine(_webHostEnvironment.WebRootPath, _pathHelper.UserProfilePath);
+            Console.WriteLine($"[DEBUG] UpdateUserProfilePhoto - Target Directory: {filePath}");
             var appUser = await _userManager.FindByIdAsync(_userInfoToken.Id.ToString());
             if (appUser == null)
             {
@@ -56,6 +57,7 @@ namespace POS.MediatR.Handlers
             }
             if (!Directory.Exists(filePath))
             {
+                Console.WriteLine($"[DEBUG] Directory does not exist. Creating...");
                 Directory.CreateDirectory(filePath);
             }
             // delete existing file
@@ -94,7 +96,7 @@ namespace POS.MediatR.Handlers
             }
 
             if (!string.IsNullOrWhiteSpace(appUser.ProfilePhoto))
-                appUser.ProfilePhoto = Path.Combine(_pathHelper.UserProfilePath, appUser.ProfilePhoto);
+                appUser.ProfilePhoto = Path.Combine(_pathHelper.UserProfilePath, appUser.ProfilePhoto).Replace("\\", "/");
             return ServiceResponse<UserDto>.ReturnResultWith200(_mapper.Map<UserDto>(appUser));
         }
     }

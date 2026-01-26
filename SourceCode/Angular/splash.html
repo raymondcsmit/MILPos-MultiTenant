@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Starting MIL POS...</title>
+    <style>
+        body {
+            margin: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background-color: #f0f2f5;
+            font-family: 'Segoe UI', sans-serif;
+            overflow: hidden;
+            user-select: none;
+        }
+        .container {
+            text-align: center;
+        }
+        .loader {
+            border: 5px solid #e0e0e0;
+            border-top: 5px solid #2c3e50; /* Dark blue/grey matching POS feels */
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 20px auto;
+        }
+        h3 {
+            color: #2c3e50;
+            margin: 0 0 10px 0;
+            font-weight: 600;
+        }
+        .status {
+            color: #7f8c8d;
+            font-size: 14px;
+            margin-top: 5px;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="loader"></div>
+        <h3>Starting MIL POS</h3>
+        <div class="status">Initializing system services...</div>
+    </div>
+</body>
+</html>

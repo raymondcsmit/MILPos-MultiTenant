@@ -53,7 +53,7 @@ public class GetCompanyProfileQueryHandler(
         response.FinancialYears = mapper.Map<List<FinancialYearDto>>(financialYears);
         if (!string.IsNullOrWhiteSpace(response.LogoUrl))
         {
-            response.LogoUrl = Path.Combine(pathHelper.CompanyLogo, response.LogoUrl);
+            response.LogoUrl = Path.Combine(pathHelper.CompanyLogo, response.LogoUrl).Replace("\\", "/");
         }
         return mapper.Map<CompanyProfileDto>(response);
     }

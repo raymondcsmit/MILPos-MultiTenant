@@ -15,7 +15,11 @@ using POS.API.Helpers;
 using POS.Domain;
 using System;
 
+using OfficeOpenXml; // Add this namespace
+
 var builder = WebApplication.CreateBuilder(args);
+ExcelPackage.License.SetNonCommercialOrganization("MIL POS");
+//ExcelPackage.License.LicenseContext = LicenseContext.NonCommercial; // Set license globally
 builder.Services.AddTransient<JobService>();
 
 

@@ -22,7 +22,7 @@ export interface ImportError {
   providedIn: 'root'
 })
 export class ImportExportService {
-  private apiUrl = `${environment.apiUrl}importexport`;
+  private apiUrl = 'importexport';
 
   constructor(private http: HttpClient) {}
 

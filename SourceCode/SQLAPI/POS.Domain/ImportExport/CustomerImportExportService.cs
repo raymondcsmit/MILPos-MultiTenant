@@ -25,7 +25,6 @@ namespace POS.Domain.ImportExport
         {
             _context = context;
             _logger = logger;
-            ExcelPackage.LicenseContext = LicenseContext.NonCommercial;
         }
 
         public async Task<byte[]> GenerateTemplateAsync(FileFormat format)

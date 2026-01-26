@@ -5,6 +5,7 @@ const { spawn } = require('child_process');
 const fs = require('fs');
 
 let win;
+let splash;
 let apiProcess;
 
 // Shared logging function
@@ -101,21 +102,16 @@ function startApi() {
         console.log(`API Output: ${data}`);
         appendLog(`STDOUT: ${data}`);
         if (data.toString().includes('Application is running on')) {
-           if (win) {
-             console.log('API Server is ready. Reloading window...');
-             appendLog('API Server is ready. Reloading window...');
-             
-             // If packaged, reload using loadFile to ensure correct protocol/path
-             if (app.isPackaged) {
-                 const indexPath = path.join(__dirname, 'dist/index.html');
-                 win.loadFile(indexPath).catch(e => {
-                     appendLog(`Reload failed: ${e}`);
-                     // Last resort fallback
-                     win.reload();
-                 });
-             } else {
-                 win.reload();
-             }
+           console.log('API Server is ready.');
+           appendLog('API Server is ready.');
+           
+           if (!win) {
+             createMainWindow();
+           }
+           
+           if (splash) {
+             splash.close();
+             splash = null;
            }
         }
       });
@@ -144,11 +140,31 @@ function startApi() {
 }
 
 function createWindow() {
-  startApi();
+  splash = new BrowserWindow({
+    width: 600,
+    height: 400,
+    transparent: false,
+    frame: false,
+    alwaysOnTop: true,
+    webPreferences: {
+        nodeIntegration: false
+    }
+  });
 
+  const splashPath = app.isPackaged
+      ? path.join(__dirname, 'splash.html') 
+      : path.join(__dirname, 'splash.html');
+
+  splash.loadFile(splashPath);
+
+  startApi();
+}
+
+function createMainWindow() {
   win = new BrowserWindow({
     width: 1200,
     height: 800,
+    show: false, // Wait for ready-to-show
     webPreferences: {
       nodeIntegration: true,
       contextIsolation: false
@@ -163,52 +179,20 @@ function createWindow() {
   } else {
     let indexPath;
     if (app.isPackaged) {
-      // Use __dirname which resolves correctly inside ASAR
-      indexPath = path.join(__dirname, 'dist/index.html');
-      console.log('Loading packaged index from:', indexPath);
-      logToFile(`Loading packaged index from: ${indexPath}`);
-      
-      // Debug: Check if file exists (fs works inside ASAR)
-      try {
-        if (fs.existsSync(indexPath)) {
-           console.log('Index file found at:', indexPath);
-           logToFile(`Index file found at: ${indexPath}`);
-        } else {
-           console.error('Index file NOT found at:', indexPath);
-           logToFile(`ERROR: Index file NOT found at: ${indexPath}`);
-           logToFile(`Root contents: ${fs.readdirSync(__dirname).join(', ')}`);
-           const distPath = path.join(__dirname, 'dist');
-           if (fs.existsSync(distPath)) {
-               logToFile(`Dist contents: ${fs.readdirSync(distPath).join(', ')}`);
-           }
-        }
-      } catch (e) {
-        console.error('Error checking file existence:', e);
-        logToFile(`Error checking file existence: ${e}`);
-      }
+      indexPath = path.join(__dirname, 'dist/index.html'); // Corrected path mainly for packaged app
     } else {
       indexPath = path.join(__dirname, '../SQLAPI/POS.API/ClientApp/browser/index.html');
-      console.log('Loading dev index from:', indexPath);
     }
 
-    // Use loadFile for robust local file loading
-    // win.loadFile handles encoding and file:// protocol automatically
-    win.loadFile(indexPath).then(() => {
-        logToFile(`Successfully loaded file: ${indexPath}`);
-    }).catch(e => {
+    win.loadFile(indexPath).catch(e => {
         console.error('Failed to load file:', e);
-        logToFile(`Failed to load file: ${e}`);
-        
-        // Fallback: try converting to file URL explicitly using node's url module
-        try {
-            const fileUrl = url.pathToFileURL(indexPath).toString();
-            logToFile(`Attempting fallback load with URL: ${fileUrl}`);
-            win.loadURL(fileUrl);
-        } catch (e2) {
-            logToFile(`Fallback failed: ${e2}`);
-        }
+        // Fallback or log error
     });
   }
+
+  win.once('ready-to-show', () => {
+      win.show();
+  });
 
   win.on('closed', () => {
     win = null;

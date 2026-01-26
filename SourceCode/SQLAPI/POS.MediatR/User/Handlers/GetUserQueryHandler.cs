@@ -40,7 +40,7 @@ namespace POS.MediatR.Handlers
                 var entityDto = _mapper.Map<UserDto>(entity);
                 if (!string.IsNullOrWhiteSpace(entityDto.ProfilePhoto))
                 {
-                    entityDto.ProfilePhoto = Path.Combine(_pathHelper.UserProfilePath, entityDto.ProfilePhoto);
+                    entityDto.ProfilePhoto = Path.Combine(_pathHelper.UserProfilePath, entityDto.ProfilePhoto).Replace("\\", "/");
                 }
                 return ServiceResponse<UserDto>.ReturnResultWith200(entityDto);
             }

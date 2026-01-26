@@ -31,17 +31,23 @@ export const HttpRequestInterceptor: HttpInterceptorFn = (
       finalize(() => loadingService.endRequest())
     );
   }
-  const url = req.url.lastIndexOf('api') > -1 ? req.url : 'api/' + req.url;
   let newReq: HttpRequest<any>;
-  if (token) {
+  if (req.url.startsWith('http://') || req.url.startsWith('https://')) {
     newReq = req.clone({
-      headers: req.headers.set('Authorization', 'Bearer ' + token),
-      url: `${baseUrl}${url}`,
+      headers: token ? req.headers.set('Authorization', 'Bearer ' + token) : req.headers
     });
   } else {
-    newReq = req.clone({
-      url: `${baseUrl}${url}`,
-    });
+    const url = req.url.lastIndexOf('api') > -1 ? req.url : 'api/' + req.url;
+    if (token) {
+      newReq = req.clone({
+        headers: req.headers.set('Authorization', 'Bearer ' + token),
+        url: `${baseUrl}${url}`,
+      });
+    } else {
+      newReq = req.clone({
+        url: `${baseUrl}${url}`,
+      });
+    }
   }
   return next(newReq)
     .pipe(

@@ -1,5 +1,6 @@
 using System;
 using System.IO;
+using Microsoft.Extensions.FileProviders;
 using System.Linq;
 using System.Reflection;
 using FluentValidation;
@@ -292,6 +293,18 @@ namespace POS.API
                 c.RoutePrefix = "swagger";
             });
             app.UseStaticFiles();
+            
+            // Serve files from ProgramData/MILPOS/wwwroot to handle permission issues in Electron
+            var appDataPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData), "MILPOS", "wwwroot");
+            if (!Directory.Exists(appDataPath))
+            {
+                Directory.CreateDirectory(appDataPath);
+            }
+            app.UseStaticFiles(new StaticFileOptions
+            {
+                FileProvider = new PhysicalFileProvider(appDataPath),
+                RequestPath = "" 
+            });
 
             // Get deployment settings
             var deploymentSettings = app.ApplicationServices.GetService<Microsoft.Extensions.Options.IOptions<DeploymentSettings>>()?.Value;

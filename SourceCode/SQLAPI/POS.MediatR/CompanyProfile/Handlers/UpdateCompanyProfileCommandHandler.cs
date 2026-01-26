@@ -62,10 +62,13 @@ namespace POS.MediatR.Handlers
         public async Task<ServiceResponse<CompanyProfileDto>> Handle(UpdateCompanyProfileCommand request, CancellationToken cancellationToken)
         {
             var logoUrl = string.Empty;
+            var oldLogoUrl = string.Empty;
 
             if (!string.IsNullOrWhiteSpace(request.ImageData))
             {
-                logoUrl = $"{Guid.NewGuid()}.{Path.GetExtension(request.LogoUrl)}";
+                var ext = Path.GetExtension(request.LogoUrl);
+                if (string.IsNullOrWhiteSpace(ext)) ext = ".png";
+                logoUrl = $"{Guid.NewGuid()}{ext}";
             }
 
             CompanyProfile companyProfile;
@@ -79,10 +82,10 @@ namespace POS.MediatR.Handlers
                     companyProfile.Phone = request.Phone;
                     companyProfile.Email = request.Email;
                     companyProfile.CurrencyCode = request.CurrencyCode;
-                    companyProfile.TaxName = request.TaxName;
                     companyProfile.TaxNumber = request.TaxNumber;
                     if (!string.IsNullOrWhiteSpace(request.ImageData))
                     {
+                        oldLogoUrl = companyProfile.LogoUrl;
                         companyProfile.LogoUrl = logoUrl;
                     }
                     _companyProfileRepository.Update(companyProfile);
@@ -125,6 +128,23 @@ namespace POS.MediatR.Handlers
                 {
                     Directory.CreateDirectory(pathToSave);
                 }
+
+                if (!string.IsNullOrWhiteSpace(oldLogoUrl))
+                {
+                    var oldFilePath = Path.Combine(pathToSave, oldLogoUrl);
+                    if (File.Exists(oldFilePath))
+                    {
+                        try
+                        {
+                            File.Delete(oldFilePath);
+                        }
+                        catch (Exception ex)
+                        {
+                            _logger.LogError(ex, "Error deleting old company logo.");
+                        }
+                    }
+                }
+
                 var documentPath = Path.Combine(pathToSave, companyProfile.LogoUrl);
                 string base64 = request.ImageData.Split(',').LastOrDefault();
                 if (!string.IsNullOrWhiteSpace(base64))
@@ -134,16 +154,16 @@ namespace POS.MediatR.Handlers
                     {
                         await File.WriteAllBytesAsync($"{documentPath}", bytes);
                     }
-                    catch
+                    catch (Exception ex)
                     {
-                        _logger.LogError("Error while saving files");
+                        _logger.LogError(ex, "Error while saving files");
                     }
                 }
             }
             var result = _mapper.Map<CompanyProfileDto>(companyProfile);
             if (!string.IsNullOrWhiteSpace(result.LogoUrl))
             {
-                result.LogoUrl = Path.Combine(_pathHelper.CompanyLogo, result.LogoUrl);
+                result.LogoUrl = Path.Combine(_pathHelper.CompanyLogo, result.LogoUrl).Replace("\\", "/");
             }
 
             result.Languages = await _mediator.Send(new GetAllLanguageCommand());
