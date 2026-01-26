@@ -139,6 +139,7 @@ namespace POS.API
             services.AddSingleton(MapperConfig.GetMapperConfigs());
             services.AddScoped<SeedingService>();
             services.AddScoped<TenantDataMigrationService>();
+            services.AddScoped<POS.Common.Services.IFileStorageService, POS.Helper.Services.FileStorageService>();
             
             // Import/Export Services
             services.AddScoped<IImportExportService<POS.Data.Product>, ProductImportExportService>();
@@ -282,6 +283,7 @@ namespace POS.API
             //         });
             //     });
             // }
+            app.UseMiddleware<POS.API.Middleware.GlobalExceptionHandlerMiddleware>();
             app.UseSwagger(c =>
             {
                 c.SerializeAsV2 = true;

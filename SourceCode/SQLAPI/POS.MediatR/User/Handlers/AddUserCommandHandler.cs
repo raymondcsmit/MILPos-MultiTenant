@@ -16,6 +16,7 @@ using POS.Data.Entities;
 using System.Linq;
 using POS.Common.UnitOfWork;
 using POS.Domain;
+using POS.Common.Services;
 
 namespace POS.MediatR.Handlers
 {
@@ -29,6 +30,7 @@ namespace POS.MediatR.Handlers
         private readonly PathHelper _pathHelper;
         private readonly IUserLocationsRepository _userLocationsRepository;
         IUnitOfWork<POSDbContext> _uow;
+        private readonly IFileStorageService _fileStorageService;
 
         public AddUserCommandHandler(
             IMapper mapper,
@@ -36,9 +38,11 @@ namespace POS.MediatR.Handlers
             UserInfoToken userInfoToken,
             ILogger<AddUserCommandHandler> logger,
             IWebHostEnvironment webHostEnvironment,
+
             PathHelper pathHelper,
             IUserLocationsRepository userLocationsRepository,
-            IUnitOfWork<POSDbContext> uow
+            IUnitOfWork<POSDbContext> uow,
+            IFileStorageService fileStorageService
             )
         {
             _mapper = mapper;
@@ -49,6 +53,7 @@ namespace POS.MediatR.Handlers
             _pathHelper = pathHelper;
             _userLocationsRepository = userLocationsRepository;
             _uow = uow;
+            _fileStorageService = fileStorageService;
         }
         public async Task<ServiceResponse<UserDto>> Handle(AddUserCommand request, CancellationToken cancellationToken)
         {
@@ -114,14 +119,7 @@ namespace POS.MediatR.Handlers
 
             if (!string.IsNullOrEmpty(request.ImgSrc))
             {
-
-                var pathToSave = Path.Combine(_webHostEnvironment.WebRootPath, _pathHelper.UserProfilePath);
-                if (!Directory.Exists(pathToSave))
-                {
-                    Directory.CreateDirectory(pathToSave);
-                }
-                var filePath = Path.Combine(pathToSave, entity.ProfilePhoto);
-                await FileData.SaveFile(pathToSave, request.ImgSrc);
+                await _fileStorageService.SaveFileAsync(_pathHelper.UserProfilePath, request.ImgSrc, entity.ProfilePhoto);
             }
             return ServiceResponse<UserDto>.ReturnResultWith200(_mapper.Map<UserDto>(entity));
         }

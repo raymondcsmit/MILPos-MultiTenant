@@ -10,9 +10,10 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using System;
-using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
+using POS.Common.Services;
+using System.IO;
 
 namespace POS.MediatR.Handlers
 {
@@ -23,14 +24,17 @@ namespace POS.MediatR.Handlers
         private readonly ILogger<UpdateSupplierCommandHandler> _logger;
         private readonly IMapper _mapper;
         private readonly IWebHostEnvironment _webHostEnvironment;
+
         private readonly PathHelper _pathHelper;
+        private readonly IFileStorageService _fileStorageService;
 
         public UpdateSupplierCommandHandler(ISupplierRepository supplierRepository,
             ILogger<UpdateSupplierCommandHandler> logger,
             IUnitOfWork<POSDbContext> uow,
             IMapper mapper,
               IWebHostEnvironment webHostEnvironment,
-              PathHelper pathHelper
+              PathHelper pathHelper,
+              IFileStorageService fileStorageService
             )
         {
             _supplierRepository = supplierRepository;
@@ -38,7 +42,9 @@ namespace POS.MediatR.Handlers
             _logger = logger;
             _mapper = mapper;
             _webHostEnvironment = webHostEnvironment;
+
             _pathHelper = pathHelper;
+            _fileStorageService = fileStorageService;
         }
 
         public async Task<ServiceResponse<SupplierDto>> Handle(UpdateSupplierCommand request, CancellationToken cancellationToken)
@@ -83,22 +89,15 @@ namespace POS.MediatR.Handlers
 
             if (request.IsImageUpload)
             {
-                string contentRootPath = _webHostEnvironment.WebRootPath;
                 // delete old file
-                if (!string.IsNullOrWhiteSpace(oldImageUrl)
-                    && File.Exists(Path.Combine(contentRootPath, _pathHelper.SupplierImagePath, oldImageUrl)))
+                if (!string.IsNullOrWhiteSpace(oldImageUrl))
                 {
-                    FileData.DeleteFile(Path.Combine(contentRootPath, _pathHelper.SupplierImagePath, oldImageUrl));
+                    _fileStorageService.DeleteFile(Path.Combine(_pathHelper.SupplierImagePath, oldImageUrl));
                 }
                 // save new file
                 if (!string.IsNullOrWhiteSpace(request.Logo))
                 {
-                    var parentPath = Path.Combine(contentRootPath, _pathHelper.SupplierImagePath);
-                    if (!Directory.Exists(parentPath))
-                    {
-                        Directory.CreateDirectory(parentPath);
-                    }
-                    await FileData.SaveFile(Path.Combine(parentPath, entity.Url), request.Logo);
+                    await _fileStorageService.SaveFileAsync(_pathHelper.SupplierImagePath, request.Logo, entity.Url);
                 }
             }
             return ServiceResponse<SupplierDto>.ReturnResultWith200(_mapper.Map<SupplierDto>(entity));

@@ -11,7 +11,10 @@ using Microsoft.Extensions.Logging;
 using OfficeOpenXml;
 using OfficeOpenXml.Style;
 using POS.Data;
+using POS.Data.Dto; // Add for UserInfoToken
 using POS.Domain.ImportExport.DTOs;
+
+using POS.Domain;
 
 namespace POS.Domain.ImportExport
 {
@@ -19,11 +22,19 @@ namespace POS.Domain.ImportExport
     {
         private readonly POSDbContext _context;
         private readonly ILogger<ProductImportExportService> _logger;
+        private readonly ITenantProvider _tenantProvider;
+        private readonly UserInfoToken _userInfoToken;
 
-        public ProductImportExportService(POSDbContext context, ILogger<ProductImportExportService> logger)
+        public ProductImportExportService(
+            POSDbContext context, 
+            ILogger<ProductImportExportService> logger, 
+            ITenantProvider tenantProvider,
+            UserInfoToken userInfoToken)
         {
             _context = context;
             _logger = logger;
+            _tenantProvider = tenantProvider;
+            _userInfoToken = userInfoToken;
         }
 
         public async Task<byte[]> GenerateTemplateAsync(FileFormat format)
@@ -522,13 +533,22 @@ namespace POS.Domain.ImportExport
 
         private async Task<Product> MapToProductAsync(ProductImportDto dto)
         {
+            var tenantId = _tenantProvider.GetTenantId();
+            if (!tenantId.HasValue || tenantId.Value == Guid.Empty)
+            {
+                throw new Exception("Tenant ID not found. Cannot import product.");
+            }
+
             var category = await _context.ProductCategories.FirstAsync(c => c.Name == dto.Category && !c.IsDeleted);
             var brand = await _context.Brands.FirstAsync(b => b.Name == dto.Brand && !b.IsDeleted);
             var unit = await _context.UnitConversations.FirstAsync(u => u.Name == dto.Unit);
 
+            var userId = _userInfoToken.Id;
+
             return new Product
             {
                 Id = Guid.NewGuid(),
+                TenantId = tenantId.Value,
                 Code = dto.Code,
                 Name = dto.Name,
                 Barcode = dto.Barcode,
@@ -545,7 +565,11 @@ namespace POS.Domain.ImportExport
                 AlertQuantity = dto.AlertQuantity,
                 Description = dto.Description,
                 IsDeleted = false,
-                HasVariant = false
+                HasVariant = false,
+                CreatedBy = userId,
+                ModifiedBy = userId,
+                CreatedDate = DateTime.UtcNow,
+                ModifiedDate = DateTime.UtcNow
             };
         }
 

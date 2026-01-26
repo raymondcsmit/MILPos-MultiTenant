@@ -19,6 +19,7 @@ using POS.MediatR.CommandAndQuery;
 using POS.MediatR.Language.Commands;
 using POS.Repository;
 using POS.Repository.Accouting;
+using POS.Common.Services;
 
 namespace POS.MediatR.Handlers
 {
@@ -35,6 +36,7 @@ namespace POS.MediatR.Handlers
         private readonly ILocationRepository _locationRepository;
         private readonly IFinancialYearRepository _financialYearRepository;
         private readonly IMediator _mediator;
+        private readonly IFileStorageService _fileStorageService;
 
         public UpdateCompanyProfileCommandHandler(
             ICompanyProfileRepository companyProfileRepository,
@@ -46,7 +48,8 @@ namespace POS.MediatR.Handlers
             ILanguageRepository languageRepository,
             ILocationRepository locationRepository,
             IFinancialYearRepository financialYearRepository,
-            IMediator mediator)
+            IMediator mediator,
+            IFileStorageService fileStorageService)
         {
             _companyProfileRepository = companyProfileRepository;
             _mapper = mapper;
@@ -58,6 +61,7 @@ namespace POS.MediatR.Handlers
             _locationRepository = locationRepository;
             _financialYearRepository = financialYearRepository;
             _mediator = mediator;
+            _fileStorageService = fileStorageService;
         }
         public async Task<ServiceResponse<CompanyProfileDto>> Handle(UpdateCompanyProfileCommand request, CancellationToken cancellationToken)
         {
@@ -122,48 +126,25 @@ namespace POS.MediatR.Handlers
 
             if (!string.IsNullOrWhiteSpace(request.ImageData))
             {
-                string pathToSave = _webHostEnvironment.WebRootPath;
-                pathToSave = Path.Combine(pathToSave, _pathHelper.CompanyLogo);
-                if (!Directory.Exists(pathToSave))
-                {
-                    Directory.CreateDirectory(pathToSave);
-                }
-
                 if (!string.IsNullOrWhiteSpace(oldLogoUrl))
                 {
-                    var oldFilePath = Path.Combine(pathToSave, oldLogoUrl);
-                    if (File.Exists(oldFilePath))
-                    {
-                        try
-                        {
-                            File.Delete(oldFilePath);
-                        }
-                        catch (Exception ex)
-                        {
-                            _logger.LogError(ex, "Error deleting old company logo.");
-                        }
-                    }
+                    _fileStorageService.DeleteFile(Path.Combine(_pathHelper.CompanyLogo, oldLogoUrl));
                 }
 
-                var documentPath = Path.Combine(pathToSave, companyProfile.LogoUrl);
-                string base64 = request.ImageData.Split(',').LastOrDefault();
-                if (!string.IsNullOrWhiteSpace(base64))
-                {
-                    byte[] bytes = Convert.FromBase64String(base64);
-                    try
-                    {
-                        await File.WriteAllBytesAsync($"{documentPath}", bytes);
-                    }
-                    catch (Exception ex)
-                    {
-                        _logger.LogError(ex, "Error while saving files");
-                    }
-                }
+                await _fileStorageService.SaveFileAsync(_pathHelper.CompanyLogo, request.ImageData, companyProfile.LogoUrl);
             }
             var result = _mapper.Map<CompanyProfileDto>(companyProfile);
             if (!string.IsNullOrWhiteSpace(result.LogoUrl))
             {
-                result.LogoUrl = Path.Combine(_pathHelper.CompanyLogo, result.LogoUrl).Replace("\\", "/");
+                 var physicalPath = _fileStorageService.GetPhysicalPath(Path.Combine(_pathHelper.CompanyLogo, result.LogoUrl));
+                 if (File.Exists(physicalPath))
+                 {
+                     result.LogoUrl = Path.Combine(_pathHelper.CompanyLogo, result.LogoUrl).Replace("\\", "/");
+                 }
+                 else
+                 {
+                     result.LogoUrl = null;
+                 }
             }
 
             result.Languages = await _mediator.Send(new GetAllLanguageCommand());

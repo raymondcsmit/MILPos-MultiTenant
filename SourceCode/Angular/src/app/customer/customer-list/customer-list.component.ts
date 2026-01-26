@@ -238,7 +238,7 @@ export class CustomerListComponent extends BaseComponent implements OnInit {
 
   openImportDialog(): void {
     const dialogRef = this.dialog.open(ImportExportDialogComponent, {
-      width: '700px',
+      width: '850px',
       data: {
         entityType: 'customers',
         entityName: 'Customer'

@@ -12,6 +12,8 @@ using OfficeOpenXml;
 using OfficeOpenXml.Style;
 using POS.Data;
 using POS.Data.Entities;
+using POS.Data.Dto; // Add for UserInfoToken
+using POS.Domain;
 using POS.Domain.ImportExport.DTOs;
 
 namespace POS.Domain.ImportExport
@@ -20,11 +22,19 @@ namespace POS.Domain.ImportExport
     {
         private readonly POSDbContext _context;
         private readonly ILogger<SupplierImportExportService> _logger;
+        private readonly ITenantProvider _tenantProvider;
+        private readonly UserInfoToken _userInfoToken;
 
-        public SupplierImportExportService(POSDbContext context, ILogger<SupplierImportExportService> logger)
+        public SupplierImportExportService(
+            POSDbContext context, 
+            ILogger<SupplierImportExportService> logger, 
+            ITenantProvider tenantProvider,
+            UserInfoToken userInfoToken)
         {
             _context = context;
             _logger = logger;
+            _tenantProvider = tenantProvider;
+            _userInfoToken = userInfoToken;
         }
 
         public async Task<byte[]> GenerateTemplateAsync(FileFormat format)
@@ -417,6 +427,14 @@ namespace POS.Domain.ImportExport
 
         private async Task<Supplier> MapToSupplierAsync(SupplierImportDto dto)
         {
+            var tenantId = _tenantProvider.GetTenantId();
+            if (!tenantId.HasValue || tenantId.Value == Guid.Empty)
+            {
+                throw new Exception("Tenant ID not found. Cannot import supplier.");
+            }
+
+            var userId = _userInfoToken.Id;
+
             // Create billing address (required)
             var billingAddress = new SupplierAddress
             {
@@ -426,7 +444,7 @@ namespace POS.Domain.ImportExport
                 CountryName = dto.BillingCountry,
                 IsDeleted = false
             };
-            _context.SupplierAddresses.Add(billingAddress);
+            // _context.SupplierAddresses.Add(billingAddress); // Removed explicit Add, rely on navigation
 
             // Create shipping address (use billing if not provided)
             var shippingAddress = new SupplierAddress
@@ -437,11 +455,12 @@ namespace POS.Domain.ImportExport
                 CountryName = string.IsNullOrWhiteSpace(dto.ShippingCountry) ? dto.BillingCountry : dto.ShippingCountry,
                 IsDeleted = false
             };
-            _context.SupplierAddresses.Add(shippingAddress);
+            // _context.SupplierAddresses.Add(shippingAddress); // Removed explicit Add
 
             var supplier = new Supplier
             {
                 Id = Guid.NewGuid(),
+                TenantId = tenantId.Value,
                 SupplierName = dto.SupplierName,
                 ContactPerson = dto.ContactPerson,
                 Email = dto.Email,
@@ -450,9 +469,13 @@ namespace POS.Domain.ImportExport
                 Website = dto.Website,
                 TaxNumber = dto.TaxNumber,
                 Description = dto.Description,
-                BillingAddressId = billingAddress.Id,
-                ShippingAddressId = shippingAddress.Id,
-                IsDeleted = false
+                BillingAddress = billingAddress,   // Navigation Property
+                ShippingAddress = shippingAddress, // Navigation Property
+                IsDeleted = false,
+                CreatedBy = userId,
+                ModifiedBy = userId,
+                CreatedDate = DateTime.UtcNow,
+                ModifiedDate = DateTime.UtcNow
             };
 
             return await Task.FromResult(supplier);

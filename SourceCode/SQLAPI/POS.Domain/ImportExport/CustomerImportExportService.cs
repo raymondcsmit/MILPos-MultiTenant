@@ -12,6 +12,8 @@ using OfficeOpenXml;
 using OfficeOpenXml.Style;
 using POS.Data;
 using POS.Data.Entities;
+using POS.Data.Dto; // Add for UserInfoToken
+using POS.Domain;
 using POS.Domain.ImportExport.DTOs;
 
 namespace POS.Domain.ImportExport
@@ -20,11 +22,19 @@ namespace POS.Domain.ImportExport
     {
         private readonly POSDbContext _context;
         private readonly ILogger<CustomerImportExportService> _logger;
+        private readonly ITenantProvider _tenantProvider;
+        private readonly UserInfoToken _userInfoToken;
 
-        public CustomerImportExportService(POSDbContext context, ILogger<CustomerImportExportService> logger)
+        public CustomerImportExportService(
+            POSDbContext context, 
+            ILogger<CustomerImportExportService> logger, 
+            ITenantProvider tenantProvider,
+            UserInfoToken userInfoToken)
         {
             _context = context;
             _logger = logger;
+            _tenantProvider = tenantProvider;
+            _userInfoToken = userInfoToken;
         }
 
         public async Task<byte[]> GenerateTemplateAsync(FileFormat format)
@@ -409,9 +419,18 @@ namespace POS.Domain.ImportExport
 
         private async Task<Customer> MapToCustomerAsync(CustomerImportDto dto)
         {
+            var tenantId = _tenantProvider.GetTenantId();
+            if (!tenantId.HasValue || tenantId.Value == Guid.Empty)
+            {
+                throw new Exception("Tenant ID not found. Cannot import customer.");
+            }
+
+            var userId = _userInfoToken.Id;
+
             var customer = new Customer
             {
                 Id = Guid.NewGuid(),
+                TenantId = tenantId.Value,
                 CustomerName = dto.CustomerName,
                 ContactPerson = dto.ContactPerson,
                 Email = dto.Email,
@@ -421,7 +440,11 @@ namespace POS.Domain.ImportExport
                 TaxNumber = dto.TaxNumber,
                 Description = dto.Description,
                 IsDeleted = false,
-                IsWalkIn = false
+                IsWalkIn = false,
+                CreatedBy = userId,
+                ModifiedBy = userId,
+                CreatedDate = DateTime.UtcNow,
+                ModifiedDate = DateTime.UtcNow
             };
 
             // Create billing address if provided
@@ -435,8 +458,8 @@ namespace POS.Domain.ImportExport
                     CountryName = dto.BillingCountry,
                     IsDeleted = false
                 };
-                _context.ContactAddresses.Add(billingAddress);
-                customer.BillingAddressId = billingAddress.Id;
+                // Use Navigation Property to ensure EF inserts Address before Customer
+                customer.BillingAddress = billingAddress;
             }
 
             // Create shipping address if provided
@@ -450,8 +473,8 @@ namespace POS.Domain.ImportExport
                     CountryName = dto.ShippingCountry,
                     IsDeleted = false
                 };
-                _context.ContactAddresses.Add(shippingAddress);
-                customer.ShippingAddressId = shippingAddress.Id;
+                // Use Navigation Property
+                customer.ShippingAddress = shippingAddress;
             }
 
             return await Task.FromResult(customer);

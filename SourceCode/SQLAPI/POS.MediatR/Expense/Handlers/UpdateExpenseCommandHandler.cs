@@ -16,10 +16,12 @@ using POS.Repository;
 using POS.Repository.Accouting;
 using System;
 using System.Collections.Generic;
-using System.IO;
-using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using POS.Common.Services;
+using System.Threading;
+using System.Linq;
+using System.IO;
 
 namespace POS.MediatR.Handlers
 {
@@ -43,6 +45,7 @@ namespace POS.MediatR.Handlers
         private readonly IInventoryService _inventoryService;
         private readonly IFinancialYearRepository _financialYearRepository;
         private readonly ITransactionStrategyFactory  _transactionStrategyFactory;
+        private readonly IFileStorageService _fileStorageService;
 
         public UpdateExpenseCommandHandler(
             IExpenseRepository expenseRepository,
@@ -60,7 +63,9 @@ namespace POS.MediatR.Handlers
             IAccountingEntryRepository accountingEntryRepository,
             IInventoryService inventoryService,
             IFinancialYearRepository financialYearRepository,
-            ITransactionStrategyFactory transactionStrategyFactory)
+
+            ITransactionStrategyFactory transactionStrategyFactory,
+            IFileStorageService fileStorageService)
         {
             _expenseRepository = expenseRepository;
             _uow = uow;
@@ -78,6 +83,7 @@ namespace POS.MediatR.Handlers
             _inventoryService = inventoryService;
             _financialYearRepository = financialYearRepository;
             _transactionStrategyFactory = transactionStrategyFactory;
+            _fileStorageService = fileStorageService;
         }
 
         public async Task<ServiceResponse<bool>> Handle(UpdateExpenseCommand request, CancellationToken cancellationToken)
@@ -107,31 +113,17 @@ namespace POS.MediatR.Handlers
                 if (!string.IsNullOrWhiteSpace(request.DocumentData)
                     && !string.IsNullOrWhiteSpace(request.ReceiptName))
                 {
-                    string contentRootPath = _webHostEnvironment.WebRootPath;
-                    var pathToSave = Path.Combine(contentRootPath, _pathHelper.Attachments);
-
-                    if (!Directory.Exists(pathToSave))
-                    {
-                        Directory.CreateDirectory(pathToSave);
-                    }
-
-                    var extension = Path.GetExtension(request.ReceiptName); ;
+                    var extension = Path.GetExtension(request.ReceiptName);
                     var id = Guid.NewGuid();
-                    var path = $"{id}.{extension}";
-                    var documentPath = Path.Combine(pathToSave, path);
-                    string base64 = request.DocumentData.Split(',').LastOrDefault();
-                    if (!string.IsNullOrWhiteSpace(base64))
+                    var path = $"{id}{extension}";
+                    try
                     {
-                        byte[] bytes = Convert.FromBase64String(base64);
-                        try
-                        {
-                            await File.WriteAllBytesAsync($"{documentPath}", bytes);
-                            entityExist.ReceiptPath = path;
-                        }
-                        catch
-                        {
-                            _logger.LogError("Error while saving files", entityExist);
-                        }
+                         await _fileStorageService.SaveFileAsync(_pathHelper.Attachments, request.DocumentData, path);
+                         entityExist.ReceiptPath = path;
+                    }
+                    catch
+                    {
+                        _logger.LogError("Error while saving files", entityExist);
                     }
                 }
                 else

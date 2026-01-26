@@ -10,8 +10,9 @@ using POS.Helper;
 using System.Linq;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.SignalR;
-using System.IO;
 using Microsoft.AspNetCore.Hosting;
+using POS.Common.Services;
+using System.IO;
 
 
 namespace POS.MediatR.Handlers
@@ -25,6 +26,7 @@ namespace POS.MediatR.Handlers
         private readonly IHubContext<UserHub, IHubClient> _hubContext;
         private readonly PathHelper _pathHelper;
         private readonly IWebHostEnvironment _webHostEnvironment;
+        private readonly IFileStorageService _fileStorageService;
 
         public UserLoginCommandHandler(
             IUserRepository userRepository,
@@ -33,7 +35,8 @@ namespace POS.MediatR.Handlers
             ILoginAuditRepository loginAuditRepository,
             IHubContext<UserHub, IHubClient> hubContext,
             PathHelper pathHelper,
-            IWebHostEnvironment webHostEnvironment
+            IWebHostEnvironment webHostEnvironment,
+            IFileStorageService fileStorageService
             )
         {
             _userRepository = userRepository;
@@ -43,6 +46,7 @@ namespace POS.MediatR.Handlers
             _hubContext = hubContext;
             _pathHelper = pathHelper;
             _webHostEnvironment = webHostEnvironment;
+            _fileStorageService = fileStorageService;
         }
         public async Task<ServiceResponse<UserAuthDto>> Handle(UserLoginCommand request, CancellationToken cancellationToken)
         {
@@ -87,16 +91,13 @@ namespace POS.MediatR.Handlers
                 await _hubContext.Clients.All.Joined(onlineUser);
                 if (!string.IsNullOrWhiteSpace(authUser.ProfilePhoto))
                 {
-                    var fullPath = Path.Combine(_webHostEnvironment.WebRootPath, _pathHelper.UserProfilePath, authUser.ProfilePhoto);
-                    //Console.WriteLine($"[DEBUG] Checking Profile Photo Path: {fullPath}");
-                    if (File.Exists(fullPath))
+                    var physicalPath = _fileStorageService.GetPhysicalPath(Path.Combine(_pathHelper.UserProfilePath, authUser.ProfilePhoto));
+                    if (File.Exists(physicalPath))
                     {
-                        //Console.WriteLine($"[DEBUG] File Exists. Returning relative path.");
                         authUser.ProfilePhoto = Path.Combine(_pathHelper.UserProfilePath, authUser.ProfilePhoto).Replace("\\", "/");
                     }
                     else
                     {
-                        //Console.WriteLine($"[DEBUG] File Does Not Exist. Returning null.");
                         authUser.ProfilePhoto = null;
                     }
                 }

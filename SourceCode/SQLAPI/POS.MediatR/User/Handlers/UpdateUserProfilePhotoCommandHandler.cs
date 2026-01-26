@@ -14,6 +14,7 @@ using POS.Domain;
 using POS.Helper;
 using POS.MediatR.CommandAndQuery;
 using Microsoft.AspNetCore.Hosting;
+using POS.Common.Services;
 
 namespace POS.MediatR.Handlers
 {
@@ -26,6 +27,7 @@ namespace POS.MediatR.Handlers
         private readonly ILogger<UpdateUserProfileCommandHandler> _logger;
         public readonly PathHelper _pathHelper;
         private readonly IWebHostEnvironment _webHostEnvironment;
+        private readonly IFileStorageService _fileStorageService;
         public UpdateUserProfilePhotoCommandHandler(
             IMapper mapper,
             IUnitOfWork<POSDbContext> uow,
@@ -33,7 +35,9 @@ namespace POS.MediatR.Handlers
             UserManager<User> userManager,
             ILogger<UpdateUserProfileCommandHandler> logger,
             PathHelper pathHelper,
-            IWebHostEnvironment webHostEnvironment
+
+            IWebHostEnvironment webHostEnvironment,
+            IFileStorageService fileStorageService
             )
         {
             _mapper = mapper;
@@ -42,7 +46,9 @@ namespace POS.MediatR.Handlers
             _userInfoToken = userInfoToken;
             _logger = logger;
             _pathHelper = pathHelper;
+
             _webHostEnvironment = webHostEnvironment;
+            _fileStorageService = fileStorageService;
         }
 
         public async Task<ServiceResponse<UserDto>> Handle(UpdateUserProfilePhotoCommand request, CancellationToken cancellationToken)
@@ -63,23 +69,19 @@ namespace POS.MediatR.Handlers
             // delete existing file
             if (!string.IsNullOrWhiteSpace(appUser.ProfilePhoto))
             {
-                if (File.Exists(Path.Combine(filePath, appUser.ProfilePhoto)))
-                {
-                    File.Delete(Path.Combine(filePath, appUser.ProfilePhoto));
-                }
+                _fileStorageService.DeleteFile(Path.Combine(_pathHelper.UserProfilePath, appUser.ProfilePhoto));
             }
 
             // save new file
             if (request.FormFile.Any())
             {
-              
-
                 var profileFile = request.FormFile[0];
                 var newProfilePhoto = $"{Guid.NewGuid()}{Path.GetExtension(profileFile.Name)}";
-                string fullPath = Path.Combine(filePath, newProfilePhoto);
-                using (var stream = new FileStream(fullPath, FileMode.Create))
+                
+                using (var memoryStream = new MemoryStream())
                 {
-                    profileFile.CopyTo(stream);
+                    await profileFile.CopyToAsync(memoryStream);
+                    await _fileStorageService.SaveFileAsync(_pathHelper.UserProfilePath, memoryStream.ToArray(), newProfilePhoto);
                 }
                 appUser.ProfilePhoto = newProfilePhoto;
             }

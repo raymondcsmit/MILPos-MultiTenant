@@ -11,9 +11,10 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using System;
-using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
+using POS.Common.Services;
+using System.Threading;
 
 namespace POS.MediatR.Handlers
 {
@@ -24,14 +25,17 @@ namespace POS.MediatR.Handlers
         private readonly ILogger<AddSupplierCommandHandler> _logger;
         private readonly IMapper _mapper;
         private readonly IWebHostEnvironment _webHostEnvironment;
+
         private readonly PathHelper _pathHelper;
+        private readonly IFileStorageService _fileStorageService;
 
         public AddSupplierCommandHandler(ISupplierRepository supplierRepository,
             ILogger<AddSupplierCommandHandler> logger,
             IUnitOfWork<POSDbContext> uow,
             IMapper mapper,
               IWebHostEnvironment webHostEnvironment,
-              PathHelper pathHelper)
+              PathHelper pathHelper,
+              IFileStorageService fileStorageService)
         {
             _supplierRepository = supplierRepository;
             _uow = uow;
@@ -39,6 +43,7 @@ namespace POS.MediatR.Handlers
             _mapper = mapper;
             _webHostEnvironment = webHostEnvironment;
             _pathHelper = pathHelper;
+            _fileStorageService = fileStorageService;
         }
 
         public async Task<ServiceResponse<SupplierDto>> Handle(AddSupplierCommand request, CancellationToken cancellationToken)
@@ -65,14 +70,7 @@ namespace POS.MediatR.Handlers
 
             if (request.IsImageUpload && !string.IsNullOrWhiteSpace(entity.Url))
             {
-                string contentRootPath = _webHostEnvironment.WebRootPath;
-                string folderPath = Path.Combine(contentRootPath, _pathHelper.SupplierImagePath);
-                if (!Directory.Exists(folderPath))
-                {
-                    Directory.CreateDirectory(folderPath);
-                }
-                var pathToSave = Path.Combine(folderPath, entity.Url);
-                await FileData.SaveFile(pathToSave, request.Logo);
+                await _fileStorageService.SaveFileAsync(_pathHelper.SupplierImagePath, request.Logo, entity.Url);
             }
             return ServiceResponse<SupplierDto>.ReturnResultWith200(_mapper.Map<SupplierDto>(entity));
         }

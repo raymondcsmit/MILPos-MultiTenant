@@ -8,9 +8,11 @@ using POS.Repository;
 using MediatR;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Logging;
-using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
+using POS.Common.Services;
+using System.Threading;
+using System.IO;
 
 namespace POS.MediatR.Handlers
 {
@@ -21,13 +23,16 @@ namespace POS.MediatR.Handlers
         private readonly ILogger<RemovedSupplierImageCommandHandler> _logger;
         private readonly IMapper _mapper;
         private readonly IWebHostEnvironment _webHostEnvironment;
+
         private readonly PathHelper _pathHelper;
+        private readonly IFileStorageService _fileStorageService;
         public RemovedSupplierImageCommandHandler(ISupplierRepository supplierRepository,
             ILogger<RemovedSupplierImageCommandHandler> logger,
             IUnitOfWork<POSDbContext> uow,
             IMapper mapper,
             IWebHostEnvironment webHostEnvironment,
-            PathHelper pathHelper
+            PathHelper pathHelper,
+            IFileStorageService fileStorageService
             )
         {
             _supplierRepository = supplierRepository;
@@ -35,7 +40,9 @@ namespace POS.MediatR.Handlers
             _logger = logger;
             _mapper = mapper;
             _webHostEnvironment = webHostEnvironment;
+
             _pathHelper = pathHelper;
+            _fileStorageService = fileStorageService;
         }
 
         public async Task<ServiceResponse<SupplierDto>> Handle(RemovedSupplierImageCommand request, CancellationToken cancellationToken)
@@ -56,11 +63,9 @@ namespace POS.MediatR.Handlers
             }
 
             // delete supplier image
-            string contentRootPath = _webHostEnvironment.WebRootPath;
-            var imgPath = Path.Combine(contentRootPath, _pathHelper.SupplierImagePath, oldImageUrl);
-            if (File.Exists(imgPath))
+            if (!string.IsNullOrWhiteSpace(oldImageUrl))
             {
-                FileData.DeleteFile(imgPath);
+                _fileStorageService.DeleteFile(Path.Combine(_pathHelper.SupplierImagePath, oldImageUrl));
             }
             return ServiceResponse<SupplierDto>.ReturnResultWith200(_mapper.Map<SupplierDto>(entity));
 

@@ -223,6 +223,14 @@ export const routes: Routes = [
               ),
           },
           {
+            path: 'fbr-settings',
+            canActivate: [AuthGuard],
+            loadComponent: () =>
+              import('./fbr-settings/fbr-settings.component').then(
+                (m) => m.FBRSettingsComponent
+              ),
+          },
+          {
             path: 'expense-category',
             canActivate: [AuthGuard],
             data: { claimType: 'EXP_MANAGE_EXP_CATEGORY' },

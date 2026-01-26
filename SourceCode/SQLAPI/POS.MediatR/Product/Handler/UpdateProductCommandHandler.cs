@@ -17,6 +17,7 @@ using POS.Domain;
 using POS.Helper;
 using POS.MediatR.Product.Command;
 using POS.Repository;
+using POS.Common.Services;
 
 namespace POS.MediatR.Product.Handler
 {
@@ -33,6 +34,7 @@ namespace POS.MediatR.Product.Handler
         private readonly ILogger<UpdateProductCommandHandler> _logger;
         private readonly IProductStockRepository _productStockRepository;
         private readonly ILocationRepository _locationRepository;
+        private readonly IFileStorageService _fileStorageService;
 
         public UpdateProductCommandHandler(IProductRepository productRepository,
             IProductTaxRepository productTaxRepository,
@@ -42,7 +44,8 @@ namespace POS.MediatR.Product.Handler
             IWebHostEnvironment webHostEnvironment,
             ILogger<UpdateProductCommandHandler> logger,
             IProductStockRepository productStockRepository,
-            ILocationRepository locationRepository)
+            ILocationRepository locationRepository,
+            IFileStorageService fileStorageService)
         {
             _productRepository = productRepository;
             _productTaxRepository = productTaxRepository;
@@ -52,7 +55,9 @@ namespace POS.MediatR.Product.Handler
             _webHostEnvironment = webHostEnvironment;
             _logger = logger;
             _productStockRepository = productStockRepository;
+
             _locationRepository = locationRepository;
+            _fileStorageService = fileStorageService;
         }
         public async Task<ServiceResponse<ProductDto>> Handle(UpdateProductCommand request, CancellationToken cancellationToken)
         {
@@ -240,34 +245,20 @@ namespace POS.MediatR.Product.Handler
 
             try
             {
-                string contentRootPath = _webHostEnvironment.WebRootPath;
-                var pathToSave = Path.Combine(contentRootPath, _pathHelper.ProductImagePath);
-                var thumbnailPathToSave = Path.Combine(contentRootPath, _pathHelper.ProductThumbnailImagePath);
-                if (!Directory.Exists(pathToSave))
-                {
-                    Directory.CreateDirectory(pathToSave);
-                }
-
-                if (!Directory.Exists(thumbnailPathToSave))
-                {
-                    Directory.CreateDirectory(thumbnailPathToSave);
-                }
-
                 if (request.IsProductImageUpload)
                 {
                     if (!string.IsNullOrWhiteSpace(request.ProductUrlData))
                     {
-                        await FileData.SaveFile(Path.Combine(pathToSave, existingProduct.ProductUrl), request.ProductUrlData);
-                        await FileData.SaveThumbnailFile(Path.Combine(thumbnailPathToSave, existingProduct.ProductUrl), request.ProductUrlData);
+                        await _fileStorageService.SaveFileAsync(_pathHelper.ProductImagePath, request.ProductUrlData, existingProduct.ProductUrl);
+                        await _fileStorageService.SaveThumbnailAsync(_pathHelper.ProductThumbnailImagePath, request.ProductUrlData, existingProduct.ProductUrl);
                     }
 
                     if (!string.IsNullOrWhiteSpace(oldProductUrl))
                     {
-                        FileData.DeleteFile(Path.Combine(pathToSave, oldProductUrl));
-                        FileData.DeleteFile(Path.Combine(thumbnailPathToSave, oldProductUrl));
+                         _fileStorageService.DeleteFile(Path.Combine(_pathHelper.ProductImagePath, oldProductUrl));
+                         _fileStorageService.DeleteFile(Path.Combine(_pathHelper.ProductThumbnailImagePath, oldProductUrl));
                     }
                 }
-
             }
             catch (Exception ex)
             {

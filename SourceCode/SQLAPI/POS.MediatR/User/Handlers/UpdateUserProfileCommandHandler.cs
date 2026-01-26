@@ -13,6 +13,7 @@ using POS.Helper;
 using Microsoft.Extensions.Logging;
 using System.IO;
 using Microsoft.AspNetCore.Hosting;
+using POS.Common.Services;
 
 
 namespace POS.MediatR.Handlers
@@ -26,6 +27,7 @@ namespace POS.MediatR.Handlers
         private readonly ILogger<UpdateUserProfileCommandHandler> _logger;
         public readonly PathHelper _pathHelper;
         private readonly IWebHostEnvironment _webHostEnvironment;
+        private readonly IFileStorageService _fileStorageService;
 
         public UpdateUserProfileCommandHandler(
             IMapper mapper,
@@ -34,7 +36,8 @@ namespace POS.MediatR.Handlers
             UserManager<User> userManager,
             ILogger<UpdateUserProfileCommandHandler> logger,
             PathHelper pathHelper,
-            IWebHostEnvironment webHostEnvironment
+            IWebHostEnvironment webHostEnvironment,
+            IFileStorageService fileStorageService
             )
         {
             _mapper = mapper;
@@ -44,6 +47,7 @@ namespace POS.MediatR.Handlers
             _logger = logger;
             _pathHelper = pathHelper;
             _webHostEnvironment = webHostEnvironment;
+            _fileStorageService = fileStorageService;
         }
 
         public async Task<ServiceResponse<UserDto>> Handle(UpdateUserProfileCommand request, CancellationToken cancellationToken)
@@ -61,60 +65,15 @@ namespace POS.MediatR.Handlers
 
             if (request.IsImageUpdate && !string.IsNullOrWhiteSpace(request.ImgSrc))
             {
-                var filePath = Path.Combine(_webHostEnvironment.WebRootPath, _pathHelper.UserProfilePath);
-                if (!Directory.Exists(filePath))
-                {
-                    Directory.CreateDirectory(filePath);
-                }
-
                 // Delete existing file
                 if (!string.IsNullOrWhiteSpace(appUser.ProfilePhoto))
                 {
-                    try
-                    {
-                        var existingFile = Path.Combine(filePath, appUser.ProfilePhoto);
-                        if (File.Exists(existingFile))
-                        {
-                            File.Delete(existingFile);
-                        }
-                    }
-                    catch (UnauthorizedAccessException) 
-                    {
-                        // Try deleting from alternate path
-                         var appDataPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData), "MILPOS", "wwwroot", _pathHelper.UserProfilePath);
-                         var existingFileAppData = Path.Combine(appDataPath, appUser.ProfilePhoto);
-                         if (File.Exists(existingFileAppData))
-                         {
-                             try { File.Delete(existingFileAppData); } catch { }
-                         }
-                    }
-                    catch (Exception ex)
-                    {
-                         _logger.LogError(ex, "Error deleting existing profile photo.");
-                    }
+                    _fileStorageService.DeleteFile(Path.Combine(_pathHelper.UserProfilePath, appUser.ProfilePhoto));
                 }
 
                 // Save new file
-                var base64Data = request.ImgSrc.Contains(",") ? request.ImgSrc.Split(',')[1] : request.ImgSrc;
-                var bytes = Convert.FromBase64String(base64Data);
-                var fileName = $"{Guid.NewGuid()}.png"; // Assuming PNG for base64, or detect mime type if needed
-                var fullPath = Path.Combine(filePath, fileName);
-                
-                try
-                {
-                    await File.WriteAllBytesAsync(fullPath, bytes);
-                }
-                catch (UnauthorizedAccessException)
-                {
-                     // Fallback to ProgramData
-                     var appDataPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData), "MILPOS", "wwwroot", _pathHelper.UserProfilePath);
-                     if (!Directory.Exists(appDataPath))
-                     {
-                         Directory.CreateDirectory(appDataPath);
-                     }
-                     fullPath = Path.Combine(appDataPath, fileName);
-                     await File.WriteAllBytesAsync(fullPath, bytes);
-                }
+                var fileName = $"{Guid.NewGuid()}.png"; 
+                await _fileStorageService.SaveFileAsync(_pathHelper.UserProfilePath, request.ImgSrc, fileName);
                 appUser.ProfilePhoto = fileName;
             }
 
@@ -125,10 +84,8 @@ namespace POS.MediatR.Handlers
             }
             if (!string.IsNullOrWhiteSpace(appUser.ProfilePhoto))
             {
-                var fullPath = Path.Combine(_webHostEnvironment.WebRootPath, _pathHelper.UserProfilePath, appUser.ProfilePhoto);
-                var appDataPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData), "MILPOS", "wwwroot", _pathHelper.UserProfilePath, appUser.ProfilePhoto);
-                
-                if (File.Exists(fullPath) || File.Exists(appDataPath))
+                var physicalPath = _fileStorageService.GetPhysicalPath(Path.Combine(_pathHelper.UserProfilePath, appUser.ProfilePhoto));
+                if (File.Exists(physicalPath))
                 {
                     appUser.ProfilePhoto = Path.Combine(_pathHelper.UserProfilePath, appUser.ProfilePhoto).Replace("\\", "/");
                 }

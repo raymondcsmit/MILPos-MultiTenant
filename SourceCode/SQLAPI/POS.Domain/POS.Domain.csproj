@@ -23,6 +23,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\POS.Data\POS.Data.csproj" />
+    <ProjectReference Include="..\POS.Helper\POS.Helper.csproj" />
   </ItemGroup>
 
 </Project>

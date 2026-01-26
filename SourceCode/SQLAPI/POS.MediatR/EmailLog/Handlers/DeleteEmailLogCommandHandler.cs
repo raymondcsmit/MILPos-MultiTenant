@@ -10,6 +10,7 @@ using POS.Domain;
 using POS.Helper;
 using POS.MediatR.EmailLog.Commands;
 using POS.Repository;
+using POS.Common.Services;
 
 namespace POS.MediatR.EmailLog.Handlers
 {
@@ -17,7 +18,8 @@ namespace POS.MediatR.EmailLog.Handlers
         IEmailLogRepository _emailLogRepository,
         IUnitOfWork<POSDbContext> _uow,
         ILogger<DeleteEmailLogCommandHandler> logger,
-        IWebHostEnvironment webHostEnvironment) : IRequestHandler<DeleteEmailLogCommand, ServiceResponse<bool>>
+        IWebHostEnvironment webHostEnvironment,
+        IFileStorageService fileStorageService) : IRequestHandler<DeleteEmailLogCommand, ServiceResponse<bool>>
     {
         public async Task<ServiceResponse<bool>> Handle(DeleteEmailLogCommand request, CancellationToken cancellationToken)
         {
@@ -39,11 +41,7 @@ namespace POS.MediatR.EmailLog.Handlers
             {
                 foreach (var attachment in entityExist.EmailLogAttachments)
                 {
-                    var attachmentPath = Path.Combine(webHostEnvironment.WebRootPath, attachment.Path);
-                    if (File.Exists(attachmentPath))
-                    {
-                        File.Delete(attachmentPath);
-                    }
+                    fileStorageService.DeleteFile(attachment.Path);
                 }
             }
             catch (System.Exception ex)

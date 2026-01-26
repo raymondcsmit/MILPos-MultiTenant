@@ -9,7 +9,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\POS.Helper\POS.Helper.csproj" />
+
   </ItemGroup>
 
 </Project>

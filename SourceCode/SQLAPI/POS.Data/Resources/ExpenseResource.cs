@@ -1,5 +1,4 @@
-﻿using POS.Helper;
-using System;
+﻿using System;
 
 namespace POS.Data.Resources
 {
