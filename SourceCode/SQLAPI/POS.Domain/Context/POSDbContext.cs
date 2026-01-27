@@ -792,8 +792,198 @@ namespace POS.Domain
                 b.Property(d => d.IsSystem).HasDefaultValue(true);
             });
 
+            // --- String Length Optimizations ---
+
+            // 1. Identity & Tenant Updates
+            builder.Entity<Tenant>(b => {
+                b.Property(t => t.Address).HasMaxLength(1000);
+                b.Property(t => t.ContactPhone).HasMaxLength(50);
+                b.Property(t => t.SubscriptionPlan).HasMaxLength(100);
+                b.Property(t => t.ConnectionString).HasMaxLength(1000);
+            });
+
+            builder.Entity<User>(b => {
+                b.Property(u => u.FirstName).HasMaxLength(200);
+                b.Property(u => u.LastName).HasMaxLength(200);
+                b.Property(u => u.ProfilePhoto).HasMaxLength(500);
+                b.Property(u => u.Provider).HasMaxLength(100);
+                b.Property(u => u.Address).HasMaxLength(500);
+                b.Property(u => u.ResetPasswordCode).HasMaxLength(500);
+            });
+
+            // 2. Master Data
+            builder.Entity<Country>(b => b.Property(c => c.CountryName).HasMaxLength(200));
+            builder.Entity<City>(b => b.Property(c => c.CityName).HasMaxLength(200));
+            
+            builder.Entity<Location>(b => {
+                b.Property(l => l.Name).HasMaxLength(200);
+                b.Property(l => l.ContactPerson).HasMaxLength(200);
+                b.Property(l => l.Address).HasMaxLength(500);
+                b.Property(l => l.Email).HasMaxLength(256);
+                b.Property(l => l.Mobile).HasMaxLength(50);
+                b.Property(l => l.Website).HasMaxLength(500);
+            });
+
+            builder.Entity<Currency>(b => {
+                b.Property(c => c.Name).HasMaxLength(100);
+                b.Property(c => c.Symbol).HasMaxLength(10);
+            });
+
+            builder.Entity<Language>(b => {
+                b.Property(l => l.Name).HasMaxLength(100);
+                b.Property(l => l.Code).HasMaxLength(20);
+                b.Property(l => l.ImageUrl).HasMaxLength(500);
+            });
+
+            // 3. Business Entities
+            builder.Entity<Customer>(b => {
+                b.Property(c => c.CustomerName).HasMaxLength(250);
+                b.Property(c => c.ContactPerson).HasMaxLength(200);
+                b.Property(c => c.Email).HasMaxLength(256);
+                b.Property(c => c.PhoneNo).HasMaxLength(50);
+                b.Property(c => c.MobileNo).HasMaxLength(50);
+                b.Property(c => c.Fax).HasMaxLength(50);
+                b.Property(c => c.Website).HasMaxLength(500);
+                b.Property(c => c.Url).HasMaxLength(500);
+                b.Property(c => c.TaxNumber).HasMaxLength(50);
+                b.Property(c => c.Description).HasMaxLength(2000);
+            });
+
+            builder.Entity<Supplier>(b => {
+                b.Property(s => s.SupplierName).HasMaxLength(250);
+                b.Property(s => s.ContactPerson).HasMaxLength(200);
+                b.Property(s => s.Email).HasMaxLength(256);
+                b.Property(s => s.PhoneNo).HasMaxLength(50);
+                b.Property(s => s.MobileNo).HasMaxLength(50);
+                b.Property(s => s.Fax).HasMaxLength(50);
+                b.Property(s => s.Website).HasMaxLength(500);
+                b.Property(s => s.Url).HasMaxLength(500);
+                b.Property(s => s.TaxNumber).HasMaxLength(50);
+                b.Property(s => s.Description).HasMaxLength(2000);
+            });
+
+             builder.Entity<SupplierAddress>(b => {
+                b.Property(a => a.Address).HasMaxLength(500);
+                b.Property(a => a.CountryName).HasMaxLength(200);
+                b.Property(a => a.CityName).HasMaxLength(200);
+            });
+
+            builder.Entity<ContactRequest>(b => {
+                b.Property(c => c.Name).HasMaxLength(200);
+                b.Property(c => c.Email).HasMaxLength(256);
+                b.Property(c => c.Phone).HasMaxLength(50);
+                b.Property(c => c.Message).HasMaxLength(4000); 
+            });
+
+            // 4. Inventory
+             builder.Entity<Product>(b => {
+                b.Property(p => p.Name).HasMaxLength(200);
+                b.Property(p => p.Code).HasMaxLength(100);
+                b.Property(p => p.Barcode).HasMaxLength(100); 
+                b.Property(p => p.SkuCode).HasMaxLength(100); 
+                b.Property(p => p.SkuName).HasMaxLength(200);
+                b.Property(p => p.Description).HasMaxLength(4000);
+                b.Property(p => p.ProductUrl).HasMaxLength(500);
+            });
+
+            builder.Entity<ProductCategory>(b => {
+                b.Property(c => c.Name).HasMaxLength(200);
+                b.Property(c => c.Description).HasMaxLength(1000);
+            });
+            
+             builder.Entity<Brand>(b => {
+                b.Property(b => b.Name).HasMaxLength(200);
+                b.Property(b => b.ImageUrl).HasMaxLength(500);
+            });
+            
+             builder.Entity<UnitConversation>(b => {
+                b.Property(u => u.Name).HasMaxLength(100);
+                b.Property(u => u.Code).HasMaxLength(50); 
+                // Operator is Enum, no MaxLength
+            });
+
+             builder.Entity<Variant>(b => b.Property(v => v.Name).HasMaxLength(200));
+             builder.Entity<VariantItem>(b => b.Property(v => v.Name).HasMaxLength(200));
+
+             builder.Entity<StockTransfer>(b => {
+                b.Property(s => s.ReferenceNo).HasMaxLength(50);
+                b.Property(s => s.Notes).HasMaxLength(1000);
+             });
+
+            // 5. Sales & Purchase orders
+            builder.Entity<SalesOrder>(b => {
+                b.Property(s => s.OrderNumber).HasMaxLength(50);
+                b.Property(s => s.Note).HasMaxLength(2000);
+                b.Property(s => s.SaleReturnNote).HasMaxLength(2000);
+                b.Property(s => s.TermAndCondition).HasMaxLength(4000);
+            });
+
+            builder.Entity<PurchaseOrder>(b => {
+                b.Property(p => p.OrderNumber).HasMaxLength(50);
+                b.Property(p => p.Note).HasMaxLength(2000);
+                b.Property(p => p.TermAndCondition).HasMaxLength(4000);
+            });
+            
+             builder.Entity<SalesOrderPayment>(b => {
+                b.Property(p => p.ReferenceNumber).HasMaxLength(50);
+                b.Property(p => p.Note).HasMaxLength(1000);
+            });
+
+             builder.Entity<PurchaseOrderPayment>(b => {
+                 b.Property(p => p.ReferenceNumber).HasMaxLength(50);
+                 b.Property(p => p.Note).HasMaxLength(1000);
+            });
+
+            // 6. Finance
+            builder.Entity<Expense>(b => {
+                 b.Property(e => e.Reference).HasMaxLength(100);
+                 b.Property(e => e.Description).HasMaxLength(1000);
+                 b.Property(e => e.ReceiptName).HasMaxLength(200);
+                 b.Property(e => e.ReceiptPath).HasMaxLength(500);
+            });
+
+            builder.Entity<ExpenseCategory>(b => b.Property(e => e.Name).HasMaxLength(200));
+
+            builder.Entity<LedgerAccount>(b => {
+                b.Property(l => l.AccountName).HasMaxLength(200);
+                b.Property(l => l.AccountCode).HasMaxLength(50);
+            });
+            
+            builder.Entity<Tax>(b => b.Property(t => t.Name).HasMaxLength(100));
+
+            // 7. Inquiry
+             builder.Entity<Inquiry>(b => {
+                 b.Property(i => i.CompanyName).HasMaxLength(200);
+                 b.Property(i => i.ContactPerson).HasMaxLength(200);
+                 b.Property(i => i.Email).HasMaxLength(256);
+                 b.Property(i => i.Phone).HasMaxLength(50);
+                 b.Property(i => i.MobileNo).HasMaxLength(50);
+                 b.Property(i => i.Website).HasMaxLength(500);
+                 b.Property(i => i.Address).HasMaxLength(500);
+                 b.Property(i => i.CityName).HasMaxLength(200);
+                 b.Property(i => i.CountryName).HasMaxLength(200);
+                 b.Property(i => i.Message).HasMaxLength(4000);
+            });
+            
+             builder.Entity<InquirySource>(b => b.Property(i => i.Name).HasMaxLength(200));
+             builder.Entity<InquiryStatus>(b => b.Property(i => i.Name).HasMaxLength(200));
+
+             // 8. Logs
+             builder.Entity<NLog>(b => {
+                 b.Property(n => n.MachineName).HasMaxLength(100);
+                 b.Property(n => n.Level).HasMaxLength(50);
+                 b.Property(n => n.Logger).HasMaxLength(250);
+             });
+             
+             builder.Entity<EmailLog>(b => {
+                 b.Property(e => e.SenderEmail).HasMaxLength(256);
+                 b.Property(e => e.RecipientEmail).HasMaxLength(256);
+                 b.Property(e => e.Subject).HasMaxLength(500);
+                 b.Property(e => e.ErrorMessage).HasMaxLength(4000);
+             });
+
             // Apply global query filters for multi-tenancy
-            //ApplyTenantQueryFilters(builder);
+            ApplyTenantQueryFilters(builder);
 
             builder.Entity<User>().ToTable("Users");
             builder.Entity<Role>().ToTable("Roles");
@@ -806,37 +996,49 @@ namespace POS.Domain
             builder.DefalutDeleteValueFilter();
         }
 
+        public Guid? CurrentTenantId => _tenantProvider?.GetTenantId();
+
         private void ApplyTenantQueryFilters(ModelBuilder builder)
         {
-            var tenantId = _tenantProvider?.GetTenantId();
-
-            // Only apply filters if tenant context is available
-            if (!tenantId.HasValue)
-                return;
-
             // Apply to User entity
             builder.Entity<User>()
-                .HasQueryFilter(u => u.TenantId == tenantId && !u.IsDeleted);
+                .HasQueryFilter(u => u.TenantId == CurrentTenantId && !u.IsDeleted);
 
             // Apply to Role entity
             builder.Entity<Role>()
-                .HasQueryFilter(r => r.TenantId == tenantId && !r.IsDeleted);
+                .HasQueryFilter(r => r.TenantId == CurrentTenantId && !r.IsDeleted);
 
-            // Apply to all entities inheriting from BaseEntity
-            // We use explicit configuration to avoid runtime warnings about invalid filters on some entities (e.g. Reminder)
-            
-            // Core Entities
-            builder.Entity<SalesOrder>().HasQueryFilter(e => e.TenantId == tenantId && !e.IsDeleted);
-            builder.Entity<Customer>().HasQueryFilter(e => e.TenantId == tenantId && !e.IsDeleted);
-            builder.Entity<Product>().HasQueryFilter(e => e.TenantId == tenantId && !e.IsDeleted);
-            builder.Entity<ProductCategory>().HasQueryFilter(e => e.TenantId == tenantId && !e.IsDeleted);
-            builder.Entity<Tax>().HasQueryFilter(e => e.TenantId == tenantId && !e.IsDeleted);
-            
-            // FBR Entities
-            builder.Entity<POS.Data.Entities.FBR.FBRConfiguration>().HasQueryFilter(e => e.TenantId == tenantId && !e.IsDeleted);
-            builder.Entity<POS.Data.Entities.FBR.FBRSubmissionLog>().HasQueryFilter(e => e.TenantId == tenantId && !e.IsDeleted);
+            // Entities that should remain global (Shared Master Data)
+            var globalEntityTypes = new[]
+            {
+                typeof(POS.Data.Country),
+                typeof(POS.Data.City),
+                typeof(POS.Data.Entities.Language),
+                typeof(POS.Data.Action),
+                typeof(POS.Data.Page),
+                typeof(POS.Data.Entities.PageHelper)
+            };
 
-            // Other critical entities can be added here as needed, but Reminder is excluded for now.
+            // Apply to all entities inheriting from BaseEntity EXCEPT global ones
+            var entityTypes = builder.Model.GetEntityTypes()
+                .Where(t => typeof(BaseEntity).IsAssignableFrom(t.ClrType) 
+                            && !globalEntityTypes.Contains(t.ClrType))
+                .ToList();
+
+            var setGlobalQueryFilterMethod = typeof(POSDbContext)
+                .GetMethods(System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance)
+                .Single(t => t.IsGenericMethod && t.Name == nameof(SetGlobalQueryFilter));
+
+            foreach (var entityType in entityTypes)
+            {
+                var method = setGlobalQueryFilterMethod.MakeGenericMethod(entityType.ClrType);
+                method.Invoke(this, new object[] { builder });
+            }
+        }
+
+        private void SetGlobalQueryFilter<T>(ModelBuilder builder) where T : BaseEntity
+        {
+            builder.Entity<T>().HasQueryFilter(e => e.TenantId == CurrentTenantId && !e.IsDeleted);
         }
 
         public override int SaveChanges()

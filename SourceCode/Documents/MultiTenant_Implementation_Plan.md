@@ -703,7 +703,7 @@ Add multi-tenancy configuration:
     "Enabled": true,
     "TenantResolutionStrategy": "Subdomain",
     "DefaultTenantId": "00000000-0000-0000-0000-000000000000",
-    "AllowTenantSwitching": false
+    "AllowTenantSwitching": true
   }
 }
 ```

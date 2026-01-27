@@ -117,10 +117,7 @@ namespace POS.API
                 options.ConfigureWarnings(builder =>
                 {
                     builder.Ignore(CoreEventId.PossibleIncorrectRequiredNavigationWithQueryFilterInteractionWarning);
-                    if (provider == "Sqlite")
-                    {
-                        builder.Ignore(RelationalEventId.PendingModelChangesWarning);
-                    }
+                    builder.Ignore(RelationalEventId.PendingModelChangesWarning);
                 });
             });
             
@@ -323,13 +320,15 @@ namespace POS.API
             
             app.UseHttpsRedirection();
             
+
+            
+            app.UseAuthentication();
+
             // Add tenant resolution middleware only in cloud mode
             if (deploymentSettings?.MultiTenancy?.Enabled == true)
             {
                 app.UseMiddleware<POS.API.Middleware.TenantResolutionMiddleware>();
             }
-            
-            app.UseAuthentication();
             app.UseRouting();
             app.UseAuthorization();
             app.UseResponseCompression();

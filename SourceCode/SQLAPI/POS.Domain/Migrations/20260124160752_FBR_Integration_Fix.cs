@@ -10,6 +10,8 @@ namespace POS.Domain.Migrations
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
         {
+            if (migrationBuilder.ActiveProvider == "Microsoft.EntityFrameworkCore.Sqlite")
+            {
             migrationBuilder.AlterColumn<string>(
                 name: "FBRResponseJson",
                 table: "SalesOrders",
@@ -36,11 +38,14 @@ namespace POS.Domain.Migrations
                 oldClrType: typeof(string),
                 oldType: "TEXT",
                 oldNullable: true);
+            }
         }
 
         /// <inheritdoc />
         protected override void Down(MigrationBuilder migrationBuilder)
         {
+            if (migrationBuilder.ActiveProvider == "Microsoft.EntityFrameworkCore.Sqlite")
+            {
             migrationBuilder.AlterColumn<string>(
                 name: "FBRResponseJson",
                 table: "SalesOrders",
@@ -67,6 +72,7 @@ namespace POS.Domain.Migrations
                 oldClrType: typeof(string),
                 oldType: "TEXT",
                 oldNullable: true);
+            }
         }
     }
 }

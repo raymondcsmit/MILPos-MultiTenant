@@ -16,16 +16,23 @@ namespace POS.Domain
             var configuration = new ConfigurationBuilder()
                 .SetBasePath(Directory.GetCurrentDirectory())
                 .AddJsonFile("appsettings.json", optional: false)
+                .AddJsonFile("appsettings.Development.json", optional: true)
                 .AddJsonFile("appsettings.Desktop.json", optional: true)
                 .Build();
 
-            // Get connection string (default to SQLite for migrations)
-            var connectionString = configuration.GetConnectionString("SqliteConnectionString")
-                ?? "Data Source=pos.db";
-
-            // Create options
+            var provider = configuration.GetValue<string>("DatabaseProvider") ?? "Sqlite";
             var optionsBuilder = new DbContextOptionsBuilder<POSDbContext>();
-            optionsBuilder.UseSqlite(connectionString);
+
+            if (provider == "Sqlite")
+            {
+                 var connectionString = configuration.GetConnectionString("SqliteConnectionString") ?? "Data Source=pos.db";
+                 optionsBuilder.UseSqlite(connectionString);
+            }
+            else
+            {
+                 var connectionString = configuration.GetConnectionString("DbConnectionString");
+                 optionsBuilder.UseSqlServer(connectionString);
+            }
 
             // Create a single tenant provider for design-time
             var tenantProvider = new SingleTenantProvider();
