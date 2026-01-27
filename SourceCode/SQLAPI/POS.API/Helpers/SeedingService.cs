@@ -1,4 +1,5 @@
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Metadata;
 using POS.Data;
 using POS.Data.Entities;
 using POS.Domain;
@@ -69,19 +70,75 @@ namespace POS.API.Helpers
                 var priorityTables = new List<string>
                 {
                     "Tenants",
-                    "Users", // Users first because Roles might reference Users for CreatedBy
+                    "Users", 
                     "Roles",
                     "UserRoles",
+                    "RoleClaims",
+                    "UserClaims",
+                    "UserLogins",
+                    "UserTokens",
+                    "UserLocations",
+                    "CompanyProfiles",
                     "Currencies",
                     "Countries",
                     "Cities",
                     "Locations",
-                    "LedgerAccounts",
                     "FinancialYears",
-                    "ProductCategories",
+                    "LedgerAccounts",
                     "Taxes",
-                    "Units", // Wait, I see UnitConversations.csv but not Units.csv?
+                    "UnitConversations", // Fixed from "Units"
                     "Brands",
+                    "ProductCategories",
+                    "ExpenseCategories",
+                    "Suppliers",
+                    "SupplierAddresses",
+                    "Customers",
+                    "ContactAddresses",
+                    "Products",
+                    "ProductTaxes",
+                    "ProductStocks",
+                    "PurchaseOrders",
+                    "PurchaseOrderItems",
+                    "PurchaseOrderItemTaxes",
+                    "PurchaseOrderPayments",
+                    "SalesOrders",
+                    "SalesOrderItems",
+                    "SalesOrderItemTaxes",
+                    "SalesOrderPayments",
+                    "Transactions",
+                    "TransactionItems",
+                    "TransactionItemTaxes",
+                    "AccountingEntries",
+                    "PaymentEntries",
+                    "TaxEntries",
+                    "StockAdjustments",
+                    "DamagedStocks",
+                    "StockTransfers",
+                    "StockTransferItems",
+                    "Expenses",
+                    "ExpenseTaxes",
+                    "LoanDetails",
+                    "LoanRepayments",
+                    "InquiryStatuses",
+                    "InquirySources",
+                    "Inquiries",
+                    "InquiryProducts",
+                    "InquiryActivities",
+                    "InquiryAttachments",
+                    "InquiryNotes",
+                    "Reminders",
+                    "ReminderUsers",
+                    "ReminderSchedulers",
+                    "ReminderNotifications",
+                    "DailyReminders",
+                    "QuarterlyReminders",
+                    "HalfYearlyReminders",
+                    "EmailTemplates",
+                    "EmailSMTPSettings",
+                    "Actions",
+                    "Pages",
+                    "Pagehelpers",
+                    "Languages"
                 };
 
                 // Get all DbSet properties from Context
@@ -107,8 +164,8 @@ namespace POS.API.Helpers
                 }
                 else if (provider == "Microsoft.EntityFrameworkCore.SqlServer")
                 {
-                    // For SQL Server, we would need to disable constraints per table or use another method
-                    // For now, let's focus on Sqlite as per the user's environment
+                    // Disable all constraints
+                    await _context.Database.ExecuteSqlRawAsync("EXEC sp_msforeachtable \"ALTER TABLE ? NOCHECK CONSTRAINT all\"");
                 }
 
                 try
@@ -136,6 +193,10 @@ namespace POS.API.Helpers
                     if (provider == "Microsoft.EntityFrameworkCore.Sqlite")
                     {
                         await _context.Database.ExecuteSqlRawAsync("PRAGMA foreign_keys = ON;");
+                    }
+                    else if (provider == "Microsoft.EntityFrameworkCore.SqlServer")
+                    {
+                        await _context.Database.ExecuteSqlRawAsync("EXEC sp_msforeachtable \"ALTER TABLE ? WITH CHECK CHECK CONSTRAINT all\"");
                     }
                 }
                 
@@ -266,17 +327,56 @@ namespace POS.API.Helpers
 
             if (entities.Any())
             {
+                 var provider = _context.Database.ProviderName;
+                 var entityType = _context.Model.FindEntityType(typeof(T));
+                 var tableName = entityType.GetTableName();
+                 var schema = entityType.GetSchema();
+                 var fullTableName = string.IsNullOrEmpty(schema) ? $"[{tableName}]" : $"[{schema}].[{tableName}]";
+
+                 bool isSqlServer = provider == "Microsoft.EntityFrameworkCore.SqlServer";
+                 
+                 // Robust identity check for SQL Server: if it's SQL Server and has an 'Id' property of type int/long
+                 // we assume it might be an identity column if we are trying to seed it explicitly.
+                 bool hasIdentity = isSqlServer && entityType.GetProperties().Any(p => 
+                        (p.Name.Equals("Id", StringComparison.OrdinalIgnoreCase)) && 
+                        (p.ClrType == typeof(int) || p.ClrType == typeof(long)));
+
+                 Console.WriteLine($"Table: {tableName}, FullPath: {fullTableName}, HasIdentity: {hasIdentity}");
+
+                 await _context.Database.OpenConnectionAsync();
                  try
                  {
+                    if (hasIdentity)
+                    {
+                        Console.WriteLine($"Executing: SET IDENTITY_INSERT {fullTableName} ON");
+                        await _context.Database.ExecuteSqlRawAsync($"SET IDENTITY_INSERT {fullTableName} ON");
+                    }
+
                     var dbSet = _context.Set<T>();
                     await dbSet.AddRangeAsync(entities);
                     await _context.SaveChangesAsync();
+
+                    if (hasIdentity)
+                    {
+                        await _context.Database.ExecuteSqlRawAsync($"SET IDENTITY_INSERT {fullTableName} OFF");
+                    }
                  }
                  catch (Exception ex) 
                  {
                      var innerMessage = ex.InnerException?.Message ?? "No inner exception";
                      Console.WriteLine($"Error batch saving {typeof(T).Name}: {ex.Message}");
                      if (ex.InnerException != null) Console.WriteLine($"Inner Exception: {innerMessage}");
+
+                     if (hasIdentity)
+                     {
+                         try { await _context.Database.ExecuteSqlRawAsync($"SET IDENTITY_INSERT {fullTableName} OFF"); } catch { }
+                     }
+                 }
+                 finally
+                 {
+                     await _context.Database.CloseConnectionAsync();
+                     // ALWAYS clear tracker after each table to prevent pollution/leaks
+                     _context.ChangeTracker.Clear();
                  }
             }
         }

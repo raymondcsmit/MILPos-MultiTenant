@@ -107,7 +107,6 @@ namespace POS.Domain
         public DbSet<LoanRepayment> LoanRepayments { get; set; }
         
         // FBR Integration
-        public DbSet<POS.Data.Entities.FBR.FBRConfiguration> FBRConfigurations { get; set; }
         public DbSet<POS.Data.Entities.FBR.FBRSubmissionLog> FBRSubmissionLogs { get; set; }
 
 
@@ -646,7 +645,12 @@ namespace POS.Domain
                 b.HasOne(st => st.Branch)
                  .WithMany()
                  .HasForeignKey(st => st.BranchId)
-                 .OnDelete(DeleteBehavior.Restrict);
+                 .OnDelete(DeleteBehavior.NoAction);
+
+                b.HasOne(e => e.CreatedByUser)
+                    .WithMany()
+                    .HasForeignKey(e => e.CreatedBy)
+                    .OnDelete(DeleteBehavior.NoAction);
 
             });
 
@@ -655,7 +659,7 @@ namespace POS.Domain
                 b.HasOne(e => e.CreatedByUser)
                     .WithMany()
                     .HasForeignKey(ur => ur.CreatedBy)
-                    .OnDelete(DeleteBehavior.Restrict);
+                    .OnDelete(DeleteBehavior.NoAction);
 
                 b.HasMany(e => e.TransactionItems)
                   .WithOne(e => e.Transaction)
@@ -702,7 +706,7 @@ namespace POS.Domain
                 b.HasOne(e => e.Branch)
                    .WithMany()
                    .HasForeignKey(ur => ur.BranchId)
-                   .OnDelete(DeleteBehavior.Restrict);
+                   .OnDelete(DeleteBehavior.NoAction);
 
             });
 
@@ -716,7 +720,7 @@ namespace POS.Domain
                 b.HasOne(e => e.Branch)
                    .WithMany()
                    .HasForeignKey(ur => ur.BranchId)
-                   .OnDelete(DeleteBehavior.Restrict);
+                   .OnDelete(DeleteBehavior.NoAction);
 
             });
             builder.Entity<StockAdjustment>(b =>
@@ -729,7 +733,7 @@ namespace POS.Domain
                 b.HasOne(e => e.Branch)
                    .WithMany()
                    .HasForeignKey(ur => ur.BranchId)
-                   .OnDelete(DeleteBehavior.Restrict);
+                   .OnDelete(DeleteBehavior.NoAction);
 
             });
             builder.Entity<Payroll>(b =>
@@ -738,6 +742,11 @@ namespace POS.Domain
                     .WithMany()
                     .HasForeignKey(ur => ur.EmployeeId)
                     .OnDelete(DeleteBehavior.Restrict);
+
+                b.HasOne(e => e.Location)
+                   .WithMany()
+                   .HasForeignKey(ur => ur.BranchId)
+                   .OnDelete(DeleteBehavior.NoAction);
             });
 
 
@@ -822,6 +831,9 @@ namespace POS.Domain
                 b.Property(l => l.Email).HasMaxLength(256);
                 b.Property(l => l.Mobile).HasMaxLength(50);
                 b.Property(l => l.Website).HasMaxLength(500);
+                b.Property(l => l.FBRKey).HasMaxLength(500).IsRequired();
+                b.Property(l => l.POSID).HasMaxLength(20).IsRequired();
+                b.Property(l => l.ApiBaseUrl).HasMaxLength(200).IsRequired();
             });
 
             builder.Entity<Currency>(b => {

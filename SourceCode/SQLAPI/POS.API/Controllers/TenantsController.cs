@@ -1,8 +1,13 @@
+using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using POS.API.Services;
+using POS.Data.Dto.Tenant;
 using POS.Data.Entities;
 using POS.Domain;
+using POS.MediatR.Tenant.Commands;
+using POS.Repository;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -16,11 +21,40 @@ namespace POS.API.Controllers
     {
         private readonly POSDbContext _context;
         private readonly TenantDataMigrationService _migrationService;
+        private readonly IMediator _mediator;
 
-        public TenantsController(POSDbContext context, TenantDataMigrationService migrationService)
+        public TenantsController(POSDbContext context, TenantDataMigrationService migrationService, IMediator mediator)
         {
             _context = context;
             _migrationService = migrationService;
+            _mediator = mediator;
+        }
+
+        /// <summary>
+        /// Register a new tenant (Public)
+        /// </summary>
+        [HttpPost("register")]
+        [AllowAnonymous]
+        public async Task<ActionResult<Tenant>> Register([FromBody] RegisterTenantDto dto)
+        {
+            var command = new RegisterTenantCommand
+            {
+                Name = dto.Name,
+                Subdomain = dto.Subdomain,
+                AdminEmail = dto.AdminEmail,
+                AdminPassword = dto.AdminPassword,
+                Phone = dto.Phone,
+                Address = dto.Address
+            };
+
+            var response = await _mediator.Send(command);
+            
+            if (response.StatusCode == 200)
+            {
+                return Ok(response.Data);
+            }
+            
+            return BadRequest(new { message = string.Join(", ", response.Errors) });
         }
 
         /// <summary>

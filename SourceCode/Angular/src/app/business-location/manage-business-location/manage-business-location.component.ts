@@ -62,7 +62,11 @@ export class ManageBusinessLocationComponent
       address: ['', Validators.required],
       mobile: [''],
       contactPerson: [''],
+      website: [''],
       email: ['', [Validators.email]],
+      fbrKey: ['', Validators.required],
+      posid: ['', Validators.required],
+      apiBaseUrl: ['', Validators.required],
     });
   }
 

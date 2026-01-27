@@ -783,16 +783,48 @@ namespace POS.Domain.Migrations.SqlServer
                     b.Property<DateTime?>("ClosedDate")
                         .HasColumnType("datetime2");
 
+                    b.Property<Guid>("CreatedBy")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime>("CreatedDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<Guid?>("DeletedBy")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime?>("DeletedDate")
+                        .HasColumnType("datetime2");
+
                     b.Property<DateTime>("EndDate")
                         .HasColumnType("datetime2");
 
                     b.Property<bool>("IsClosed")
                         .HasColumnType("bit");
 
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("bit");
+
+                    b.Property<DateTime?>("LastSyncedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<Guid>("ModifiedBy")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime>("ModifiedDate")
+                        .HasColumnType("datetime2");
+
                     b.Property<DateTime>("StartDate")
                         .HasColumnType("datetime2");
 
+                    b.Property<long>("SyncVersion")
+                        .HasColumnType("bigint");
+
+                    b.Property<Guid>("TenantId")
+                        .HasColumnType("uniqueidentifier");
+
                     b.HasKey("Id");
+
+                    b.HasIndex("CreatedBy");
 
                     b.ToTable("FinancialYears");
                 });
@@ -1447,121 +1479,6 @@ namespace POS.Domain.Migrations.SqlServer
                     b.ToTable("ExpenseTaxes");
                 });
 
-            modelBuilder.Entity("POS.Data.Entities.FBR.FBRConfiguration", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<string>("ApiBaseUrl")
-                        .IsRequired()
-                        .HasMaxLength(200)
-                        .HasColumnType("nvarchar(200)");
-
-                    b.Property<bool>("AutoSubmitInvoices")
-                        .HasColumnType("bit");
-
-                    b.Property<string>("BranchCode")
-                        .IsRequired()
-                        .HasMaxLength(20)
-                        .HasColumnType("nvarchar(20)");
-
-                    b.Property<string>("ClientId")
-                        .IsRequired()
-                        .HasMaxLength(100)
-                        .HasColumnType("nvarchar(100)");
-
-                    b.Property<string>("ClientSecret")
-                        .IsRequired()
-                        .HasMaxLength(500)
-                        .HasColumnType("nvarchar(500)");
-
-                    b.Property<Guid>("CreatedBy")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<DateTime>("CreatedDate")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("CurrentAccessToken")
-                        .HasMaxLength(1000)
-                        .HasColumnType("nvarchar(1000)");
-
-                    b.Property<Guid?>("DeletedBy")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<DateTime?>("DeletedDate")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("FBRKey")
-                        .IsRequired()
-                        .HasMaxLength(500)
-                        .HasColumnType("nvarchar(500)");
-
-                    b.Property<int>("FailedSubmissionsToday")
-                        .HasColumnType("int");
-
-                    b.Property<bool>("IsDeleted")
-                        .HasColumnType("bit");
-
-                    b.Property<bool>("IsEnabled")
-                        .HasColumnType("bit");
-
-                    b.Property<bool>("IsTestMode")
-                        .HasColumnType("bit");
-
-                    b.Property<DateTime?>("LastSuccessfulSubmission")
-                        .HasColumnType("datetime2");
-
-                    b.Property<DateTime?>("LastSyncedAt")
-                        .HasColumnType("datetime2");
-
-                    b.Property<DateTime?>("LastTokenRefresh")
-                        .HasColumnType("datetime2");
-
-                    b.Property<int>("MaxRetryAttempts")
-                        .HasColumnType("int");
-
-                    b.Property<int>("MaxRetryDelaySeconds")
-                        .HasColumnType("int");
-
-                    b.Property<Guid>("ModifiedBy")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<DateTime>("ModifiedDate")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("POSID")
-                        .IsRequired()
-                        .HasMaxLength(20)
-                        .HasColumnType("nvarchar(20)");
-
-                    b.Property<int>("RetryDelaySeconds")
-                        .HasColumnType("int");
-
-                    b.Property<string>("STRN")
-                        .IsRequired()
-                        .HasMaxLength(20)
-                        .HasColumnType("nvarchar(20)");
-
-                    b.Property<long>("SyncVersion")
-                        .HasColumnType("bigint");
-
-                    b.Property<Guid>("TenantId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<DateTime?>("TokenExpiresAt")
-                        .HasColumnType("datetime2");
-
-                    b.Property<int>("TotalSubmissionsToday")
-                        .HasColumnType("int");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("CreatedBy");
-
-                    b.ToTable("FBRConfigurations");
-                });
-
             modelBuilder.Entity("POS.Data.Entities.FBR.FBRSubmissionLog", b =>
                 {
                     b.Property<Guid>("Id")
@@ -1927,6 +1844,14 @@ namespace POS.Domain.Migrations.SqlServer
                         .HasMaxLength(500)
                         .HasColumnType("nvarchar(500)");
 
+                    b.Property<string>("ApiBaseUrl")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("nvarchar(200)");
+
+                    b.Property<bool>("AutoSubmitInvoices")
+                        .HasColumnType("bit");
+
                     b.Property<string>("ContactPerson")
                         .HasMaxLength(200)
                         .HasColumnType("nvarchar(200)");
@@ -1947,7 +1872,15 @@ namespace POS.Domain.Migrations.SqlServer
                         .HasMaxLength(256)
                         .HasColumnType("nvarchar(256)");
 
+                    b.Property<string>("FBRKey")
+                        .IsRequired()
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)");
+
                     b.Property<bool>("IsDeleted")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("IsFBREnabled")
                         .HasColumnType("bit");
 
                     b.Property<DateTime?>("LastSyncedAt")
@@ -1966,6 +1899,11 @@ namespace POS.Domain.Migrations.SqlServer
                     b.Property<string>("Name")
                         .HasMaxLength(200)
                         .HasColumnType("nvarchar(200)");
+
+                    b.Property<string>("POSID")
+                        .IsRequired()
+                        .HasMaxLength(20)
+                        .HasColumnType("nvarchar(20)");
 
                     b.Property<long>("SyncVersion")
                         .HasColumnType("bigint");
@@ -4879,13 +4817,13 @@ namespace POS.Domain.Migrations.SqlServer
                     b.HasOne("POS.Data.Entities.Location", "Branch")
                         .WithMany()
                         .HasForeignKey("BranchId")
-                        .OnDelete(DeleteBehavior.Restrict)
+                        .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
 
                     b.HasOne("POS.Data.User", "CreatedByUser")
                         .WithMany()
                         .HasForeignKey("CreatedBy")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
 
                     b.HasOne("POS.Data.Entities.Accounts.LedgerAccount", "CreditLedgerAccount")
@@ -4923,6 +4861,17 @@ namespace POS.Domain.Migrations.SqlServer
                     b.Navigation("FinancialYear");
 
                     b.Navigation("Transaction");
+                });
+
+            modelBuilder.Entity("POS.Data.Entities.Accounts.FinancialYear", b =>
+                {
+                    b.HasOne("POS.Data.User", "CreatedByUser")
+                        .WithMany()
+                        .HasForeignKey("CreatedBy")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("CreatedByUser");
                 });
 
             modelBuilder.Entity("POS.Data.Entities.Accounts.LedgerAccount", b =>
@@ -5001,7 +4950,7 @@ namespace POS.Domain.Migrations.SqlServer
                     b.HasOne("POS.Data.Entities.Location", "Branch")
                         .WithMany()
                         .HasForeignKey("BranchId")
-                        .OnDelete(DeleteBehavior.Restrict)
+                        .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
 
                     b.HasOne("POS.Data.Entities.Transaction", "Transaction")
@@ -5020,7 +4969,7 @@ namespace POS.Domain.Migrations.SqlServer
                     b.HasOne("POS.Data.Entities.Location", "Branch")
                         .WithMany()
                         .HasForeignKey("BranchId")
-                        .OnDelete(DeleteBehavior.Restrict)
+                        .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
 
                     b.HasOne("POS.Data.Product", "InventoryItem")
@@ -5039,7 +4988,7 @@ namespace POS.Domain.Migrations.SqlServer
                     b.HasOne("POS.Data.Entities.Location", "Branch")
                         .WithMany()
                         .HasForeignKey("BranchId")
-                        .OnDelete(DeleteBehavior.Restrict)
+                        .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
 
                     b.HasOne("POS.Data.User", "CreatedByUser")
@@ -5194,17 +5143,6 @@ namespace POS.Domain.Migrations.SqlServer
                     b.Navigation("Tax");
                 });
 
-            modelBuilder.Entity("POS.Data.Entities.FBR.FBRConfiguration", b =>
-                {
-                    b.HasOne("POS.Data.User", "CreatedByUser")
-                        .WithMany()
-                        .HasForeignKey("CreatedBy")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("CreatedByUser");
-                });
-
             modelBuilder.Entity("POS.Data.Entities.FBR.FBRSubmissionLog", b =>
                 {
                     b.HasOne("POS.Data.User", "CreatedByUser")
@@ -5336,7 +5274,7 @@ namespace POS.Domain.Migrations.SqlServer
                     b.HasOne("POS.Data.Entities.Location", "Location")
                         .WithMany()
                         .HasForeignKey("BranchId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
 
                     b.HasOne("POS.Data.User", "Employee")
@@ -5476,7 +5414,7 @@ namespace POS.Domain.Migrations.SqlServer
                     b.HasOne("POS.Data.User", "CreatedByUser")
                         .WithMany()
                         .HasForeignKey("CreatedBy")
-                        .OnDelete(DeleteBehavior.Restrict)
+                        .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
 
                     b.HasOne("POS.Data.Entities.Accounts.FinancialYear", "FinancialYear")

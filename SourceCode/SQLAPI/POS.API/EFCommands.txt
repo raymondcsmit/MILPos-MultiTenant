@@ -1,4 +1,11 @@
-﻿SqlServer
+﻿dotnet ef migrations add MainInitSQLServer -c POSDbContext -p POS.Domain/POS.Domain.csproj --startup-project POS.API/POS.API.csproj -o Migrations/SqlServer
+dotnet ef migrations add FBRUpdateSQLServer -c POSDbContext -p POS.Domain/POS.Domain.csproj --startup-project POS.API/POS.API.csproj -o Migrations/SqlServer
+
+
+dotnet ef database update MainInitSQLServer -c POSDbContext -p POS.Domain/POS.Domain.csproj --startup-project POS.API/POS.API.csproj
+
+
+SqlServer
 	dotnet ef migrations add MainInit -c POSDbContext -p POS.Domain/POS.Domain.csproj --startup-project POS.API/POS.API.csproj -o Migrations/SqlServer
     dotnet ef database update Initial_SqlServer -c POSDbContext -p POS.Domain/POS.Domain.csproj --startup-project POS.API/POS.API.csproj		
    

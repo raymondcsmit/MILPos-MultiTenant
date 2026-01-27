@@ -13,6 +13,11 @@ namespace POS.Data.Dto
         public string Mobile { get; set; }
         public string ContactPerson { get; set; }
         public string Website { get; set; }
+        public string FBRKey { get; set; }
+        public string POSID { get; set; }
+        public string ApiBaseUrl { get; set; }
+        public bool IsFBREnabled { get; set; }
+        public bool AutoSubmitInvoices { get; set; }
         public virtual ICollection<UserLocation> UserLocations { get; set; }
     }
 }

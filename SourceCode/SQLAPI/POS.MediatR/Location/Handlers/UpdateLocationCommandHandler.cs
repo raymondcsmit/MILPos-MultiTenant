@@ -32,6 +32,11 @@ namespace POS.MediatR.Location.Handlers
             entityExist.Mobile = request.Mobile;
             entityExist.ContactPerson = request.ContactPerson;
             entityExist.Website = request.Website;
+            entityExist.FBRKey = request.FBRKey;
+            entityExist.POSID = request.POSID;
+            entityExist.ApiBaseUrl = request.ApiBaseUrl;
+            entityExist.IsFBREnabled = request.IsFBREnabled;
+            entityExist.AutoSubmitInvoices = request.AutoSubmitInvoices;
             _locationRepository.Update(entityExist);
 
             if (await _uow.SaveAsync() <= 0)

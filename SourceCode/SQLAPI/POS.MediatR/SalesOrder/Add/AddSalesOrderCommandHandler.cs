@@ -84,10 +84,10 @@ namespace POS.MediatR.Handlers
             // FBR Integration Logic
             try 
             {
-                var fbrConfig = await _uow.Context.Set<POS.Data.Entities.FBR.FBRConfiguration>()
-                    .FirstOrDefaultAsync(c => c.IsEnabled && !c.IsDeleted && c.TenantId == salesOrder.TenantId, cancellationToken);
+                var location = await _uow.Context.Set<POS.Data.Entities.Location>()
+                    .FirstOrDefaultAsync(l => l.Id == salesOrder.LocationId, cancellationToken);
 
-                if (fbrConfig != null && fbrConfig.AutoSubmitInvoices)
+                if (location != null && location.IsFBREnabled && location.AutoSubmitInvoices)
                 {
                     salesOrder.FBRStatus = POS.Data.Entities.FBR.FBRSubmissionStatus.Queued;
                     salesOrder.BuyerNTN = request.BuyerNTN;
@@ -97,7 +97,7 @@ namespace POS.MediatR.Handlers
                     salesOrder.BuyerAddress = request.BuyerAddress;
                     salesOrder.SaleType = !string.IsNullOrEmpty(request.SaleType) ? request.SaleType : "Retail";
                     
-                    _logger.LogInformation("Sales Order {OrderNumber} queued for FBR submission", salesOrder.OrderNumber);
+                    _logger.LogInformation("Sales Order {OrderNumber} queued for FBR submission (Location: {LocationName})", salesOrder.OrderNumber, location.Name);
                 }
             }
             catch (Exception ex)

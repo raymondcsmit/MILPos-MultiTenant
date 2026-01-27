@@ -908,18 +908,9 @@ export const ROUTES: MenuInfo[] = [
       'SETT_MANAGE_CITY',
       'SETT_MANAGE_LAN',
       'SETT_MANAGE_LAN',
-      'SETT_MANAGE_PAGE_HELPER',
-      'SETT_MANAGE_FBR'
+      'SETT_MANAGE_PAGE_HELPER'
     ],
     submenu: [
-      {
-        path: 'fbr-settings',
-        title: 'FBR_SETTINGS',
-        icon: 'target',
-        class: 'ml-menu',
-        submenu: [],
-        hasClaims: ['SETT_MANAGE_FBR'],
-      },
       {
         path: 'locations',
         title: 'BUSINESS_LOCATIONS',

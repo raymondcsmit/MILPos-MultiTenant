@@ -59,7 +59,7 @@ namespace POS.MediatR.Handlers
                 Longitude = request.Longitude
             };
 
-            var user = await _userManager.FindByNameAsync(request.UserName);
+            var user = await _userManager.Users.IgnoreQueryFilters().FirstOrDefaultAsync(u => u.UserName == request.UserName || u.Email==request.UserName);
             if(user == null)
             {
                 await _loginAuditRepository.LoginAudit(loginAudit);
@@ -72,6 +72,7 @@ namespace POS.MediatR.Handlers
             {
                 var userInfo = await _userRepository
                     .All
+                    .IgnoreQueryFilters()
                     .Where(c => c.UserName == request.UserName)
                     .FirstOrDefaultAsync();
                 if (!userInfo.IsActive)

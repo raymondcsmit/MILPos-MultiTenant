@@ -16,6 +16,11 @@ export const routes: Routes = [
     resolve: { profile: CompanyProfileResolver },
     children: [
       {
+        path: 'register',
+        loadComponent: () =>
+          import('./register-tenant/register-tenant.component').then((m) => m.RegisterTenantComponent),
+      },
+      {
         path: 'login',
         loadComponent: () =>
           import('./login/login.component').then((m) => m.LoginComponent),
@@ -220,14 +225,6 @@ export const routes: Routes = [
             loadComponent: () =>
               import('./company-profile/company-profile.component').then(
                 (m) => m.CompanyProfileComponent
-              ),
-          },
-          {
-            path: 'fbr-settings',
-            canActivate: [AuthGuard],
-            loadComponent: () =>
-              import('./fbr-settings/fbr-settings.component').then(
-                (m) => m.FBRSettingsComponent
               ),
           },
           {

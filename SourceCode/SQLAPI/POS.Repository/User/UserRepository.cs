@@ -91,15 +91,15 @@ public class UserRepository : GenericRepository<User, POSDbContext>,
 
     public async Task<UserAuthDto> BuildUserAuthObject(User appUser)
     {
-        var companyProfile = _companyProfileRepository.All.FirstOrDefault();
+        var companyProfile = await _companyProfileRepository.All.IgnoreQueryFilters().FirstOrDefaultAsync(c => c.TenantId == appUser.TenantId);
         List<Guid> locations;
         if (appUser.IsAllLocations)
         {
-            locations = await _locationRepository.All.Select(c => c.Id).ToListAsync();
+            locations = await _locationRepository.All.IgnoreQueryFilters().Where(c => c.TenantId == appUser.TenantId).Select(c => c.Id).ToListAsync();
         }
         else
         {
-            locations = await _userLocationsRepository.All.Where(ul => ul.UserId == appUser.Id)
+            locations = await _userLocationsRepository.All.IgnoreQueryFilters().Where(ul => ul.UserId == appUser.Id)
                 .Select(d => d.LocationId).ToListAsync();
         }
 

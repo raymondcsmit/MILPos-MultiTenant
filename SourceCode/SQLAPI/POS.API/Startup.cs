@@ -21,6 +21,7 @@ using Microsoft.Extensions.Logging;
 using Microsoft.OpenApi;
 using Newtonsoft.Json;
 using POS.API.Helpers;
+using POS.API.Services;
 using POS.API.Helpers.Mapping;
 using POS.Data;
 using POS.Data.Dto;
@@ -135,6 +136,7 @@ namespace POS.API
             });
             services.AddSingleton(MapperConfig.GetMapperConfigs());
             services.AddScoped<SeedingService>();
+            services.AddScoped<ITenantRegistrationService, TenantRegistrationService>();
             services.AddScoped<TenantDataMigrationService>();
             services.AddScoped<POS.Common.Services.IFileStorageService, POS.Helper.Services.FileStorageService>();
             
@@ -144,7 +146,6 @@ namespace POS.API
             services.AddScoped<IImportExportService<POS.Data.Supplier>, SupplierImportExportService>();
             
             // FBR Integration Services
-            services.AddScoped<POS.Domain.FBR.IFBRAuthenticationService, POS.Domain.FBR.FBRAuthenticationService>();
             services.AddScoped<POS.Domain.FBR.IFBRQRCodeService, POS.Domain.FBR.FBRQRCodeService>();
             services.AddHttpClient<POS.Domain.FBR.IFBRInvoiceService, POS.Domain.FBR.FBRInvoiceService>()
                 .SetHandlerLifetime(TimeSpan.FromMinutes(5)); // Prevent socket exhaustion

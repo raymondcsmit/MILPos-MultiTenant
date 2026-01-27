@@ -59,6 +59,48 @@
           }
         </div>
       </div>
+      <div class="col-lg-6 col-sm-12 mb-sm-1">
+        <div class="form-group">
+          <label for="website" class="form-label">{{"WEBSITE" | translate}}</label>
+          <input formControlName="website" type="text" class="form-control" id="website">
+        </div>
+      </div>
+      <div class="col-lg-6 col-sm-12 mb-sm-1">
+        <div class="form-group">
+          <label for="fbrKey" class="text-danger form-label">{{"FBR_KEY" | translate}}*</label>
+          <input formControlName="fbrKey" type="text" class="form-control" id="fbrKey">
+          @if(locationForm.get('fbrKey')?.touched && locationForm.get('fbrKey')?.errors &&
+          locationForm.get('fbrKey')?.errors?.['required']){
+          <div class="text-danger">
+            {{"FBR_KEY_IS_REQUIRED" | translate}}
+          </div>
+          }
+        </div>
+      </div>
+      <div class="col-lg-6 col-sm-12 mb-sm-1">
+        <div class="form-group">
+          <label for="posid" class="text-danger form-label">{{"POS_ID" | translate}}*</label>
+          <input formControlName="posid" type="text" class="form-control" id="posid">
+          @if(locationForm.get('posid')?.touched && locationForm.get('posid')?.errors &&
+          locationForm.get('posid')?.errors?.['required']){
+          <div class="text-danger">
+            {{"POS_ID_IS_REQUIRED" | translate}}
+          </div>
+          }
+        </div>
+      </div>
+      <div class="col-sm-12 mb-sm-1">
+        <div class="form-group">
+          <label for="apiBaseUrl" class="text-danger form-label">{{"API_BASE_URL" | translate}}*</label>
+          <input formControlName="apiBaseUrl" type="text" class="form-control" id="apiBaseUrl">
+          @if(locationForm.get('apiBaseUrl')?.touched && locationForm.get('apiBaseUrl')?.errors &&
+          locationForm.get('apiBaseUrl')?.errors?.['required']){
+          <div class="text-danger">
+            {{"API_BASE_URL_IS_REQUIRED" | translate}}
+          </div>
+          }
+        </div>
+      </div>
     </div>
     <div class="row">
       <div class="mt-3 col-sm-12">
