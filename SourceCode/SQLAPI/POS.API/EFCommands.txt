@@ -1,5 +1,28 @@
-﻿dotnet ef migrations add MainInitSQLServer -c POSDbContext -p POS.Domain/POS.Domain.csproj --startup-project POS.API/POS.API.csproj -o Migrations/SqlServer
+﻿
+Powershell
+
+SQLServer
+$env:DatabaseProvider="SqlServer"
+dotnet ef migrations add MainInitSQLServer -p POS.Migrations.SqlServer/POS.Migrations.SqlServer.csproj -s POS.API/POS.API.csproj -o Migrations
+
+SQLITE
+$env:DatabaseProvider="Sqlite"
+dotnet ef migrations add MainInitSQLITE -p POS.Migrations.Sqlite/POS.Migrations.Sqlite.csproj -s POS.API/POS.API.csproj -o Migrations
+
+
+
+
+dotnet ef migrations add MainInitSQLServer -c POSDbContext -p POS.Domain/POS.Domain.csproj --startup-project POS.API/POS.API.csproj -o Migrations/SqlServer
 dotnet ef migrations add FBRUpdateSQLServer -c POSDbContext -p POS.Domain/POS.Domain.csproj --startup-project POS.API/POS.API.csproj -o Migrations/SqlServer
+
+
+dotnet ef migrations add MainInitSQLITE -c POSDbContext -p POS.Domain/POS.Domain.csproj --startup-project POS.API/POS.API.csproj -o Migrations/SQLITE
+
+
+
+dotnet ef migrations add FBRUpdateSQLITE -c POSDbContext -p POS.Domain/POS.Domain.csproj --startup-project POS.API/POS.API.csproj -o Migrations/SQLITE
+dotnet ef database update MainInitSQLITE -c POSDbContext -p POS.Domain/POS.Domain.csproj --startup-project POS.API/POS.API.csproj
+
 
 
 dotnet ef database update MainInitSQLServer -c POSDbContext -p POS.Domain/POS.Domain.csproj --startup-project POS.API/POS.API.csproj

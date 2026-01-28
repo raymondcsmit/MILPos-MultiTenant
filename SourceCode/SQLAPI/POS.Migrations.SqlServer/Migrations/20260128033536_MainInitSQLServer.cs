@@ -2,10 +2,10 @@
 
 #nullable disable
 
-namespace POS.Domain.Migrations
+namespace POS.Migrations.SqlServer.Migrations
 {
     /// <inheritdoc />
-    public partial class FBR_Final_Schema : Migration
+    public partial class MainInitSQLServer : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)

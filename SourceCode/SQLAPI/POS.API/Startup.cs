@@ -105,12 +105,14 @@ namespace POS.API
                 var provider = Configuration.GetValue<string>("DatabaseProvider") ?? "Sqlite";
                 if (provider == "Sqlite")
                 {
-                    options.UseSqlite(Configuration.GetConnectionString("SqliteConnectionString"))
+                    options.UseSqlite(Configuration.GetConnectionString("SqliteConnectionString"),
+                        b => b.MigrationsAssembly("POS.Migrations.Sqlite"))
                     .EnableSensitiveDataLogging();
                 }
                 else
                 {
-                    options.UseSqlServer(Configuration.GetConnectionString("DbConnectionString"))
+                    options.UseSqlServer(Configuration.GetConnectionString("DbConnectionString"),
+                        b => b.MigrationsAssembly("POS.Migrations.SqlServer"))
                     .EnableSensitiveDataLogging();
                 }
 

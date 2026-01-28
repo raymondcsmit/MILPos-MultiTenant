@@ -24,6 +24,9 @@ namespace POS.MediatR.Location.Handlers
                     Mobile = c.Mobile,
                     ContactPerson = c.ContactPerson,
                     Website = c.Website,
+                    FBRKey=c.FBRKey,
+                    POSID=c.POSID,
+                    ApiBaseUrl=c.ApiBaseUrl,
                 }).ToListAsync();
             return entities;
         }

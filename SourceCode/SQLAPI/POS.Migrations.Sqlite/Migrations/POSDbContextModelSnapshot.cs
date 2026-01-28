@@ -2,20 +2,17 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
-using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using POS.Domain;
 
 #nullable disable
 
-namespace POS.Domain.Migrations
+namespace POS.Migrations.Sqlite.Migrations
 {
     [DbContext(typeof(POSDbContext))]
-    [Migration("20260124160752_FBR_Integration_Fix")]
-    partial class FBR_Integration_Fix
+    partial class POSDbContextModelSnapshot : ModelSnapshot
     {
-        /// <inheritdoc />
-        protected override void BuildTargetModel(ModelBuilder modelBuilder)
+        protected override void BuildModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder.HasAnnotation("ProductVersion", "10.0.2");
@@ -98,6 +95,7 @@ namespace POS.Domain.Migrations
                         .HasColumnType("TEXT");
 
                     b.Property<string>("ImageUrl")
+                        .HasMaxLength(500)
                         .HasColumnType("TEXT");
 
                     b.Property<bool>("IsDeleted")
@@ -113,6 +111,7 @@ namespace POS.Domain.Migrations
                         .HasColumnType("TEXT");
 
                     b.Property<string>("Name")
+                        .HasMaxLength(200)
                         .HasColumnType("TEXT");
 
                     b.Property<long>("SyncVersion")
@@ -135,6 +134,7 @@ namespace POS.Domain.Migrations
                         .HasColumnType("TEXT");
 
                     b.Property<string>("CityName")
+                        .HasMaxLength(200)
                         .HasColumnType("TEXT");
 
                     b.Property<Guid>("CountryId")
@@ -273,6 +273,7 @@ namespace POS.Domain.Migrations
                         .HasColumnType("TEXT");
 
                     b.Property<string>("Email")
+                        .HasMaxLength(256)
                         .HasColumnType("TEXT");
 
                     b.Property<bool>("IsDeleted")
@@ -282,6 +283,7 @@ namespace POS.Domain.Migrations
                         .HasColumnType("TEXT");
 
                     b.Property<string>("Message")
+                        .HasMaxLength(4000)
                         .HasColumnType("TEXT");
 
                     b.Property<Guid>("ModifiedBy")
@@ -293,9 +295,11 @@ namespace POS.Domain.Migrations
                         .HasDefaultValueSql("CURRENT_TIMESTAMP");
 
                     b.Property<string>("Name")
+                        .HasMaxLength(200)
                         .HasColumnType("TEXT");
 
                     b.Property<string>("Phone")
+                        .HasMaxLength(50)
                         .HasColumnType("TEXT");
 
                     b.Property<long>("SyncVersion")
@@ -318,6 +322,7 @@ namespace POS.Domain.Migrations
                         .HasColumnType("TEXT");
 
                     b.Property<string>("CountryName")
+                        .HasMaxLength(200)
                         .HasColumnType("TEXT");
 
                     b.Property<Guid>("CreatedBy")
@@ -366,9 +371,11 @@ namespace POS.Domain.Migrations
                         .HasColumnType("TEXT");
 
                     b.Property<string>("Name")
+                        .HasMaxLength(100)
                         .HasColumnType("TEXT");
 
                     b.Property<string>("Symbol")
+                        .HasMaxLength(10)
                         .HasColumnType("TEXT");
 
                     b.HasKey("Id");
@@ -386,6 +393,7 @@ namespace POS.Domain.Migrations
                         .HasColumnType("TEXT");
 
                     b.Property<string>("ContactPerson")
+                        .HasMaxLength(200)
                         .HasColumnType("TEXT");
 
                     b.Property<Guid>("CreatedBy")
@@ -395,6 +403,7 @@ namespace POS.Domain.Migrations
                         .HasColumnType("TEXT");
 
                     b.Property<string>("CustomerName")
+                        .HasMaxLength(250)
                         .HasColumnType("TEXT");
 
                     b.Property<Guid?>("DeletedBy")
@@ -404,12 +413,15 @@ namespace POS.Domain.Migrations
                         .HasColumnType("TEXT");
 
                     b.Property<string>("Description")
+                        .HasMaxLength(2000)
                         .HasColumnType("TEXT");
 
                     b.Property<string>("Email")
+                        .HasMaxLength(256)
                         .HasColumnType("TEXT");
 
                     b.Property<string>("Fax")
+                        .HasMaxLength(50)
                         .HasColumnType("TEXT");
 
                     b.Property<bool>("IsDeleted")
@@ -422,6 +434,7 @@ namespace POS.Domain.Migrations
                         .HasColumnType("TEXT");
 
                     b.Property<string>("MobileNo")
+                        .HasMaxLength(50)
                         .HasColumnType("TEXT");
 
                     b.Property<Guid>("ModifiedBy")
@@ -431,6 +444,7 @@ namespace POS.Domain.Migrations
                         .HasColumnType("TEXT");
 
                     b.Property<string>("PhoneNo")
+                        .HasMaxLength(50)
                         .HasColumnType("TEXT");
 
                     b.Property<Guid?>("ShippingAddressId")
@@ -440,15 +454,18 @@ namespace POS.Domain.Migrations
                         .HasColumnType("INTEGER");
 
                     b.Property<string>("TaxNumber")
+                        .HasMaxLength(50)
                         .HasColumnType("TEXT");
 
                     b.Property<Guid>("TenantId")
                         .HasColumnType("TEXT");
 
                     b.Property<string>("Url")
+                        .HasMaxLength(500)
                         .HasColumnType("TEXT");
 
                     b.Property<string>("Website")
+                        .HasMaxLength(500)
                         .HasColumnType("TEXT");
 
                     b.HasKey("Id");
@@ -494,12 +511,15 @@ namespace POS.Domain.Migrations
                         .HasColumnType("TEXT");
 
                     b.Property<string>("ErrorMessage")
+                        .HasMaxLength(4000)
                         .HasColumnType("TEXT");
 
                     b.Property<string>("RecipientEmail")
+                        .HasMaxLength(256)
                         .HasColumnType("TEXT");
 
                     b.Property<string>("SenderEmail")
+                        .HasMaxLength(256)
                         .HasColumnType("TEXT");
 
                     b.Property<DateTime>("SentAt")
@@ -509,6 +529,7 @@ namespace POS.Domain.Migrations
                         .HasColumnType("INTEGER");
 
                     b.Property<string>("Subject")
+                        .HasMaxLength(500)
                         .HasColumnType("TEXT");
 
                     b.HasKey("Id");
@@ -757,16 +778,48 @@ namespace POS.Domain.Migrations
                     b.Property<DateTime?>("ClosedDate")
                         .HasColumnType("TEXT");
 
+                    b.Property<Guid>("CreatedBy")
+                        .HasColumnType("TEXT");
+
+                    b.Property<DateTime>("CreatedDate")
+                        .HasColumnType("TEXT");
+
+                    b.Property<Guid?>("DeletedBy")
+                        .HasColumnType("TEXT");
+
+                    b.Property<DateTime?>("DeletedDate")
+                        .HasColumnType("TEXT");
+
                     b.Property<DateTime>("EndDate")
                         .HasColumnType("TEXT");
 
                     b.Property<bool>("IsClosed")
                         .HasColumnType("INTEGER");
 
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<DateTime?>("LastSyncedAt")
+                        .HasColumnType("TEXT");
+
+                    b.Property<Guid>("ModifiedBy")
+                        .HasColumnType("TEXT");
+
+                    b.Property<DateTime>("ModifiedDate")
+                        .HasColumnType("TEXT");
+
                     b.Property<DateTime>("StartDate")
                         .HasColumnType("TEXT");
 
+                    b.Property<long>("SyncVersion")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<Guid>("TenantId")
+                        .HasColumnType("TEXT");
+
                     b.HasKey("Id");
+
+                    b.HasIndex("CreatedBy");
 
                     b.ToTable("FinancialYears");
                 });
@@ -779,7 +832,7 @@ namespace POS.Domain.Migrations
 
                     b.Property<string>("AccountCode")
                         .IsRequired()
-                        .HasMaxLength(10)
+                        .HasMaxLength(50)
                         .HasColumnType("TEXT");
 
                     b.Property<int>("AccountGroup")
@@ -787,7 +840,7 @@ namespace POS.Domain.Migrations
 
                     b.Property<string>("AccountName")
                         .IsRequired()
-                        .HasMaxLength(100)
+                        .HasMaxLength(200)
                         .HasColumnType("TEXT");
 
                     b.Property<int>("AccountType")
@@ -1421,121 +1474,6 @@ namespace POS.Domain.Migrations
                     b.ToTable("ExpenseTaxes");
                 });
 
-            modelBuilder.Entity("POS.Data.Entities.FBR.FBRConfiguration", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("TEXT");
-
-                    b.Property<string>("ApiBaseUrl")
-                        .IsRequired()
-                        .HasMaxLength(200)
-                        .HasColumnType("TEXT");
-
-                    b.Property<bool>("AutoSubmitInvoices")
-                        .HasColumnType("INTEGER");
-
-                    b.Property<string>("BranchCode")
-                        .IsRequired()
-                        .HasMaxLength(20)
-                        .HasColumnType("TEXT");
-
-                    b.Property<string>("ClientId")
-                        .IsRequired()
-                        .HasMaxLength(100)
-                        .HasColumnType("TEXT");
-
-                    b.Property<string>("ClientSecret")
-                        .IsRequired()
-                        .HasMaxLength(500)
-                        .HasColumnType("TEXT");
-
-                    b.Property<Guid>("CreatedBy")
-                        .HasColumnType("TEXT");
-
-                    b.Property<DateTime>("CreatedDate")
-                        .HasColumnType("TEXT");
-
-                    b.Property<string>("CurrentAccessToken")
-                        .HasMaxLength(1000)
-                        .HasColumnType("TEXT");
-
-                    b.Property<Guid?>("DeletedBy")
-                        .HasColumnType("TEXT");
-
-                    b.Property<DateTime?>("DeletedDate")
-                        .HasColumnType("TEXT");
-
-                    b.Property<string>("FBRKey")
-                        .IsRequired()
-                        .HasMaxLength(500)
-                        .HasColumnType("TEXT");
-
-                    b.Property<int>("FailedSubmissionsToday")
-                        .HasColumnType("INTEGER");
-
-                    b.Property<bool>("IsDeleted")
-                        .HasColumnType("INTEGER");
-
-                    b.Property<bool>("IsEnabled")
-                        .HasColumnType("INTEGER");
-
-                    b.Property<bool>("IsTestMode")
-                        .HasColumnType("INTEGER");
-
-                    b.Property<DateTime?>("LastSuccessfulSubmission")
-                        .HasColumnType("TEXT");
-
-                    b.Property<DateTime?>("LastSyncedAt")
-                        .HasColumnType("TEXT");
-
-                    b.Property<DateTime?>("LastTokenRefresh")
-                        .HasColumnType("TEXT");
-
-                    b.Property<int>("MaxRetryAttempts")
-                        .HasColumnType("INTEGER");
-
-                    b.Property<int>("MaxRetryDelaySeconds")
-                        .HasColumnType("INTEGER");
-
-                    b.Property<Guid>("ModifiedBy")
-                        .HasColumnType("TEXT");
-
-                    b.Property<DateTime>("ModifiedDate")
-                        .HasColumnType("TEXT");
-
-                    b.Property<string>("POSID")
-                        .IsRequired()
-                        .HasMaxLength(20)
-                        .HasColumnType("TEXT");
-
-                    b.Property<int>("RetryDelaySeconds")
-                        .HasColumnType("INTEGER");
-
-                    b.Property<string>("STRN")
-                        .IsRequired()
-                        .HasMaxLength(20)
-                        .HasColumnType("TEXT");
-
-                    b.Property<long>("SyncVersion")
-                        .HasColumnType("INTEGER");
-
-                    b.Property<Guid>("TenantId")
-                        .HasColumnType("TEXT");
-
-                    b.Property<DateTime?>("TokenExpiresAt")
-                        .HasColumnType("TEXT");
-
-                    b.Property<int>("TotalSubmissionsToday")
-                        .HasColumnType("INTEGER");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("CreatedBy");
-
-                    b.ToTable("FBRConfigurations");
-                });
-
             modelBuilder.Entity("POS.Data.Entities.FBR.FBRSubmissionLog", b =>
                 {
                     b.Property<Guid>("Id")
@@ -1814,6 +1752,7 @@ namespace POS.Domain.Migrations
                         .HasColumnType("TEXT");
 
                     b.Property<string>("Name")
+                        .HasMaxLength(200)
                         .HasColumnType("TEXT");
 
                     b.Property<long>("SyncVersion")
@@ -1836,6 +1775,7 @@ namespace POS.Domain.Migrations
                         .HasColumnType("TEXT");
 
                     b.Property<string>("Code")
+                        .HasMaxLength(20)
                         .HasColumnType("TEXT");
 
                     b.Property<Guid>("CreatedBy")
@@ -1851,6 +1791,7 @@ namespace POS.Domain.Migrations
                         .HasColumnType("TEXT");
 
                     b.Property<string>("ImageUrl")
+                        .HasMaxLength(500)
                         .HasColumnType("TEXT");
 
                     b.Property<bool>("IsDeleted")
@@ -1869,6 +1810,7 @@ namespace POS.Domain.Migrations
                         .HasColumnType("TEXT");
 
                     b.Property<string>("Name")
+                        .HasMaxLength(100)
                         .HasColumnType("TEXT");
 
                     b.Property<int>("Order")
@@ -1894,9 +1836,19 @@ namespace POS.Domain.Migrations
                         .HasColumnType("TEXT");
 
                     b.Property<string>("Address")
+                        .HasMaxLength(500)
                         .HasColumnType("TEXT");
 
+                    b.Property<string>("ApiBaseUrl")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("TEXT");
+
+                    b.Property<bool>("AutoSubmitInvoices")
+                        .HasColumnType("INTEGER");
+
                     b.Property<string>("ContactPerson")
+                        .HasMaxLength(200)
                         .HasColumnType("TEXT");
 
                     b.Property<Guid>("CreatedBy")
@@ -1912,15 +1864,25 @@ namespace POS.Domain.Migrations
                         .HasColumnType("TEXT");
 
                     b.Property<string>("Email")
+                        .HasMaxLength(256)
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("FBRKey")
+                        .IsRequired()
+                        .HasMaxLength(500)
                         .HasColumnType("TEXT");
 
                     b.Property<bool>("IsDeleted")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<bool>("IsFBREnabled")
                         .HasColumnType("INTEGER");
 
                     b.Property<DateTime?>("LastSyncedAt")
                         .HasColumnType("TEXT");
 
                     b.Property<string>("Mobile")
+                        .HasMaxLength(50)
                         .HasColumnType("TEXT");
 
                     b.Property<Guid>("ModifiedBy")
@@ -1930,6 +1892,12 @@ namespace POS.Domain.Migrations
                         .HasColumnType("TEXT");
 
                     b.Property<string>("Name")
+                        .HasMaxLength(200)
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("POSID")
+                        .IsRequired()
+                        .HasMaxLength(20)
                         .HasColumnType("TEXT");
 
                     b.Property<long>("SyncVersion")
@@ -1939,6 +1907,7 @@ namespace POS.Domain.Migrations
                         .HasColumnType("TEXT");
 
                     b.Property<string>("Website")
+                        .HasMaxLength(500)
                         .HasColumnType("TEXT");
 
                     b.HasKey("Id");
@@ -2093,6 +2062,7 @@ namespace POS.Domain.Migrations
                         .HasColumnType("TEXT");
 
                     b.Property<string>("Description")
+                        .HasMaxLength(1000)
                         .HasColumnType("TEXT");
 
                     b.Property<bool>("IsDeleted")
@@ -2110,6 +2080,7 @@ namespace POS.Domain.Migrations
                         .HasDefaultValueSql("CURRENT_TIMESTAMP");
 
                     b.Property<string>("Name")
+                        .HasMaxLength(200)
                         .HasColumnType("TEXT");
 
                     b.Property<Guid?>("ParentId")
@@ -2240,9 +2211,11 @@ namespace POS.Domain.Migrations
                         .HasColumnType("TEXT");
 
                     b.Property<string>("Notes")
+                        .HasMaxLength(1000)
                         .HasColumnType("TEXT");
 
                     b.Property<string>("ReferenceNo")
+                        .HasMaxLength(50)
                         .HasColumnType("TEXT");
 
                     b.Property<int>("Status")
@@ -2450,9 +2423,11 @@ namespace POS.Domain.Migrations
                         .HasColumnType("TEXT");
 
                     b.Property<string>("Address")
+                        .HasMaxLength(1000)
                         .HasColumnType("TEXT");
 
                     b.Property<string>("ConnectionString")
+                        .HasMaxLength(1000)
                         .HasColumnType("TEXT");
 
                     b.Property<string>("ContactEmail")
@@ -2460,6 +2435,7 @@ namespace POS.Domain.Migrations
                         .HasColumnType("TEXT");
 
                     b.Property<string>("ContactPhone")
+                        .HasMaxLength(50)
                         .HasColumnType("TEXT");
 
                     b.Property<DateTime>("CreatedDate")
@@ -2492,6 +2468,7 @@ namespace POS.Domain.Migrations
                         .HasColumnType("TEXT");
 
                     b.Property<string>("SubscriptionPlan")
+                        .HasMaxLength(100)
                         .HasColumnType("TEXT");
 
                     b.Property<DateTime?>("SubscriptionStartDate")
@@ -2660,6 +2637,7 @@ namespace POS.Domain.Migrations
                         .HasColumnType("TEXT");
 
                     b.Property<string>("Name")
+                        .HasMaxLength(200)
                         .HasColumnType("TEXT");
 
                     b.Property<long>("SyncVersion")
@@ -2706,6 +2684,7 @@ namespace POS.Domain.Migrations
                         .HasColumnType("TEXT");
 
                     b.Property<string>("Name")
+                        .HasMaxLength(200)
                         .HasColumnType("TEXT");
 
                     b.Property<long>("SyncVersion")
@@ -2748,6 +2727,7 @@ namespace POS.Domain.Migrations
                         .HasColumnType("TEXT");
 
                     b.Property<string>("Description")
+                        .HasMaxLength(1000)
                         .HasColumnType("TEXT");
 
                     b.Property<Guid?>("ExpenseById")
@@ -2777,12 +2757,15 @@ namespace POS.Domain.Migrations
                         .HasDefaultValueSql("CURRENT_TIMESTAMP");
 
                     b.Property<string>("ReceiptName")
+                        .HasMaxLength(200)
                         .HasColumnType("TEXT");
 
                     b.Property<string>("ReceiptPath")
+                        .HasMaxLength(500)
                         .HasColumnType("TEXT");
 
                     b.Property<string>("Reference")
+                        .HasMaxLength(100)
                         .HasColumnType("TEXT");
 
                     b.Property<long>("SyncVersion")
@@ -2840,6 +2823,7 @@ namespace POS.Domain.Migrations
                         .HasDefaultValueSql("CURRENT_TIMESTAMP");
 
                     b.Property<string>("Name")
+                        .HasMaxLength(200)
                         .HasColumnType("TEXT");
 
                     b.Property<long>("SyncVersion")
@@ -2887,6 +2871,7 @@ namespace POS.Domain.Migrations
                         .HasColumnType("TEXT");
 
                     b.Property<string>("Address")
+                        .HasMaxLength(500)
                         .HasColumnType("TEXT");
 
                     b.Property<Guid?>("AssignTo")
@@ -2896,19 +2881,22 @@ namespace POS.Domain.Migrations
                         .HasColumnType("TEXT");
 
                     b.Property<string>("CityName")
+                        .HasMaxLength(200)
                         .HasColumnType("TEXT");
 
                     b.Property<string>("CompanyName")
+                        .HasMaxLength(200)
                         .HasColumnType("TEXT");
 
                     b.Property<string>("ContactPerson")
-                        .HasMaxLength(100)
+                        .HasMaxLength(200)
                         .HasColumnType("TEXT");
 
                     b.Property<Guid?>("CountryId")
                         .HasColumnType("TEXT");
 
                     b.Property<string>("CountryName")
+                        .HasMaxLength(200)
                         .HasColumnType("TEXT");
 
                     b.Property<Guid>("CreatedBy")
@@ -2924,7 +2912,7 @@ namespace POS.Domain.Migrations
                         .HasColumnType("TEXT");
 
                     b.Property<string>("Email")
-                        .HasMaxLength(50)
+                        .HasMaxLength(256)
                         .HasColumnType("TEXT");
 
                     b.Property<Guid>("InquirySourceId")
@@ -2940,9 +2928,11 @@ namespace POS.Domain.Migrations
                         .HasColumnType("TEXT");
 
                     b.Property<string>("Message")
+                        .HasMaxLength(4000)
                         .HasColumnType("TEXT");
 
                     b.Property<string>("MobileNo")
+                        .HasMaxLength(50)
                         .HasColumnType("TEXT");
 
                     b.Property<Guid>("ModifiedBy")
@@ -2952,6 +2942,7 @@ namespace POS.Domain.Migrations
                         .HasColumnType("TEXT");
 
                     b.Property<string>("Phone")
+                        .HasMaxLength(50)
                         .HasColumnType("TEXT");
 
                     b.Property<long>("SyncVersion")
@@ -2961,6 +2952,7 @@ namespace POS.Domain.Migrations
                         .HasColumnType("TEXT");
 
                     b.Property<string>("Website")
+                        .HasMaxLength(500)
                         .HasColumnType("TEXT");
 
                     b.HasKey("Id");
@@ -3026,6 +3018,7 @@ namespace POS.Domain.Migrations
                         .HasColumnType("TEXT");
 
                     b.Property<string>("Name")
+                        .HasMaxLength(200)
                         .HasColumnType("TEXT");
 
                     b.Property<long>("SyncVersion")
@@ -3089,15 +3082,18 @@ namespace POS.Domain.Migrations
                         .HasColumnType("TEXT");
 
                     b.Property<string>("Level")
+                        .HasMaxLength(50)
                         .HasColumnType("TEXT");
 
                     b.Property<DateTime>("Logged")
                         .HasColumnType("TEXT");
 
                     b.Property<string>("Logger")
+                        .HasMaxLength(250)
                         .HasColumnType("TEXT");
 
                     b.Property<string>("MachineName")
+                        .HasMaxLength(100)
                         .HasColumnType("TEXT");
 
                     b.Property<string>("Message")
@@ -3176,6 +3172,7 @@ namespace POS.Domain.Migrations
                         .HasColumnType("decimal(18,2)");
 
                     b.Property<string>("Barcode")
+                        .HasMaxLength(100)
                         .HasColumnType("TEXT");
 
                     b.Property<Guid>("BrandId")
@@ -3185,6 +3182,7 @@ namespace POS.Domain.Migrations
                         .HasColumnType("TEXT");
 
                     b.Property<string>("Code")
+                        .HasMaxLength(100)
                         .HasColumnType("TEXT");
 
                     b.Property<Guid>("CreatedBy")
@@ -3203,6 +3201,7 @@ namespace POS.Domain.Migrations
                         .HasColumnType("TEXT");
 
                     b.Property<string>("Description")
+                        .HasMaxLength(4000)
                         .HasColumnType("TEXT");
 
                     b.Property<bool>("HasVariant")
@@ -3230,12 +3229,14 @@ namespace POS.Domain.Migrations
                         .HasColumnType("decimal(18,2)");
 
                     b.Property<string>("Name")
+                        .HasMaxLength(200)
                         .HasColumnType("TEXT");
 
                     b.Property<Guid?>("ParentId")
                         .HasColumnType("TEXT");
 
                     b.Property<string>("ProductUrl")
+                        .HasMaxLength(500)
                         .HasColumnType("TEXT");
 
                     b.Property<decimal?>("PurchasePrice")
@@ -3245,9 +3246,11 @@ namespace POS.Domain.Migrations
                         .HasColumnType("decimal(18,2)");
 
                     b.Property<string>("SkuCode")
+                        .HasMaxLength(100)
                         .HasColumnType("TEXT");
 
                     b.Property<string>("SkuName")
+                        .HasMaxLength(200)
                         .HasColumnType("TEXT");
 
                     b.Property<long>("SyncVersion")
@@ -3382,9 +3385,11 @@ namespace POS.Domain.Migrations
                         .HasDefaultValueSql("CURRENT_TIMESTAMP");
 
                     b.Property<string>("Note")
+                        .HasMaxLength(2000)
                         .HasColumnType("TEXT");
 
                     b.Property<string>("OrderNumber")
+                        .HasMaxLength(50)
                         .HasColumnType("TEXT");
 
                     b.Property<DateTime>("POCreatedDate")
@@ -3409,6 +3414,7 @@ namespace POS.Domain.Migrations
                         .HasColumnType("TEXT");
 
                     b.Property<string>("TermAndCondition")
+                        .HasMaxLength(4000)
                         .HasColumnType("TEXT");
 
                     b.Property<decimal>("TotalAmount")
@@ -3553,6 +3559,7 @@ namespace POS.Domain.Migrations
                         .HasDefaultValueSql("CURRENT_TIMESTAMP");
 
                     b.Property<string>("Note")
+                        .HasMaxLength(1000)
                         .HasColumnType("TEXT");
 
                     b.Property<DateTime>("PaymentDate")
@@ -3568,6 +3575,7 @@ namespace POS.Domain.Migrations
                         .HasColumnType("TEXT");
 
                     b.Property<string>("ReferenceNumber")
+                        .HasMaxLength(50)
                         .HasColumnType("TEXT");
 
                     b.Property<long>("SyncVersion")
@@ -3911,9 +3919,11 @@ namespace POS.Domain.Migrations
                         .HasColumnType("TEXT");
 
                     b.Property<string>("Note")
+                        .HasMaxLength(2000)
                         .HasColumnType("TEXT");
 
                     b.Property<string>("OrderNumber")
+                        .HasMaxLength(50)
                         .HasColumnType("TEXT");
 
                     b.Property<int>("PaymentStatus")
@@ -3923,6 +3933,7 @@ namespace POS.Domain.Migrations
                         .HasColumnType("TEXT");
 
                     b.Property<string>("SaleReturnNote")
+                        .HasMaxLength(2000)
                         .HasColumnType("TEXT");
 
                     b.Property<string>("SaleType")
@@ -3938,6 +3949,7 @@ namespace POS.Domain.Migrations
                         .HasColumnType("TEXT");
 
                     b.Property<string>("TermAndCondition")
+                        .HasMaxLength(4000)
                         .HasColumnType("TEXT");
 
                     b.Property<decimal>("TotalAmount")
@@ -4083,6 +4095,7 @@ namespace POS.Domain.Migrations
                         .HasColumnType("TEXT");
 
                     b.Property<string>("Note")
+                        .HasMaxLength(1000)
                         .HasColumnType("TEXT");
 
                     b.Property<DateTime>("PaymentDate")
@@ -4095,6 +4108,7 @@ namespace POS.Domain.Migrations
                         .HasColumnType("INTEGER");
 
                     b.Property<string>("ReferenceNumber")
+                        .HasMaxLength(50)
                         .HasColumnType("TEXT");
 
                     b.Property<Guid>("SalesOrderId")
@@ -4187,6 +4201,7 @@ namespace POS.Domain.Migrations
                         .HasColumnType("TEXT");
 
                     b.Property<string>("ContactPerson")
+                        .HasMaxLength(200)
                         .HasColumnType("TEXT");
 
                     b.Property<Guid>("CreatedBy")
@@ -4202,12 +4217,15 @@ namespace POS.Domain.Migrations
                         .HasColumnType("TEXT");
 
                     b.Property<string>("Description")
+                        .HasMaxLength(2000)
                         .HasColumnType("TEXT");
 
                     b.Property<string>("Email")
+                        .HasMaxLength(256)
                         .HasColumnType("TEXT");
 
                     b.Property<string>("Fax")
+                        .HasMaxLength(50)
                         .HasColumnType("TEXT");
 
                     b.Property<bool>("IsDeleted")
@@ -4217,6 +4235,7 @@ namespace POS.Domain.Migrations
                         .HasColumnType("TEXT");
 
                     b.Property<string>("MobileNo")
+                        .HasMaxLength(50)
                         .HasColumnType("TEXT");
 
                     b.Property<Guid>("ModifiedBy")
@@ -4228,27 +4247,32 @@ namespace POS.Domain.Migrations
                         .HasDefaultValueSql("CURRENT_TIMESTAMP");
 
                     b.Property<string>("PhoneNo")
+                        .HasMaxLength(50)
                         .HasColumnType("TEXT");
 
                     b.Property<Guid>("ShippingAddressId")
                         .HasColumnType("TEXT");
 
                     b.Property<string>("SupplierName")
+                        .HasMaxLength(250)
                         .HasColumnType("TEXT");
 
                     b.Property<long>("SyncVersion")
                         .HasColumnType("INTEGER");
 
                     b.Property<string>("TaxNumber")
+                        .HasMaxLength(50)
                         .HasColumnType("TEXT");
 
                     b.Property<Guid>("TenantId")
                         .HasColumnType("TEXT");
 
                     b.Property<string>("Url")
+                        .HasMaxLength(500)
                         .HasColumnType("TEXT");
 
                     b.Property<string>("Website")
+                        .HasMaxLength(500)
                         .HasColumnType("TEXT");
 
                     b.HasKey("Id");
@@ -4269,18 +4293,21 @@ namespace POS.Domain.Migrations
                         .HasColumnType("TEXT");
 
                     b.Property<string>("Address")
+                        .HasMaxLength(500)
                         .HasColumnType("TEXT");
 
                     b.Property<Guid?>("CityId")
                         .HasColumnType("TEXT");
 
                     b.Property<string>("CityName")
+                        .HasMaxLength(200)
                         .HasColumnType("TEXT");
 
                     b.Property<Guid?>("CountryId")
                         .HasColumnType("TEXT");
 
                     b.Property<string>("CountryName")
+                        .HasMaxLength(200)
                         .HasColumnType("TEXT");
 
                     b.Property<bool>("IsDeleted")
@@ -4329,6 +4356,7 @@ namespace POS.Domain.Migrations
                         .HasColumnType("TEXT");
 
                     b.Property<string>("Name")
+                        .HasMaxLength(100)
                         .HasColumnType("TEXT");
 
                     b.Property<string>("OutPutAccountCode")
@@ -4357,6 +4385,7 @@ namespace POS.Domain.Migrations
                         .HasColumnType("TEXT");
 
                     b.Property<string>("Code")
+                        .HasMaxLength(50)
                         .HasColumnType("TEXT");
 
                     b.Property<Guid>("CreatedBy")
@@ -4384,6 +4413,7 @@ namespace POS.Domain.Migrations
                         .HasColumnType("TEXT");
 
                     b.Property<string>("Name")
+                        .HasMaxLength(100)
                         .HasColumnType("TEXT");
 
                     b.Property<int?>("Operator")
@@ -4420,6 +4450,7 @@ namespace POS.Domain.Migrations
                         .HasColumnType("INTEGER");
 
                     b.Property<string>("Address")
+                        .HasMaxLength(500)
                         .HasColumnType("TEXT");
 
                     b.Property<string>("ConcurrencyStamp")
@@ -4446,6 +4477,7 @@ namespace POS.Domain.Migrations
                         .HasColumnType("INTEGER");
 
                     b.Property<string>("FirstName")
+                        .HasMaxLength(200)
                         .HasColumnType("TEXT");
 
                     b.Property<bool>("IsActive")
@@ -4461,6 +4493,7 @@ namespace POS.Domain.Migrations
                         .HasColumnType("INTEGER");
 
                     b.Property<string>("LastName")
+                        .HasMaxLength(200)
                         .HasColumnType("TEXT");
 
                     b.Property<bool>("LockoutEnabled")
@@ -4495,12 +4528,15 @@ namespace POS.Domain.Migrations
                         .HasColumnType("INTEGER");
 
                     b.Property<string>("ProfilePhoto")
+                        .HasMaxLength(500)
                         .HasColumnType("TEXT");
 
                     b.Property<string>("Provider")
+                        .HasMaxLength(100)
                         .HasColumnType("TEXT");
 
                     b.Property<string>("ResetPasswordCode")
+                        .HasMaxLength(500)
                         .HasColumnType("TEXT");
 
                     b.Property<string>("SecurityStamp")
@@ -4768,13 +4804,13 @@ namespace POS.Domain.Migrations
                     b.HasOne("POS.Data.Entities.Location", "Branch")
                         .WithMany()
                         .HasForeignKey("BranchId")
-                        .OnDelete(DeleteBehavior.Restrict)
+                        .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
 
                     b.HasOne("POS.Data.User", "CreatedByUser")
                         .WithMany()
                         .HasForeignKey("CreatedBy")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
 
                     b.HasOne("POS.Data.Entities.Accounts.LedgerAccount", "CreditLedgerAccount")
@@ -4812,6 +4848,17 @@ namespace POS.Domain.Migrations
                     b.Navigation("FinancialYear");
 
                     b.Navigation("Transaction");
+                });
+
+            modelBuilder.Entity("POS.Data.Entities.Accounts.FinancialYear", b =>
+                {
+                    b.HasOne("POS.Data.User", "CreatedByUser")
+                        .WithMany()
+                        .HasForeignKey("CreatedBy")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("CreatedByUser");
                 });
 
             modelBuilder.Entity("POS.Data.Entities.Accounts.LedgerAccount", b =>
@@ -4890,7 +4937,7 @@ namespace POS.Domain.Migrations
                     b.HasOne("POS.Data.Entities.Location", "Branch")
                         .WithMany()
                         .HasForeignKey("BranchId")
-                        .OnDelete(DeleteBehavior.Restrict)
+                        .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
 
                     b.HasOne("POS.Data.Entities.Transaction", "Transaction")
@@ -4909,7 +4956,7 @@ namespace POS.Domain.Migrations
                     b.HasOne("POS.Data.Entities.Location", "Branch")
                         .WithMany()
                         .HasForeignKey("BranchId")
-                        .OnDelete(DeleteBehavior.Restrict)
+                        .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
 
                     b.HasOne("POS.Data.Product", "InventoryItem")
@@ -4928,7 +4975,7 @@ namespace POS.Domain.Migrations
                     b.HasOne("POS.Data.Entities.Location", "Branch")
                         .WithMany()
                         .HasForeignKey("BranchId")
-                        .OnDelete(DeleteBehavior.Restrict)
+                        .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
 
                     b.HasOne("POS.Data.User", "CreatedByUser")
@@ -5083,17 +5130,6 @@ namespace POS.Domain.Migrations
                     b.Navigation("Tax");
                 });
 
-            modelBuilder.Entity("POS.Data.Entities.FBR.FBRConfiguration", b =>
-                {
-                    b.HasOne("POS.Data.User", "CreatedByUser")
-                        .WithMany()
-                        .HasForeignKey("CreatedBy")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("CreatedByUser");
-                });
-
             modelBuilder.Entity("POS.Data.Entities.FBR.FBRSubmissionLog", b =>
                 {
                     b.HasOne("POS.Data.User", "CreatedByUser")
@@ -5225,7 +5261,7 @@ namespace POS.Domain.Migrations
                     b.HasOne("POS.Data.Entities.Location", "Location")
                         .WithMany()
                         .HasForeignKey("BranchId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
 
                     b.HasOne("POS.Data.User", "Employee")
@@ -5365,7 +5401,7 @@ namespace POS.Domain.Migrations
                     b.HasOne("POS.Data.User", "CreatedByUser")
                         .WithMany()
                         .HasForeignKey("CreatedBy")
-                        .OnDelete(DeleteBehavior.Restrict)
+                        .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
 
                     b.HasOne("POS.Data.Entities.Accounts.FinancialYear", "FinancialYear")

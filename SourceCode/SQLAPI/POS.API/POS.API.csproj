@@ -70,6 +70,8 @@
 		<ProjectReference Include="..\POS.Domain\POS.Domain.csproj" />
 		<ProjectReference Include="..\POS.Helper\POS.Helper.csproj" />
 		<ProjectReference Include="..\POS.MediatR\POS.MediatR.csproj" />
+		<ProjectReference Include="..\POS.Migrations.Sqlite\POS.Migrations.Sqlite.csproj" />
+		<ProjectReference Include="..\POS.Migrations.SqlServer\POS.Migrations.SqlServer.csproj" />
 	</ItemGroup>
 
 	<ItemGroup>

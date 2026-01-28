@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 18
-VisualStudioVersion = 18.2.11415.280 d18.0
+VisualStudioVersion = 18.2.11415.280
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "POS.Common", "POS.Common\POS.Common.csproj", "{D591A163-BB6A-4DCD-A288-1FD4FD7381CB}"
 EndProject
@@ -18,6 +18,10 @@ EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "POS.API", "POS.API\POS.API.csproj", "{C772B3A9-D3A4-40B4-B796-F6B9A50E3E4D}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "POS.DataMigrationUtility", "POS.DataMigrationUtility\POS.DataMigrationUtility.csproj", "{5A37A425-DC24-49E8-A703-90F54FE7E1A7}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "POS.Migrations.Sqlite", "POS.Migrations.Sqlite\POS.Migrations.Sqlite.csproj", "{7298909C-F768-79F0-8143-1EA105DAFBAA}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "POS.Migrations.SqlServer", "POS.Migrations.SqlServer\POS.Migrations.SqlServer.csproj", "{3B312634-43A2-CD2E-1AFD-442E36F32354}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -125,6 +129,30 @@ Global
 		{5A37A425-DC24-49E8-A703-90F54FE7E1A7}.Release|x64.Build.0 = Release|Any CPU
 		{5A37A425-DC24-49E8-A703-90F54FE7E1A7}.Release|x86.ActiveCfg = Release|Any CPU
 		{5A37A425-DC24-49E8-A703-90F54FE7E1A7}.Release|x86.Build.0 = Release|Any CPU
+		{7298909C-F768-79F0-8143-1EA105DAFBAA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7298909C-F768-79F0-8143-1EA105DAFBAA}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7298909C-F768-79F0-8143-1EA105DAFBAA}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{7298909C-F768-79F0-8143-1EA105DAFBAA}.Debug|x64.Build.0 = Debug|Any CPU
+		{7298909C-F768-79F0-8143-1EA105DAFBAA}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{7298909C-F768-79F0-8143-1EA105DAFBAA}.Debug|x86.Build.0 = Debug|Any CPU
+		{7298909C-F768-79F0-8143-1EA105DAFBAA}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7298909C-F768-79F0-8143-1EA105DAFBAA}.Release|Any CPU.Build.0 = Release|Any CPU
+		{7298909C-F768-79F0-8143-1EA105DAFBAA}.Release|x64.ActiveCfg = Release|Any CPU
+		{7298909C-F768-79F0-8143-1EA105DAFBAA}.Release|x64.Build.0 = Release|Any CPU
+		{7298909C-F768-79F0-8143-1EA105DAFBAA}.Release|x86.ActiveCfg = Release|Any CPU
+		{7298909C-F768-79F0-8143-1EA105DAFBAA}.Release|x86.Build.0 = Release|Any CPU
+		{3B312634-43A2-CD2E-1AFD-442E36F32354}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3B312634-43A2-CD2E-1AFD-442E36F32354}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3B312634-43A2-CD2E-1AFD-442E36F32354}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{3B312634-43A2-CD2E-1AFD-442E36F32354}.Debug|x64.Build.0 = Debug|Any CPU
+		{3B312634-43A2-CD2E-1AFD-442E36F32354}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{3B312634-43A2-CD2E-1AFD-442E36F32354}.Debug|x86.Build.0 = Debug|Any CPU
+		{3B312634-43A2-CD2E-1AFD-442E36F32354}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3B312634-43A2-CD2E-1AFD-442E36F32354}.Release|Any CPU.Build.0 = Release|Any CPU
+		{3B312634-43A2-CD2E-1AFD-442E36F32354}.Release|x64.ActiveCfg = Release|Any CPU
+		{3B312634-43A2-CD2E-1AFD-442E36F32354}.Release|x64.Build.0 = Release|Any CPU
+		{3B312634-43A2-CD2E-1AFD-442E36F32354}.Release|x86.ActiveCfg = Release|Any CPU
+		{3B312634-43A2-CD2E-1AFD-442E36F32354}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
