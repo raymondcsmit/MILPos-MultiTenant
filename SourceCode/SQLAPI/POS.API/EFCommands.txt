@@ -4,11 +4,17 @@ Powershell
 SQLServer
 $env:DatabaseProvider="SqlServer"
 dotnet ef migrations add MainInitSQLServer -p POS.Migrations.SqlServer/POS.Migrations.SqlServer.csproj -s POS.API/POS.API.csproj -o Migrations
+$env:DatabaseProvider="SqlServer"
+dotnet ef migrations add BusinessTypeSQLServer -p POS.Migrations.SqlServer/POS.Migrations.SqlServer.csproj -s POS.API/POS.API.csproj -o Migrations
+
+
 
 SQLITE
 $env:DatabaseProvider="Sqlite"
 dotnet ef migrations add MainInitSQLITE -p POS.Migrations.Sqlite/POS.Migrations.Sqlite.csproj -s POS.API/POS.API.csproj -o Migrations
 
+$env:DatabaseProvider="Sqlite"
+dotnet ef migrations add BusinessTypeSQLITE -p POS.Migrations.Sqlite/POS.Migrations.Sqlite.csproj -s POS.API/POS.API.csproj -o Migrations
 
 
 

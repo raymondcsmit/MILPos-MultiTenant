@@ -17,6 +17,7 @@ public class CompanyProfileDto
     public string TaxName { get; set; }
     public string LicenseKey { get; set; } = string.Empty;
     public string PurchaseCode { get; set; } = string.Empty;
+    public BusinessType BusinessType { get; set; }
 
     public List<LanguageDto> Languages { get; set; } = [];
     public List<LocationDto> Locations { get; set; } = [];

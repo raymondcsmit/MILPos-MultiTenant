@@ -26,5 +26,14 @@ export interface SalesOrderItem {
   returnquantity?: number;
   purchasePrice?: number;
   discountType?: string;
-  returnItemsQuantities?: number
+  returnItemsQuantities?: number;
+
+  // Pharmacy / Agri Fields
+  batchNumber?: string;
+  expiryDate?: Date;
+
+  // Petrol Pump Fields
+  nozzleId?: string;
+  meterReadingStart?: number;
+  meterReadingEnd?: number;
 }

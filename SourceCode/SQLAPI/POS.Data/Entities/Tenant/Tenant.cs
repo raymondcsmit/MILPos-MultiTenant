@@ -20,5 +20,6 @@ namespace POS.Data.Entities
         public string LogoUrl { get; set; }
         public string TimeZone { get; set; }
         public string Currency { get; set; }
+        public string BusinessType { get; set; } = "Retail";
     }
 }

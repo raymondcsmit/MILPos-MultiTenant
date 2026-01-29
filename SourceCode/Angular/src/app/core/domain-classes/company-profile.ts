@@ -13,6 +13,7 @@ export class CompanyProfile {
   phone?: string;
   email?: string;
   currencyCode?: string;
+  businessType?: number;
   languages?: LanguageFlag[];
   locations?: BusinessLocation[];
   financialYears?: FinancialYear[];

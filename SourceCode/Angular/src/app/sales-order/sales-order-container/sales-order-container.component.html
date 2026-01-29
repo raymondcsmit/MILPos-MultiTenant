@@ -1,0 +1,23 @@
+<!-- RETAIL (0) or GENERAL STORE (4) -->
+<ng-container *ngIf="businessType === 0 || businessType === 4; else pharmacyMode">
+  <app-sales-order-retail></app-sales-order-retail>
+</ng-container>
+
+<!-- PHARMACY (1) or AGRI (2) -->
+<ng-template #pharmacyMode>
+  <ng-container *ngIf="businessType === 1 || businessType === 2; else petrolMode">
+    <app-sales-order-pharmacy></app-sales-order-pharmacy>
+  </ng-container>
+</ng-template>
+
+<!-- PETROL PUMP (3) -->
+<ng-template #petrolMode>
+  <ng-container *ngIf="businessType === 3; else fallbackMode">
+    <app-sales-order-petrol></app-sales-order-petrol>
+  </ng-container>
+</ng-template>
+
+<!-- FALLBACK (Legacy Component) -->
+<ng-template #fallbackMode>
+  <app-sales-order-add-edit></app-sales-order-add-edit>
+</ng-template>

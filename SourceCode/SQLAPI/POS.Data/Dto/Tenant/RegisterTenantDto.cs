@@ -10,5 +10,6 @@ namespace POS.Data.Dto.Tenant
         public string AdminPassword { get; set; } = "admin@123";
         public string Phone { get; set; }
         public string Address { get; set; }
+        public string BusinessType { get; set; } = "Retail"; // Retail, Pharmacy, Petrol
     }
 }

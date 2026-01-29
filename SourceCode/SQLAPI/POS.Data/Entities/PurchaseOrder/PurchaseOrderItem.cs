@@ -31,6 +31,10 @@ namespace POS.Data
         public Product Product { get; set; }
         public DateTime CreatedDate { get; set; } = DateTime.UtcNow;
         public List<PurchaseOrderItemTax> PurchaseOrderItemTaxes { get; set; }
+        
+        // Batch Tracking Fields
+        public string BatchNumber { get; set; }
+        public DateTime? ExpiryDate { get; set; }
 
     }
 }

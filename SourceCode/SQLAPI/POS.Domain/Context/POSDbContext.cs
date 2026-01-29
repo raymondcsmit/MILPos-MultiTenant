@@ -3,6 +3,7 @@ using Microsoft.EntityFrameworkCore;
 using POS.Data;
 using POS.Data.Entities;
 using POS.Data.Entities.Accounts;
+using POS.Data.Entities.Inventory;
 using System;
 using System.Linq;
 using System.Threading.Tasks;
@@ -108,6 +109,8 @@ namespace POS.Domain
         
         // FBR Integration
         public DbSet<POS.Data.Entities.FBR.FBRSubmissionLog> FBRSubmissionLogs { get; set; }
+
+        public DbSet<InventoryBatch> InventoryBatches { get; set; }
 
 
         protected override void OnModelCreating(ModelBuilder builder)

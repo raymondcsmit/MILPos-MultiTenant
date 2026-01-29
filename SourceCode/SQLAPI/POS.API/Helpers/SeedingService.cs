@@ -28,10 +28,16 @@ namespace POS.API.Helpers
             try
             {
                 // Check if the database is already seeded (Check Tenants)
+                // Check if the database is already seeded (Check Tenants)
                 if (await _context.Tenants.AnyAsync())
                 {
-                    Console.WriteLine("Database already seeded (Tenants exist). Skipping data initialization.");
-                    return;
+                     // Instead of returning, we will fetch the default TenantId for subsequent seeding
+                     var defaultTenant = await _context.Tenants.FirstOrDefaultAsync();
+                     if (defaultTenant != null)
+                     {
+                         _defaultTenantId = defaultTenant.Id;
+                         Console.WriteLine($"Database already seeded. Using existing Default Tenant ID: {_defaultTenantId}");
+                     }
                 }
 
                 Console.WriteLine("Starting database seeding from CSV files...");
@@ -323,6 +329,33 @@ namespace POS.API.Helpers
                 }
 
                 if (hasData) entities.Add(entity);
+            }
+
+            // Incremental Seeding Logic: Filter out entities that already exist
+            if (entities.Any() && typeof(BaseEntity).IsAssignableFrom(typeof(T)))
+            {
+                 // We can't use generic T in LINQ to Entities easily for IDs unless we project 
+                 // But we can fetch client side or use a raw check. 
+                 // Since SeedData is small, fetching IDs of T is acceptable.
+                 try 
+                 {
+                    // Safe projection if T has Id property (BaseEntity has it)
+                     var existingIds = await _context.Set<T>()
+                                             .Select(e => ((BaseEntity)(object)e).Id)
+                                             .ToListAsync();
+                                             
+                     var existingIdSet = new HashSet<Guid>(existingIds);
+                     entities = entities.Where(e => !existingIdSet.Contains(((BaseEntity)(object)e).Id)).ToList();
+                     
+                     if (entities.Any()) 
+                     {
+                         Console.WriteLine($"Seeding {entities.Count} new records into {typeof(T).Name}...");
+                     }
+                 }
+                 catch (Exception ex)
+                 {
+                     Console.WriteLine($"Warning: Could not check existing IDs for {typeof(T).Name}. Proceeding with AddRange (may fail if duplicates exist). Error: {ex.Message}");
+                 }
             }
 
             if (entities.Any())

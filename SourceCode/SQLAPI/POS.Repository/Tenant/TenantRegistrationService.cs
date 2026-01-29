@@ -54,7 +54,8 @@ namespace POS.Repository
                 SubscriptionPlan = "Trial",
                 SubscriptionStartDate = DateTime.UtcNow,
                 SubscriptionEndDate = DateTime.UtcNow.AddDays(14),
-                MaxUsers = 5
+                MaxUsers = 5,
+                BusinessType = dto.BusinessType
             };
 
             _context.Tenants.Add(tenant);
@@ -188,24 +189,30 @@ namespace POS.Repository
 
             // Units
             var units = ReadCsv<POS.Data.UnitConversation>("UnitConversations.csv");
+            var unitMap = new Dictionary<string, Guid>();
             foreach(var item in units)
             {
+                var oldId = item.Id.ToString().ToUpper();
                 item.Id = Guid.NewGuid();
                 item.TenantId = tenant.Id;
                 item.CreatedBy = adminUser.Id;
                 item.CreatedDate = DateTime.UtcNow;
                 _context.UnitConversations.Add(item);
+                unitMap[oldId] = item.Id;
             }
 
             // Categories
             var cats = ReadCsv<POS.Data.Entities.ProductCategory>("ProductCategories.csv");
+            var categoryMap = new Dictionary<string, Guid>();
             foreach(var item in cats)
             {
+                var oldId = item.Id.ToString().ToUpper();
                 item.Id = Guid.NewGuid();
                 item.TenantId = tenant.Id;
                 item.CreatedBy = adminUser.Id;
                 item.CreatedDate = DateTime.UtcNow;
                 _context.ProductCategories.Add(item);
+                categoryMap[oldId] = item.Id;
             }
             
             // Expense Categories
@@ -234,6 +241,8 @@ namespace POS.Repository
             };
             _context.Locations.Add(location);
             
+            var mainLocationId = location.Id; // Capture for stocks
+
             // Link Admin to this location
             _context.UserLocations.Add(new UserLocation
             {
@@ -242,6 +251,109 @@ namespace POS.Repository
             });
 
             await _context.SaveChangesAsync();
+
+            // ---------------------------------------------------------
+            // Seed Brands (Missing in original, needed for Products)
+            // ---------------------------------------------------------
+            var brands = ReadCsv<Brand>("Brands.csv");
+            var brandMap = new Dictionary<string, Guid>();
+            foreach (var item in brands)
+            {
+                var oldId = item.Id.ToString().ToUpper();
+                item.Id = Guid.NewGuid();
+                item.TenantId = tenant.Id;
+                item.CreatedBy = adminUser.Id;
+                item.CreatedDate = DateTime.UtcNow;
+                _context.Brands.Add(item);
+                brandMap[oldId] = item.Id;
+            }
+
+            // ---------------------------------------------------------
+            // Seed Products (Filtered by BusinessType) with Dependencies
+            // ---------------------------------------------------------
+            var allProducts = ReadCsv<POS.Data.Product>("Products.csv");
+            var productMap = new Dictionary<string, Guid>(); // OldId -> NewId
+            var seededProducts = new List<Product>();
+
+            string prefix = "";
+            if (tenant.BusinessType == "Pharmacy") prefix = "PH";
+            else if (tenant.BusinessType == "Petrol") prefix = "PT";
+            else prefix = "RT"; // Default to Retail
+
+            foreach (var p in allProducts)
+            {
+                // Filter logic
+                if (string.IsNullOrEmpty(p.Code)) continue;
+                if (!p.Code.StartsWith(prefix, StringComparison.OrdinalIgnoreCase)) continue;
+
+                var oldId = p.Id.ToString().ToUpper();
+                p.Id = Guid.NewGuid();
+                p.TenantId = tenant.Id;
+                p.CreatedBy = adminUser.Id;
+                p.CreatedDate = DateTime.UtcNow;
+
+                // Remap Foreign Keys
+                // Note: Properties are Guid (non-nullable), so check Guid.Empty
+                if (p.UnitId != Guid.Empty && unitMap.TryGetValue(p.UnitId.ToString().ToUpper(), out var newUnitId))
+                    p.UnitId = newUnitId;
+                
+                if (p.CategoryId != Guid.Empty && categoryMap.TryGetValue(p.CategoryId.ToString().ToUpper(), out var newCatId))
+                    p.CategoryId = newCatId;
+
+                if (p.BrandId.HasValue && p.BrandId != Guid.Empty && brandMap.TryGetValue(p.BrandId.Value.ToString().ToUpper(), out var newBrandId))
+                {
+                    p.BrandId = newBrandId;
+                }
+                else
+                {
+                    p.BrandId = null; // Ensure null if not found or empty
+                }
+
+                seededProducts.Add(p);
+                productMap[oldId] = p.Id;
+            }
+            
+            if (seededProducts.Any())
+            {
+                _context.Products.AddRange(seededProducts);
+            }
+
+            // ---------------------------------------------------------
+            // Seed Product Stocks
+            // ---------------------------------------------------------
+            var allStocks = ReadCsv<POS.Data.Entities.ProductStock>("ProductStocks.csv");
+            var seededStocks = new List<ProductStock>();
+
+            foreach (var s in allStocks)
+            {
+                var oldProdId = s.ProductId.ToString().ToUpper();
+                
+                // Only seed stock if the product was seeded
+                if (productMap.TryGetValue(oldProdId, out var newProdId))
+                {
+                    s.Id = Guid.NewGuid();
+                    s.ProductId = newProdId;
+                    s.LocationId = mainLocationId; // Assign to the main location we just created
+                    s.ModifiedDate = DateTime.UtcNow;
+                    
+                    seededStocks.Add(s);
+                }
+            }
+
+            if (seededStocks.Any())
+            {
+                _context.ProductStocks.AddRange(seededStocks);
+            }
+
+            try 
+            {
+                await _context.SaveChangesAsync();
+            }
+            catch (Exception ex)
+            {
+                // Log error (simple console for now, or throw with detail)
+                throw new Exception($"Seeding failed: {ex.Message} {ex.InnerException?.Message}", ex);
+            }
         }
 
         private async Task SeedFinancialDataAsync(Tenant tenant, User adminUser)
