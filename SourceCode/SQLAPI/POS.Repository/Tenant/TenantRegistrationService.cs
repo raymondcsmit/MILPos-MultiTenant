@@ -293,12 +293,31 @@ namespace POS.Repository
                 p.CreatedDate = DateTime.UtcNow;
 
                 // Remap Foreign Keys
-                // Note: Properties are Guid (non-nullable), so check Guid.Empty
-                if (p.UnitId != Guid.Empty && unitMap.TryGetValue(p.UnitId.ToString().ToUpper(), out var newUnitId))
-                    p.UnitId = newUnitId;
+                if (p.UnitId != Guid.Empty)
+                {
+                    if (unitMap.TryGetValue(p.UnitId.ToString().ToUpper(), out var newUnitId))
+                    {
+                        p.UnitId = newUnitId;
+                    }
+                    else
+                    {
+                        // Critical dependency missing
+                        throw new Exception($"Missing Unit mapping for Product {p.Name} (Old UnitId: {p.UnitId})");
+                    }
+                }
                 
-                if (p.CategoryId != Guid.Empty && categoryMap.TryGetValue(p.CategoryId.ToString().ToUpper(), out var newCatId))
-                    p.CategoryId = newCatId;
+                if (p.CategoryId != Guid.Empty)
+                {
+                    if (categoryMap.TryGetValue(p.CategoryId.ToString().ToUpper(), out var newCatId))
+                    {
+                        p.CategoryId = newCatId;
+                    }
+                    else
+                    {
+                        // Critical dependency missing
+                        throw new Exception($"Missing Category mapping for Product {p.Name} (Old CategoryId: {p.CategoryId})");
+                    }
+                }
 
                 if (p.BrandId.HasValue && p.BrandId != Guid.Empty && brandMap.TryGetValue(p.BrandId.Value.ToString().ToUpper(), out var newBrandId))
                 {
