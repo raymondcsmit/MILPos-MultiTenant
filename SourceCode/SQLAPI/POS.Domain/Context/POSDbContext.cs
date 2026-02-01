@@ -117,6 +117,25 @@ namespace POS.Domain
         {
             base.OnModelCreating(builder);
 
+            // Configure InventoryBatch to prevent cycles
+            builder.Entity<InventoryBatch>(b =>
+            {
+                b.HasOne(e => e.Product)
+                    .WithMany()
+                    .HasForeignKey(e => e.ProductId)
+                    .OnDelete(DeleteBehavior.Restrict);
+
+                b.HasOne(e => e.Location)
+                    .WithMany()
+                    .HasForeignKey(e => e.LocationId)
+                    .OnDelete(DeleteBehavior.Restrict);
+
+                b.HasOne(e => e.CreatedByUser)
+                    .WithMany()
+                    .HasForeignKey(e => e.CreatedBy)
+                    .OnDelete(DeleteBehavior.Restrict);
+            });
+
             // Configure Tenant entity
             builder.Entity<Tenant>(b =>
             {

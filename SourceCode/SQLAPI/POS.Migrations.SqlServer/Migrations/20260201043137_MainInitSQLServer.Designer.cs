@@ -12,7 +12,7 @@ using POS.Domain;
 namespace POS.Migrations.SqlServer.Migrations
 {
     [DbContext(typeof(POSDbContext))]
-    [Migration("20260129020344_MainInitSQLServer")]
+    [Migration("20260201043137_MainInitSQLServer")]
     partial class MainInitSQLServer
     {
         /// <inheritdoc />
@@ -2513,6 +2513,9 @@ namespace POS.Migrations.SqlServer.Migrations
                         .HasMaxLength(1000)
                         .HasColumnType("nvarchar(1000)");
 
+                    b.Property<string>("BusinessType")
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<string>("ConnectionString")
                         .HasMaxLength(1000)
                         .HasColumnType("nvarchar(1000)");
@@ -3262,7 +3265,7 @@ namespace POS.Migrations.SqlServer.Migrations
                         .HasMaxLength(100)
                         .HasColumnType("nvarchar(100)");
 
-                    b.Property<Guid>("BrandId")
+                    b.Property<Guid?>("BrandId")
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<Guid>("CategoryId")
@@ -5342,19 +5345,19 @@ namespace POS.Migrations.SqlServer.Migrations
                     b.HasOne("POS.Data.User", "CreatedByUser")
                         .WithMany()
                         .HasForeignKey("CreatedBy")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.HasOne("POS.Data.Entities.Location", "Location")
                         .WithMany()
                         .HasForeignKey("LocationId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.HasOne("POS.Data.Product", "Product")
                         .WithMany()
                         .HasForeignKey("ProductId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.Navigation("CreatedByUser");
@@ -5751,9 +5754,7 @@ namespace POS.Migrations.SqlServer.Migrations
                 {
                     b.HasOne("POS.Data.Brand", "Brand")
                         .WithMany()
-                        .HasForeignKey("BrandId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .HasForeignKey("BrandId");
 
                     b.HasOne("POS.Data.Entities.ProductCategory", "ProductCategory")
                         .WithMany()

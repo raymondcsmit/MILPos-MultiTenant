@@ -3,10 +3,10 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 #nullable disable
 
-namespace POS.Migrations.SqlServer.Migrations
+namespace POS.Migrations.Sqlite.Migrations
 {
     /// <inheritdoc />
-    public partial class MainInitSQLServer : Migration
+    public partial class MainInitSQLITE : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -15,15 +15,15 @@ namespace POS.Migrations.SqlServer.Migrations
                 name: "ContactAddresses",
                 columns: table => new
                 {
-                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    ContactPerson = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    MobileNo = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    Address = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    CountryName = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    CityName = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    CountryId = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
-                    CityId = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
-                    IsDeleted = table.Column<bool>(type: "bit", nullable: false)
+                    Id = table.Column<Guid>(type: "TEXT", nullable: false),
+                    ContactPerson = table.Column<string>(type: "TEXT", nullable: true),
+                    MobileNo = table.Column<string>(type: "TEXT", nullable: true),
+                    Address = table.Column<string>(type: "TEXT", nullable: true),
+                    CountryName = table.Column<string>(type: "TEXT", nullable: true),
+                    CityName = table.Column<string>(type: "TEXT", nullable: true),
+                    CountryId = table.Column<Guid>(type: "TEXT", nullable: true),
+                    CityId = table.Column<Guid>(type: "TEXT", nullable: true),
+                    IsDeleted = table.Column<bool>(type: "INTEGER", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -34,9 +34,9 @@ namespace POS.Migrations.SqlServer.Migrations
                 name: "Currencies",
                 columns: table => new
                 {
-                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    Name = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: true),
-                    Symbol = table.Column<string>(type: "nvarchar(10)", maxLength: 10, nullable: true)
+                    Id = table.Column<Guid>(type: "TEXT", nullable: false),
+                    Name = table.Column<string>(type: "TEXT", maxLength: 100, nullable: true),
+                    Symbol = table.Column<string>(type: "TEXT", maxLength: 10, nullable: true)
                 },
                 constraints: table =>
                 {
@@ -47,14 +47,14 @@ namespace POS.Migrations.SqlServer.Migrations
                 name: "EmailLogs",
                 columns: table => new
                 {
-                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    SenderEmail = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: true),
-                    RecipientEmail = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: true),
-                    Subject = table.Column<string>(type: "nvarchar(500)", maxLength: 500, nullable: true),
-                    Body = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    Status = table.Column<int>(type: "int", nullable: false),
-                    ErrorMessage = table.Column<string>(type: "nvarchar(4000)", maxLength: 4000, nullable: true),
-                    SentAt = table.Column<DateTime>(type: "datetime2", nullable: false)
+                    Id = table.Column<Guid>(type: "TEXT", nullable: false),
+                    SenderEmail = table.Column<string>(type: "TEXT", maxLength: 256, nullable: true),
+                    RecipientEmail = table.Column<string>(type: "TEXT", maxLength: 256, nullable: true),
+                    Subject = table.Column<string>(type: "TEXT", maxLength: 500, nullable: true),
+                    Body = table.Column<string>(type: "TEXT", nullable: true),
+                    Status = table.Column<int>(type: "INTEGER", nullable: false),
+                    ErrorMessage = table.Column<string>(type: "TEXT", maxLength: 4000, nullable: true),
+                    SentAt = table.Column<DateTime>(type: "TEXT", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -65,14 +65,14 @@ namespace POS.Migrations.SqlServer.Migrations
                 name: "LoginAudits",
                 columns: table => new
                 {
-                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    UserName = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    LoginTime = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    RemoteIP = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: true),
-                    Status = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    Provider = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    Latitude = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: true),
-                    Longitude = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: true)
+                    Id = table.Column<Guid>(type: "TEXT", nullable: false),
+                    UserName = table.Column<string>(type: "TEXT", nullable: true),
+                    LoginTime = table.Column<DateTime>(type: "TEXT", nullable: false),
+                    RemoteIP = table.Column<string>(type: "TEXT", maxLength: 50, nullable: true),
+                    Status = table.Column<string>(type: "TEXT", nullable: true),
+                    Provider = table.Column<string>(type: "TEXT", nullable: true),
+                    Latitude = table.Column<string>(type: "TEXT", maxLength: 50, nullable: true),
+                    Longitude = table.Column<string>(type: "TEXT", maxLength: 50, nullable: true)
                 },
                 constraints: table =>
                 {
@@ -83,16 +83,16 @@ namespace POS.Migrations.SqlServer.Migrations
                 name: "NLog",
                 columns: table => new
                 {
-                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    MachineName = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: true),
-                    Logged = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    Level = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: true),
-                    Message = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    Logger = table.Column<string>(type: "nvarchar(250)", maxLength: 250, nullable: true),
-                    Properties = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    Callsite = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    Exception = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    Source = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: true)
+                    Id = table.Column<Guid>(type: "TEXT", nullable: false),
+                    MachineName = table.Column<string>(type: "TEXT", maxLength: 100, nullable: true),
+                    Logged = table.Column<DateTime>(type: "TEXT", nullable: false),
+                    Level = table.Column<string>(type: "TEXT", maxLength: 50, nullable: true),
+                    Message = table.Column<string>(type: "TEXT", nullable: true),
+                    Logger = table.Column<string>(type: "TEXT", maxLength: 250, nullable: true),
+                    Properties = table.Column<string>(type: "TEXT", nullable: true),
+                    Callsite = table.Column<string>(type: "TEXT", nullable: true),
+                    Exception = table.Column<string>(type: "TEXT", nullable: true),
+                    Source = table.Column<string>(type: "TEXT", maxLength: 50, nullable: true)
                 },
                 constraints: table =>
                 {
@@ -103,17 +103,17 @@ namespace POS.Migrations.SqlServer.Migrations
                 name: "SyncLogs",
                 columns: table => new
                 {
-                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    TenantId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    DeviceId = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: true),
-                    Direction = table.Column<int>(type: "int", nullable: false),
-                    StartedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    CompletedAt = table.Column<DateTime>(type: "datetime2", nullable: true),
-                    RecordsSynced = table.Column<int>(type: "int", nullable: false),
-                    RecordsConflicted = table.Column<int>(type: "int", nullable: false),
-                    RecordsFailed = table.Column<int>(type: "int", nullable: false),
-                    Status = table.Column<int>(type: "int", nullable: false),
-                    ErrorMessage = table.Column<string>(type: "nvarchar(4000)", maxLength: 4000, nullable: true)
+                    Id = table.Column<Guid>(type: "TEXT", nullable: false),
+                    TenantId = table.Column<Guid>(type: "TEXT", nullable: false),
+                    DeviceId = table.Column<string>(type: "TEXT", maxLength: 50, nullable: true),
+                    Direction = table.Column<int>(type: "INTEGER", nullable: false),
+                    StartedAt = table.Column<DateTime>(type: "TEXT", nullable: false),
+                    CompletedAt = table.Column<DateTime>(type: "TEXT", nullable: true),
+                    RecordsSynced = table.Column<int>(type: "INTEGER", nullable: false),
+                    RecordsConflicted = table.Column<int>(type: "INTEGER", nullable: false),
+                    RecordsFailed = table.Column<int>(type: "INTEGER", nullable: false),
+                    Status = table.Column<int>(type: "INTEGER", nullable: false),
+                    ErrorMessage = table.Column<string>(type: "TEXT", maxLength: 4000, nullable: true)
                 },
                 constraints: table =>
                 {
@@ -124,13 +124,13 @@ namespace POS.Migrations.SqlServer.Migrations
                 name: "SyncMetadata",
                 columns: table => new
                 {
-                    Id = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    EntityType = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
-                    LastPullSync = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    LastPushSync = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    LastSuccessfulSync = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    PendingChanges = table.Column<int>(type: "int", nullable: false)
+                    Id = table.Column<int>(type: "INTEGER", nullable: false)
+                        .Annotation("Sqlite:Autoincrement", true),
+                    EntityType = table.Column<string>(type: "TEXT", maxLength: 100, nullable: false),
+                    LastPullSync = table.Column<DateTime>(type: "TEXT", nullable: false),
+                    LastPushSync = table.Column<DateTime>(type: "TEXT", nullable: false),
+                    LastSuccessfulSync = table.Column<DateTime>(type: "TEXT", nullable: false),
+                    PendingChanges = table.Column<int>(type: "INTEGER", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -141,10 +141,10 @@ namespace POS.Migrations.SqlServer.Migrations
                 name: "TableSettings",
                 columns: table => new
                 {
-                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    ScreenName = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    UserId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    SettingsJson = table.Column<string>(type: "nvarchar(max)", nullable: true)
+                    Id = table.Column<Guid>(type: "TEXT", nullable: false),
+                    ScreenName = table.Column<string>(type: "TEXT", nullable: false),
+                    UserId = table.Column<Guid>(type: "TEXT", nullable: false),
+                    SettingsJson = table.Column<string>(type: "TEXT", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -155,22 +155,23 @@ namespace POS.Migrations.SqlServer.Migrations
                 name: "Tenants",
                 columns: table => new
                 {
-                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    Name = table.Column<string>(type: "nvarchar(200)", maxLength: 200, nullable: false),
-                    Subdomain = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
-                    ContactEmail = table.Column<string>(type: "nvarchar(200)", maxLength: 200, nullable: true),
-                    ContactPhone = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: true),
-                    Address = table.Column<string>(type: "nvarchar(1000)", maxLength: 1000, nullable: true),
-                    IsActive = table.Column<bool>(type: "bit", nullable: false),
-                    CreatedDate = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    SubscriptionStartDate = table.Column<DateTime>(type: "datetime2", nullable: true),
-                    SubscriptionEndDate = table.Column<DateTime>(type: "datetime2", nullable: true),
-                    SubscriptionPlan = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: true),
-                    MaxUsers = table.Column<int>(type: "int", nullable: false),
-                    ConnectionString = table.Column<string>(type: "nvarchar(1000)", maxLength: 1000, nullable: true),
-                    LogoUrl = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    TimeZone = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: true),
-                    Currency = table.Column<string>(type: "nvarchar(10)", maxLength: 10, nullable: true)
+                    Id = table.Column<Guid>(type: "TEXT", nullable: false),
+                    Name = table.Column<string>(type: "TEXT", maxLength: 200, nullable: false),
+                    Subdomain = table.Column<string>(type: "TEXT", maxLength: 100, nullable: false),
+                    ContactEmail = table.Column<string>(type: "TEXT", maxLength: 200, nullable: true),
+                    ContactPhone = table.Column<string>(type: "TEXT", maxLength: 50, nullable: true),
+                    Address = table.Column<string>(type: "TEXT", maxLength: 1000, nullable: true),
+                    IsActive = table.Column<bool>(type: "INTEGER", nullable: false),
+                    CreatedDate = table.Column<DateTime>(type: "TEXT", nullable: false),
+                    SubscriptionStartDate = table.Column<DateTime>(type: "TEXT", nullable: true),
+                    SubscriptionEndDate = table.Column<DateTime>(type: "TEXT", nullable: true),
+                    SubscriptionPlan = table.Column<string>(type: "TEXT", maxLength: 100, nullable: true),
+                    MaxUsers = table.Column<int>(type: "INTEGER", nullable: false),
+                    ConnectionString = table.Column<string>(type: "TEXT", maxLength: 1000, nullable: true),
+                    LogoUrl = table.Column<string>(type: "TEXT", nullable: true),
+                    TimeZone = table.Column<string>(type: "TEXT", maxLength: 100, nullable: true),
+                    Currency = table.Column<string>(type: "TEXT", maxLength: 10, nullable: true),
+                    BusinessType = table.Column<string>(type: "TEXT", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -181,10 +182,10 @@ namespace POS.Migrations.SqlServer.Migrations
                 name: "EmailLogAttachments",
                 columns: table => new
                 {
-                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    EmailLogId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    Path = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    Name = table.Column<string>(type: "nvarchar(max)", nullable: true)
+                    Id = table.Column<Guid>(type: "TEXT", nullable: false),
+                    EmailLogId = table.Column<Guid>(type: "TEXT", nullable: false),
+                    Path = table.Column<string>(type: "TEXT", nullable: true),
+                    Name = table.Column<string>(type: "TEXT", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -201,38 +202,38 @@ namespace POS.Migrations.SqlServer.Migrations
                 name: "Users",
                 columns: table => new
                 {
-                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    TenantId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    FirstName = table.Column<string>(type: "nvarchar(200)", maxLength: 200, nullable: true),
-                    LastName = table.Column<string>(type: "nvarchar(200)", maxLength: 200, nullable: true),
-                    IsDeleted = table.Column<bool>(type: "bit", nullable: false),
-                    IsActive = table.Column<bool>(type: "bit", nullable: false),
-                    ProfilePhoto = table.Column<string>(type: "nvarchar(500)", maxLength: 500, nullable: true),
-                    Provider = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: true),
-                    Address = table.Column<string>(type: "nvarchar(500)", maxLength: 500, nullable: true),
-                    IsSuperAdmin = table.Column<bool>(type: "bit", nullable: false),
-                    CreatedDate = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    CreatedBy = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
-                    ModifiedDate = table.Column<DateTime>(type: "datetime2", nullable: false, defaultValueSql: "CURRENT_TIMESTAMP"),
-                    ModifiedBy = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
-                    DeletedDate = table.Column<DateTime>(type: "datetime2", nullable: true),
-                    DeletedBy = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
-                    IsAllLocations = table.Column<bool>(type: "bit", nullable: false),
-                    ResetPasswordCode = table.Column<string>(type: "nvarchar(500)", maxLength: 500, nullable: true),
-                    UserName = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: true),
-                    NormalizedUserName = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: true),
-                    Email = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: true),
-                    NormalizedEmail = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: true),
-                    EmailConfirmed = table.Column<bool>(type: "bit", nullable: false),
-                    PasswordHash = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    SecurityStamp = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    ConcurrencyStamp = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    PhoneNumber = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    PhoneNumberConfirmed = table.Column<bool>(type: "bit", nullable: false),
-                    TwoFactorEnabled = table.Column<bool>(type: "bit", nullable: false),
-                    LockoutEnd = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: true),
-                    LockoutEnabled = table.Column<bool>(type: "bit", nullable: false),
-                    AccessFailedCount = table.Column<int>(type: "int", nullable: false)
+                    Id = table.Column<Guid>(type: "TEXT", nullable: false),
+                    TenantId = table.Column<Guid>(type: "TEXT", nullable: false),
+                    FirstName = table.Column<string>(type: "TEXT", maxLength: 200, nullable: true),
+                    LastName = table.Column<string>(type: "TEXT", maxLength: 200, nullable: true),
+                    IsDeleted = table.Column<bool>(type: "INTEGER", nullable: false),
+                    IsActive = table.Column<bool>(type: "INTEGER", nullable: false),
+                    ProfilePhoto = table.Column<string>(type: "TEXT", maxLength: 500, nullable: true),
+                    Provider = table.Column<string>(type: "TEXT", maxLength: 100, nullable: true),
+                    Address = table.Column<string>(type: "TEXT", maxLength: 500, nullable: true),
+                    IsSuperAdmin = table.Column<bool>(type: "INTEGER", nullable: false),
+                    CreatedDate = table.Column<DateTime>(type: "TEXT", nullable: false),
+                    CreatedBy = table.Column<Guid>(type: "TEXT", nullable: true),
+                    ModifiedDate = table.Column<DateTime>(type: "TEXT", nullable: false, defaultValueSql: "CURRENT_TIMESTAMP"),
+                    ModifiedBy = table.Column<Guid>(type: "TEXT", nullable: true),
+                    DeletedDate = table.Column<DateTime>(type: "TEXT", nullable: true),
+                    DeletedBy = table.Column<Guid>(type: "TEXT", nullable: true),
+                    IsAllLocations = table.Column<bool>(type: "INTEGER", nullable: false),
+                    ResetPasswordCode = table.Column<string>(type: "TEXT", maxLength: 500, nullable: true),
+                    UserName = table.Column<string>(type: "TEXT", maxLength: 256, nullable: true),
+                    NormalizedUserName = table.Column<string>(type: "TEXT", maxLength: 256, nullable: true),
+                    Email = table.Column<string>(type: "TEXT", maxLength: 256, nullable: true),
+                    NormalizedEmail = table.Column<string>(type: "TEXT", maxLength: 256, nullable: true),
+                    EmailConfirmed = table.Column<bool>(type: "INTEGER", nullable: false),
+                    PasswordHash = table.Column<string>(type: "TEXT", nullable: true),
+                    SecurityStamp = table.Column<string>(type: "TEXT", nullable: true),
+                    ConcurrencyStamp = table.Column<string>(type: "TEXT", nullable: true),
+                    PhoneNumber = table.Column<string>(type: "TEXT", nullable: true),
+                    PhoneNumberConfirmed = table.Column<bool>(type: "INTEGER", nullable: false),
+                    TwoFactorEnabled = table.Column<bool>(type: "INTEGER", nullable: false),
+                    LockoutEnd = table.Column<DateTimeOffset>(type: "TEXT", nullable: true),
+                    LockoutEnabled = table.Column<bool>(type: "INTEGER", nullable: false),
+                    AccessFailedCount = table.Column<int>(type: "INTEGER", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -249,19 +250,19 @@ namespace POS.Migrations.SqlServer.Migrations
                 name: "Brands",
                 columns: table => new
                 {
-                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    Name = table.Column<string>(type: "nvarchar(200)", maxLength: 200, nullable: true),
-                    ImageUrl = table.Column<string>(type: "nvarchar(500)", maxLength: 500, nullable: true),
-                    TenantId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    CreatedDate = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    CreatedBy = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    ModifiedDate = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    ModifiedBy = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    DeletedDate = table.Column<DateTime>(type: "datetime2", nullable: true),
-                    DeletedBy = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
-                    SyncVersion = table.Column<long>(type: "bigint", nullable: false),
-                    LastSyncedAt = table.Column<DateTime>(type: "datetime2", nullable: true),
-                    IsDeleted = table.Column<bool>(type: "bit", nullable: false)
+                    Id = table.Column<Guid>(type: "TEXT", nullable: false),
+                    Name = table.Column<string>(type: "TEXT", maxLength: 200, nullable: true),
+                    ImageUrl = table.Column<string>(type: "TEXT", maxLength: 500, nullable: true),
+                    TenantId = table.Column<Guid>(type: "TEXT", nullable: false),
+                    CreatedDate = table.Column<DateTime>(type: "TEXT", nullable: false),
+                    CreatedBy = table.Column<Guid>(type: "TEXT", nullable: false),
+                    ModifiedDate = table.Column<DateTime>(type: "TEXT", nullable: false),
+                    ModifiedBy = table.Column<Guid>(type: "TEXT", nullable: false),
+                    DeletedDate = table.Column<DateTime>(type: "TEXT", nullable: true),
+                    DeletedBy = table.Column<Guid>(type: "TEXT", nullable: true),
+                    SyncVersion = table.Column<long>(type: "INTEGER", nullable: false),
+                    LastSyncedAt = table.Column<DateTime>(type: "TEXT", nullable: true),
+                    IsDeleted = table.Column<bool>(type: "INTEGER", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -278,28 +279,28 @@ namespace POS.Migrations.SqlServer.Migrations
                 name: "CompanyProfiles",
                 columns: table => new
                 {
-                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    Title = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    Address = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    LogoUrl = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    Phone = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    Email = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    TaxName = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    TaxNumber = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    CurrencyCode = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    LicenseKey = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    PurchaseCode = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    BusinessType = table.Column<int>(type: "int", nullable: false),
-                    TenantId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    CreatedDate = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    CreatedBy = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    ModifiedDate = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    ModifiedBy = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    DeletedDate = table.Column<DateTime>(type: "datetime2", nullable: true),
-                    DeletedBy = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
-                    SyncVersion = table.Column<long>(type: "bigint", nullable: false),
-                    LastSyncedAt = table.Column<DateTime>(type: "datetime2", nullable: true),
-                    IsDeleted = table.Column<bool>(type: "bit", nullable: false)
+                    Id = table.Column<Guid>(type: "TEXT", nullable: false),
+                    Title = table.Column<string>(type: "TEXT", nullable: true),
+                    Address = table.Column<string>(type: "TEXT", nullable: true),
+                    LogoUrl = table.Column<string>(type: "TEXT", nullable: true),
+                    Phone = table.Column<string>(type: "TEXT", nullable: true),
+                    Email = table.Column<string>(type: "TEXT", nullable: true),
+                    TaxName = table.Column<string>(type: "TEXT", nullable: true),
+                    TaxNumber = table.Column<string>(type: "TEXT", nullable: true),
+                    CurrencyCode = table.Column<string>(type: "TEXT", nullable: true),
+                    LicenseKey = table.Column<string>(type: "TEXT", nullable: true),
+                    PurchaseCode = table.Column<string>(type: "TEXT", nullable: true),
+                    BusinessType = table.Column<int>(type: "INTEGER", nullable: false),
+                    TenantId = table.Column<Guid>(type: "TEXT", nullable: false),
+                    CreatedDate = table.Column<DateTime>(type: "TEXT", nullable: false),
+                    CreatedBy = table.Column<Guid>(type: "TEXT", nullable: false),
+                    ModifiedDate = table.Column<DateTime>(type: "TEXT", nullable: false),
+                    ModifiedBy = table.Column<Guid>(type: "TEXT", nullable: false),
+                    DeletedDate = table.Column<DateTime>(type: "TEXT", nullable: true),
+                    DeletedBy = table.Column<Guid>(type: "TEXT", nullable: true),
+                    SyncVersion = table.Column<long>(type: "INTEGER", nullable: false),
+                    LastSyncedAt = table.Column<DateTime>(type: "TEXT", nullable: true),
+                    IsDeleted = table.Column<bool>(type: "INTEGER", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -316,21 +317,21 @@ namespace POS.Migrations.SqlServer.Migrations
                 name: "ContactRequests",
                 columns: table => new
                 {
-                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    Name = table.Column<string>(type: "nvarchar(200)", maxLength: 200, nullable: true),
-                    Email = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: true),
-                    Phone = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: true),
-                    Message = table.Column<string>(type: "nvarchar(4000)", maxLength: 4000, nullable: true),
-                    TenantId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    CreatedDate = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    CreatedBy = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    ModifiedDate = table.Column<DateTime>(type: "datetime2", nullable: false, defaultValueSql: "CURRENT_TIMESTAMP"),
-                    ModifiedBy = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    DeletedDate = table.Column<DateTime>(type: "datetime2", nullable: true),
-                    DeletedBy = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
-                    SyncVersion = table.Column<long>(type: "bigint", nullable: false),
-                    LastSyncedAt = table.Column<DateTime>(type: "datetime2", nullable: true),
-                    IsDeleted = table.Column<bool>(type: "bit", nullable: false)
+                    Id = table.Column<Guid>(type: "TEXT", nullable: false),
+                    Name = table.Column<string>(type: "TEXT", maxLength: 200, nullable: true),
+                    Email = table.Column<string>(type: "TEXT", maxLength: 256, nullable: true),
+                    Phone = table.Column<string>(type: "TEXT", maxLength: 50, nullable: true),
+                    Message = table.Column<string>(type: "TEXT", maxLength: 4000, nullable: true),
+                    TenantId = table.Column<Guid>(type: "TEXT", nullable: false),
+                    CreatedDate = table.Column<DateTime>(type: "TEXT", nullable: false),
+                    CreatedBy = table.Column<Guid>(type: "TEXT", nullable: false),
+                    ModifiedDate = table.Column<DateTime>(type: "TEXT", nullable: false, defaultValueSql: "CURRENT_TIMESTAMP"),
+                    ModifiedBy = table.Column<Guid>(type: "TEXT", nullable: false),
+                    DeletedDate = table.Column<DateTime>(type: "TEXT", nullable: true),
+                    DeletedBy = table.Column<Guid>(type: "TEXT", nullable: true),
+                    SyncVersion = table.Column<long>(type: "INTEGER", nullable: false),
+                    LastSyncedAt = table.Column<DateTime>(type: "TEXT", nullable: true),
+                    IsDeleted = table.Column<bool>(type: "INTEGER", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -347,18 +348,18 @@ namespace POS.Migrations.SqlServer.Migrations
                 name: "Countries",
                 columns: table => new
                 {
-                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    CountryName = table.Column<string>(type: "nvarchar(200)", maxLength: 200, nullable: true),
-                    TenantId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    CreatedDate = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    CreatedBy = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    ModifiedDate = table.Column<DateTime>(type: "datetime2", nullable: false, defaultValueSql: "CURRENT_TIMESTAMP"),
-                    ModifiedBy = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    DeletedDate = table.Column<DateTime>(type: "datetime2", nullable: true),
-                    DeletedBy = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
-                    SyncVersion = table.Column<long>(type: "bigint", nullable: false),
-                    LastSyncedAt = table.Column<DateTime>(type: "datetime2", nullable: true),
-                    IsDeleted = table.Column<bool>(type: "bit", nullable: false)
+                    Id = table.Column<Guid>(type: "TEXT", nullable: false),
+                    CountryName = table.Column<string>(type: "TEXT", maxLength: 200, nullable: true),
+                    TenantId = table.Column<Guid>(type: "TEXT", nullable: false),
+                    CreatedDate = table.Column<DateTime>(type: "TEXT", nullable: false),
+                    CreatedBy = table.Column<Guid>(type: "TEXT", nullable: false),
+                    ModifiedDate = table.Column<DateTime>(type: "TEXT", nullable: false, defaultValueSql: "CURRENT_TIMESTAMP"),
+                    ModifiedBy = table.Column<Guid>(type: "TEXT", nullable: false),
+                    DeletedDate = table.Column<DateTime>(type: "TEXT", nullable: true),
+                    DeletedBy = table.Column<Guid>(type: "TEXT", nullable: true),
+                    SyncVersion = table.Column<long>(type: "INTEGER", nullable: false),
+                    LastSyncedAt = table.Column<DateTime>(type: "TEXT", nullable: true),
+                    IsDeleted = table.Column<bool>(type: "INTEGER", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -375,30 +376,30 @@ namespace POS.Migrations.SqlServer.Migrations
                 name: "Customers",
                 columns: table => new
                 {
-                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    CustomerName = table.Column<string>(type: "nvarchar(250)", maxLength: 250, nullable: true),
-                    ContactPerson = table.Column<string>(type: "nvarchar(200)", maxLength: 200, nullable: true),
-                    Email = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: true),
-                    Fax = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: true),
-                    MobileNo = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: true),
-                    PhoneNo = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: true),
-                    Website = table.Column<string>(type: "nvarchar(500)", maxLength: 500, nullable: true),
-                    Description = table.Column<string>(type: "nvarchar(2000)", maxLength: 2000, nullable: true),
-                    Url = table.Column<string>(type: "nvarchar(500)", maxLength: 500, nullable: true),
-                    BillingAddressId = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
-                    ShippingAddressId = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
-                    IsWalkIn = table.Column<bool>(type: "bit", nullable: false),
-                    TaxNumber = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: true),
-                    TenantId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    CreatedDate = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    CreatedBy = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    ModifiedDate = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    ModifiedBy = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    DeletedDate = table.Column<DateTime>(type: "datetime2", nullable: true),
-                    DeletedBy = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
-                    SyncVersion = table.Column<long>(type: "bigint", nullable: false),
-                    LastSyncedAt = table.Column<DateTime>(type: "datetime2", nullable: true),
-                    IsDeleted = table.Column<bool>(type: "bit", nullable: false)
+                    Id = table.Column<Guid>(type: "TEXT", nullable: false),
+                    CustomerName = table.Column<string>(type: "TEXT", maxLength: 250, nullable: true),
+                    ContactPerson = table.Column<string>(type: "TEXT", maxLength: 200, nullable: true),
+                    Email = table.Column<string>(type: "TEXT", maxLength: 256, nullable: true),
+                    Fax = table.Column<string>(type: "TEXT", maxLength: 50, nullable: true),
+                    MobileNo = table.Column<string>(type: "TEXT", maxLength: 50, nullable: true),
+                    PhoneNo = table.Column<string>(type: "TEXT", maxLength: 50, nullable: true),
+                    Website = table.Column<string>(type: "TEXT", maxLength: 500, nullable: true),
+                    Description = table.Column<string>(type: "TEXT", maxLength: 2000, nullable: true),
+                    Url = table.Column<string>(type: "TEXT", maxLength: 500, nullable: true),
+                    BillingAddressId = table.Column<Guid>(type: "TEXT", nullable: true),
+                    ShippingAddressId = table.Column<Guid>(type: "TEXT", nullable: true),
+                    IsWalkIn = table.Column<bool>(type: "INTEGER", nullable: false),
+                    TaxNumber = table.Column<string>(type: "TEXT", maxLength: 50, nullable: true),
+                    TenantId = table.Column<Guid>(type: "TEXT", nullable: false),
+                    CreatedDate = table.Column<DateTime>(type: "TEXT", nullable: false),
+                    CreatedBy = table.Column<Guid>(type: "TEXT", nullable: false),
+                    ModifiedDate = table.Column<DateTime>(type: "TEXT", nullable: false),
+                    ModifiedBy = table.Column<Guid>(type: "TEXT", nullable: false),
+                    DeletedDate = table.Column<DateTime>(type: "TEXT", nullable: true),
+                    DeletedBy = table.Column<Guid>(type: "TEXT", nullable: true),
+                    SyncVersion = table.Column<long>(type: "INTEGER", nullable: false),
+                    LastSyncedAt = table.Column<DateTime>(type: "TEXT", nullable: true),
+                    IsDeleted = table.Column<bool>(type: "INTEGER", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -427,25 +428,25 @@ namespace POS.Migrations.SqlServer.Migrations
                 name: "EmailSMTPSettings",
                 columns: table => new
                 {
-                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    Host = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    UserName = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    Password = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    Port = table.Column<int>(type: "int", nullable: false),
-                    IsDefault = table.Column<bool>(type: "bit", nullable: false),
-                    EncryptionType = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    FromEmail = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    FromName = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    TenantId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    CreatedDate = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    CreatedBy = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    ModifiedDate = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    ModifiedBy = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    DeletedDate = table.Column<DateTime>(type: "datetime2", nullable: true),
-                    DeletedBy = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
-                    SyncVersion = table.Column<long>(type: "bigint", nullable: false),
-                    LastSyncedAt = table.Column<DateTime>(type: "datetime2", nullable: true),
-                    IsDeleted = table.Column<bool>(type: "bit", nullable: false)
+                    Id = table.Column<Guid>(type: "TEXT", nullable: false),
+                    Host = table.Column<string>(type: "TEXT", nullable: false),
+                    UserName = table.Column<string>(type: "TEXT", nullable: false),
+                    Password = table.Column<string>(type: "TEXT", nullable: false),
+                    Port = table.Column<int>(type: "INTEGER", nullable: false),
+                    IsDefault = table.Column<bool>(type: "INTEGER", nullable: false),
+                    EncryptionType = table.Column<string>(type: "TEXT", nullable: true),
+                    FromEmail = table.Column<string>(type: "TEXT", nullable: true),
+                    FromName = table.Column<string>(type: "TEXT", nullable: true),
+                    TenantId = table.Column<Guid>(type: "TEXT", nullable: false),
+                    CreatedDate = table.Column<DateTime>(type: "TEXT", nullable: false),
+                    CreatedBy = table.Column<Guid>(type: "TEXT", nullable: false),
+                    ModifiedDate = table.Column<DateTime>(type: "TEXT", nullable: false),
+                    ModifiedBy = table.Column<Guid>(type: "TEXT", nullable: false),
+                    DeletedDate = table.Column<DateTime>(type: "TEXT", nullable: true),
+                    DeletedBy = table.Column<Guid>(type: "TEXT", nullable: true),
+                    SyncVersion = table.Column<long>(type: "INTEGER", nullable: false),
+                    LastSyncedAt = table.Column<DateTime>(type: "TEXT", nullable: true),
+                    IsDeleted = table.Column<bool>(type: "INTEGER", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -462,20 +463,20 @@ namespace POS.Migrations.SqlServer.Migrations
                 name: "EmailTemplates",
                 columns: table => new
                 {
-                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    Name = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    Subject = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    Body = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    TenantId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    CreatedDate = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    CreatedBy = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    ModifiedDate = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    ModifiedBy = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    DeletedDate = table.Column<DateTime>(type: "datetime2", nullable: true),
-                    DeletedBy = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
-                    SyncVersion = table.Column<long>(type: "bigint", nullable: false),
-                    LastSyncedAt = table.Column<DateTime>(type: "datetime2", nullable: true),
-                    IsDeleted = table.Column<bool>(type: "bit", nullable: false)
+                    Id = table.Column<Guid>(type: "TEXT", nullable: false),
+                    Name = table.Column<string>(type: "TEXT", nullable: true),
+                    Subject = table.Column<string>(type: "TEXT", nullable: true),
+                    Body = table.Column<string>(type: "TEXT", nullable: true),
+                    TenantId = table.Column<Guid>(type: "TEXT", nullable: false),
+                    CreatedDate = table.Column<DateTime>(type: "TEXT", nullable: false),
+                    CreatedBy = table.Column<Guid>(type: "TEXT", nullable: false),
+                    ModifiedDate = table.Column<DateTime>(type: "TEXT", nullable: false),
+                    ModifiedBy = table.Column<Guid>(type: "TEXT", nullable: false),
+                    DeletedDate = table.Column<DateTime>(type: "TEXT", nullable: true),
+                    DeletedBy = table.Column<Guid>(type: "TEXT", nullable: true),
+                    SyncVersion = table.Column<long>(type: "INTEGER", nullable: false),
+                    LastSyncedAt = table.Column<DateTime>(type: "TEXT", nullable: true),
+                    IsDeleted = table.Column<bool>(type: "INTEGER", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -492,18 +493,18 @@ namespace POS.Migrations.SqlServer.Migrations
                 name: "ExpenseCategories",
                 columns: table => new
                 {
-                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    Name = table.Column<string>(type: "nvarchar(200)", maxLength: 200, nullable: true),
-                    TenantId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    CreatedDate = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    CreatedBy = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    ModifiedDate = table.Column<DateTime>(type: "datetime2", nullable: false, defaultValueSql: "CURRENT_TIMESTAMP"),
-                    ModifiedBy = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    DeletedDate = table.Column<DateTime>(type: "datetime2", nullable: true),
-                    DeletedBy = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
-                    SyncVersion = table.Column<long>(type: "bigint", nullable: false),
-                    LastSyncedAt = table.Column<DateTime>(type: "datetime2", nullable: true),
-                    IsDeleted = table.Column<bool>(type: "bit", nullable: false)
+                    Id = table.Column<Guid>(type: "TEXT", nullable: false),
+                    Name = table.Column<string>(type: "TEXT", maxLength: 200, nullable: true),
+                    TenantId = table.Column<Guid>(type: "TEXT", nullable: false),
+                    CreatedDate = table.Column<DateTime>(type: "TEXT", nullable: false),
+                    CreatedBy = table.Column<Guid>(type: "TEXT", nullable: false),
+                    ModifiedDate = table.Column<DateTime>(type: "TEXT", nullable: false, defaultValueSql: "CURRENT_TIMESTAMP"),
+                    ModifiedBy = table.Column<Guid>(type: "TEXT", nullable: false),
+                    DeletedDate = table.Column<DateTime>(type: "TEXT", nullable: true),
+                    DeletedBy = table.Column<Guid>(type: "TEXT", nullable: true),
+                    SyncVersion = table.Column<long>(type: "INTEGER", nullable: false),
+                    LastSyncedAt = table.Column<DateTime>(type: "TEXT", nullable: true),
+                    IsDeleted = table.Column<bool>(type: "INTEGER", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -520,22 +521,22 @@ namespace POS.Migrations.SqlServer.Migrations
                 name: "FinancialYears",
                 columns: table => new
                 {
-                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    StartDate = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    EndDate = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    IsClosed = table.Column<bool>(type: "bit", nullable: false),
-                    ClosedDate = table.Column<DateTime>(type: "datetime2", nullable: true),
-                    ClosedBy = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    TenantId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    CreatedDate = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    CreatedBy = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    ModifiedDate = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    ModifiedBy = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    DeletedDate = table.Column<DateTime>(type: "datetime2", nullable: true),
-                    DeletedBy = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
-                    SyncVersion = table.Column<long>(type: "bigint", nullable: false),
-                    LastSyncedAt = table.Column<DateTime>(type: "datetime2", nullable: true),
-                    IsDeleted = table.Column<bool>(type: "bit", nullable: false)
+                    Id = table.Column<Guid>(type: "TEXT", nullable: false),
+                    StartDate = table.Column<DateTime>(type: "TEXT", nullable: false),
+                    EndDate = table.Column<DateTime>(type: "TEXT", nullable: false),
+                    IsClosed = table.Column<bool>(type: "INTEGER", nullable: false),
+                    ClosedDate = table.Column<DateTime>(type: "TEXT", nullable: true),
+                    ClosedBy = table.Column<Guid>(type: "TEXT", nullable: false),
+                    TenantId = table.Column<Guid>(type: "TEXT", nullable: false),
+                    CreatedDate = table.Column<DateTime>(type: "TEXT", nullable: false),
+                    CreatedBy = table.Column<Guid>(type: "TEXT", nullable: false),
+                    ModifiedDate = table.Column<DateTime>(type: "TEXT", nullable: false),
+                    ModifiedBy = table.Column<Guid>(type: "TEXT", nullable: false),
+                    DeletedDate = table.Column<DateTime>(type: "TEXT", nullable: true),
+                    DeletedBy = table.Column<Guid>(type: "TEXT", nullable: true),
+                    SyncVersion = table.Column<long>(type: "INTEGER", nullable: false),
+                    LastSyncedAt = table.Column<DateTime>(type: "TEXT", nullable: true),
+                    IsDeleted = table.Column<bool>(type: "INTEGER", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -552,18 +553,18 @@ namespace POS.Migrations.SqlServer.Migrations
                 name: "InquirySources",
                 columns: table => new
                 {
-                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    Name = table.Column<string>(type: "nvarchar(200)", maxLength: 200, nullable: true),
-                    TenantId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    CreatedDate = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    CreatedBy = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    ModifiedDate = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    ModifiedBy = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    DeletedDate = table.Column<DateTime>(type: "datetime2", nullable: true),
-                    DeletedBy = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
-                    SyncVersion = table.Column<long>(type: "bigint", nullable: false),
-                    LastSyncedAt = table.Column<DateTime>(type: "datetime2", nullable: true),
-                    IsDeleted = table.Column<bool>(type: "bit", nullable: false)
+                    Id = table.Column<Guid>(type: "TEXT", nullable: false),
+                    Name = table.Column<string>(type: "TEXT", maxLength: 200, nullable: true),
+                    TenantId = table.Column<Guid>(type: "TEXT", nullable: false),
+                    CreatedDate = table.Column<DateTime>(type: "TEXT", nullable: false),
+                    CreatedBy = table.Column<Guid>(type: "TEXT", nullable: false),
+                    ModifiedDate = table.Column<DateTime>(type: "TEXT", nullable: false),
+                    ModifiedBy = table.Column<Guid>(type: "TEXT", nullable: false),
+                    DeletedDate = table.Column<DateTime>(type: "TEXT", nullable: true),
+                    DeletedBy = table.Column<Guid>(type: "TEXT", nullable: true),
+                    SyncVersion = table.Column<long>(type: "INTEGER", nullable: false),
+                    LastSyncedAt = table.Column<DateTime>(type: "TEXT", nullable: true),
+                    IsDeleted = table.Column<bool>(type: "INTEGER", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -580,18 +581,18 @@ namespace POS.Migrations.SqlServer.Migrations
                 name: "InquiryStatuses",
                 columns: table => new
                 {
-                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    Name = table.Column<string>(type: "nvarchar(200)", maxLength: 200, nullable: true),
-                    TenantId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    CreatedDate = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    CreatedBy = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    ModifiedDate = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    ModifiedBy = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    DeletedDate = table.Column<DateTime>(type: "datetime2", nullable: true),
-                    DeletedBy = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
-                    SyncVersion = table.Column<long>(type: "bigint", nullable: false),
-                    LastSyncedAt = table.Column<DateTime>(type: "datetime2", nullable: true),
-                    IsDeleted = table.Column<bool>(type: "bit", nullable: false)
+                    Id = table.Column<Guid>(type: "TEXT", nullable: false),
+                    Name = table.Column<string>(type: "TEXT", maxLength: 200, nullable: true),
+                    TenantId = table.Column<Guid>(type: "TEXT", nullable: false),
+                    CreatedDate = table.Column<DateTime>(type: "TEXT", nullable: false),
+                    CreatedBy = table.Column<Guid>(type: "TEXT", nullable: false),
+                    ModifiedDate = table.Column<DateTime>(type: "TEXT", nullable: false),
+                    ModifiedBy = table.Column<Guid>(type: "TEXT", nullable: false),
+                    DeletedDate = table.Column<DateTime>(type: "TEXT", nullable: true),
+                    DeletedBy = table.Column<Guid>(type: "TEXT", nullable: true),
+                    SyncVersion = table.Column<long>(type: "INTEGER", nullable: false),
+                    LastSyncedAt = table.Column<DateTime>(type: "TEXT", nullable: true),
+                    IsDeleted = table.Column<bool>(type: "INTEGER", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -608,22 +609,22 @@ namespace POS.Migrations.SqlServer.Migrations
                 name: "Languages",
                 columns: table => new
                 {
-                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    Name = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: true),
-                    Code = table.Column<string>(type: "nvarchar(20)", maxLength: 20, nullable: true),
-                    ImageUrl = table.Column<string>(type: "nvarchar(500)", maxLength: 500, nullable: true),
-                    Isrtl = table.Column<bool>(type: "bit", nullable: false),
-                    Order = table.Column<int>(type: "int", nullable: false),
-                    TenantId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    CreatedDate = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    CreatedBy = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    ModifiedDate = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    ModifiedBy = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    DeletedDate = table.Column<DateTime>(type: "datetime2", nullable: true),
-                    DeletedBy = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
-                    SyncVersion = table.Column<long>(type: "bigint", nullable: false),
-                    LastSyncedAt = table.Column<DateTime>(type: "datetime2", nullable: true),
-                    IsDeleted = table.Column<bool>(type: "bit", nullable: false)
+                    Id = table.Column<Guid>(type: "TEXT", nullable: false),
+                    Name = table.Column<string>(type: "TEXT", maxLength: 100, nullable: true),
+                    Code = table.Column<string>(type: "TEXT", maxLength: 20, nullable: true),
+                    ImageUrl = table.Column<string>(type: "TEXT", maxLength: 500, nullable: true),
+                    Isrtl = table.Column<bool>(type: "INTEGER", nullable: false),
+                    Order = table.Column<int>(type: "INTEGER", nullable: false),
+                    TenantId = table.Column<Guid>(type: "TEXT", nullable: false),
+                    CreatedDate = table.Column<DateTime>(type: "TEXT", nullable: false),
+                    CreatedBy = table.Column<Guid>(type: "TEXT", nullable: false),
+                    ModifiedDate = table.Column<DateTime>(type: "TEXT", nullable: false),
+                    ModifiedBy = table.Column<Guid>(type: "TEXT", nullable: false),
+                    DeletedDate = table.Column<DateTime>(type: "TEXT", nullable: true),
+                    DeletedBy = table.Column<Guid>(type: "TEXT", nullable: true),
+                    SyncVersion = table.Column<long>(type: "INTEGER", nullable: false),
+                    LastSyncedAt = table.Column<DateTime>(type: "TEXT", nullable: true),
+                    IsDeleted = table.Column<bool>(type: "INTEGER", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -640,26 +641,26 @@ namespace POS.Migrations.SqlServer.Migrations
                 name: "LedgerAccounts",
                 columns: table => new
                 {
-                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    AccountCode = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: false),
-                    AccountName = table.Column<string>(type: "nvarchar(200)", maxLength: 200, nullable: false),
-                    AccountType = table.Column<int>(type: "int", nullable: false),
-                    AccountGroup = table.Column<int>(type: "int", nullable: false),
-                    ParentAccountId = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
+                    Id = table.Column<Guid>(type: "TEXT", nullable: false),
+                    AccountCode = table.Column<string>(type: "TEXT", maxLength: 50, nullable: false),
+                    AccountName = table.Column<string>(type: "TEXT", maxLength: 200, nullable: false),
+                    AccountType = table.Column<int>(type: "INTEGER", nullable: false),
+                    AccountGroup = table.Column<int>(type: "INTEGER", nullable: false),
+                    ParentAccountId = table.Column<Guid>(type: "TEXT", nullable: true),
                     OpeningBalance = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
-                    IsActive = table.Column<bool>(type: "bit", nullable: false),
-                    IsTemporary = table.Column<bool>(type: "bit", nullable: false),
-                    IsSystem = table.Column<bool>(type: "bit", nullable: false, defaultValue: true),
-                    TenantId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    CreatedDate = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    CreatedBy = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    ModifiedDate = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    ModifiedBy = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    DeletedDate = table.Column<DateTime>(type: "datetime2", nullable: true),
-                    DeletedBy = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
-                    SyncVersion = table.Column<long>(type: "bigint", nullable: false),
-                    LastSyncedAt = table.Column<DateTime>(type: "datetime2", nullable: true),
-                    IsDeleted = table.Column<bool>(type: "bit", nullable: false)
+                    IsActive = table.Column<bool>(type: "INTEGER", nullable: false),
+                    IsTemporary = table.Column<bool>(type: "INTEGER", nullable: false),
+                    IsSystem = table.Column<bool>(type: "INTEGER", nullable: false, defaultValue: true),
+                    TenantId = table.Column<Guid>(type: "TEXT", nullable: false),
+                    CreatedDate = table.Column<DateTime>(type: "TEXT", nullable: false),
+                    CreatedBy = table.Column<Guid>(type: "TEXT", nullable: false),
+                    ModifiedDate = table.Column<DateTime>(type: "TEXT", nullable: false),
+                    ModifiedBy = table.Column<Guid>(type: "TEXT", nullable: false),
+                    DeletedDate = table.Column<DateTime>(type: "TEXT", nullable: true),
+                    DeletedBy = table.Column<Guid>(type: "TEXT", nullable: true),
+                    SyncVersion = table.Column<long>(type: "INTEGER", nullable: false),
+                    LastSyncedAt = table.Column<DateTime>(type: "TEXT", nullable: true),
+                    IsDeleted = table.Column<bool>(type: "INTEGER", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -681,28 +682,28 @@ namespace POS.Migrations.SqlServer.Migrations
                 name: "Locations",
                 columns: table => new
                 {
-                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    Name = table.Column<string>(type: "nvarchar(200)", maxLength: 200, nullable: true),
-                    Address = table.Column<string>(type: "nvarchar(500)", maxLength: 500, nullable: true),
-                    Email = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: true),
-                    Mobile = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: true),
-                    ContactPerson = table.Column<string>(type: "nvarchar(200)", maxLength: 200, nullable: true),
-                    Website = table.Column<string>(type: "nvarchar(500)", maxLength: 500, nullable: true),
-                    FBRKey = table.Column<string>(type: "nvarchar(500)", maxLength: 500, nullable: false),
-                    POSID = table.Column<string>(type: "nvarchar(20)", maxLength: 20, nullable: false),
-                    ApiBaseUrl = table.Column<string>(type: "nvarchar(200)", maxLength: 200, nullable: false),
-                    IsFBREnabled = table.Column<bool>(type: "bit", nullable: false),
-                    AutoSubmitInvoices = table.Column<bool>(type: "bit", nullable: false),
-                    TenantId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    CreatedDate = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    CreatedBy = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    ModifiedDate = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    ModifiedBy = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    DeletedDate = table.Column<DateTime>(type: "datetime2", nullable: true),
-                    DeletedBy = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
-                    SyncVersion = table.Column<long>(type: "bigint", nullable: false),
-                    LastSyncedAt = table.Column<DateTime>(type: "datetime2", nullable: true),
-                    IsDeleted = table.Column<bool>(type: "bit", nullable: false)
+                    Id = table.Column<Guid>(type: "TEXT", nullable: false),
+                    Name = table.Column<string>(type: "TEXT", maxLength: 200, nullable: true),
+                    Address = table.Column<string>(type: "TEXT", maxLength: 500, nullable: true),
+                    Email = table.Column<string>(type: "TEXT", maxLength: 256, nullable: true),
+                    Mobile = table.Column<string>(type: "TEXT", maxLength: 50, nullable: true),
+                    ContactPerson = table.Column<string>(type: "TEXT", maxLength: 200, nullable: true),
+                    Website = table.Column<string>(type: "TEXT", maxLength: 500, nullable: true),
+                    FBRKey = table.Column<string>(type: "TEXT", maxLength: 500, nullable: false),
+                    POSID = table.Column<string>(type: "TEXT", maxLength: 20, nullable: false),
+                    ApiBaseUrl = table.Column<string>(type: "TEXT", maxLength: 200, nullable: false),
+                    IsFBREnabled = table.Column<bool>(type: "INTEGER", nullable: false),
+                    AutoSubmitInvoices = table.Column<bool>(type: "INTEGER", nullable: false),
+                    TenantId = table.Column<Guid>(type: "TEXT", nullable: false),
+                    CreatedDate = table.Column<DateTime>(type: "TEXT", nullable: false),
+                    CreatedBy = table.Column<Guid>(type: "TEXT", nullable: false),
+                    ModifiedDate = table.Column<DateTime>(type: "TEXT", nullable: false),
+                    ModifiedBy = table.Column<Guid>(type: "TEXT", nullable: false),
+                    DeletedDate = table.Column<DateTime>(type: "TEXT", nullable: true),
+                    DeletedBy = table.Column<Guid>(type: "TEXT", nullable: true),
+                    SyncVersion = table.Column<long>(type: "INTEGER", nullable: false),
+                    LastSyncedAt = table.Column<DateTime>(type: "TEXT", nullable: true),
+                    IsDeleted = table.Column<bool>(type: "INTEGER", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -719,20 +720,20 @@ namespace POS.Migrations.SqlServer.Migrations
                 name: "Pagehelpers",
                 columns: table => new
                 {
-                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    Code = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    Name = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    Description = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    TenantId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    CreatedDate = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    CreatedBy = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    ModifiedDate = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    ModifiedBy = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    DeletedDate = table.Column<DateTime>(type: "datetime2", nullable: true),
-                    DeletedBy = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
-                    SyncVersion = table.Column<long>(type: "bigint", nullable: false),
-                    LastSyncedAt = table.Column<DateTime>(type: "datetime2", nullable: true),
-                    IsDeleted = table.Column<bool>(type: "bit", nullable: false)
+                    Id = table.Column<Guid>(type: "TEXT", nullable: false),
+                    Code = table.Column<string>(type: "TEXT", nullable: true),
+                    Name = table.Column<string>(type: "TEXT", nullable: true),
+                    Description = table.Column<string>(type: "TEXT", nullable: true),
+                    TenantId = table.Column<Guid>(type: "TEXT", nullable: false),
+                    CreatedDate = table.Column<DateTime>(type: "TEXT", nullable: false),
+                    CreatedBy = table.Column<Guid>(type: "TEXT", nullable: false),
+                    ModifiedDate = table.Column<DateTime>(type: "TEXT", nullable: false),
+                    ModifiedBy = table.Column<Guid>(type: "TEXT", nullable: false),
+                    DeletedDate = table.Column<DateTime>(type: "TEXT", nullable: true),
+                    DeletedBy = table.Column<Guid>(type: "TEXT", nullable: true),
+                    SyncVersion = table.Column<long>(type: "INTEGER", nullable: false),
+                    LastSyncedAt = table.Column<DateTime>(type: "TEXT", nullable: true),
+                    IsDeleted = table.Column<bool>(type: "INTEGER", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -749,19 +750,19 @@ namespace POS.Migrations.SqlServer.Migrations
                 name: "Pages",
                 columns: table => new
                 {
-                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    Name = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    Order = table.Column<int>(type: "int", nullable: false),
-                    TenantId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    CreatedDate = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    CreatedBy = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    ModifiedDate = table.Column<DateTime>(type: "datetime2", nullable: false, defaultValueSql: "CURRENT_TIMESTAMP"),
-                    ModifiedBy = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    DeletedDate = table.Column<DateTime>(type: "datetime2", nullable: true),
-                    DeletedBy = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
-                    SyncVersion = table.Column<long>(type: "bigint", nullable: false),
-                    LastSyncedAt = table.Column<DateTime>(type: "datetime2", nullable: true),
-                    IsDeleted = table.Column<bool>(type: "bit", nullable: false)
+                    Id = table.Column<Guid>(type: "TEXT", nullable: false),
+                    Name = table.Column<string>(type: "TEXT", nullable: true),
+                    Order = table.Column<int>(type: "INTEGER", nullable: false),
+                    TenantId = table.Column<Guid>(type: "TEXT", nullable: false),
+                    CreatedDate = table.Column<DateTime>(type: "TEXT", nullable: false),
+                    CreatedBy = table.Column<Guid>(type: "TEXT", nullable: false),
+                    ModifiedDate = table.Column<DateTime>(type: "TEXT", nullable: false, defaultValueSql: "CURRENT_TIMESTAMP"),
+                    ModifiedBy = table.Column<Guid>(type: "TEXT", nullable: false),
+                    DeletedDate = table.Column<DateTime>(type: "TEXT", nullable: true),
+                    DeletedBy = table.Column<Guid>(type: "TEXT", nullable: true),
+                    SyncVersion = table.Column<long>(type: "INTEGER", nullable: false),
+                    LastSyncedAt = table.Column<DateTime>(type: "TEXT", nullable: true),
+                    IsDeleted = table.Column<bool>(type: "INTEGER", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -778,20 +779,20 @@ namespace POS.Migrations.SqlServer.Migrations
                 name: "ProductCategories",
                 columns: table => new
                 {
-                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    Name = table.Column<string>(type: "nvarchar(200)", maxLength: 200, nullable: true),
-                    ParentId = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
-                    Description = table.Column<string>(type: "nvarchar(1000)", maxLength: 1000, nullable: true),
-                    TenantId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    CreatedDate = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    CreatedBy = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    ModifiedDate = table.Column<DateTime>(type: "datetime2", nullable: false, defaultValueSql: "CURRENT_TIMESTAMP"),
-                    ModifiedBy = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    DeletedDate = table.Column<DateTime>(type: "datetime2", nullable: true),
-                    DeletedBy = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
-                    SyncVersion = table.Column<long>(type: "bigint", nullable: false),
-                    LastSyncedAt = table.Column<DateTime>(type: "datetime2", nullable: true),
-                    IsDeleted = table.Column<bool>(type: "bit", nullable: false)
+                    Id = table.Column<Guid>(type: "TEXT", nullable: false),
+                    Name = table.Column<string>(type: "TEXT", maxLength: 200, nullable: true),
+                    ParentId = table.Column<Guid>(type: "TEXT", nullable: true),
+                    Description = table.Column<string>(type: "TEXT", maxLength: 1000, nullable: true),
+                    TenantId = table.Column<Guid>(type: "TEXT", nullable: false),
+                    CreatedDate = table.Column<DateTime>(type: "TEXT", nullable: false),
+                    CreatedBy = table.Column<Guid>(type: "TEXT", nullable: false),
+                    ModifiedDate = table.Column<DateTime>(type: "TEXT", nullable: false, defaultValueSql: "CURRENT_TIMESTAMP"),
+                    ModifiedBy = table.Column<Guid>(type: "TEXT", nullable: false),
+                    DeletedDate = table.Column<DateTime>(type: "TEXT", nullable: true),
+                    DeletedBy = table.Column<Guid>(type: "TEXT", nullable: true),
+                    SyncVersion = table.Column<long>(type: "INTEGER", nullable: false),
+                    LastSyncedAt = table.Column<DateTime>(type: "TEXT", nullable: true),
+                    IsDeleted = table.Column<bool>(type: "INTEGER", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -813,25 +814,25 @@ namespace POS.Migrations.SqlServer.Migrations
                 name: "Reminders",
                 columns: table => new
                 {
-                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    Subject = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    Message = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    Frequency = table.Column<int>(type: "int", nullable: true),
-                    StartDate = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    EndDate = table.Column<DateTime>(type: "datetime2", nullable: true),
-                    DayOfWeek = table.Column<int>(type: "int", nullable: true),
-                    IsRepeated = table.Column<bool>(type: "bit", nullable: false),
-                    IsEmailNotification = table.Column<bool>(type: "bit", nullable: false),
-                    TenantId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    CreatedDate = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    CreatedBy = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    ModifiedDate = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    ModifiedBy = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    DeletedDate = table.Column<DateTime>(type: "datetime2", nullable: true),
-                    DeletedBy = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
-                    SyncVersion = table.Column<long>(type: "bigint", nullable: false),
-                    LastSyncedAt = table.Column<DateTime>(type: "datetime2", nullable: true),
-                    IsDeleted = table.Column<bool>(type: "bit", nullable: false)
+                    Id = table.Column<Guid>(type: "TEXT", nullable: false),
+                    Subject = table.Column<string>(type: "TEXT", nullable: true),
+                    Message = table.Column<string>(type: "TEXT", nullable: true),
+                    Frequency = table.Column<int>(type: "INTEGER", nullable: true),
+                    StartDate = table.Column<DateTime>(type: "TEXT", nullable: false),
+                    EndDate = table.Column<DateTime>(type: "TEXT", nullable: true),
+                    DayOfWeek = table.Column<int>(type: "INTEGER", nullable: true),
+                    IsRepeated = table.Column<bool>(type: "INTEGER", nullable: false),
+                    IsEmailNotification = table.Column<bool>(type: "INTEGER", nullable: false),
+                    TenantId = table.Column<Guid>(type: "TEXT", nullable: false),
+                    CreatedDate = table.Column<DateTime>(type: "TEXT", nullable: false),
+                    CreatedBy = table.Column<Guid>(type: "TEXT", nullable: false),
+                    ModifiedDate = table.Column<DateTime>(type: "TEXT", nullable: false),
+                    ModifiedBy = table.Column<Guid>(type: "TEXT", nullable: false),
+                    DeletedDate = table.Column<DateTime>(type: "TEXT", nullable: true),
+                    DeletedBy = table.Column<Guid>(type: "TEXT", nullable: true),
+                    SyncVersion = table.Column<long>(type: "INTEGER", nullable: false),
+                    LastSyncedAt = table.Column<DateTime>(type: "TEXT", nullable: true),
+                    IsDeleted = table.Column<bool>(type: "INTEGER", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -848,18 +849,18 @@ namespace POS.Migrations.SqlServer.Migrations
                 name: "ReminderSchedulers",
                 columns: table => new
                 {
-                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    Duration = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    IsActive = table.Column<bool>(type: "bit", nullable: false),
-                    Frequency = table.Column<int>(type: "int", nullable: true),
-                    CreatedDate = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    UserId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    IsRead = table.Column<bool>(type: "bit", nullable: false),
-                    IsEmailNotification = table.Column<bool>(type: "bit", nullable: false),
-                    Subject = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    Message = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    ReferenceId = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
-                    Application = table.Column<int>(type: "int", nullable: true)
+                    Id = table.Column<Guid>(type: "TEXT", nullable: false),
+                    Duration = table.Column<DateTime>(type: "TEXT", nullable: false),
+                    IsActive = table.Column<bool>(type: "INTEGER", nullable: false),
+                    Frequency = table.Column<int>(type: "INTEGER", nullable: true),
+                    CreatedDate = table.Column<DateTime>(type: "TEXT", nullable: false),
+                    UserId = table.Column<Guid>(type: "TEXT", nullable: false),
+                    IsRead = table.Column<bool>(type: "INTEGER", nullable: false),
+                    IsEmailNotification = table.Column<bool>(type: "INTEGER", nullable: false),
+                    Subject = table.Column<string>(type: "TEXT", nullable: true),
+                    Message = table.Column<string>(type: "TEXT", nullable: true),
+                    ReferenceId = table.Column<Guid>(type: "TEXT", nullable: true),
+                    Application = table.Column<int>(type: "INTEGER", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -876,19 +877,19 @@ namespace POS.Migrations.SqlServer.Migrations
                 name: "Roles",
                 columns: table => new
                 {
-                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    TenantId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    IsDeleted = table.Column<bool>(type: "bit", nullable: false),
-                    CreatedDate = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    CreatedBy = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
-                    ModifiedDate = table.Column<DateTime>(type: "datetime2", nullable: false, defaultValueSql: "CURRENT_TIMESTAMP"),
-                    ModifiedBy = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    DeletedDate = table.Column<DateTime>(type: "datetime2", nullable: true),
-                    DeletedBy = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
-                    IsSuperRole = table.Column<bool>(type: "bit", nullable: false),
-                    Name = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: true),
-                    NormalizedName = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: true),
-                    ConcurrencyStamp = table.Column<string>(type: "nvarchar(max)", nullable: true)
+                    Id = table.Column<Guid>(type: "TEXT", nullable: false),
+                    TenantId = table.Column<Guid>(type: "TEXT", nullable: false),
+                    IsDeleted = table.Column<bool>(type: "INTEGER", nullable: false),
+                    CreatedDate = table.Column<DateTime>(type: "TEXT", nullable: false),
+                    CreatedBy = table.Column<Guid>(type: "TEXT", nullable: true),
+                    ModifiedDate = table.Column<DateTime>(type: "TEXT", nullable: false, defaultValueSql: "CURRENT_TIMESTAMP"),
+                    ModifiedBy = table.Column<Guid>(type: "TEXT", nullable: false),
+                    DeletedDate = table.Column<DateTime>(type: "TEXT", nullable: true),
+                    DeletedBy = table.Column<Guid>(type: "TEXT", nullable: true),
+                    IsSuperRole = table.Column<bool>(type: "INTEGER", nullable: false),
+                    Name = table.Column<string>(type: "TEXT", maxLength: 256, nullable: true),
+                    NormalizedName = table.Column<string>(type: "TEXT", maxLength: 256, nullable: true),
+                    ConcurrencyStamp = table.Column<string>(type: "TEXT", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -923,21 +924,21 @@ namespace POS.Migrations.SqlServer.Migrations
                 name: "Taxes",
                 columns: table => new
                 {
-                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    Name = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: true),
+                    Id = table.Column<Guid>(type: "TEXT", nullable: false),
+                    Name = table.Column<string>(type: "TEXT", maxLength: 100, nullable: true),
                     Percentage = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
-                    InPutAccountCode = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    OutPutAccountCode = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    TenantId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    CreatedDate = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    CreatedBy = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    ModifiedDate = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    ModifiedBy = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    DeletedDate = table.Column<DateTime>(type: "datetime2", nullable: true),
-                    DeletedBy = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
-                    SyncVersion = table.Column<long>(type: "bigint", nullable: false),
-                    LastSyncedAt = table.Column<DateTime>(type: "datetime2", nullable: true),
-                    IsDeleted = table.Column<bool>(type: "bit", nullable: false)
+                    InPutAccountCode = table.Column<string>(type: "TEXT", nullable: true),
+                    OutPutAccountCode = table.Column<string>(type: "TEXT", nullable: true),
+                    TenantId = table.Column<Guid>(type: "TEXT", nullable: false),
+                    CreatedDate = table.Column<DateTime>(type: "TEXT", nullable: false),
+                    CreatedBy = table.Column<Guid>(type: "TEXT", nullable: false),
+                    ModifiedDate = table.Column<DateTime>(type: "TEXT", nullable: false),
+                    ModifiedBy = table.Column<Guid>(type: "TEXT", nullable: false),
+                    DeletedDate = table.Column<DateTime>(type: "TEXT", nullable: true),
+                    DeletedBy = table.Column<Guid>(type: "TEXT", nullable: true),
+                    SyncVersion = table.Column<long>(type: "INTEGER", nullable: false),
+                    LastSyncedAt = table.Column<DateTime>(type: "TEXT", nullable: true),
+                    IsDeleted = table.Column<bool>(type: "INTEGER", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -954,22 +955,22 @@ namespace POS.Migrations.SqlServer.Migrations
                 name: "UnitConversations",
                 columns: table => new
                 {
-                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    Name = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: true),
-                    Code = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: true),
-                    Operator = table.Column<int>(type: "int", nullable: true),
+                    Id = table.Column<Guid>(type: "TEXT", nullable: false),
+                    Name = table.Column<string>(type: "TEXT", maxLength: 100, nullable: true),
+                    Code = table.Column<string>(type: "TEXT", maxLength: 50, nullable: true),
+                    Operator = table.Column<int>(type: "INTEGER", nullable: true),
                     Value = table.Column<decimal>(type: "decimal(18,2)", nullable: true),
-                    ParentId = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
-                    TenantId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    CreatedDate = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    CreatedBy = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    ModifiedDate = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    ModifiedBy = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    DeletedDate = table.Column<DateTime>(type: "datetime2", nullable: true),
-                    DeletedBy = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
-                    SyncVersion = table.Column<long>(type: "bigint", nullable: false),
-                    LastSyncedAt = table.Column<DateTime>(type: "datetime2", nullable: true),
-                    IsDeleted = table.Column<bool>(type: "bit", nullable: false)
+                    ParentId = table.Column<Guid>(type: "TEXT", nullable: true),
+                    TenantId = table.Column<Guid>(type: "TEXT", nullable: false),
+                    CreatedDate = table.Column<DateTime>(type: "TEXT", nullable: false),
+                    CreatedBy = table.Column<Guid>(type: "TEXT", nullable: false),
+                    ModifiedDate = table.Column<DateTime>(type: "TEXT", nullable: false),
+                    ModifiedBy = table.Column<Guid>(type: "TEXT", nullable: false),
+                    DeletedDate = table.Column<DateTime>(type: "TEXT", nullable: true),
+                    DeletedBy = table.Column<Guid>(type: "TEXT", nullable: true),
+                    SyncVersion = table.Column<long>(type: "INTEGER", nullable: false),
+                    LastSyncedAt = table.Column<DateTime>(type: "TEXT", nullable: true),
+                    IsDeleted = table.Column<bool>(type: "INTEGER", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -991,10 +992,10 @@ namespace POS.Migrations.SqlServer.Migrations
                 name: "UserLogins",
                 columns: table => new
                 {
-                    LoginProvider = table.Column<string>(type: "nvarchar(450)", nullable: false),
-                    ProviderKey = table.Column<string>(type: "nvarchar(450)", nullable: false),
-                    ProviderDisplayName = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    UserId = table.Column<Guid>(type: "uniqueidentifier", nullable: false)
+                    LoginProvider = table.Column<string>(type: "TEXT", nullable: false),
+                    ProviderKey = table.Column<string>(type: "TEXT", nullable: false),
+                    ProviderDisplayName = table.Column<string>(type: "TEXT", nullable: true),
+                    UserId = table.Column<Guid>(type: "TEXT", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -1011,10 +1012,10 @@ namespace POS.Migrations.SqlServer.Migrations
                 name: "UserTokens",
                 columns: table => new
                 {
-                    UserId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    LoginProvider = table.Column<string>(type: "nvarchar(450)", nullable: false),
-                    Name = table.Column<string>(type: "nvarchar(450)", nullable: false),
-                    Value = table.Column<string>(type: "nvarchar(max)", nullable: true)
+                    UserId = table.Column<Guid>(type: "TEXT", nullable: false),
+                    LoginProvider = table.Column<string>(type: "TEXT", nullable: false),
+                    Name = table.Column<string>(type: "TEXT", nullable: false),
+                    Value = table.Column<string>(type: "TEXT", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -1031,18 +1032,18 @@ namespace POS.Migrations.SqlServer.Migrations
                 name: "Variants",
                 columns: table => new
                 {
-                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    Name = table.Column<string>(type: "nvarchar(200)", maxLength: 200, nullable: true),
-                    TenantId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    CreatedDate = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    CreatedBy = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    ModifiedDate = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    ModifiedBy = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    DeletedDate = table.Column<DateTime>(type: "datetime2", nullable: true),
-                    DeletedBy = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
-                    SyncVersion = table.Column<long>(type: "bigint", nullable: false),
-                    LastSyncedAt = table.Column<DateTime>(type: "datetime2", nullable: true),
-                    IsDeleted = table.Column<bool>(type: "bit", nullable: false)
+                    Id = table.Column<Guid>(type: "TEXT", nullable: false),
+                    Name = table.Column<string>(type: "TEXT", maxLength: 200, nullable: true),
+                    TenantId = table.Column<Guid>(type: "TEXT", nullable: false),
+                    CreatedDate = table.Column<DateTime>(type: "TEXT", nullable: false),
+                    CreatedBy = table.Column<Guid>(type: "TEXT", nullable: false),
+                    ModifiedDate = table.Column<DateTime>(type: "TEXT", nullable: false),
+                    ModifiedBy = table.Column<Guid>(type: "TEXT", nullable: false),
+                    DeletedDate = table.Column<DateTime>(type: "TEXT", nullable: true),
+                    DeletedBy = table.Column<Guid>(type: "TEXT", nullable: true),
+                    SyncVersion = table.Column<long>(type: "INTEGER", nullable: false),
+                    LastSyncedAt = table.Column<DateTime>(type: "TEXT", nullable: true),
+                    IsDeleted = table.Column<bool>(type: "INTEGER", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -1059,19 +1060,19 @@ namespace POS.Migrations.SqlServer.Migrations
                 name: "Cities",
                 columns: table => new
                 {
-                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    CityName = table.Column<string>(type: "nvarchar(200)", maxLength: 200, nullable: true),
-                    CountryId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    TenantId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    CreatedDate = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    CreatedBy = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    ModifiedDate = table.Column<DateTime>(type: "datetime2", nullable: false, defaultValueSql: "CURRENT_TIMESTAMP"),
-                    ModifiedBy = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    DeletedDate = table.Column<DateTime>(type: "datetime2", nullable: true),
-                    DeletedBy = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
-                    SyncVersion = table.Column<long>(type: "bigint", nullable: false),
-                    LastSyncedAt = table.Column<DateTime>(type: "datetime2", nullable: true),
-                    IsDeleted = table.Column<bool>(type: "bit", nullable: false)
+                    Id = table.Column<Guid>(type: "TEXT", nullable: false),
+                    CityName = table.Column<string>(type: "TEXT", maxLength: 200, nullable: true),
+                    CountryId = table.Column<Guid>(type: "TEXT", nullable: false),
+                    TenantId = table.Column<Guid>(type: "TEXT", nullable: false),
+                    CreatedDate = table.Column<DateTime>(type: "TEXT", nullable: false),
+                    CreatedBy = table.Column<Guid>(type: "TEXT", nullable: false),
+                    ModifiedDate = table.Column<DateTime>(type: "TEXT", nullable: false, defaultValueSql: "CURRENT_TIMESTAMP"),
+                    ModifiedBy = table.Column<Guid>(type: "TEXT", nullable: false),
+                    DeletedDate = table.Column<DateTime>(type: "TEXT", nullable: true),
+                    DeletedBy = table.Column<Guid>(type: "TEXT", nullable: true),
+                    SyncVersion = table.Column<long>(type: "INTEGER", nullable: false),
+                    LastSyncedAt = table.Column<DateTime>(type: "TEXT", nullable: true),
+                    IsDeleted = table.Column<bool>(type: "INTEGER", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -1094,27 +1095,27 @@ namespace POS.Migrations.SqlServer.Migrations
                 name: "CustomerLedgers",
                 columns: table => new
                 {
-                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    Date = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    CustomerId = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
-                    AccountName = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    LocationId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    Description = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Id = table.Column<Guid>(type: "TEXT", nullable: false),
+                    Date = table.Column<DateTime>(type: "TEXT", nullable: false),
+                    CustomerId = table.Column<Guid>(type: "TEXT", nullable: true),
+                    AccountName = table.Column<string>(type: "TEXT", nullable: true),
+                    LocationId = table.Column<Guid>(type: "TEXT", nullable: false),
+                    Description = table.Column<string>(type: "TEXT", nullable: true),
                     Amount = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
-                    Reference = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Reference = table.Column<string>(type: "TEXT", nullable: true),
                     Balance = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
                     Overdue = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
-                    Note = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    TenantId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    CreatedDate = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    CreatedBy = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    ModifiedDate = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    ModifiedBy = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    DeletedDate = table.Column<DateTime>(type: "datetime2", nullable: true),
-                    DeletedBy = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
-                    SyncVersion = table.Column<long>(type: "bigint", nullable: false),
-                    LastSyncedAt = table.Column<DateTime>(type: "datetime2", nullable: true),
-                    IsDeleted = table.Column<bool>(type: "bit", nullable: false)
+                    Note = table.Column<string>(type: "TEXT", nullable: true),
+                    TenantId = table.Column<Guid>(type: "TEXT", nullable: false),
+                    CreatedDate = table.Column<DateTime>(type: "TEXT", nullable: false),
+                    CreatedBy = table.Column<Guid>(type: "TEXT", nullable: false),
+                    ModifiedDate = table.Column<DateTime>(type: "TEXT", nullable: false),
+                    ModifiedBy = table.Column<Guid>(type: "TEXT", nullable: false),
+                    DeletedDate = table.Column<DateTime>(type: "TEXT", nullable: true),
+                    DeletedBy = table.Column<Guid>(type: "TEXT", nullable: true),
+                    SyncVersion = table.Column<long>(type: "INTEGER", nullable: false),
+                    LastSyncedAt = table.Column<DateTime>(type: "TEXT", nullable: true),
+                    IsDeleted = table.Column<bool>(type: "INTEGER", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -1142,27 +1143,27 @@ namespace POS.Migrations.SqlServer.Migrations
                 name: "Expenses",
                 columns: table => new
                 {
-                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    Reference = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: true),
-                    ExpenseCategoryId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    Id = table.Column<Guid>(type: "TEXT", nullable: false),
+                    Reference = table.Column<string>(type: "TEXT", maxLength: 100, nullable: true),
+                    ExpenseCategoryId = table.Column<Guid>(type: "TEXT", nullable: false),
                     Amount = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
-                    ExpenseById = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
-                    Description = table.Column<string>(type: "nvarchar(1000)", maxLength: 1000, nullable: true),
-                    ExpenseDate = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    ReceiptName = table.Column<string>(type: "nvarchar(200)", maxLength: 200, nullable: true),
-                    ReceiptPath = table.Column<string>(type: "nvarchar(500)", maxLength: 500, nullable: true),
+                    ExpenseById = table.Column<Guid>(type: "TEXT", nullable: true),
+                    Description = table.Column<string>(type: "TEXT", maxLength: 1000, nullable: true),
+                    ExpenseDate = table.Column<DateTime>(type: "TEXT", nullable: false),
+                    ReceiptName = table.Column<string>(type: "TEXT", maxLength: 200, nullable: true),
+                    ReceiptPath = table.Column<string>(type: "TEXT", maxLength: 500, nullable: true),
                     TotalTax = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
-                    LocationId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    TenantId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    CreatedDate = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    CreatedBy = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    ModifiedDate = table.Column<DateTime>(type: "datetime2", nullable: false, defaultValueSql: "CURRENT_TIMESTAMP"),
-                    ModifiedBy = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    DeletedDate = table.Column<DateTime>(type: "datetime2", nullable: true),
-                    DeletedBy = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
-                    SyncVersion = table.Column<long>(type: "bigint", nullable: false),
-                    LastSyncedAt = table.Column<DateTime>(type: "datetime2", nullable: true),
-                    IsDeleted = table.Column<bool>(type: "bit", nullable: false)
+                    LocationId = table.Column<Guid>(type: "TEXT", nullable: false),
+                    TenantId = table.Column<Guid>(type: "TEXT", nullable: false),
+                    CreatedDate = table.Column<DateTime>(type: "TEXT", nullable: false),
+                    CreatedBy = table.Column<Guid>(type: "TEXT", nullable: false),
+                    ModifiedDate = table.Column<DateTime>(type: "TEXT", nullable: false, defaultValueSql: "CURRENT_TIMESTAMP"),
+                    ModifiedBy = table.Column<Guid>(type: "TEXT", nullable: false),
+                    DeletedDate = table.Column<DateTime>(type: "TEXT", nullable: true),
+                    DeletedBy = table.Column<Guid>(type: "TEXT", nullable: true),
+                    SyncVersion = table.Column<long>(type: "INTEGER", nullable: false),
+                    LastSyncedAt = table.Column<DateTime>(type: "TEXT", nullable: true),
+                    IsDeleted = table.Column<bool>(type: "INTEGER", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -1197,25 +1198,25 @@ namespace POS.Migrations.SqlServer.Migrations
                 name: "LoanDetails",
                 columns: table => new
                 {
-                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    LoanAccountId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    LoanAccountInterestExpenseId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    Id = table.Column<Guid>(type: "TEXT", nullable: false),
+                    LoanAccountId = table.Column<Guid>(type: "TEXT", nullable: false),
+                    LoanAccountInterestExpenseId = table.Column<Guid>(type: "TEXT", nullable: false),
                     LoanAmount = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
-                    LenderName = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    LoanDate = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    Narration = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    BranchId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    LoanNumber = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    TenantId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    CreatedDate = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    CreatedBy = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    ModifiedDate = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    ModifiedBy = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    DeletedDate = table.Column<DateTime>(type: "datetime2", nullable: true),
-                    DeletedBy = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
-                    SyncVersion = table.Column<long>(type: "bigint", nullable: false),
-                    LastSyncedAt = table.Column<DateTime>(type: "datetime2", nullable: true),
-                    IsDeleted = table.Column<bool>(type: "bit", nullable: false)
+                    LenderName = table.Column<string>(type: "TEXT", nullable: true),
+                    LoanDate = table.Column<DateTime>(type: "TEXT", nullable: false),
+                    Narration = table.Column<string>(type: "TEXT", nullable: true),
+                    BranchId = table.Column<Guid>(type: "TEXT", nullable: false),
+                    LoanNumber = table.Column<string>(type: "TEXT", nullable: true),
+                    TenantId = table.Column<Guid>(type: "TEXT", nullable: false),
+                    CreatedDate = table.Column<DateTime>(type: "TEXT", nullable: false),
+                    CreatedBy = table.Column<Guid>(type: "TEXT", nullable: false),
+                    ModifiedDate = table.Column<DateTime>(type: "TEXT", nullable: false),
+                    ModifiedBy = table.Column<Guid>(type: "TEXT", nullable: false),
+                    DeletedDate = table.Column<DateTime>(type: "TEXT", nullable: true),
+                    DeletedBy = table.Column<Guid>(type: "TEXT", nullable: true),
+                    SyncVersion = table.Column<long>(type: "INTEGER", nullable: false),
+                    LastSyncedAt = table.Column<DateTime>(type: "TEXT", nullable: true),
+                    IsDeleted = table.Column<bool>(type: "INTEGER", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -1249,10 +1250,10 @@ namespace POS.Migrations.SqlServer.Migrations
                 name: "Payrolls",
                 columns: table => new
                 {
-                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    EmployeeId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    BranchId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    SalaryMonth = table.Column<int>(type: "int", nullable: false),
+                    Id = table.Column<Guid>(type: "TEXT", nullable: false),
+                    EmployeeId = table.Column<Guid>(type: "TEXT", nullable: false),
+                    BranchId = table.Column<Guid>(type: "TEXT", nullable: false),
+                    SalaryMonth = table.Column<int>(type: "INTEGER", nullable: false),
                     MobileBill = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
                     FoodBill = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
                     Bonus = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
@@ -1263,12 +1264,12 @@ namespace POS.Migrations.SqlServer.Migrations
                     BasicSalary = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
                     Advance = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
                     TotalSalary = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
-                    PaymentMode = table.Column<int>(type: "int", nullable: false),
-                    ChequeNo = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    SalaryDate = table.Column<DateOnly>(type: "date", nullable: false),
-                    Note = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    Attachment = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    FinancialYearId = table.Column<Guid>(type: "uniqueidentifier", nullable: false)
+                    PaymentMode = table.Column<int>(type: "INTEGER", nullable: false),
+                    ChequeNo = table.Column<string>(type: "TEXT", nullable: true),
+                    SalaryDate = table.Column<DateOnly>(type: "TEXT", nullable: false),
+                    Note = table.Column<string>(type: "TEXT", nullable: true),
+                    Attachment = table.Column<string>(type: "TEXT", nullable: true),
+                    FinancialYearId = table.Column<Guid>(type: "TEXT", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -1296,53 +1297,53 @@ namespace POS.Migrations.SqlServer.Migrations
                 name: "SalesOrders",
                 columns: table => new
                 {
-                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    OrderNumber = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: true),
-                    Note = table.Column<string>(type: "nvarchar(2000)", maxLength: 2000, nullable: true),
-                    SaleReturnNote = table.Column<string>(type: "nvarchar(2000)", maxLength: 2000, nullable: true),
-                    TermAndCondition = table.Column<string>(type: "nvarchar(4000)", maxLength: 4000, nullable: true),
-                    IsSalesOrderRequest = table.Column<bool>(type: "bit", nullable: false),
-                    SOCreatedDate = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    Status = table.Column<int>(type: "int", nullable: false),
-                    DeliveryDate = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    DeliveryStatus = table.Column<int>(type: "int", nullable: false),
-                    CustomerId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    Id = table.Column<Guid>(type: "TEXT", nullable: false),
+                    OrderNumber = table.Column<string>(type: "TEXT", maxLength: 50, nullable: true),
+                    Note = table.Column<string>(type: "TEXT", maxLength: 2000, nullable: true),
+                    SaleReturnNote = table.Column<string>(type: "TEXT", maxLength: 2000, nullable: true),
+                    TermAndCondition = table.Column<string>(type: "TEXT", maxLength: 4000, nullable: true),
+                    IsSalesOrderRequest = table.Column<bool>(type: "INTEGER", nullable: false),
+                    SOCreatedDate = table.Column<DateTime>(type: "TEXT", nullable: false),
+                    Status = table.Column<int>(type: "INTEGER", nullable: false),
+                    DeliveryDate = table.Column<DateTime>(type: "TEXT", nullable: false),
+                    DeliveryStatus = table.Column<int>(type: "INTEGER", nullable: false),
+                    CustomerId = table.Column<Guid>(type: "TEXT", nullable: false),
                     TotalAmount = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
                     TotalTax = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
                     TotalDiscount = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
                     FlatDiscount = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
                     TotalPaidAmount = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
                     TotalRoundOff = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
-                    TotalRefundAmount = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
-                    PaymentStatus = table.Column<int>(type: "int", nullable: false),
-                    LocationId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    BuyerNTN = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    BuyerCNIC = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    BuyerName = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    BuyerPhoneNumber = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    BuyerAddress = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    SaleType = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    FBRStatus = table.Column<int>(type: "int", nullable: false),
-                    FBRInvoiceNumber = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    FBRUSIN = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    FBRSubmittedAt = table.Column<DateTime>(type: "datetime2", nullable: true),
-                    FBRAcknowledgedAt = table.Column<DateTime>(type: "datetime2", nullable: true),
-                    FBRQRCodeData = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    FBRQRCodeImagePath = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    FBRRetryCount = table.Column<int>(type: "int", nullable: false),
-                    FBRNextRetryAt = table.Column<DateTime>(type: "datetime2", nullable: true),
-                    FBRErrorMessage = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    FBRResponseJson = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    TenantId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    CreatedDate = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    CreatedBy = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    ModifiedDate = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    ModifiedBy = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    DeletedDate = table.Column<DateTime>(type: "datetime2", nullable: true),
-                    DeletedBy = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
-                    SyncVersion = table.Column<long>(type: "bigint", nullable: false),
-                    LastSyncedAt = table.Column<DateTime>(type: "datetime2", nullable: true),
-                    IsDeleted = table.Column<bool>(type: "bit", nullable: false)
+                    TotalRefundAmount = table.Column<decimal>(type: "TEXT", nullable: false),
+                    PaymentStatus = table.Column<int>(type: "INTEGER", nullable: false),
+                    LocationId = table.Column<Guid>(type: "TEXT", nullable: false),
+                    BuyerNTN = table.Column<string>(type: "TEXT", nullable: true),
+                    BuyerCNIC = table.Column<string>(type: "TEXT", nullable: true),
+                    BuyerName = table.Column<string>(type: "TEXT", nullable: true),
+                    BuyerPhoneNumber = table.Column<string>(type: "TEXT", nullable: true),
+                    BuyerAddress = table.Column<string>(type: "TEXT", nullable: true),
+                    SaleType = table.Column<string>(type: "TEXT", nullable: true),
+                    FBRStatus = table.Column<int>(type: "INTEGER", nullable: false),
+                    FBRInvoiceNumber = table.Column<string>(type: "TEXT", nullable: true),
+                    FBRUSIN = table.Column<string>(type: "TEXT", nullable: true),
+                    FBRSubmittedAt = table.Column<DateTime>(type: "TEXT", nullable: true),
+                    FBRAcknowledgedAt = table.Column<DateTime>(type: "TEXT", nullable: true),
+                    FBRQRCodeData = table.Column<string>(type: "TEXT", nullable: true),
+                    FBRQRCodeImagePath = table.Column<string>(type: "TEXT", nullable: true),
+                    FBRRetryCount = table.Column<int>(type: "INTEGER", nullable: false),
+                    FBRNextRetryAt = table.Column<DateTime>(type: "TEXT", nullable: true),
+                    FBRErrorMessage = table.Column<string>(type: "TEXT", nullable: true),
+                    FBRResponseJson = table.Column<string>(type: "TEXT", nullable: true),
+                    TenantId = table.Column<Guid>(type: "TEXT", nullable: false),
+                    CreatedDate = table.Column<DateTime>(type: "TEXT", nullable: false),
+                    CreatedBy = table.Column<Guid>(type: "TEXT", nullable: false),
+                    ModifiedDate = table.Column<DateTime>(type: "TEXT", nullable: false),
+                    ModifiedBy = table.Column<Guid>(type: "TEXT", nullable: false),
+                    DeletedDate = table.Column<DateTime>(type: "TEXT", nullable: true),
+                    DeletedBy = table.Column<Guid>(type: "TEXT", nullable: true),
+                    SyncVersion = table.Column<long>(type: "INTEGER", nullable: false),
+                    LastSyncedAt = table.Column<DateTime>(type: "TEXT", nullable: true),
+                    IsDeleted = table.Column<bool>(type: "INTEGER", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -1371,25 +1372,25 @@ namespace POS.Migrations.SqlServer.Migrations
                 name: "StockTransfers",
                 columns: table => new
                 {
-                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    TransferDate = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    ReferenceNo = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: true),
-                    Status = table.Column<int>(type: "int", nullable: false),
-                    FromLocationId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    ToLocationId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    Id = table.Column<Guid>(type: "TEXT", nullable: false),
+                    TransferDate = table.Column<DateTime>(type: "TEXT", nullable: false),
+                    ReferenceNo = table.Column<string>(type: "TEXT", maxLength: 50, nullable: true),
+                    Status = table.Column<int>(type: "INTEGER", nullable: false),
+                    FromLocationId = table.Column<Guid>(type: "TEXT", nullable: false),
+                    ToLocationId = table.Column<Guid>(type: "TEXT", nullable: false),
                     TotalShippingCharge = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
                     TotalAmount = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
-                    Notes = table.Column<string>(type: "nvarchar(1000)", maxLength: 1000, nullable: true),
-                    TenantId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    CreatedDate = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    CreatedBy = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    ModifiedDate = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    ModifiedBy = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    DeletedDate = table.Column<DateTime>(type: "datetime2", nullable: true),
-                    DeletedBy = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
-                    SyncVersion = table.Column<long>(type: "bigint", nullable: false),
-                    LastSyncedAt = table.Column<DateTime>(type: "datetime2", nullable: true),
-                    IsDeleted = table.Column<bool>(type: "bit", nullable: false)
+                    Notes = table.Column<string>(type: "TEXT", maxLength: 1000, nullable: true),
+                    TenantId = table.Column<Guid>(type: "TEXT", nullable: false),
+                    CreatedDate = table.Column<DateTime>(type: "TEXT", nullable: false),
+                    CreatedBy = table.Column<Guid>(type: "TEXT", nullable: false),
+                    ModifiedDate = table.Column<DateTime>(type: "TEXT", nullable: false),
+                    ModifiedBy = table.Column<Guid>(type: "TEXT", nullable: false),
+                    DeletedDate = table.Column<DateTime>(type: "TEXT", nullable: true),
+                    DeletedBy = table.Column<Guid>(type: "TEXT", nullable: true),
+                    SyncVersion = table.Column<long>(type: "INTEGER", nullable: false),
+                    LastSyncedAt = table.Column<DateTime>(type: "TEXT", nullable: true),
+                    IsDeleted = table.Column<bool>(type: "INTEGER", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -1418,35 +1419,35 @@ namespace POS.Migrations.SqlServer.Migrations
                 name: "Transactions",
                 columns: table => new
                 {
-                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    TransactionNumber = table.Column<string>(type: "nvarchar(20)", maxLength: 20, nullable: false),
-                    TransactionType = table.Column<int>(type: "int", nullable: false),
-                    BranchId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    TransactionDate = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    Id = table.Column<Guid>(type: "TEXT", nullable: false),
+                    TransactionNumber = table.Column<string>(type: "TEXT", maxLength: 20, nullable: false),
+                    TransactionType = table.Column<int>(type: "INTEGER", nullable: false),
+                    BranchId = table.Column<Guid>(type: "TEXT", nullable: false),
+                    TransactionDate = table.Column<DateTime>(type: "TEXT", nullable: false),
                     SubTotal = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
                     DiscountAmount = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
                     FlatDiscount = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
                     TaxAmount = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
                     RoundOffAmount = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
                     TotalAmount = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
-                    Narration = table.Column<string>(type: "nvarchar(500)", maxLength: 500, nullable: true),
-                    ReferenceNumber = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: true),
-                    Status = table.Column<int>(type: "int", nullable: false),
-                    PaymentStatus = table.Column<int>(type: "int", nullable: false),
+                    Narration = table.Column<string>(type: "TEXT", maxLength: 500, nullable: true),
+                    ReferenceNumber = table.Column<string>(type: "TEXT", maxLength: 50, nullable: true),
+                    Status = table.Column<int>(type: "INTEGER", nullable: false),
+                    PaymentStatus = table.Column<int>(type: "INTEGER", nullable: false),
                     PaidAmount = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
                     ReturnItemsAmount = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
                     BalanceAmount = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
-                    FinancialYearId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    TenantId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    CreatedDate = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    CreatedBy = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    ModifiedDate = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    ModifiedBy = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    DeletedDate = table.Column<DateTime>(type: "datetime2", nullable: true),
-                    DeletedBy = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
-                    SyncVersion = table.Column<long>(type: "bigint", nullable: false),
-                    LastSyncedAt = table.Column<DateTime>(type: "datetime2", nullable: true),
-                    IsDeleted = table.Column<bool>(type: "bit", nullable: false)
+                    FinancialYearId = table.Column<Guid>(type: "TEXT", nullable: false),
+                    TenantId = table.Column<Guid>(type: "TEXT", nullable: false),
+                    CreatedDate = table.Column<DateTime>(type: "TEXT", nullable: false),
+                    CreatedBy = table.Column<Guid>(type: "TEXT", nullable: false),
+                    ModifiedDate = table.Column<DateTime>(type: "TEXT", nullable: false),
+                    ModifiedBy = table.Column<Guid>(type: "TEXT", nullable: false),
+                    DeletedDate = table.Column<DateTime>(type: "TEXT", nullable: true),
+                    DeletedBy = table.Column<Guid>(type: "TEXT", nullable: true),
+                    SyncVersion = table.Column<long>(type: "INTEGER", nullable: false),
+                    LastSyncedAt = table.Column<DateTime>(type: "TEXT", nullable: true),
+                    IsDeleted = table.Column<bool>(type: "INTEGER", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -1474,8 +1475,8 @@ namespace POS.Migrations.SqlServer.Migrations
                 name: "UserLocations",
                 columns: table => new
                 {
-                    UserId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    LocationId = table.Column<Guid>(type: "uniqueidentifier", nullable: false)
+                    UserId = table.Column<Guid>(type: "TEXT", nullable: false),
+                    LocationId = table.Column<Guid>(type: "TEXT", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -1498,21 +1499,21 @@ namespace POS.Migrations.SqlServer.Migrations
                 name: "Actions",
                 columns: table => new
                 {
-                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    Name = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    Order = table.Column<int>(type: "int", nullable: false),
-                    PageId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    Code = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    TenantId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    CreatedDate = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    CreatedBy = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    ModifiedDate = table.Column<DateTime>(type: "datetime2", nullable: false, defaultValueSql: "CURRENT_TIMESTAMP"),
-                    ModifiedBy = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    DeletedDate = table.Column<DateTime>(type: "datetime2", nullable: true),
-                    DeletedBy = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
-                    SyncVersion = table.Column<long>(type: "bigint", nullable: false),
-                    LastSyncedAt = table.Column<DateTime>(type: "datetime2", nullable: true),
-                    IsDeleted = table.Column<bool>(type: "bit", nullable: false)
+                    Id = table.Column<Guid>(type: "TEXT", nullable: false),
+                    Name = table.Column<string>(type: "TEXT", nullable: true),
+                    Order = table.Column<int>(type: "INTEGER", nullable: false),
+                    PageId = table.Column<Guid>(type: "TEXT", nullable: false),
+                    Code = table.Column<string>(type: "TEXT", nullable: true),
+                    TenantId = table.Column<Guid>(type: "TEXT", nullable: false),
+                    CreatedDate = table.Column<DateTime>(type: "TEXT", nullable: false),
+                    CreatedBy = table.Column<Guid>(type: "TEXT", nullable: false),
+                    ModifiedDate = table.Column<DateTime>(type: "TEXT", nullable: false, defaultValueSql: "CURRENT_TIMESTAMP"),
+                    ModifiedBy = table.Column<Guid>(type: "TEXT", nullable: false),
+                    DeletedDate = table.Column<DateTime>(type: "TEXT", nullable: true),
+                    DeletedBy = table.Column<Guid>(type: "TEXT", nullable: true),
+                    SyncVersion = table.Column<long>(type: "INTEGER", nullable: false),
+                    LastSyncedAt = table.Column<DateTime>(type: "TEXT", nullable: true),
+                    IsDeleted = table.Column<bool>(type: "INTEGER", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -1535,10 +1536,10 @@ namespace POS.Migrations.SqlServer.Migrations
                 name: "DailyReminders",
                 columns: table => new
                 {
-                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    ReminderId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    DayOfWeek = table.Column<int>(type: "int", nullable: false),
-                    IsActive = table.Column<bool>(type: "bit", nullable: false)
+                    Id = table.Column<Guid>(type: "TEXT", nullable: false),
+                    ReminderId = table.Column<Guid>(type: "TEXT", nullable: false),
+                    DayOfWeek = table.Column<int>(type: "INTEGER", nullable: false),
+                    IsActive = table.Column<bool>(type: "INTEGER", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -1555,11 +1556,11 @@ namespace POS.Migrations.SqlServer.Migrations
                 name: "HalfYearlyReminders",
                 columns: table => new
                 {
-                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    ReminderId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    Day = table.Column<int>(type: "int", nullable: false),
-                    Month = table.Column<int>(type: "int", nullable: false),
-                    Quarter = table.Column<int>(type: "int", nullable: false)
+                    Id = table.Column<Guid>(type: "TEXT", nullable: false),
+                    ReminderId = table.Column<Guid>(type: "TEXT", nullable: false),
+                    Day = table.Column<int>(type: "INTEGER", nullable: false),
+                    Month = table.Column<int>(type: "INTEGER", nullable: false),
+                    Quarter = table.Column<int>(type: "INTEGER", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -1576,11 +1577,11 @@ namespace POS.Migrations.SqlServer.Migrations
                 name: "QuarterlyReminders",
                 columns: table => new
                 {
-                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    ReminderId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    Day = table.Column<int>(type: "int", nullable: false),
-                    Month = table.Column<int>(type: "int", nullable: false),
-                    Quarter = table.Column<int>(type: "int", nullable: false)
+                    Id = table.Column<Guid>(type: "TEXT", nullable: false),
+                    ReminderId = table.Column<Guid>(type: "TEXT", nullable: false),
+                    Day = table.Column<int>(type: "INTEGER", nullable: false),
+                    Month = table.Column<int>(type: "INTEGER", nullable: false),
+                    Quarter = table.Column<int>(type: "INTEGER", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -1597,13 +1598,13 @@ namespace POS.Migrations.SqlServer.Migrations
                 name: "ReminderNotifications",
                 columns: table => new
                 {
-                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    ReminderId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    Subject = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    Description = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    FetchDateTime = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    IsDeleted = table.Column<bool>(type: "bit", nullable: false),
-                    IsEmailNotification = table.Column<bool>(type: "bit", nullable: false)
+                    Id = table.Column<Guid>(type: "TEXT", nullable: false),
+                    ReminderId = table.Column<Guid>(type: "TEXT", nullable: false),
+                    Subject = table.Column<string>(type: "TEXT", nullable: true),
+                    Description = table.Column<string>(type: "TEXT", nullable: true),
+                    FetchDateTime = table.Column<DateTime>(type: "TEXT", nullable: false),
+                    IsDeleted = table.Column<bool>(type: "INTEGER", nullable: false),
+                    IsEmailNotification = table.Column<bool>(type: "INTEGER", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -1620,8 +1621,8 @@ namespace POS.Migrations.SqlServer.Migrations
                 name: "ReminderUsers",
                 columns: table => new
                 {
-                    ReminderId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    UserId = table.Column<Guid>(type: "uniqueidentifier", nullable: false)
+                    ReminderId = table.Column<Guid>(type: "TEXT", nullable: false),
+                    UserId = table.Column<Guid>(type: "TEXT", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -1643,8 +1644,8 @@ namespace POS.Migrations.SqlServer.Migrations
                 name: "UserRoles",
                 columns: table => new
                 {
-                    UserId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    RoleId = table.Column<Guid>(type: "uniqueidentifier", nullable: false)
+                    UserId = table.Column<Guid>(type: "TEXT", nullable: false),
+                    RoleId = table.Column<Guid>(type: "TEXT", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -1667,19 +1668,19 @@ namespace POS.Migrations.SqlServer.Migrations
                 name: "VariantItems",
                 columns: table => new
                 {
-                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    Name = table.Column<string>(type: "nvarchar(200)", maxLength: 200, nullable: true),
-                    VariantId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    TenantId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    CreatedDate = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    CreatedBy = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    ModifiedDate = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    ModifiedBy = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    DeletedDate = table.Column<DateTime>(type: "datetime2", nullable: true),
-                    DeletedBy = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
-                    SyncVersion = table.Column<long>(type: "bigint", nullable: false),
-                    LastSyncedAt = table.Column<DateTime>(type: "datetime2", nullable: true),
-                    IsDeleted = table.Column<bool>(type: "bit", nullable: false)
+                    Id = table.Column<Guid>(type: "TEXT", nullable: false),
+                    Name = table.Column<string>(type: "TEXT", maxLength: 200, nullable: true),
+                    VariantId = table.Column<Guid>(type: "TEXT", nullable: false),
+                    TenantId = table.Column<Guid>(type: "TEXT", nullable: false),
+                    CreatedDate = table.Column<DateTime>(type: "TEXT", nullable: false),
+                    CreatedBy = table.Column<Guid>(type: "TEXT", nullable: false),
+                    ModifiedDate = table.Column<DateTime>(type: "TEXT", nullable: false),
+                    ModifiedBy = table.Column<Guid>(type: "TEXT", nullable: false),
+                    DeletedDate = table.Column<DateTime>(type: "TEXT", nullable: true),
+                    DeletedBy = table.Column<Guid>(type: "TEXT", nullable: true),
+                    SyncVersion = table.Column<long>(type: "INTEGER", nullable: false),
+                    LastSyncedAt = table.Column<DateTime>(type: "TEXT", nullable: true),
+                    IsDeleted = table.Column<bool>(type: "INTEGER", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -1702,32 +1703,32 @@ namespace POS.Migrations.SqlServer.Migrations
                 name: "Inquiries",
                 columns: table => new
                 {
-                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    CompanyName = table.Column<string>(type: "nvarchar(200)", maxLength: 200, nullable: true),
-                    ContactPerson = table.Column<string>(type: "nvarchar(200)", maxLength: 200, nullable: true),
-                    Email = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: true),
-                    Phone = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: true),
-                    MobileNo = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: true),
-                    Address = table.Column<string>(type: "nvarchar(500)", maxLength: 500, nullable: true),
-                    Message = table.Column<string>(type: "nvarchar(4000)", maxLength: 4000, nullable: true),
-                    CityName = table.Column<string>(type: "nvarchar(200)", maxLength: 200, nullable: true),
-                    Website = table.Column<string>(type: "nvarchar(500)", maxLength: 500, nullable: true),
-                    CountryName = table.Column<string>(type: "nvarchar(200)", maxLength: 200, nullable: true),
-                    CityId = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
-                    CountryId = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
-                    AssignTo = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
-                    InquiryStatusId = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
-                    InquirySourceId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    TenantId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    CreatedDate = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    CreatedBy = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    ModifiedDate = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    ModifiedBy = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    DeletedDate = table.Column<DateTime>(type: "datetime2", nullable: true),
-                    DeletedBy = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
-                    SyncVersion = table.Column<long>(type: "bigint", nullable: false),
-                    LastSyncedAt = table.Column<DateTime>(type: "datetime2", nullable: true),
-                    IsDeleted = table.Column<bool>(type: "bit", nullable: false)
+                    Id = table.Column<Guid>(type: "TEXT", nullable: false),
+                    CompanyName = table.Column<string>(type: "TEXT", maxLength: 200, nullable: true),
+                    ContactPerson = table.Column<string>(type: "TEXT", maxLength: 200, nullable: true),
+                    Email = table.Column<string>(type: "TEXT", maxLength: 256, nullable: true),
+                    Phone = table.Column<string>(type: "TEXT", maxLength: 50, nullable: true),
+                    MobileNo = table.Column<string>(type: "TEXT", maxLength: 50, nullable: true),
+                    Address = table.Column<string>(type: "TEXT", maxLength: 500, nullable: true),
+                    Message = table.Column<string>(type: "TEXT", maxLength: 4000, nullable: true),
+                    CityName = table.Column<string>(type: "TEXT", maxLength: 200, nullable: true),
+                    Website = table.Column<string>(type: "TEXT", maxLength: 500, nullable: true),
+                    CountryName = table.Column<string>(type: "TEXT", maxLength: 200, nullable: true),
+                    CityId = table.Column<Guid>(type: "TEXT", nullable: true),
+                    CountryId = table.Column<Guid>(type: "TEXT", nullable: true),
+                    AssignTo = table.Column<Guid>(type: "TEXT", nullable: true),
+                    InquiryStatusId = table.Column<Guid>(type: "TEXT", nullable: true),
+                    InquirySourceId = table.Column<Guid>(type: "TEXT", nullable: false),
+                    TenantId = table.Column<Guid>(type: "TEXT", nullable: false),
+                    CreatedDate = table.Column<DateTime>(type: "TEXT", nullable: false),
+                    CreatedBy = table.Column<Guid>(type: "TEXT", nullable: false),
+                    ModifiedDate = table.Column<DateTime>(type: "TEXT", nullable: false),
+                    ModifiedBy = table.Column<Guid>(type: "TEXT", nullable: false),
+                    DeletedDate = table.Column<DateTime>(type: "TEXT", nullable: true),
+                    DeletedBy = table.Column<Guid>(type: "TEXT", nullable: true),
+                    SyncVersion = table.Column<long>(type: "INTEGER", nullable: false),
+                    LastSyncedAt = table.Column<DateTime>(type: "TEXT", nullable: true),
+                    IsDeleted = table.Column<bool>(type: "INTEGER", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -1770,13 +1771,13 @@ namespace POS.Migrations.SqlServer.Migrations
                 name: "SupplierAddresses",
                 columns: table => new
                 {
-                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    Address = table.Column<string>(type: "nvarchar(500)", maxLength: 500, nullable: true),
-                    CountryName = table.Column<string>(type: "nvarchar(200)", maxLength: 200, nullable: true),
-                    CityName = table.Column<string>(type: "nvarchar(200)", maxLength: 200, nullable: true),
-                    CountryId = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
-                    CityId = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
-                    IsDeleted = table.Column<bool>(type: "bit", nullable: false)
+                    Id = table.Column<Guid>(type: "TEXT", nullable: false),
+                    Address = table.Column<string>(type: "TEXT", maxLength: 500, nullable: true),
+                    CountryName = table.Column<string>(type: "TEXT", maxLength: 200, nullable: true),
+                    CityName = table.Column<string>(type: "TEXT", maxLength: 200, nullable: true),
+                    CountryId = table.Column<Guid>(type: "TEXT", nullable: true),
+                    CityId = table.Column<Guid>(type: "TEXT", nullable: true),
+                    IsDeleted = table.Column<bool>(type: "INTEGER", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -1797,20 +1798,20 @@ namespace POS.Migrations.SqlServer.Migrations
                 name: "ExpenseTaxes",
                 columns: table => new
                 {
-                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    ExpenseId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    TaxId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    Id = table.Column<Guid>(type: "TEXT", nullable: false),
+                    ExpenseId = table.Column<Guid>(type: "TEXT", nullable: false),
+                    TaxId = table.Column<Guid>(type: "TEXT", nullable: false),
                     TaxValue = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
-                    TenantId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    CreatedDate = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    CreatedBy = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    ModifiedDate = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    ModifiedBy = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    DeletedDate = table.Column<DateTime>(type: "datetime2", nullable: true),
-                    DeletedBy = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
-                    SyncVersion = table.Column<long>(type: "bigint", nullable: false),
-                    LastSyncedAt = table.Column<DateTime>(type: "datetime2", nullable: true),
-                    IsDeleted = table.Column<bool>(type: "bit", nullable: false)
+                    TenantId = table.Column<Guid>(type: "TEXT", nullable: false),
+                    CreatedDate = table.Column<DateTime>(type: "TEXT", nullable: false),
+                    CreatedBy = table.Column<Guid>(type: "TEXT", nullable: false),
+                    ModifiedDate = table.Column<DateTime>(type: "TEXT", nullable: false),
+                    ModifiedBy = table.Column<Guid>(type: "TEXT", nullable: false),
+                    DeletedDate = table.Column<DateTime>(type: "TEXT", nullable: true),
+                    DeletedBy = table.Column<Guid>(type: "TEXT", nullable: true),
+                    SyncVersion = table.Column<long>(type: "INTEGER", nullable: false),
+                    LastSyncedAt = table.Column<DateTime>(type: "TEXT", nullable: true),
+                    IsDeleted = table.Column<bool>(type: "INTEGER", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -1839,22 +1840,22 @@ namespace POS.Migrations.SqlServer.Migrations
                 name: "LoanRepayments",
                 columns: table => new
                 {
-                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    LoanDetailId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    Id = table.Column<Guid>(type: "TEXT", nullable: false),
+                    LoanDetailId = table.Column<Guid>(type: "TEXT", nullable: false),
                     PricipalAmount = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
                     InterestAmount = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
-                    PaymentDate = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    Note = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    TenantId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    CreatedDate = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    CreatedBy = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    ModifiedDate = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    ModifiedBy = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    DeletedDate = table.Column<DateTime>(type: "datetime2", nullable: true),
-                    DeletedBy = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
-                    SyncVersion = table.Column<long>(type: "bigint", nullable: false),
-                    LastSyncedAt = table.Column<DateTime>(type: "datetime2", nullable: true),
-                    IsDeleted = table.Column<bool>(type: "bit", nullable: false)
+                    PaymentDate = table.Column<DateTime>(type: "TEXT", nullable: false),
+                    Note = table.Column<string>(type: "TEXT", nullable: true),
+                    TenantId = table.Column<Guid>(type: "TEXT", nullable: false),
+                    CreatedDate = table.Column<DateTime>(type: "TEXT", nullable: false),
+                    CreatedBy = table.Column<Guid>(type: "TEXT", nullable: false),
+                    ModifiedDate = table.Column<DateTime>(type: "TEXT", nullable: false),
+                    ModifiedBy = table.Column<Guid>(type: "TEXT", nullable: false),
+                    DeletedDate = table.Column<DateTime>(type: "TEXT", nullable: true),
+                    DeletedBy = table.Column<Guid>(type: "TEXT", nullable: true),
+                    SyncVersion = table.Column<long>(type: "INTEGER", nullable: false),
+                    LastSyncedAt = table.Column<DateTime>(type: "TEXT", nullable: true),
+                    IsDeleted = table.Column<bool>(type: "INTEGER", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -1876,26 +1877,26 @@ namespace POS.Migrations.SqlServer.Migrations
                 name: "FBRSubmissionLogs",
                 columns: table => new
                 {
-                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    SalesOrderId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    AttemptedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    Status = table.Column<int>(type: "int", nullable: false),
-                    RequestPayload = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    ResponsePayload = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    HttpStatusCode = table.Column<int>(type: "int", nullable: false),
-                    ErrorMessage = table.Column<string>(type: "nvarchar(1000)", maxLength: 1000, nullable: true),
-                    ResponseTime = table.Column<TimeSpan>(type: "time", nullable: false),
-                    SubmittedBy = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: true),
-                    TenantId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    CreatedDate = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    CreatedBy = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    ModifiedDate = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    ModifiedBy = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    DeletedDate = table.Column<DateTime>(type: "datetime2", nullable: true),
-                    DeletedBy = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
-                    SyncVersion = table.Column<long>(type: "bigint", nullable: false),
-                    LastSyncedAt = table.Column<DateTime>(type: "datetime2", nullable: true),
-                    IsDeleted = table.Column<bool>(type: "bit", nullable: false)
+                    Id = table.Column<Guid>(type: "TEXT", nullable: false),
+                    SalesOrderId = table.Column<Guid>(type: "TEXT", nullable: false),
+                    AttemptedAt = table.Column<DateTime>(type: "TEXT", nullable: false),
+                    Status = table.Column<int>(type: "INTEGER", nullable: false),
+                    RequestPayload = table.Column<string>(type: "TEXT", nullable: true),
+                    ResponsePayload = table.Column<string>(type: "TEXT", nullable: true),
+                    HttpStatusCode = table.Column<int>(type: "INTEGER", nullable: false),
+                    ErrorMessage = table.Column<string>(type: "TEXT", maxLength: 1000, nullable: true),
+                    ResponseTime = table.Column<TimeSpan>(type: "TEXT", nullable: false),
+                    SubmittedBy = table.Column<string>(type: "TEXT", maxLength: 50, nullable: true),
+                    TenantId = table.Column<Guid>(type: "TEXT", nullable: false),
+                    CreatedDate = table.Column<DateTime>(type: "TEXT", nullable: false),
+                    CreatedBy = table.Column<Guid>(type: "TEXT", nullable: false),
+                    ModifiedDate = table.Column<DateTime>(type: "TEXT", nullable: false),
+                    ModifiedBy = table.Column<Guid>(type: "TEXT", nullable: false),
+                    DeletedDate = table.Column<DateTime>(type: "TEXT", nullable: true),
+                    DeletedBy = table.Column<Guid>(type: "TEXT", nullable: true),
+                    SyncVersion = table.Column<long>(type: "INTEGER", nullable: false),
+                    LastSyncedAt = table.Column<DateTime>(type: "TEXT", nullable: true),
+                    IsDeleted = table.Column<bool>(type: "INTEGER", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -1918,25 +1919,25 @@ namespace POS.Migrations.SqlServer.Migrations
                 name: "SalesOrderPayments",
                 columns: table => new
                 {
-                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    SalesOrderId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    PaymentDate = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    ReferenceNumber = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: true),
+                    Id = table.Column<Guid>(type: "TEXT", nullable: false),
+                    SalesOrderId = table.Column<Guid>(type: "TEXT", nullable: false),
+                    PaymentDate = table.Column<DateTime>(type: "TEXT", nullable: false),
+                    ReferenceNumber = table.Column<string>(type: "TEXT", maxLength: 50, nullable: true),
                     Amount = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
-                    PaymentMethod = table.Column<int>(type: "int", nullable: false),
-                    Note = table.Column<string>(type: "nvarchar(1000)", maxLength: 1000, nullable: true),
-                    AttachmentUrl = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    PaymentType = table.Column<int>(type: "int", nullable: false),
-                    TenantId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    CreatedDate = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    CreatedBy = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    ModifiedDate = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    ModifiedBy = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    DeletedDate = table.Column<DateTime>(type: "datetime2", nullable: true),
-                    DeletedBy = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
-                    SyncVersion = table.Column<long>(type: "bigint", nullable: false),
-                    LastSyncedAt = table.Column<DateTime>(type: "datetime2", nullable: true),
-                    IsDeleted = table.Column<bool>(type: "bit", nullable: false)
+                    PaymentMethod = table.Column<int>(type: "INTEGER", nullable: false),
+                    Note = table.Column<string>(type: "TEXT", maxLength: 1000, nullable: true),
+                    AttachmentUrl = table.Column<string>(type: "TEXT", nullable: true),
+                    PaymentType = table.Column<int>(type: "INTEGER", nullable: false),
+                    TenantId = table.Column<Guid>(type: "TEXT", nullable: false),
+                    CreatedDate = table.Column<DateTime>(type: "TEXT", nullable: false),
+                    CreatedBy = table.Column<Guid>(type: "TEXT", nullable: false),
+                    ModifiedDate = table.Column<DateTime>(type: "TEXT", nullable: false),
+                    ModifiedBy = table.Column<Guid>(type: "TEXT", nullable: false),
+                    DeletedDate = table.Column<DateTime>(type: "TEXT", nullable: true),
+                    DeletedBy = table.Column<Guid>(type: "TEXT", nullable: true),
+                    SyncVersion = table.Column<long>(type: "INTEGER", nullable: false),
+                    LastSyncedAt = table.Column<DateTime>(type: "TEXT", nullable: true),
+                    IsDeleted = table.Column<bool>(type: "INTEGER", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -1959,27 +1960,27 @@ namespace POS.Migrations.SqlServer.Migrations
                 name: "AccountingEntries",
                 columns: table => new
                 {
-                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    TransactionId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    BranchId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    DebitLedgerAccountId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    CreditLedgerAccountId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    Id = table.Column<Guid>(type: "TEXT", nullable: false),
+                    TransactionId = table.Column<Guid>(type: "TEXT", nullable: false),
+                    BranchId = table.Column<Guid>(type: "TEXT", nullable: false),
+                    DebitLedgerAccountId = table.Column<Guid>(type: "TEXT", nullable: false),
+                    CreditLedgerAccountId = table.Column<Guid>(type: "TEXT", nullable: false),
                     Amount = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
-                    Narration = table.Column<string>(type: "nvarchar(500)", maxLength: 500, nullable: true),
-                    Reference = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: true),
-                    EntryDate = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    EntryType = table.Column<int>(type: "int", nullable: false),
-                    FinancialYearId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    TenantId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    CreatedDate = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    CreatedBy = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    ModifiedDate = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    ModifiedBy = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    DeletedDate = table.Column<DateTime>(type: "datetime2", nullable: true),
-                    DeletedBy = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
-                    SyncVersion = table.Column<long>(type: "bigint", nullable: false),
-                    LastSyncedAt = table.Column<DateTime>(type: "datetime2", nullable: true),
-                    IsDeleted = table.Column<bool>(type: "bit", nullable: false)
+                    Narration = table.Column<string>(type: "TEXT", maxLength: 500, nullable: true),
+                    Reference = table.Column<string>(type: "TEXT", maxLength: 50, nullable: true),
+                    EntryDate = table.Column<DateTime>(type: "TEXT", nullable: false),
+                    EntryType = table.Column<int>(type: "INTEGER", nullable: false),
+                    FinancialYearId = table.Column<Guid>(type: "TEXT", nullable: false),
+                    TenantId = table.Column<Guid>(type: "TEXT", nullable: false),
+                    CreatedDate = table.Column<DateTime>(type: "TEXT", nullable: false),
+                    CreatedBy = table.Column<Guid>(type: "TEXT", nullable: false),
+                    ModifiedDate = table.Column<DateTime>(type: "TEXT", nullable: false),
+                    ModifiedBy = table.Column<Guid>(type: "TEXT", nullable: false),
+                    DeletedDate = table.Column<DateTime>(type: "TEXT", nullable: true),
+                    DeletedBy = table.Column<Guid>(type: "TEXT", nullable: true),
+                    SyncVersion = table.Column<long>(type: "INTEGER", nullable: false),
+                    LastSyncedAt = table.Column<DateTime>(type: "TEXT", nullable: true),
+                    IsDeleted = table.Column<bool>(type: "INTEGER", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -2024,16 +2025,16 @@ namespace POS.Migrations.SqlServer.Migrations
                 name: "PaymentEntries",
                 columns: table => new
                 {
-                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    TransactionId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    BranchId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    PaymentMethod = table.Column<int>(type: "int", nullable: false),
+                    Id = table.Column<Guid>(type: "TEXT", nullable: false),
+                    TransactionId = table.Column<Guid>(type: "TEXT", nullable: false),
+                    BranchId = table.Column<Guid>(type: "TEXT", nullable: false),
+                    PaymentMethod = table.Column<int>(type: "INTEGER", nullable: false),
                     Amount = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
-                    PaymentDate = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    ReferenceNumber = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: true),
-                    Narration = table.Column<string>(type: "nvarchar(500)", maxLength: 500, nullable: true),
-                    Status = table.Column<int>(type: "int", nullable: false),
-                    CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false)
+                    PaymentDate = table.Column<DateTime>(type: "TEXT", nullable: false),
+                    ReferenceNumber = table.Column<string>(type: "TEXT", maxLength: 100, nullable: true),
+                    Narration = table.Column<string>(type: "TEXT", maxLength: 500, nullable: true),
+                    Status = table.Column<int>(type: "INTEGER", nullable: false),
+                    CreatedAt = table.Column<DateTime>(type: "TEXT", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -2055,24 +2056,24 @@ namespace POS.Migrations.SqlServer.Migrations
                 name: "TaxEntries",
                 columns: table => new
                 {
-                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    TransactionId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    BranchId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    TaxType = table.Column<int>(type: "int", nullable: false),
+                    Id = table.Column<Guid>(type: "TEXT", nullable: false),
+                    TransactionId = table.Column<Guid>(type: "TEXT", nullable: false),
+                    BranchId = table.Column<Guid>(type: "TEXT", nullable: false),
+                    TaxType = table.Column<int>(type: "INTEGER", nullable: false),
                     TaxPercentage = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
                     TaxableAmount = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
                     TaxAmount = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
-                    TaxDescription = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: true),
-                    TenantId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    CreatedDate = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    CreatedBy = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    ModifiedDate = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    ModifiedBy = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    DeletedDate = table.Column<DateTime>(type: "datetime2", nullable: true),
-                    DeletedBy = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
-                    SyncVersion = table.Column<long>(type: "bigint", nullable: false),
-                    LastSyncedAt = table.Column<DateTime>(type: "datetime2", nullable: true),
-                    IsDeleted = table.Column<bool>(type: "bit", nullable: false)
+                    TaxDescription = table.Column<string>(type: "TEXT", maxLength: 50, nullable: true),
+                    TenantId = table.Column<Guid>(type: "TEXT", nullable: false),
+                    CreatedDate = table.Column<DateTime>(type: "TEXT", nullable: false),
+                    CreatedBy = table.Column<Guid>(type: "TEXT", nullable: false),
+                    ModifiedDate = table.Column<DateTime>(type: "TEXT", nullable: false),
+                    ModifiedBy = table.Column<Guid>(type: "TEXT", nullable: false),
+                    DeletedDate = table.Column<DateTime>(type: "TEXT", nullable: true),
+                    DeletedBy = table.Column<Guid>(type: "TEXT", nullable: true),
+                    SyncVersion = table.Column<long>(type: "INTEGER", nullable: false),
+                    LastSyncedAt = table.Column<DateTime>(type: "TEXT", nullable: true),
+                    IsDeleted = table.Column<bool>(type: "INTEGER", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -2100,12 +2101,12 @@ namespace POS.Migrations.SqlServer.Migrations
                 name: "RoleClaims",
                 columns: table => new
                 {
-                    Id = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    ActionId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    RoleId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    ClaimType = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    ClaimValue = table.Column<string>(type: "nvarchar(max)", nullable: true)
+                    Id = table.Column<int>(type: "INTEGER", nullable: false)
+                        .Annotation("Sqlite:Autoincrement", true),
+                    ActionId = table.Column<Guid>(type: "TEXT", nullable: false),
+                    RoleId = table.Column<Guid>(type: "TEXT", nullable: false),
+                    ClaimType = table.Column<string>(type: "TEXT", nullable: true),
+                    ClaimValue = table.Column<string>(type: "TEXT", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -2128,12 +2129,12 @@ namespace POS.Migrations.SqlServer.Migrations
                 name: "UserClaims",
                 columns: table => new
                 {
-                    Id = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    ActionId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    UserId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    ClaimType = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    ClaimValue = table.Column<string>(type: "nvarchar(max)", nullable: true)
+                    Id = table.Column<int>(type: "INTEGER", nullable: false)
+                        .Annotation("Sqlite:Autoincrement", true),
+                    ActionId = table.Column<Guid>(type: "TEXT", nullable: false),
+                    UserId = table.Column<Guid>(type: "TEXT", nullable: false),
+                    ClaimType = table.Column<string>(type: "TEXT", nullable: true),
+                    ClaimValue = table.Column<string>(type: "TEXT", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -2156,39 +2157,39 @@ namespace POS.Migrations.SqlServer.Migrations
                 name: "Products",
                 columns: table => new
                 {
-                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    Name = table.Column<string>(type: "nvarchar(200)", maxLength: 200, nullable: true),
-                    Code = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: true),
-                    Barcode = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: true),
-                    SkuCode = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: true),
-                    SkuName = table.Column<string>(type: "nvarchar(200)", maxLength: 200, nullable: true),
-                    Description = table.Column<string>(type: "nvarchar(4000)", maxLength: 4000, nullable: true),
-                    ProductUrl = table.Column<string>(type: "nvarchar(500)", maxLength: 500, nullable: true),
-                    UnitId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    Id = table.Column<Guid>(type: "TEXT", nullable: false),
+                    Name = table.Column<string>(type: "TEXT", maxLength: 200, nullable: true),
+                    Code = table.Column<string>(type: "TEXT", maxLength: 100, nullable: true),
+                    Barcode = table.Column<string>(type: "TEXT", maxLength: 100, nullable: true),
+                    SkuCode = table.Column<string>(type: "TEXT", maxLength: 100, nullable: true),
+                    SkuName = table.Column<string>(type: "TEXT", maxLength: 200, nullable: true),
+                    Description = table.Column<string>(type: "TEXT", maxLength: 4000, nullable: true),
+                    ProductUrl = table.Column<string>(type: "TEXT", maxLength: 500, nullable: true),
+                    UnitId = table.Column<Guid>(type: "TEXT", nullable: false),
                     PurchasePrice = table.Column<decimal>(type: "decimal(18,2)", nullable: true),
                     Margin = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
-                    IsMarginIncludeTax = table.Column<bool>(type: "bit", nullable: false),
+                    IsMarginIncludeTax = table.Column<bool>(type: "INTEGER", nullable: false),
                     SalesPrice = table.Column<decimal>(type: "decimal(18,2)", nullable: true),
                     Mrp = table.Column<decimal>(type: "decimal(18,2)", nullable: true),
                     TaxAmount = table.Column<decimal>(type: "decimal(18,2)", nullable: true),
-                    CategoryId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    BrandId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    HasVariant = table.Column<bool>(type: "bit", nullable: false),
-                    ParentId = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
-                    VariantId = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
-                    VariantItemId = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
+                    CategoryId = table.Column<Guid>(type: "TEXT", nullable: false),
+                    BrandId = table.Column<Guid>(type: "TEXT", nullable: true),
+                    HasVariant = table.Column<bool>(type: "INTEGER", nullable: false),
+                    ParentId = table.Column<Guid>(type: "TEXT", nullable: true),
+                    VariantId = table.Column<Guid>(type: "TEXT", nullable: true),
+                    VariantItemId = table.Column<Guid>(type: "TEXT", nullable: true),
                     AlertQuantity = table.Column<decimal>(type: "decimal(18,2)", nullable: true),
                     CurrentStock = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
-                    TenantId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    CreatedDate = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    CreatedBy = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    ModifiedDate = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    ModifiedBy = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    DeletedDate = table.Column<DateTime>(type: "datetime2", nullable: true),
-                    DeletedBy = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
-                    SyncVersion = table.Column<long>(type: "bigint", nullable: false),
-                    LastSyncedAt = table.Column<DateTime>(type: "datetime2", nullable: true),
-                    IsDeleted = table.Column<bool>(type: "bit", nullable: false)
+                    TenantId = table.Column<Guid>(type: "TEXT", nullable: false),
+                    CreatedDate = table.Column<DateTime>(type: "TEXT", nullable: false),
+                    CreatedBy = table.Column<Guid>(type: "TEXT", nullable: false),
+                    ModifiedDate = table.Column<DateTime>(type: "TEXT", nullable: false),
+                    ModifiedBy = table.Column<Guid>(type: "TEXT", nullable: false),
+                    DeletedDate = table.Column<DateTime>(type: "TEXT", nullable: true),
+                    DeletedBy = table.Column<Guid>(type: "TEXT", nullable: true),
+                    SyncVersion = table.Column<long>(type: "INTEGER", nullable: false),
+                    LastSyncedAt = table.Column<DateTime>(type: "TEXT", nullable: true),
+                    IsDeleted = table.Column<bool>(type: "INTEGER", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -2197,8 +2198,7 @@ namespace POS.Migrations.SqlServer.Migrations
                         name: "FK_Products_Brands_BrandId",
                         column: x => x.BrandId,
                         principalTable: "Brands",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
+                        principalColumn: "Id");
                     table.ForeignKey(
                         name: "FK_Products_ProductCategories_CategoryId",
                         column: x => x.CategoryId,
@@ -2238,24 +2238,24 @@ namespace POS.Migrations.SqlServer.Migrations
                 name: "InquiryActivities",
                 columns: table => new
                 {
-                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    Subject = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    Description = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    DueDate = table.Column<DateTime>(type: "datetime2", nullable: true),
-                    IsOpen = table.Column<bool>(type: "bit", nullable: false),
-                    AssignTo = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
-                    Priority = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    InquiryId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    TenantId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    CreatedDate = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    CreatedBy = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    ModifiedDate = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    ModifiedBy = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    DeletedDate = table.Column<DateTime>(type: "datetime2", nullable: true),
-                    DeletedBy = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
-                    SyncVersion = table.Column<long>(type: "bigint", nullable: false),
-                    LastSyncedAt = table.Column<DateTime>(type: "datetime2", nullable: true),
-                    IsDeleted = table.Column<bool>(type: "bit", nullable: false)
+                    Id = table.Column<Guid>(type: "TEXT", nullable: false),
+                    Subject = table.Column<string>(type: "TEXT", nullable: true),
+                    Description = table.Column<string>(type: "TEXT", nullable: true),
+                    DueDate = table.Column<DateTime>(type: "TEXT", nullable: true),
+                    IsOpen = table.Column<bool>(type: "INTEGER", nullable: false),
+                    AssignTo = table.Column<Guid>(type: "TEXT", nullable: true),
+                    Priority = table.Column<string>(type: "TEXT", nullable: true),
+                    InquiryId = table.Column<Guid>(type: "TEXT", nullable: false),
+                    TenantId = table.Column<Guid>(type: "TEXT", nullable: false),
+                    CreatedDate = table.Column<DateTime>(type: "TEXT", nullable: false),
+                    CreatedBy = table.Column<Guid>(type: "TEXT", nullable: false),
+                    ModifiedDate = table.Column<DateTime>(type: "TEXT", nullable: false),
+                    ModifiedBy = table.Column<Guid>(type: "TEXT", nullable: false),
+                    DeletedDate = table.Column<DateTime>(type: "TEXT", nullable: true),
+                    DeletedBy = table.Column<Guid>(type: "TEXT", nullable: true),
+                    SyncVersion = table.Column<long>(type: "INTEGER", nullable: false),
+                    LastSyncedAt = table.Column<DateTime>(type: "TEXT", nullable: true),
+                    IsDeleted = table.Column<bool>(type: "INTEGER", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -2283,20 +2283,20 @@ namespace POS.Migrations.SqlServer.Migrations
                 name: "InquiryAttachments",
                 columns: table => new
                 {
-                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    InquiryId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    Path = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    Name = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    TenantId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    CreatedDate = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    CreatedBy = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    ModifiedDate = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    ModifiedBy = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    DeletedDate = table.Column<DateTime>(type: "datetime2", nullable: true),
-                    DeletedBy = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
-                    SyncVersion = table.Column<long>(type: "bigint", nullable: false),
-                    LastSyncedAt = table.Column<DateTime>(type: "datetime2", nullable: true),
-                    IsDeleted = table.Column<bool>(type: "bit", nullable: false)
+                    Id = table.Column<Guid>(type: "TEXT", nullable: false),
+                    InquiryId = table.Column<Guid>(type: "TEXT", nullable: false),
+                    Path = table.Column<string>(type: "TEXT", nullable: true),
+                    Name = table.Column<string>(type: "TEXT", nullable: true),
+                    TenantId = table.Column<Guid>(type: "TEXT", nullable: false),
+                    CreatedDate = table.Column<DateTime>(type: "TEXT", nullable: false),
+                    CreatedBy = table.Column<Guid>(type: "TEXT", nullable: false),
+                    ModifiedDate = table.Column<DateTime>(type: "TEXT", nullable: false),
+                    ModifiedBy = table.Column<Guid>(type: "TEXT", nullable: false),
+                    DeletedDate = table.Column<DateTime>(type: "TEXT", nullable: true),
+                    DeletedBy = table.Column<Guid>(type: "TEXT", nullable: true),
+                    SyncVersion = table.Column<long>(type: "INTEGER", nullable: false),
+                    LastSyncedAt = table.Column<DateTime>(type: "TEXT", nullable: true),
+                    IsDeleted = table.Column<bool>(type: "INTEGER", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -2319,19 +2319,19 @@ namespace POS.Migrations.SqlServer.Migrations
                 name: "InquiryNotes",
                 columns: table => new
                 {
-                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    InquiryId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    Note = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    TenantId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    CreatedDate = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    CreatedBy = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    ModifiedDate = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    ModifiedBy = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    DeletedDate = table.Column<DateTime>(type: "datetime2", nullable: true),
-                    DeletedBy = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
-                    SyncVersion = table.Column<long>(type: "bigint", nullable: false),
-                    LastSyncedAt = table.Column<DateTime>(type: "datetime2", nullable: true),
-                    IsDeleted = table.Column<bool>(type: "bit", nullable: false)
+                    Id = table.Column<Guid>(type: "TEXT", nullable: false),
+                    InquiryId = table.Column<Guid>(type: "TEXT", nullable: false),
+                    Note = table.Column<string>(type: "TEXT", nullable: true),
+                    TenantId = table.Column<Guid>(type: "TEXT", nullable: false),
+                    CreatedDate = table.Column<DateTime>(type: "TEXT", nullable: false),
+                    CreatedBy = table.Column<Guid>(type: "TEXT", nullable: false),
+                    ModifiedDate = table.Column<DateTime>(type: "TEXT", nullable: false),
+                    ModifiedBy = table.Column<Guid>(type: "TEXT", nullable: false),
+                    DeletedDate = table.Column<DateTime>(type: "TEXT", nullable: true),
+                    DeletedBy = table.Column<Guid>(type: "TEXT", nullable: true),
+                    SyncVersion = table.Column<long>(type: "INTEGER", nullable: false),
+                    LastSyncedAt = table.Column<DateTime>(type: "TEXT", nullable: true),
+                    IsDeleted = table.Column<bool>(type: "INTEGER", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -2354,29 +2354,29 @@ namespace POS.Migrations.SqlServer.Migrations
                 name: "Suppliers",
                 columns: table => new
                 {
-                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    SupplierName = table.Column<string>(type: "nvarchar(250)", maxLength: 250, nullable: true),
-                    ContactPerson = table.Column<string>(type: "nvarchar(200)", maxLength: 200, nullable: true),
-                    Email = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: true),
-                    Fax = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: true),
-                    MobileNo = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: true),
-                    PhoneNo = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: true),
-                    Website = table.Column<string>(type: "nvarchar(500)", maxLength: 500, nullable: true),
-                    Description = table.Column<string>(type: "nvarchar(2000)", maxLength: 2000, nullable: true),
-                    Url = table.Column<string>(type: "nvarchar(500)", maxLength: 500, nullable: true),
-                    BillingAddressId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    ShippingAddressId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    TaxNumber = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: true),
-                    TenantId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    CreatedDate = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    CreatedBy = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    ModifiedDate = table.Column<DateTime>(type: "datetime2", nullable: false, defaultValueSql: "CURRENT_TIMESTAMP"),
-                    ModifiedBy = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    DeletedDate = table.Column<DateTime>(type: "datetime2", nullable: true),
-                    DeletedBy = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
-                    SyncVersion = table.Column<long>(type: "bigint", nullable: false),
-                    LastSyncedAt = table.Column<DateTime>(type: "datetime2", nullable: true),
-                    IsDeleted = table.Column<bool>(type: "bit", nullable: false)
+                    Id = table.Column<Guid>(type: "TEXT", nullable: false),
+                    SupplierName = table.Column<string>(type: "TEXT", maxLength: 250, nullable: true),
+                    ContactPerson = table.Column<string>(type: "TEXT", maxLength: 200, nullable: true),
+                    Email = table.Column<string>(type: "TEXT", maxLength: 256, nullable: true),
+                    Fax = table.Column<string>(type: "TEXT", maxLength: 50, nullable: true),
+                    MobileNo = table.Column<string>(type: "TEXT", maxLength: 50, nullable: true),
+                    PhoneNo = table.Column<string>(type: "TEXT", maxLength: 50, nullable: true),
+                    Website = table.Column<string>(type: "TEXT", maxLength: 500, nullable: true),
+                    Description = table.Column<string>(type: "TEXT", maxLength: 2000, nullable: true),
+                    Url = table.Column<string>(type: "TEXT", maxLength: 500, nullable: true),
+                    BillingAddressId = table.Column<Guid>(type: "TEXT", nullable: false),
+                    ShippingAddressId = table.Column<Guid>(type: "TEXT", nullable: false),
+                    TaxNumber = table.Column<string>(type: "TEXT", maxLength: 50, nullable: true),
+                    TenantId = table.Column<Guid>(type: "TEXT", nullable: false),
+                    CreatedDate = table.Column<DateTime>(type: "TEXT", nullable: false),
+                    CreatedBy = table.Column<Guid>(type: "TEXT", nullable: false),
+                    ModifiedDate = table.Column<DateTime>(type: "TEXT", nullable: false, defaultValueSql: "CURRENT_TIMESTAMP"),
+                    ModifiedBy = table.Column<Guid>(type: "TEXT", nullable: false),
+                    DeletedDate = table.Column<DateTime>(type: "TEXT", nullable: true),
+                    DeletedBy = table.Column<Guid>(type: "TEXT", nullable: true),
+                    SyncVersion = table.Column<long>(type: "INTEGER", nullable: false),
+                    LastSyncedAt = table.Column<DateTime>(type: "TEXT", nullable: true),
+                    IsDeleted = table.Column<bool>(type: "INTEGER", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -2405,15 +2405,15 @@ namespace POS.Migrations.SqlServer.Migrations
                 name: "DamagedStocks",
                 columns: table => new
                 {
-                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    ProductId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    Id = table.Column<Guid>(type: "TEXT", nullable: false),
+                    ProductId = table.Column<Guid>(type: "TEXT", nullable: false),
                     DamagedQuantity = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
-                    Reason = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    ReportedId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    DamagedDate = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    CreatedDate = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    CreatedBy = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    LocationId = table.Column<Guid>(type: "uniqueidentifier", nullable: false)
+                    Reason = table.Column<string>(type: "TEXT", nullable: true),
+                    ReportedId = table.Column<Guid>(type: "TEXT", nullable: false),
+                    DamagedDate = table.Column<DateTime>(type: "TEXT", nullable: false),
+                    CreatedDate = table.Column<DateTime>(type: "TEXT", nullable: false),
+                    CreatedBy = table.Column<Guid>(type: "TEXT", nullable: false),
+                    LocationId = table.Column<Guid>(type: "TEXT", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -2448,8 +2448,8 @@ namespace POS.Migrations.SqlServer.Migrations
                 name: "InquiryProducts",
                 columns: table => new
                 {
-                    ProductId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    InquiryId = table.Column<Guid>(type: "uniqueidentifier", nullable: false)
+                    ProductId = table.Column<Guid>(type: "TEXT", nullable: false),
+                    InquiryId = table.Column<Guid>(type: "TEXT", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -2472,26 +2472,26 @@ namespace POS.Migrations.SqlServer.Migrations
                 name: "InventoryBatches",
                 columns: table => new
                 {
-                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    BatchNumber = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    ExpiryDate = table.Column<DateTime>(type: "datetime2", nullable: true),
-                    ManufacturingDate = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    Id = table.Column<Guid>(type: "TEXT", nullable: false),
+                    BatchNumber = table.Column<string>(type: "TEXT", nullable: true),
+                    ExpiryDate = table.Column<DateTime>(type: "TEXT", nullable: true),
+                    ManufacturingDate = table.Column<DateTime>(type: "TEXT", nullable: true),
                     Quantity = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
                     PurchasePrice = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
                     SalesPrice = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
-                    ProductId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    LocationId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    IsActive = table.Column<bool>(type: "bit", nullable: false),
-                    TenantId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    CreatedDate = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    CreatedBy = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    ModifiedDate = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    ModifiedBy = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    DeletedDate = table.Column<DateTime>(type: "datetime2", nullable: true),
-                    DeletedBy = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
-                    SyncVersion = table.Column<long>(type: "bigint", nullable: false),
-                    LastSyncedAt = table.Column<DateTime>(type: "datetime2", nullable: true),
-                    IsDeleted = table.Column<bool>(type: "bit", nullable: false)
+                    ProductId = table.Column<Guid>(type: "TEXT", nullable: false),
+                    LocationId = table.Column<Guid>(type: "TEXT", nullable: false),
+                    IsActive = table.Column<bool>(type: "INTEGER", nullable: false),
+                    TenantId = table.Column<Guid>(type: "TEXT", nullable: false),
+                    CreatedDate = table.Column<DateTime>(type: "TEXT", nullable: false),
+                    CreatedBy = table.Column<Guid>(type: "TEXT", nullable: false),
+                    ModifiedDate = table.Column<DateTime>(type: "TEXT", nullable: false),
+                    ModifiedBy = table.Column<Guid>(type: "TEXT", nullable: false),
+                    DeletedDate = table.Column<DateTime>(type: "TEXT", nullable: true),
+                    DeletedBy = table.Column<Guid>(type: "TEXT", nullable: true),
+                    SyncVersion = table.Column<long>(type: "INTEGER", nullable: false),
+                    LastSyncedAt = table.Column<DateTime>(type: "TEXT", nullable: true),
+                    IsDeleted = table.Column<bool>(type: "INTEGER", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -2501,31 +2501,31 @@ namespace POS.Migrations.SqlServer.Migrations
                         column: x => x.LocationId,
                         principalTable: "Locations",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
+                        onDelete: ReferentialAction.Restrict);
                     table.ForeignKey(
                         name: "FK_InventoryBatches_Products_ProductId",
                         column: x => x.ProductId,
                         principalTable: "Products",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
+                        onDelete: ReferentialAction.Restrict);
                     table.ForeignKey(
                         name: "FK_InventoryBatches_Users_CreatedBy",
                         column: x => x.CreatedBy,
                         principalTable: "Users",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
+                        onDelete: ReferentialAction.Restrict);
                 });
 
             migrationBuilder.CreateTable(
                 name: "ProductStocks",
                 columns: table => new
                 {
-                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    Id = table.Column<Guid>(type: "TEXT", nullable: false),
                     CurrentStock = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
                     PurchasePrice = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
-                    LocationId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    ProductId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    ModifiedDate = table.Column<DateTime>(type: "datetime2", nullable: false)
+                    LocationId = table.Column<Guid>(type: "TEXT", nullable: false),
+                    ProductId = table.Column<Guid>(type: "TEXT", nullable: false),
+                    ModifiedDate = table.Column<DateTime>(type: "TEXT", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -2548,19 +2548,19 @@ namespace POS.Migrations.SqlServer.Migrations
                 name: "ProductTaxes",
                 columns: table => new
                 {
-                    ProductId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    TaxId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    TenantId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    CreatedDate = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    CreatedBy = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    ModifiedDate = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    ModifiedBy = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    DeletedDate = table.Column<DateTime>(type: "datetime2", nullable: true),
-                    DeletedBy = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
-                    SyncVersion = table.Column<long>(type: "bigint", nullable: false),
-                    LastSyncedAt = table.Column<DateTime>(type: "datetime2", nullable: true),
-                    IsDeleted = table.Column<bool>(type: "bit", nullable: false)
+                    ProductId = table.Column<Guid>(type: "TEXT", nullable: false),
+                    TaxId = table.Column<Guid>(type: "TEXT", nullable: false),
+                    Id = table.Column<Guid>(type: "TEXT", nullable: false),
+                    TenantId = table.Column<Guid>(type: "TEXT", nullable: false),
+                    CreatedDate = table.Column<DateTime>(type: "TEXT", nullable: false),
+                    CreatedBy = table.Column<Guid>(type: "TEXT", nullable: false),
+                    ModifiedDate = table.Column<DateTime>(type: "TEXT", nullable: false),
+                    ModifiedBy = table.Column<Guid>(type: "TEXT", nullable: false),
+                    DeletedDate = table.Column<DateTime>(type: "TEXT", nullable: true),
+                    DeletedBy = table.Column<Guid>(type: "TEXT", nullable: true),
+                    SyncVersion = table.Column<long>(type: "INTEGER", nullable: false),
+                    LastSyncedAt = table.Column<DateTime>(type: "TEXT", nullable: true),
+                    IsDeleted = table.Column<bool>(type: "INTEGER", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -2589,22 +2589,22 @@ namespace POS.Migrations.SqlServer.Migrations
                 name: "SalesOrderItems",
                 columns: table => new
                 {
-                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    ProductId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    Status = table.Column<int>(type: "int", nullable: false),
-                    SalesOrderId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    Id = table.Column<Guid>(type: "TEXT", nullable: false),
+                    ProductId = table.Column<Guid>(type: "TEXT", nullable: false),
+                    Status = table.Column<int>(type: "INTEGER", nullable: false),
+                    SalesOrderId = table.Column<Guid>(type: "TEXT", nullable: false),
                     UnitPrice = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
-                    Quantity = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
+                    Quantity = table.Column<decimal>(type: "TEXT", nullable: false),
                     TaxValue = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
                     Discount = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
                     DiscountPercentage = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
-                    CreatedDate = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    UnitId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    CreatedDate = table.Column<DateTime>(type: "TEXT", nullable: false),
+                    UnitId = table.Column<Guid>(type: "TEXT", nullable: false),
                     PurchasePrice = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
-                    DiscountType = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    BatchNumber = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    ExpiryDate = table.Column<DateTime>(type: "datetime2", nullable: true),
-                    NozzleId = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
+                    DiscountType = table.Column<string>(type: "TEXT", nullable: true),
+                    BatchNumber = table.Column<string>(type: "TEXT", nullable: true),
+                    ExpiryDate = table.Column<DateTime>(type: "TEXT", nullable: true),
+                    NozzleId = table.Column<Guid>(type: "TEXT", nullable: true),
                     MeterReadingStart = table.Column<decimal>(type: "decimal(18,2)", nullable: true),
                     MeterReadingEnd = table.Column<decimal>(type: "decimal(18,2)", nullable: true)
                 },
@@ -2635,17 +2635,17 @@ namespace POS.Migrations.SqlServer.Migrations
                 name: "StockAdjustments",
                 columns: table => new
                 {
-                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    InventoryItemId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    BranchId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    AdjustmentType = table.Column<int>(type: "int", nullable: false),
+                    Id = table.Column<Guid>(type: "TEXT", nullable: false),
+                    InventoryItemId = table.Column<Guid>(type: "TEXT", nullable: false),
+                    BranchId = table.Column<Guid>(type: "TEXT", nullable: false),
+                    AdjustmentType = table.Column<int>(type: "INTEGER", nullable: false),
                     Quantity = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
                     UnitCost = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
                     TotalValue = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
-                    Reason = table.Column<string>(type: "nvarchar(500)", maxLength: 500, nullable: true),
-                    Reference = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: true),
-                    AdjustmentDate = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false)
+                    Reason = table.Column<string>(type: "TEXT", maxLength: 500, nullable: true),
+                    Reference = table.Column<string>(type: "TEXT", maxLength: 50, nullable: true),
+                    AdjustmentDate = table.Column<DateTime>(type: "TEXT", nullable: false),
+                    CreatedAt = table.Column<DateTime>(type: "TEXT", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -2667,24 +2667,24 @@ namespace POS.Migrations.SqlServer.Migrations
                 name: "StockTransferItems",
                 columns: table => new
                 {
-                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    StockTransferId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    ProductId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    Id = table.Column<Guid>(type: "TEXT", nullable: false),
+                    StockTransferId = table.Column<Guid>(type: "TEXT", nullable: false),
+                    ProductId = table.Column<Guid>(type: "TEXT", nullable: false),
                     Quantity = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
                     UnitPrice = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
                     ShippingCharge = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
                     SubTotal = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
-                    UnitId = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
-                    TenantId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    CreatedDate = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    CreatedBy = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    ModifiedDate = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    ModifiedBy = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    DeletedDate = table.Column<DateTime>(type: "datetime2", nullable: true),
-                    DeletedBy = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
-                    SyncVersion = table.Column<long>(type: "bigint", nullable: false),
-                    LastSyncedAt = table.Column<DateTime>(type: "datetime2", nullable: true),
-                    IsDeleted = table.Column<bool>(type: "bit", nullable: false)
+                    UnitId = table.Column<Guid>(type: "TEXT", nullable: true),
+                    TenantId = table.Column<Guid>(type: "TEXT", nullable: false),
+                    CreatedDate = table.Column<DateTime>(type: "TEXT", nullable: false),
+                    CreatedBy = table.Column<Guid>(type: "TEXT", nullable: false),
+                    ModifiedDate = table.Column<DateTime>(type: "TEXT", nullable: false),
+                    ModifiedBy = table.Column<Guid>(type: "TEXT", nullable: false),
+                    DeletedDate = table.Column<DateTime>(type: "TEXT", nullable: true),
+                    DeletedBy = table.Column<Guid>(type: "TEXT", nullable: true),
+                    SyncVersion = table.Column<long>(type: "INTEGER", nullable: false),
+                    LastSyncedAt = table.Column<DateTime>(type: "TEXT", nullable: true),
+                    IsDeleted = table.Column<bool>(type: "INTEGER", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -2718,19 +2718,19 @@ namespace POS.Migrations.SqlServer.Migrations
                 name: "TransactionItems",
                 columns: table => new
                 {
-                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    TransactionId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    InventoryItemId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    Id = table.Column<Guid>(type: "TEXT", nullable: false),
+                    TransactionId = table.Column<Guid>(type: "TEXT", nullable: false),
+                    InventoryItemId = table.Column<Guid>(type: "TEXT", nullable: false),
                     Quantity = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
                     UnitPrice = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
                     DiscountPercentage = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
-                    DiscountType = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    DiscountType = table.Column<string>(type: "TEXT", nullable: true),
                     DiscountAmount = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
                     TaxPercentage = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
                     TaxAmount = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
                     LineTotal = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
                     PurchasePrice = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
-                    UnitId = table.Column<Guid>(type: "uniqueidentifier", nullable: false)
+                    UnitId = table.Column<Guid>(type: "TEXT", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -2758,35 +2758,35 @@ namespace POS.Migrations.SqlServer.Migrations
                 name: "PurchaseOrders",
                 columns: table => new
                 {
-                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    OrderNumber = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: true),
-                    Note = table.Column<string>(type: "nvarchar(2000)", maxLength: 2000, nullable: true),
-                    PurchaseReturnNote = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    TermAndCondition = table.Column<string>(type: "nvarchar(4000)", maxLength: 4000, nullable: true),
-                    IsPurchaseOrderRequest = table.Column<bool>(type: "bit", nullable: false),
-                    POCreatedDate = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    Status = table.Column<int>(type: "int", nullable: false),
-                    DeliveryDate = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    DeliveryStatus = table.Column<int>(type: "int", nullable: false),
-                    SupplierId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    Id = table.Column<Guid>(type: "TEXT", nullable: false),
+                    OrderNumber = table.Column<string>(type: "TEXT", maxLength: 50, nullable: true),
+                    Note = table.Column<string>(type: "TEXT", maxLength: 2000, nullable: true),
+                    PurchaseReturnNote = table.Column<string>(type: "TEXT", nullable: true),
+                    TermAndCondition = table.Column<string>(type: "TEXT", maxLength: 4000, nullable: true),
+                    IsPurchaseOrderRequest = table.Column<bool>(type: "INTEGER", nullable: false),
+                    POCreatedDate = table.Column<DateTime>(type: "TEXT", nullable: false),
+                    Status = table.Column<int>(type: "INTEGER", nullable: false),
+                    DeliveryDate = table.Column<DateTime>(type: "TEXT", nullable: false),
+                    DeliveryStatus = table.Column<int>(type: "INTEGER", nullable: false),
+                    SupplierId = table.Column<Guid>(type: "TEXT", nullable: false),
                     TotalAmount = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
                     TotalTax = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
                     TotalDiscount = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
                     TotalPaidAmount = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
                     TotalRoundOff = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
-                    TotalRefundAmount = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
-                    PaymentStatus = table.Column<int>(type: "int", nullable: false),
-                    LocationId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    TenantId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    CreatedDate = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    CreatedBy = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    ModifiedDate = table.Column<DateTime>(type: "datetime2", nullable: false, defaultValueSql: "CURRENT_TIMESTAMP"),
-                    ModifiedBy = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    DeletedDate = table.Column<DateTime>(type: "datetime2", nullable: true),
-                    DeletedBy = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
-                    SyncVersion = table.Column<long>(type: "bigint", nullable: false),
-                    LastSyncedAt = table.Column<DateTime>(type: "datetime2", nullable: true),
-                    IsDeleted = table.Column<bool>(type: "bit", nullable: false)
+                    TotalRefundAmount = table.Column<decimal>(type: "TEXT", nullable: false),
+                    PaymentStatus = table.Column<int>(type: "INTEGER", nullable: false),
+                    LocationId = table.Column<Guid>(type: "TEXT", nullable: false),
+                    TenantId = table.Column<Guid>(type: "TEXT", nullable: false),
+                    CreatedDate = table.Column<DateTime>(type: "TEXT", nullable: false),
+                    CreatedBy = table.Column<Guid>(type: "TEXT", nullable: false),
+                    ModifiedDate = table.Column<DateTime>(type: "TEXT", nullable: false, defaultValueSql: "CURRENT_TIMESTAMP"),
+                    ModifiedBy = table.Column<Guid>(type: "TEXT", nullable: false),
+                    DeletedDate = table.Column<DateTime>(type: "TEXT", nullable: true),
+                    DeletedBy = table.Column<Guid>(type: "TEXT", nullable: true),
+                    SyncVersion = table.Column<long>(type: "INTEGER", nullable: false),
+                    LastSyncedAt = table.Column<DateTime>(type: "TEXT", nullable: true),
+                    IsDeleted = table.Column<bool>(type: "INTEGER", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -2814,22 +2814,22 @@ namespace POS.Migrations.SqlServer.Migrations
                 name: "SendEmails",
                 columns: table => new
                 {
-                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    Subject = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    Message = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    SupplierId = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
-                    CustomerId = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
-                    IsSend = table.Column<bool>(type: "bit", nullable: false),
-                    TenantId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    CreatedDate = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    CreatedBy = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    ModifiedDate = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    ModifiedBy = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    DeletedDate = table.Column<DateTime>(type: "datetime2", nullable: true),
-                    DeletedBy = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
-                    SyncVersion = table.Column<long>(type: "bigint", nullable: false),
-                    LastSyncedAt = table.Column<DateTime>(type: "datetime2", nullable: true),
-                    IsDeleted = table.Column<bool>(type: "bit", nullable: false)
+                    Id = table.Column<Guid>(type: "TEXT", nullable: false),
+                    Subject = table.Column<string>(type: "TEXT", nullable: true),
+                    Message = table.Column<string>(type: "TEXT", nullable: true),
+                    SupplierId = table.Column<Guid>(type: "TEXT", nullable: true),
+                    CustomerId = table.Column<Guid>(type: "TEXT", nullable: true),
+                    IsSend = table.Column<bool>(type: "INTEGER", nullable: false),
+                    TenantId = table.Column<Guid>(type: "TEXT", nullable: false),
+                    CreatedDate = table.Column<DateTime>(type: "TEXT", nullable: false),
+                    CreatedBy = table.Column<Guid>(type: "TEXT", nullable: false),
+                    ModifiedDate = table.Column<DateTime>(type: "TEXT", nullable: false),
+                    ModifiedBy = table.Column<Guid>(type: "TEXT", nullable: false),
+                    DeletedDate = table.Column<DateTime>(type: "TEXT", nullable: true),
+                    DeletedBy = table.Column<Guid>(type: "TEXT", nullable: true),
+                    SyncVersion = table.Column<long>(type: "INTEGER", nullable: false),
+                    LastSyncedAt = table.Column<DateTime>(type: "TEXT", nullable: true),
+                    IsDeleted = table.Column<bool>(type: "INTEGER", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -2856,9 +2856,9 @@ namespace POS.Migrations.SqlServer.Migrations
                 name: "SalesOrderItemTaxes",
                 columns: table => new
                 {
-                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    SalesOrderItemId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    TaxId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    Id = table.Column<Guid>(type: "TEXT", nullable: false),
+                    SalesOrderItemId = table.Column<Guid>(type: "TEXT", nullable: false),
+                    TaxId = table.Column<Guid>(type: "TEXT", nullable: false),
                     TaxValue = table.Column<decimal>(type: "decimal(18,2)", nullable: false)
                 },
                 constraints: table =>
@@ -2882,8 +2882,8 @@ namespace POS.Migrations.SqlServer.Migrations
                 name: "TransactionItemTaxes",
                 columns: table => new
                 {
-                    TransactionItemId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    TaxId = table.Column<Guid>(type: "uniqueidentifier", nullable: false)
+                    TransactionItemId = table.Column<Guid>(type: "TEXT", nullable: false),
+                    TaxId = table.Column<Guid>(type: "TEXT", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -2906,20 +2906,20 @@ namespace POS.Migrations.SqlServer.Migrations
                 name: "PurchaseOrderItems",
                 columns: table => new
                 {
-                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    ProductId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    Status = table.Column<int>(type: "int", nullable: false),
-                    PurchaseOrderId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    Id = table.Column<Guid>(type: "TEXT", nullable: false),
+                    ProductId = table.Column<Guid>(type: "TEXT", nullable: false),
+                    Status = table.Column<int>(type: "INTEGER", nullable: false),
+                    PurchaseOrderId = table.Column<Guid>(type: "TEXT", nullable: false),
                     UnitPrice = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
                     Quantity = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
                     TaxValue = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
                     Discount = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
                     DiscountPercentage = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
-                    DiscountType = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    UnitId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    CreatedDate = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    BatchNumber = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    ExpiryDate = table.Column<DateTime>(type: "datetime2", nullable: true)
+                    DiscountType = table.Column<string>(type: "TEXT", nullable: true),
+                    UnitId = table.Column<Guid>(type: "TEXT", nullable: false),
+                    CreatedDate = table.Column<DateTime>(type: "TEXT", nullable: false),
+                    BatchNumber = table.Column<string>(type: "TEXT", nullable: true),
+                    ExpiryDate = table.Column<DateTime>(type: "TEXT", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -2947,25 +2947,25 @@ namespace POS.Migrations.SqlServer.Migrations
                 name: "PurchaseOrderPayments",
                 columns: table => new
                 {
-                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    PurchaseOrderId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    PaymentDate = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    ReferenceNumber = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: true),
+                    Id = table.Column<Guid>(type: "TEXT", nullable: false),
+                    PurchaseOrderId = table.Column<Guid>(type: "TEXT", nullable: false),
+                    PaymentDate = table.Column<DateTime>(type: "TEXT", nullable: false),
+                    ReferenceNumber = table.Column<string>(type: "TEXT", maxLength: 50, nullable: true),
                     Amount = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
-                    PaymentMethod = table.Column<int>(type: "int", nullable: false),
-                    Note = table.Column<string>(type: "nvarchar(1000)", maxLength: 1000, nullable: true),
-                    AttachmentUrl = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    PaymentType = table.Column<int>(type: "int", nullable: false),
-                    TenantId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    CreatedDate = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    CreatedBy = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    ModifiedDate = table.Column<DateTime>(type: "datetime2", nullable: false, defaultValueSql: "CURRENT_TIMESTAMP"),
-                    ModifiedBy = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    DeletedDate = table.Column<DateTime>(type: "datetime2", nullable: true),
-                    DeletedBy = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
-                    SyncVersion = table.Column<long>(type: "bigint", nullable: false),
-                    LastSyncedAt = table.Column<DateTime>(type: "datetime2", nullable: true),
-                    IsDeleted = table.Column<bool>(type: "bit", nullable: false)
+                    PaymentMethod = table.Column<int>(type: "INTEGER", nullable: false),
+                    Note = table.Column<string>(type: "TEXT", maxLength: 1000, nullable: true),
+                    AttachmentUrl = table.Column<string>(type: "TEXT", nullable: true),
+                    PaymentType = table.Column<int>(type: "INTEGER", nullable: false),
+                    TenantId = table.Column<Guid>(type: "TEXT", nullable: false),
+                    CreatedDate = table.Column<DateTime>(type: "TEXT", nullable: false),
+                    CreatedBy = table.Column<Guid>(type: "TEXT", nullable: false),
+                    ModifiedDate = table.Column<DateTime>(type: "TEXT", nullable: false, defaultValueSql: "CURRENT_TIMESTAMP"),
+                    ModifiedBy = table.Column<Guid>(type: "TEXT", nullable: false),
+                    DeletedDate = table.Column<DateTime>(type: "TEXT", nullable: true),
+                    DeletedBy = table.Column<Guid>(type: "TEXT", nullable: true),
+                    SyncVersion = table.Column<long>(type: "INTEGER", nullable: false),
+                    LastSyncedAt = table.Column<DateTime>(type: "TEXT", nullable: true),
+                    IsDeleted = table.Column<bool>(type: "INTEGER", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -2988,9 +2988,9 @@ namespace POS.Migrations.SqlServer.Migrations
                 name: "PurchaseOrderItemTaxes",
                 columns: table => new
                 {
-                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    PurchaseOrderItemId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    TaxId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    Id = table.Column<Guid>(type: "TEXT", nullable: false),
+                    PurchaseOrderItemId = table.Column<Guid>(type: "TEXT", nullable: false),
+                    TaxId = table.Column<Guid>(type: "TEXT", nullable: false),
                     TaxValue = table.Column<decimal>(type: "decimal(18,2)", nullable: false)
                 },
                 constraints: table =>
@@ -3564,8 +3564,7 @@ namespace POS.Migrations.SqlServer.Migrations
                 name: "RoleNameIndex",
                 table: "Roles",
                 column: "NormalizedName",
-                unique: true,
-                filter: "[NormalizedName] IS NOT NULL");
+                unique: true);
 
             migrationBuilder.CreateIndex(
                 name: "IX_SalesOrderItems_ProductId",
@@ -3822,8 +3821,7 @@ namespace POS.Migrations.SqlServer.Migrations
                 name: "UserNameIndex",
                 table: "Users",
                 column: "NormalizedUserName",
-                unique: true,
-                filter: "[NormalizedUserName] IS NOT NULL");
+                unique: true);
 
             migrationBuilder.CreateIndex(
                 name: "IX_VariantItems_CreatedBy",

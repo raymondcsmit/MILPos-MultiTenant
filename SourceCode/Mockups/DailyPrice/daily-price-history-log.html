@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Daily Price - History Log</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/ag-grid-community/dist/ag-grid-community.min.js"></script>
+    <style>
+        body { background-color: #f8f9fc; }
+        .log-entry { font-size: 0.9em; }
+        .change-up { color: green; font-weight: bold; }
+        .change-down { color: red; font-weight: bold; }
+        .change-same { color: gray; }
+    </style>
+</head>
+<body class="p-4">
+    <div class="card shadow">
+        <div class="card-header bg-white d-flex justify-content-between align-items-center">
+            <h4 class="m-0 text-primary">Price Change Audit Log</h4>
+            <div class="d-flex gap-2">
+                <input type="date" class="form-control" value="2026-02-01">
+                <button class="btn btn-outline-secondary"><i class="fas fa-filter"></i> Filter</button>
+                <button class="btn btn-primary"><i class="fas fa-download"></i> Export</button>
+            </div>
+        </div>
+        <div class="card-body">
+            <div id="logGrid" style="height: 600px; width: 100%;" class="ag-theme-alpine"></div>
+        </div>
+    </div>
+
+    <script>
+        const gridOptions = {
+            rowData: [
+                { date: '2026-02-01 09:30', product: 'iPhone 15 Pro', user: 'Admin', oldPrice: 1049, newPrice: 1099, change: 50, percent: 4.7 },
+                { date: '2026-02-01 09:15', product: 'Samsung S24', user: 'System', oldPrice: 899, newPrice: 899, change: 0, percent: 0 },
+                { date: '2026-01-31 16:45', product: 'Milk 1L', user: 'Manager', oldPrice: 2.80, newPrice: 2.50, change: -0.30, percent: -10.7 },
+                { date: '2026-01-31 10:00', product: 'Bread', user: 'Admin', oldPrice: 1.80, newPrice: 2.00, change: 0.20, percent: 11.1 },
+            ],
+            columnDefs: [
+                { field: "date", headerName: "Timestamp", width: 160, sortable: true },
+                { field: "product", headerName: "Product", width: 200, filter: true },
+                { field: "user", headerName: "Changed By", width: 120, filter: true },
+                { field: "oldPrice", headerName: "Old", width: 100, valueFormatter: p => '$'+p.value.toFixed(2) },
+                { field: "newPrice", headerName: "New", width: 100, valueFormatter: p => '$'+p.value.toFixed(2) },
+                { 
+                    field: "change", 
+                    headerName: "Variance", 
+                    width: 120,
+                    cellRenderer: params => {
+                        const icon = params.value > 0 ? 'up' : (params.value < 0 ? 'down' : 'minus');
+                        const color = params.value > 0 ? 'change-up' : (params.value < 0 ? 'change-down' : 'change-same');
+                        return `<span class="${color}"><i class="fas fa-arrow-${icon} small"></i> $${Math.abs(params.value).toFixed(2)} (${params.data.percent}%)</span>`;
+                    }
+                }
+            ],
+            defaultColDef: { resizable: true }
+        };
+        new agGrid.Grid(document.getElementById('logGrid'), gridOptions);
+    </script>
+</body>
+</html>

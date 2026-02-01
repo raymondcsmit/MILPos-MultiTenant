@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Daily Price Manager - Enhanced Grid</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/ag-grid-community/dist/ag-grid-community.min.js"></script>
+    <style>
+        :root { --primary: #4e73df; --bg-light: #f8f9fc; }
+        body { background-color: var(--bg-light); font-family: 'Segoe UI', sans-serif; }
+        .product-img { width: 40px; height: 40px; object-fit: cover; border-radius: 4px; border: 1px solid #ddd; }
+        .filter-card { background: white; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.05); }
+        .price-col-history { background-color: #f8f9fc; color: #666; font-style: italic; }
+        .price-col-current { background-color: #fff; font-weight: 600; border-left: 2px solid var(--primary); }
+    </style>
+</head>
+<body>
+    <div class="container-fluid p-4">
+        <div class="d-flex justify-content-between mb-4">
+            <h2 class="h4 text-gray-800">Daily Price Management</h2>
+            <div class="btn-group">
+                <button class="btn btn-outline-secondary"><i class="fas fa-history"></i> Logs</button>
+                <button class="btn btn-primary"><i class="fas fa-save"></i> Save Changes</button>
+            </div>
+        </div>
+
+        <!-- Advanced Filter Panel -->
+        <div class="filter-card p-3 mb-4">
+            <div class="row g-3">
+                <div class="col-md-2">
+                    <label class="form-label small fw-bold">Price Date</label>
+                    <input type="date" class="form-control form-control-sm" value="2026-02-01">
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label small fw-bold">Search</label>
+                    <div class="input-group input-group-sm">
+                        <span class="input-group-text"><i class="fas fa-search"></i></span>
+                        <input type="text" class="form-control" placeholder="Product Name, SKU, Code...">
+                    </div>
+                </div>
+                <div class="col-md-2">
+                    <label class="form-label small fw-bold">Category</label>
+                    <select class="form-select form-select-sm">
+                        <option>All Categories</option>
+                        <option>Electronics</option>
+                        <option>Grocery</option>
+                    </select>
+                </div>
+                <div class="col-md-2">
+                    <label class="form-label small fw-bold">Brand</label>
+                    <select class="form-select form-select-sm">
+                        <option>All Brands</option>
+                        <option>Samsung</option>
+                        <option>Apple</option>
+                        <option>Nestle</option>
+                    </select>
+                </div>
+                <div class="col-md-3 d-flex align-items-end">
+                    <div class="form-check me-3">
+                        <input class="form-check-input" type="checkbox" id="missingPrice">
+                        <label class="form-check-label small" for="missingPrice">Hide Set Prices</label>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Grid Container -->
+        <div id="myGrid" style="height: 70vh; width: 100%;" class="ag-theme-alpine"></div>
+    </div>
+
+    <script>
+        const gridOptions = {
+            rowData: [
+                { id: 1, name: 'iPhone 15 Pro', code: 'IP15P', category: 'Electronics', brand: 'Apple', image: 'https://via.placeholder.com/40', basePrice: 999, prevPrice: 1049, yesterdayPrice: 1049, todayPrice: 1049, stock: 45 },
+                { id: 2, name: 'Galaxy S24', code: 'S24', category: 'Electronics', brand: 'Samsung', image: 'https://via.placeholder.com/40', basePrice: 899, prevPrice: 899, yesterdayPrice: 899, todayPrice: 850, stock: 120 },
+                { id: 3, name: 'Milk 1L', code: 'MILK', category: 'Grocery', brand: 'Nestle', image: 'https://via.placeholder.com/40', basePrice: 2.50, prevPrice: 2.80, yesterdayPrice: 2.80, todayPrice: null, stock: 500 }
+            ],
+            columnDefs: [
+                { 
+                    headerName: "Product Details",
+                    children: [
+                        { field: "name", width: 250, cellRenderer: params => `
+                            <div class="d-flex align-items-center">
+                                <img src="${params.data.image}" class="product-img me-2">
+                                <div>
+                                    <div class="fw-bold">${params.value}</div>
+                                    <small class="text-muted">${params.data.code}</small>
+                                </div>
+                            </div>
+                        `},
+                        { field: "category", width: 120 },
+                        { field: "brand", width: 120 },
+                        { field: "stock", headerName: "Stock", width: 90 }
+                    ]
+                },
+                {
+                    headerName: "Price History (Read Only)",
+                    children: [
+                        { field: "basePrice", headerName: "Base", width: 100, valueFormatter: p => '$'+p.value, cellClass: 'price-col-history' },
+                        { field: "prevPrice", headerName: "Last Week", width: 100, valueFormatter: p => '$'+p.value, cellClass: 'price-col-history' },
+                        { field: "yesterdayPrice", headerName: "Yesterday", width: 100, valueFormatter: p => '$'+p.value, cellClass: 'price-col-history' }
+                    ]
+                },
+                {
+                    headerName: "Today's Pricing",
+                    children: [
+                        { 
+                            field: "todayPrice", 
+                            headerName: "Sales Price", 
+                            editable: true, 
+                            width: 120,
+                            cellClass: 'price-col-current',
+                            valueFormatter: p => p.value ? '$'+p.value : 'Copy Yesterday',
+                            cellStyle: p => !p.value ? {color: '#ccc', fontStyle: 'italic'} : (p.value < p.data.yesterdayPrice ? {color: 'red'} : {color: 'green'})
+                        }
+                    ]
+                }
+            ],
+            defaultColDef: { resizable: true, sortable: true, filter: true }
+        };
+        new agGrid.Grid(document.getElementById('myGrid'), gridOptions);
+    </script>
+</body>
+</html>

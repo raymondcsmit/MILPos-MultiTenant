@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Daily Price Manager - Bulk Wizard</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root { --primary: #4e73df; }
+        .step-indicator { display: flex; justify-content: space-between; margin-bottom: 2rem; position: relative; }
+        .step-indicator::before { content: ''; position: absolute; top: 15px; left: 0; right: 0; height: 2px; background: #e3e6f0; z-index: 1; }
+        .step { position: relative; z-index: 2; background: white; width: 30px; height: 30px; border-radius: 50%; display: flex; align-items: center; justify-content: center; border: 2px solid #e3e6f0; font-weight: bold; color: #858796; }
+        .step.active { border-color: var(--primary); background: var(--primary); color: white; }
+        .step-label { position: absolute; top: 35px; left: 50%; transform: translateX(-50%); font-size: 0.75rem; white-space: nowrap; }
+    </style>
+</head>
+<body class="bg-light">
+    <div class="container py-5">
+        <div class="card shadow">
+            <div class="card-header bg-white py-3">
+                <h4 class="m-0 font-weight-bold text-primary">Bulk Price Update Wizard</h4>
+            </div>
+            <div class="card-body p-4">
+                <!-- Step Indicator -->
+                <div class="step-indicator px-5">
+                    <div class="step active">1<span class="step-label">Select Products</span></div>
+                    <div class="step">2<span class="step-label">Define Rules</span></div>
+                    <div class="step">3<span class="step-label">Review & Apply</span></div>
+                </div>
+
+                <!-- Step 1 Content: Selection -->
+                <div id="step1">
+                    <h5 class="mb-3">Filter Products to Update</h5>
+                    <div class="row g-3 mb-4">
+                        <div class="col-md-4">
+                            <label class="form-label">Category</label>
+                            <select class="form-select" size="5" multiple>
+                                <option selected>Electronics</option>
+                                <option>Computers</option>
+                                <option>Mobile Phones</option>
+                                <option>Accessories</option>
+                            </select>
+                            <div class="form-text">Hold Ctrl to select multiple</div>
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label">Brand</label>
+                            <select class="form-select" size="5" multiple>
+                                <option selected>Apple</option>
+                                <option selected>Samsung</option>
+                                <option>Sony</option>
+                            </select>
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label">Quick Filters</label>
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" checked>
+                                <label class="form-check-label">Include active products only</label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox">
+                                <label class="form-check-label">Only items with low margin (< 10%)</label>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="alert alert-info">
+                        <i class="fas fa-info-circle me-2"></i> Selected criteria matches <strong>145 products</strong>.
+                    </div>
+                </div>
+
+                <!-- Step 2 Content: Rules (Hidden for mockup) -->
+                <!-- 
+                <div id="step2" style="display:none;">
+                    <h5>Apply Price Rules</h5>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <label>Action</label>
+                            <select class="form-select">
+                                <option>Increase Price by Percentage</option>
+                                <option>Decrease Price by Percentage</option>
+                                <option>Set Fixed Price</option>
+                            </select>
+                        </div>
+                        <div class="col-md-6">
+                            <label>Value</label>
+                            <input type="number" class="form-control" placeholder="e.g. 5">
+                        </div>
+                    </div>
+                </div>
+                -->
+
+                <!-- Navigation -->
+                <div class="d-flex justify-content-between mt-5">
+                    <button class="btn btn-secondary" disabled>Back</button>
+                    <button class="btn btn-primary">Next: Define Rules <i class="fas fa-arrow-right ms-2"></i></button>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

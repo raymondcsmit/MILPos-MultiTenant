@@ -54,66 +54,19 @@ namespace POS.Repository
             {
                 var entities = await source
                     .AsNoTracking()
-                    .Select(c => new ProductDto
-                    {
-                        Id = c.Id,
-                        Name = c.Name,
-                        Mrp = c.Mrp,
-                        SalesPrice = c.SalesPrice,
-                        PurchasePrice = c.PurchasePrice,
-                        CategoryId = c.CategoryId,
-                        CategoryName = c.ProductCategory.Name,
-                        UnitName = c.Unit.Name,
-                        UnitId = c.UnitId,
-                        BrandId = c.BrandId ?? Guid.Empty,
-                        Barcode = c.Barcode,
-                        SkuCode = c.SkuCode,
-                        SkuName = c.SkuName,
-                        BrandName = c.Brand != null ? c.Brand.Name : "",
-                        AlertQuantity = c.AlertQuantity,
-                        HasVariant = c.HasVariant,
-                        IsMarginIncludeTax = c.IsMarginIncludeTax,
-                        Margin = c.Margin,
-                        TaxAmount = c.TaxAmount,
-                        VariantId = c.VariantId,
-                        VariantItemId = c.VariantItemId,
-                        ProductTaxes = _mapper.Map<List<ProductTaxDto>>(c.ProductTaxes),
-                        ProductUrl = !string.IsNullOrWhiteSpace(c.ProductUrl) ? Path.Combine(_pathHelper.ProductThumbnailImagePath, c.ProductUrl) : ""
-                    }).ToListAsync();
-                return entities;
+                    .ToListAsync();
+
+                return _mapper.Map<List<ProductDto>>(entities);
             }
             else
             {
                 var entities = await source
-                .Skip(skip)
-                .Take(pageSize)
-                .AsNoTracking()
-                .Select(c => new ProductDto
-                {
-                    Id = c.Id,
-                    Name = c.Name,
-                    Mrp = c.Mrp,
-                    SalesPrice = c.SalesPrice,
-                    PurchasePrice = c.PurchasePrice,
-                    CategoryId = c.CategoryId,
-                    CategoryName = c.ProductCategory.Name,
-                    UnitName = c.Unit.Name,
-                    UnitId = c.UnitId,
-                    BrandId = c.BrandId ?? Guid.Empty,
-                    Barcode = c.Barcode,
-                    SkuCode = c.SkuCode,
-                    SkuName = c.SkuName,
-                    BrandName = c.Brand != null ? c.Brand.Name : "",
-                    AlertQuantity = c.AlertQuantity,
-                    HasVariant = c.HasVariant,
-                    IsMarginIncludeTax = c.IsMarginIncludeTax,
-                    Margin = c.Margin,
-                    VariantId = c.VariantId,
-                    VariantItemId = c.VariantItemId,
-                    ProductTaxes = _mapper.Map<List<ProductTaxDto>>(c.ProductTaxes),
-                    ProductUrl = !string.IsNullOrWhiteSpace(c.ProductUrl) ? Path.Combine(_pathHelper.ProductThumbnailImagePath, c.ProductUrl) : ""
-                }).ToListAsync();
-                return entities;
+                    .Skip(skip)
+                    .Take(pageSize)
+                    .AsNoTracking()
+                    .ToListAsync();
+
+                return _mapper.Map<List<ProductDto>>(entities);
             }
         }
     }

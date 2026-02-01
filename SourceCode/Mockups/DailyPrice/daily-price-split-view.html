@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Daily Price Manager - Split View</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        :root { --primary: #4e73df; --bg-light: #f8f9fc; }
+        body { background-color: var(--bg-light); height: 100vh; overflow: hidden; }
+        .sidebar { height: 100vh; overflow-y: auto; background: white; border-right: 1px solid #e3e6f0; }
+        .product-item.active { background-color: #f8f9fc; border-left: 4px solid var(--primary); }
+        .main-content { height: 100vh; overflow-y: auto; padding: 2rem; }
+    </style>
+</head>
+<body class="d-flex">
+    <!-- Left Sidebar: Product List -->
+    <div class="sidebar col-3 p-0">
+        <div class="p-3 border-bottom sticky-top bg-white">
+            <h5 class="mb-3">Products</h5>
+            <input type="text" class="form-control mb-2" placeholder="Search products...">
+            <div class="d-flex gap-2">
+                <select class="form-select form-select-sm"><option>All Categories</option></select>
+                <select class="form-select form-select-sm"><option>All Brands</option></select>
+            </div>
+        </div>
+        <div class="list-group list-group-flush">
+            <a href="#" class="list-group-item list-group-item-action product-item active p-3">
+                <div class="d-flex justify-content-between align-items-center mb-1">
+                    <strong>iPhone 15 Pro</strong>
+                    <span class="badge bg-success">Updated</span>
+                </div>
+                <div class="d-flex justify-content-between small text-muted">
+                    <span>Code: IP15P</span>
+                    <span>$1,049.00</span>
+                </div>
+            </a>
+            <a href="#" class="list-group-item list-group-item-action product-item p-3">
+                <div class="d-flex justify-content-between align-items-center mb-1">
+                    <strong>Galaxy S24</strong>
+                    <span class="badge bg-warning text-dark">Pending</span>
+                </div>
+                <div class="d-flex justify-content-between small text-muted">
+                    <span>Code: S24</span>
+                    <span>Last: $899.00</span>
+                </div>
+            </a>
+            <!-- More items... -->
+        </div>
+    </div>
+
+    <!-- Right Content: Detail Panel -->
+    <div class="main-content col-9 bg-light">
+        <div class="card shadow-sm mb-4">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-start mb-4">
+                    <div>
+                        <h2 class="h3 mb-1">iPhone 15 Pro</h2>
+                        <span class="badge bg-secondary me-2">Electronics</span>
+                        <span class="badge bg-info">Apple</span>
+                        <small class="text-muted ms-2">SKU: IP15P-128-BLK</small>
+                    </div>
+                    <div class="text-end">
+                        <div class="text-muted small">Base Price</div>
+                        <div class="h5 mb-0">$999.00</div>
+                    </div>
+                </div>
+
+                <div class="row g-4">
+                    <!-- Price Entry Form -->
+                    <div class="col-md-5">
+                        <div class="card bg-white border-primary h-100">
+                            <div class="card-header bg-primary text-white">Today's Pricing (Feb 01, 2026)</div>
+                            <div class="card-body">
+                                <form>
+                                    <div class="mb-3">
+                                        <label class="form-label">Sales Price</label>
+                                        <div class="input-group">
+                                            <span class="input-group-text">$</span>
+                                            <input type="number" class="form-control form-control-lg fw-bold" value="1049.00">
+                                        </div>
+                                        <small class="text-success"><i class="fas fa-arrow-up"></i> $50.00 vs Base Price</small>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label class="form-label">MRP (Optional)</label>
+                                        <div class="input-group">
+                                            <span class="input-group-text">$</span>
+                                            <input type="number" class="form-control" value="1199.00">
+                                        </div>
+                                    </div>
+                                    <div class="d-grid gap-2">
+                                        <button class="btn btn-outline-secondary" type="button">Copy Yesterday ($1,049.00)</button>
+                                        <button class="btn btn-primary" type="button">Save Price</button>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Price History & Stats -->
+                    <div class="col-md-7">
+                        <h6 class="fw-bold mb-3">Price Trend (Last 30 Days)</h6>
+                        <div class="card mb-3 p-2">
+                            <canvas id="priceChart" height="150"></canvas>
+                        </div>
+                        <h6 class="fw-bold mb-2">Recent Changes</h6>
+                        <table class="table table-sm small">
+                            <thead><tr><th>Date</th><th>Price</th><th>Change</th><th>User</th></tr></thead>
+                            <tbody>
+                                <tr><td>Jan 31</td><td>$1,049.00</td><td>-</td><td>System</td></tr>
+                                <tr><td>Jan 25</td><td>$1,049.00</td><td><span class="text-success">+$20.00</span></td><td>Admin</td></tr>
+                                <tr><td>Jan 10</td><td>$1,029.00</td><td>-</td><td>Manager</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        const ctx = document.getElementById('priceChart').getContext('2d');
+        new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: ['Jan 1', 'Jan 10', 'Jan 20', 'Jan 30'],
+                datasets: [{
+                    label: 'Sales Price',
+                    data: [1029, 1029, 1049, 1049],
+                    borderColor: '#4e73df',
+                    tension: 0.1
+                }]
+            }
+        });
+    </script>
+</body>
+</html>

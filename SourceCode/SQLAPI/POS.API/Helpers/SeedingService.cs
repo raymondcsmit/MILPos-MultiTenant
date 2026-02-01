@@ -332,30 +332,54 @@ namespace POS.API.Helpers
             }
 
             // Incremental Seeding Logic: Filter out entities that already exist
-            if (entities.Any() && typeof(BaseEntity).IsAssignableFrom(typeof(T)))
+            if (entities.Any())
             {
-                 // We can't use generic T in LINQ to Entities easily for IDs unless we project 
-                 // But we can fetch client side or use a raw check. 
-                 // Since SeedData is small, fetching IDs of T is acceptable.
-                 try 
-                 {
-                    // Safe projection if T has Id property (BaseEntity has it)
-                     var existingIds = await _context.Set<T>()
-                                             .Select(e => ((BaseEntity)(object)e).Id)
-                                             .ToListAsync();
-                                             
-                     var existingIdSet = new HashSet<Guid>(existingIds);
-                     entities = entities.Where(e => !existingIdSet.Contains(((BaseEntity)(object)e).Id)).ToList();
-                     
-                     if (entities.Any()) 
-                     {
-                         Console.WriteLine($"Seeding {entities.Count} new records into {typeof(T).Name}...");
-                     }
-                 }
-                 catch (Exception ex)
-                 {
-                     Console.WriteLine($"Warning: Could not check existing IDs for {typeof(T).Name}. Proceeding with AddRange (may fail if duplicates exist). Error: {ex.Message}");
-                 }
+                var newEntities = new List<T>();
+                var entityType = _context.Model.FindEntityType(typeof(T));
+                var primaryKey = entityType.FindPrimaryKey();
+                var keyProperties = primaryKey.Properties;
+
+                Console.WriteLine($"Checking for existing records in {typeof(T).Name}...");
+
+                foreach (var entity in entities)
+                {
+                    try
+                    {
+                        // Get primary key values for this entity
+                        var keyValues = keyProperties
+                            .Select(p => p.PropertyInfo.GetValue(entity))
+                            .ToArray();
+
+                        // Check if it exists in the database
+                        // FindAsync works for both single and composite keys
+                        var existing = await _context.Set<T>().FindAsync(keyValues);
+                        
+                        // If checking TTenant, we might also want to check by Subdomain if Id check passed (for safety)
+                        // But FindAsync is the most reliable for PK constraint violations.
+                        
+                        if (existing == null)
+                        {
+                            newEntities.Add(entity);
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        Console.WriteLine($"Error checking existence for {typeof(T).Name}: {ex.Message}");
+                        // Fallback: assume it's new if check fails (risky but better than crashing)
+                        newEntities.Add(entity);
+                    }
+                }
+
+                entities = newEntities;
+
+                if (entities.Any())
+                {
+                    Console.WriteLine($"Seeding {entities.Count} new records into {typeof(T).Name}...");
+                }
+                else
+                {
+                    // Console.WriteLine($"All records for {typeof(T).Name} already exist. Skipping.");
+                }
             }
 
             if (entities.Any())
