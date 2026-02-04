@@ -37,7 +37,6 @@ var startup = new Startup(builder.Configuration);
 
 startup.ConfigureServices(builder.Services);
 
-var connectionString = builder.Configuration.GetConnectionString("DbConnectionString");
 // Add Hangfire services.
 builder.Services.AddHangfire(configuration =>
 {
@@ -53,6 +52,7 @@ builder.Services.AddHangfire(configuration =>
     }
     else
     {
+        var connectionString = builder.Configuration.GetConnectionString("DbConnectionString");
         configuration.UseSqlServerStorage(connectionString, new SqlServerStorageOptions
         {
             CommandBatchMaxTimeout = TimeSpan.FromMinutes(5),

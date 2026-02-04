@@ -14,4 +14,6 @@ export interface Inventory {
   type: string;
   productTaxes?: ProductTax[];
   taxIds?: string[];
+  categoryName?: string;
+  brandName?: string;
 }

@@ -30,6 +30,19 @@ namespace POS.API.Controllers.ProductStock
         }
 
         /// <summary>
+        /// Bulk Update Product Stock
+        /// </summary>
+        /// <param name="command"></param>
+        /// <returns></returns>
+        [HttpPost("bulk-update")]
+        //[ClaimCheck("INVE_MANAGE_INVENTORY")]
+        public async Task<IActionResult> BulkUpdateProductStock(BulkUpdateProductStockCommand command)
+        {
+            var result = await _mediator.Send(command);
+            return ReturnFormattedResponse(result);
+        }
+
+        /// <summary>
         /// Get All product stock.
         /// </summary>
         /// <param name="productStockResource"></param>

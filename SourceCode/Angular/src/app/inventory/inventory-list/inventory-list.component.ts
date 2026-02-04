@@ -1,4 +1,5 @@
 import { ChangeDetectorRef, Component, OnInit, ViewChild } from '@angular/core';
+import { Router } from '@angular/router';
 import { MatDialog } from '@angular/material/dialog';
 import { MatPaginator, MatPaginatorModule } from '@angular/material/paginator';
 import { MatSort, MatSortModule } from '@angular/material/sort';
@@ -89,7 +90,8 @@ export class InventoryListComponent extends BaseComponent implements OnInit {
     private inventoryService: InventoryService,
     private cd: ChangeDetectorRef,
     private dialog: MatDialog,
-    private commonService: CommonService
+    private commonService: CommonService,
+    private router: Router
   ) {
     super();
     this.getLangDir();
@@ -162,6 +164,10 @@ export class InventoryListComponent extends BaseComponent implements OnInit {
   toggleRow(element: Inventory) {
     this.expandedElement = this.expandedElement === element ? null : element;
     this.cd.detectChanges();
+  }
+
+  navigateToBulkUpdate() {
+    this.router.navigate(['/inventory/bulk-update']);
   }
 
   addInvenotry(inventory?: Inventory | null) {

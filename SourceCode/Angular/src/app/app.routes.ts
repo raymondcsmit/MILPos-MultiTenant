@@ -336,6 +336,15 @@ export const routes: Routes = [
               ),
           },
           {
+            path: 'inventory/bulk-update',
+            data: { claimType: 'INVE_MANAGE_INVENTORY' },
+            canActivate: [AuthGuard],
+            loadComponent: () =>
+              import('./inventory/product-stock-bulk-update/product-stock-bulk-update.component').then(
+                (m) => m.ProductStockBulkUpdateComponent
+              ),
+          },
+          {
             path: 'purchase-order-report',
             data: { claimType: 'REP_PO_REP' },
             canActivate: [AuthGuard],

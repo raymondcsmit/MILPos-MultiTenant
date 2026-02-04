@@ -28,7 +28,6 @@ namespace POS.API.Helpers
             try
             {
                 // Check if the database is already seeded (Check Tenants)
-                // Check if the database is already seeded (Check Tenants)
                 if (await _context.Tenants.AnyAsync())
                 {
                      // Instead of returning, we will fetch the default TenantId for subsequent seeding
@@ -38,6 +37,11 @@ namespace POS.API.Helpers
                          _defaultTenantId = defaultTenant.Id;
                          Console.WriteLine($"Database already seeded. Using existing Default Tenant ID: {_defaultTenantId}");
                      }
+                     
+                     // OPTIMIZATION: If tenants exist, we assume the initial seeding is complete.
+                     // Skipping the expensive CSV parsing and per-record existence checks significantly improves startup time.
+                     Console.WriteLine("Skipping seeding process as database is already initialized.");
+                     return;
                 }
 
                 Console.WriteLine("Starting database seeding from CSV files...");
@@ -400,40 +404,56 @@ namespace POS.API.Helpers
 
                  Console.WriteLine($"Table: {tableName}, FullPath: {fullTableName}, HasIdentity: {hasIdentity}");
 
-                 await _context.Database.OpenConnectionAsync();
-                 try
+                 // Wrap saving in a transaction to speed up SQLite bulk inserts significantly
+                 using (var transaction = await _context.Database.BeginTransactionAsync())
                  {
-                    if (hasIdentity)
-                    {
-                        Console.WriteLine($"Executing: SET IDENTITY_INSERT {fullTableName} ON");
-                        await _context.Database.ExecuteSqlRawAsync($"SET IDENTITY_INSERT {fullTableName} ON");
-                    }
-
-                    var dbSet = _context.Set<T>();
-                    await dbSet.AddRangeAsync(entities);
-                    await _context.SaveChangesAsync();
-
-                    if (hasIdentity)
-                    {
-                        await _context.Database.ExecuteSqlRawAsync($"SET IDENTITY_INSERT {fullTableName} OFF");
-                    }
-                 }
-                 catch (Exception ex) 
-                 {
-                     var innerMessage = ex.InnerException?.Message ?? "No inner exception";
-                     Console.WriteLine($"Error batch saving {typeof(T).Name}: {ex.Message}");
-                     if (ex.InnerException != null) Console.WriteLine($"Inner Exception: {innerMessage}");
-
-                     if (hasIdentity)
+                     try
                      {
-                         try { await _context.Database.ExecuteSqlRawAsync($"SET IDENTITY_INSERT {fullTableName} OFF"); } catch { }
+                        if (hasIdentity)
+                        {
+                            Console.WriteLine($"Executing: SET IDENTITY_INSERT {fullTableName} ON");
+                            await _context.Database.ExecuteSqlRawAsync($"SET IDENTITY_INSERT {fullTableName} ON");
+                        }
+
+                        var dbSet = _context.Set<T>();
+                        
+                        // Optimize: AddRange is better than Add in loop, but for massive datasets, 
+                        // we should consider smaller batches if memory is an issue.
+                        // For now, assuming CSVs are < 10k rows, AddRange is fine.
+                        // Disable AutoDetectChanges for massive performance gain during AddRange
+                        _context.ChangeTracker.AutoDetectChangesEnabled = false;
+                        
+                        await dbSet.AddRangeAsync(entities);
+                        await _context.SaveChangesAsync();
+                        
+                        _context.ChangeTracker.AutoDetectChangesEnabled = true;
+
+                        if (hasIdentity)
+                        {
+                            await _context.Database.ExecuteSqlRawAsync($"SET IDENTITY_INSERT {fullTableName} OFF");
+                        }
+                        
+                        await transaction.CommitAsync();
                      }
-                 }
-                 finally
-                 {
-                     await _context.Database.CloseConnectionAsync();
-                     // ALWAYS clear tracker after each table to prevent pollution/leaks
-                     _context.ChangeTracker.Clear();
+                     catch (Exception ex) 
+                     {
+                         await transaction.RollbackAsync();
+                         
+                         var innerMessage = ex.InnerException?.Message ?? "No inner exception";
+                         Console.WriteLine($"Error batch saving {typeof(T).Name}: {ex.Message}");
+                         if (ex.InnerException != null) Console.WriteLine($"Inner Exception: {innerMessage}");
+
+                         if (hasIdentity)
+                         {
+                             try { await _context.Database.ExecuteSqlRawAsync($"SET IDENTITY_INSERT {fullTableName} OFF"); } catch { }
+                         }
+                     }
+                     finally
+                     {
+                         // ALWAYS clear tracker after each table to prevent pollution/leaks
+                         _context.ChangeTracker.Clear();
+                         _context.ChangeTracker.AutoDetectChangesEnabled = true; // Ensure it's back on
+                     }
                  }
             }
         }
