@@ -64,6 +64,8 @@ namespace POS.API.Helpers
             services.AddScoped<IInquiryAttachmentRepository, InquiryAttachmentRepository>();
             services.AddScoped<IInquiryActivityRepository, InquiryActivityRepository>();
             services.AddScoped<IInquirySourceRepository, InquirySourceRepository>();
+            services.AddScoped<IDailyProductPriceRepository, DailyProductPriceRepository>();
+
 
             services.AddScoped<IBrandRepository, BrandRepository>();
 

@@ -285,6 +285,11 @@ export const routes: Routes = [
             canActivate: [AuthGuard]
           },
           {
+            path: 'daily-price-manager',
+            loadChildren: () =>
+              import('./daily-price-manager/daily-price-routes').then((m) => m.DAILY_PRICE_ROUTES),
+          },
+          {
             path: 'variants',
             data: { claimType: 'PRO_MANAGE_VARIANTS' },
             canActivate: [AuthGuard],

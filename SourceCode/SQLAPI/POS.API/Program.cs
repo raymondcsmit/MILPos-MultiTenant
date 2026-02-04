@@ -48,7 +48,8 @@ builder.Services.AddHangfire(configuration =>
 
     if (provider == "Sqlite")
     {
-        configuration.UseSQLiteStorage(connectionString);
+        var sqliteconnectionString = builder.Configuration.GetConnectionString("SqliteHangfirConnectionString");  
+        configuration.UseSQLiteStorage(sqliteconnectionString);
     }
     else
     {

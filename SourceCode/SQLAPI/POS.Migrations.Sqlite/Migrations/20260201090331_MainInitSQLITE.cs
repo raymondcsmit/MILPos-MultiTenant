@@ -2402,6 +2402,44 @@ namespace POS.Migrations.Sqlite.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "DailyProductPrices",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(type: "TEXT", nullable: false),
+                    ProductId = table.Column<Guid>(type: "TEXT", nullable: false),
+                    PriceDate = table.Column<DateTime>(type: "TEXT", nullable: false),
+                    SalesPrice = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
+                    Mrp = table.Column<decimal>(type: "decimal(18,2)", nullable: true),
+                    IsActive = table.Column<bool>(type: "INTEGER", nullable: false),
+                    TenantId = table.Column<Guid>(type: "TEXT", nullable: false),
+                    CreatedDate = table.Column<DateTime>(type: "TEXT", nullable: false),
+                    CreatedBy = table.Column<Guid>(type: "TEXT", nullable: false),
+                    ModifiedDate = table.Column<DateTime>(type: "TEXT", nullable: false),
+                    ModifiedBy = table.Column<Guid>(type: "TEXT", nullable: false),
+                    DeletedDate = table.Column<DateTime>(type: "TEXT", nullable: true),
+                    DeletedBy = table.Column<Guid>(type: "TEXT", nullable: true),
+                    SyncVersion = table.Column<long>(type: "INTEGER", nullable: false),
+                    LastSyncedAt = table.Column<DateTime>(type: "TEXT", nullable: true),
+                    IsDeleted = table.Column<bool>(type: "INTEGER", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_DailyProductPrices", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_DailyProductPrices_Products_ProductId",
+                        column: x => x.ProductId,
+                        principalTable: "Products",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
+                        name: "FK_DailyProductPrices_Users_CreatedBy",
+                        column: x => x.CreatedBy,
+                        principalTable: "Users",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "DamagedStocks",
                 columns: table => new
                 {
@@ -3109,6 +3147,17 @@ namespace POS.Migrations.Sqlite.Migrations
                 name: "IX_Customers_ShippingAddressId",
                 table: "Customers",
                 column: "ShippingAddressId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_DailyProductPrice_Product_Date_Tenant",
+                table: "DailyProductPrices",
+                columns: new[] { "ProductId", "PriceDate", "TenantId" },
+                unique: true);
+
+            migrationBuilder.CreateIndex(
+                name: "IX_DailyProductPrices_CreatedBy",
+                table: "DailyProductPrices",
+                column: "CreatedBy");
 
             migrationBuilder.CreateIndex(
                 name: "IX_DailyReminders_ReminderId",
@@ -3856,6 +3905,9 @@ namespace POS.Migrations.Sqlite.Migrations
 
             migrationBuilder.DropTable(
                 name: "CustomerLedgers");
+
+            migrationBuilder.DropTable(
+                name: "DailyProductPrices");
 
             migrationBuilder.DropTable(
                 name: "DailyReminders");

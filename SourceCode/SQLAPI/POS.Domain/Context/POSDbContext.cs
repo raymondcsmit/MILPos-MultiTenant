@@ -110,12 +110,34 @@ namespace POS.Domain
         // FBR Integration
         public DbSet<POS.Data.Entities.FBR.FBRSubmissionLog> FBRSubmissionLogs { get; set; }
 
+
+        public DbSet<DailyProductPrice> DailyProductPrices { get; set; }
+
         public DbSet<InventoryBatch> InventoryBatches { get; set; }
+
 
 
         protected override void OnModelCreating(ModelBuilder builder)
         {
             base.OnModelCreating(builder);
+
+
+            // DailyProductPrice Configuration
+            builder.Entity<DailyProductPrice>(entity =>
+            {
+                entity.HasKey(e => e.Id);
+                entity.HasIndex(e => new { e.ProductId, e.PriceDate, e.TenantId })
+                      .IsUnique()
+                      .HasDatabaseName("IX_DailyProductPrice_Product_Date_Tenant");
+
+                entity.Property(e => e.SalesPrice).IsRequired();
+                entity.Property(e => e.PriceDate).IsRequired();
+
+                entity.HasOne(e => e.Product)
+                      .WithMany()
+                      .HasForeignKey(e => e.ProductId)
+                      .OnDelete(DeleteBehavior.Restrict);
+            });
 
             // Configure InventoryBatch to prevent cycles
             builder.Entity<InventoryBatch>(b =>
@@ -135,6 +157,7 @@ namespace POS.Domain
                     .HasForeignKey(e => e.CreatedBy)
                     .OnDelete(DeleteBehavior.Restrict);
             });
+
 
             // Configure Tenant entity
             builder.Entity<Tenant>(b =>

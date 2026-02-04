@@ -1,0 +1,75 @@
+/* Daily Price Manager Styles */
+
+.daily-price-content {
+  height: calc(100vh - 130px); /* Adjust based on header height + padding */
+  background: #fff;
+  border-radius: 4px;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+  overflow: hidden;
+}
+
+.product-list-panel {
+  height: 100%;
+  overflow-y: hidden; /* Main panel shouldn't scroll, inner container should */
+  display: flex;
+  flex-direction: column;
+}
+
+.product-list-container {
+  flex: 1;
+  overflow-y: auto;
+}
+
+.detail-panel {
+  height: 100%;
+  overflow-y: auto;
+  background-color: #f8f9fc;
+}
+
+.group-header {
+  background: #eaecf4;
+  padding: 10px 15px;
+  font-weight: bold;
+  border-bottom: 1px solid #e3e6f0;
+  cursor: pointer;
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  
+  &:hover {
+    background: #e3e6f0;
+  }
+}
+
+.product-row {
+  padding: 12px 15px;
+  border-bottom: 1px solid #f0f0f0;
+  transition: background 0.2s;
+  cursor: pointer;
+  
+  &:hover {
+    background-color: #f8f9fc;
+  }
+  
+  &.active {
+    background-color: #eef2ff;
+    border-left: 4px solid #4e73df;
+  }
+}
+
+.price-input {
+  font-weight: 600;
+}
+
+.btn.active {
+  background-color: #4e73df;
+  color: white;
+  border-color: #4e73df;
+}
+
+.stat-card {
+  background: white;
+  border-radius: 8px;
+  padding: 15px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+}

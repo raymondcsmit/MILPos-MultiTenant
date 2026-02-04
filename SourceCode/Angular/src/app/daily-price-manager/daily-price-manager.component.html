@@ -1,0 +1,197 @@
+<section class="content">
+  <div class="container-fluid">
+    <div class="row g-0 daily-price-content">
+      <!-- LEFT PANEL: Grouped Product List -->
+      <div class="col-md-5 col-lg-4 border-end bg-white product-list-panel">
+        <!-- Sticky Header Controls -->
+        <div class="p-3 border-bottom bg-white sticky-top">
+          <div class="d-flex justify-content-between align-items-center mb-3">
+            <h5 class="m-0 text-primary fw-bold">Daily Price Manager</h5>
+            <input 
+              type="date" 
+              class="form-control form-control-sm w-auto" 
+              [ngModel]="currentDate | date:'yyyy-MM-dd'"
+              (ngModelChange)="onDateChange($event)"
+            />
+          </div>
+          
+          <div class="input-group input-group-sm mb-2">
+            <span class="input-group-text"><i class="fas fa-search"></i></span>
+            <input 
+              type="text" 
+              class="form-control" 
+              placeholder="Search products..."
+              [(ngModel)]="searchTerm"
+              (ngModelChange)="onSearch($event)"
+            />
+          </div>
+          
+          <div class="d-flex gap-2 mb-2">
+            <button 
+              class="btn btn-sm btn-outline-secondary w-50"
+              [class.active]="groupBy === 'Category'"
+              (click)="onGroupByChange('Category')"
+            >
+              By Category
+            </button>
+            <button 
+              class="btn btn-sm btn-outline-secondary w-50"
+              [class.active]="groupBy === 'Brand'"
+              (click)="onGroupByChange('Brand')"
+            >
+              By Brand
+            </button>
+          </div>
+          
+          <div class="d-flex gap-2">
+            <button 
+              class="btn btn-sm btn-success w-100" 
+              (click)="saveAllChanges()"
+              [disabled]="saving || summary.updatedCount === 0"
+            >
+              <i class="fas fa-save"></i> 
+              Save All 
+              <span *ngIf="summary.updatedCount > 0" class="badge bg-white text-success ms-1">
+                {{ summary.updatedCount }}
+              </span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Product List Container -->
+        <div class="product-list-container">
+          <div *ngIf="loading" class="text-center py-5">
+            <div class="spinner-border text-primary" role="status">
+              <span class="visually-hidden">Loading...</span>
+            </div>
+          </div>
+
+          <div *ngIf="!loading && groupedData.size === 0" class="text-center text-muted py-5">
+            <i class="fas fa-inbox fa-3x mb-3"></i>
+            <p>No products found</p>
+          </div>
+
+          <div *ngFor="let group of groupedData | keyvalue">
+            <div 
+              class="group-header d-flex justify-content-between align-items-center"
+              data-bs-toggle="collapse"
+              [attr.data-bs-target]="'#group-' + group.key"
+            >
+              <span><i class="fas fa-folder me-2"></i> {{ group.key }}</span>
+              <span class="badge bg-secondary rounded-pill">{{ group.value.length }} Items</span>
+            </div>
+            
+            <div [id]="'group-' + group.key" class="collapse show">
+              <div 
+                *ngFor="let product of group.value"
+                class="product-row"
+                [class.active]="selectedProduct?.productId === product.productId"
+                (click)="selectProduct(product)"
+              >
+                <div class="d-flex justify-content-between align-items-center mb-2">
+                  <div>
+                    <div class="fw-bold">{{ product.productName }}</div>
+                    <small class="text-muted">Code: {{ product.productCode }}</small>
+                  </div>
+                  <span 
+                    class="badge"
+                    [ngClass]="'bg-' + getStatusClass(product.status) + ' bg-opacity-10 text-' + getStatusClass(product.status) + ' border border-' + getStatusClass(product.status)"
+                  >
+                    {{ product.status }}
+                  </span>
+                </div>
+                
+                <div class="d-flex justify-content-between align-items-center">
+                  <small class="text-muted">Base: ${{ product.baseSalesPrice?.toFixed(2) || '0.00' }}</small>
+                  <div class="input-group input-group-sm w-50">
+                    <span class="input-group-text">$</span>
+                    <input 
+                      type="number" 
+                      class="form-control price-input" 
+                      [value]="product.salesPrice"
+                      (change)="updateProductPrice(product.productId, $any($event.target).value)"
+                      (click)="$event.stopPropagation()"
+                      step="0.01"
+                    />
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- RIGHT PANEL: Detailed View -->
+      <div class="col-md-7 col-lg-8 p-4 detail-panel">
+        <div *ngIf="!selectedProduct" class="text-center text-muted py-5">
+          <i class="fas fa-hand-pointer fa-3x mb-3"></i>
+          <p>Select a product from the list to view details</p>
+        </div>
+
+        <div *ngIf="selectedProduct">
+          <div class="d-flex justify-content-between align-items-start mb-4">
+            <div>
+              <h2 class="h3 mb-1">{{ selectedProduct.productName }}</h2>
+              <div class="d-flex gap-2 mb-2">
+                <span class="badge bg-primary">{{ selectedProduct.categoryName }}</span>
+                <span class="badge bg-info">{{ selectedProduct.brandName }}</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="row g-4 mb-4">
+            <div class="col-md-5">
+              <div class="card border-start border-4 border-primary">
+                <div class="card-body">
+                  <h6 class="text-uppercase text-muted small fw-bold mb-2">Current Pricing</h6>
+                  <div class="mb-3">
+                    <label class="form-label small">Sales Price</label>
+                    <div class="input-group input-group-lg">
+                      <span class="input-group-text bg-white border-end-0 text-primary fw-bold">$</span>
+                      <input 
+                        type="number" 
+                        class="form-control border-start-0 ps-0 fw-bold text-primary" 
+                        [value]="selectedProduct.salesPrice"
+                        (change)="updateProductPrice(selectedProduct.productId, $any($event.target).value)"
+                        step="0.01"
+                      />
+                    </div>
+                    <div class="mt-1 d-flex justify-content-between small">
+                      <span [ngClass]="'text-' + (getVariance(selectedProduct).direction === 'up' ? 'success' : getVariance(selectedProduct).direction === 'down' ? 'danger' : 'secondary')">
+                        <i [ngClass]="'fas fa-arrow-' + getVariance(selectedProduct).direction"></i>
+                        ${{ getVariance(selectedProduct).amount.toFixed(2) }} 
+                        ({{ getVariance(selectedProduct).percentage.toFixed(1) }}%)
+                      </span>
+                      <span class="text-muted">vs Base Price</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="col-md-7">
+              <div class="row g-3">
+                <div class="col-6">
+                  <div class="card">
+                    <div class="card-body text-center">
+                      <div class="text-muted small mb-1">Base Price</div>
+                      <h4 class="mb-0">${{ selectedProduct.baseSalesPrice?.toFixed(2) || '0.00' }}</h4>
+                    </div>
+                  </div>
+                </div>
+                <div class="col-6">
+                  <div class="card">
+                    <div class="card-body text-center">
+                      <div class="text-muted small mb-1">Previous Day</div>
+                      <h4 class="mb-0">{{ selectedProduct.previousDayPrice ? '$' + selectedProduct.previousDayPrice.toFixed(2) : 'N/A' }}</h4>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
