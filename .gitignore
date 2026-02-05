@@ -444,3 +444,6 @@ clientapp/dist/
 wwwroot/dist/
 /SourceCode/Documents
 /SourceCode/SeedData
+/SourceCode/Angular/publish-release.ps1
+
+SourceCode/Angular/publish-release.ps1

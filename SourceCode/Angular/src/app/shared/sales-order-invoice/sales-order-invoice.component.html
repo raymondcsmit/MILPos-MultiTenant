@@ -89,7 +89,7 @@
         </div>
         <div
           class="body-section"
-          style="padding: 10px 10px 20px 20px; border: 1px solid gray; margin-top: 10px"
+          style="padding: 10px 10px 20px 20px; border: 1px solid var(--border-color); margin-top: 10px"
         >
           <div class="row" style="display: flex; flex-wrap: wrap">
             <div class="col-8" style="width: 50%; flex: 0 0 auto">
@@ -189,7 +189,7 @@
             }
           </div>
         </div>
-        <div class="body-section" style="padding: 16px; border: 1px solid gray">
+        <div class="body-section" style="padding: 16px; border: 1px solid var(--border-color)">
           @if(isquatation){
           <h4 class="heading" style="margin-top: 2px">
             {{ 'SALES_ORDER_REQUEST_ITEMS' | translate }}
@@ -200,20 +200,20 @@
           <table
             class="table-bordered"
             style="
-              background-color: #fff;
+              background-color: var(--surface-color);
               width: 100%;
               border-collapse: collapse;
-              box-shadow: 0px 0px 5px 0.5px #fff;
+              box-shadow: 0px 0px 5px 0.5px var(--surface-color);
             "
           >
             <thead>
-              <tr style="border: 1px solid #111; background-color: #fff">
+              <tr style="border: 1px solid var(--text-color); background-color: var(--surface-color)">
                 <th
                   style="
                     font-size: 13;
                     padding-top: 08px;
                     padding-bottom: 08px;
-                    border: 1px solid #dee2e6;
+                    border: 1px solid var(--border-color);
                     width: 5%;
                   "
                 >
@@ -224,7 +224,7 @@
                     font-size: 13;
                     padding-top: 08px;
                     padding-bottom: 08px;
-                    border: 1px solid #dee2e6;
+                    border: 1px solid var(--border-color);
                     width: 20%;
                   "
                 >
@@ -236,7 +236,7 @@
                     font-size: 13;
                     padding-top: 08px;
                     padding-bottom: 08px;
-                    border: 1px solid #dee2e6;
+                    border: 1px solid var(--border-color);
                     width: 20%;
                   "
                 >
@@ -248,7 +248,7 @@
                     font-size: 13;
                     padding-top: 08px;
                     padding-bottom: 08px;
-                    border: 1px solid #dee2e6;
+                    border: 1px solid var(--border-color);
                     width: 8%;
                   "
                 >
@@ -260,7 +260,7 @@
                     font-size: 13;
                     padding-top: 08px;
                     padding-bottom: 08px;
-                    border: 1px solid #dee2e6;
+                    border: 1px solid var(--border-color);
                     width: 20%;
                   "
                 >
@@ -272,7 +272,7 @@
                     font-size: 13;
                     padding-top: 08px;
                     padding-bottom: 08px;
-                    border: 1px solid #dee2e6;
+                    border: 1px solid var(--border-color);
                     width: 20%;
                   "
                 >
@@ -284,7 +284,7 @@
                     font-size: 13;
                     padding-top: 08px;
                     padding-bottom: 08px;
-                    border: 1px solid #dee2e6;
+                    border: 1px solid var(--border-color);
                     width: 20%;
                   "
                 >
@@ -299,7 +299,7 @@
                   style="
                     vertical-align: middle !important;
                     text-align: center;
-                    border: 1px solid #dee2e6;
+                    border: 1px solid var(--border-color);
                   "
                 >
                   {{ i + 1 }}
@@ -309,7 +309,7 @@
                     font-size: 12px;
                     vertical-align: middle !important;
                     text-align: center;
-                    border: 1px solid #dee2e6;
+                    border: 1px solid var(--border-color);
                   "
                 >
                   {{ salesItem?.product?.name }}
@@ -319,7 +319,7 @@
                     font-size: 12px;
                     vertical-align: middle !important;
                     text-align: center;
-                    border: 1px solid #dee2e6;
+                    border: 1px solid var(--border-color);
                   "
                 >
                   {{ salesItem.unitPrice | customCurrency }}
@@ -329,7 +329,7 @@
                     font-size: 12px;
                     vertical-align: middle !important;
                     text-align: center;
-                    border: 1px solid #dee2e6;
+                    border: 1px solid var(--border-color);
                   "
                 >
                   {{ salesItem.quantity }}
@@ -340,7 +340,7 @@
                     font-size: 12px;
                     vertical-align: middle !important;
                     text-align: center;
-                    border: 1px solid #dee2e6;
+                    border: 1px solid var(--border-color);
                   "
                 >
                   {{ salesItem.discount | customCurrency }}
@@ -350,7 +350,7 @@
                     font-size: 12px;
                     vertical-align: middle !important;
                     text-align: center;
-                    border: 1px solid #dee2e6;
+                    border: 1px solid var(--border-color);
                   "
                 >
                   {{ salesItem.taxValue | customCurrency }}
@@ -367,7 +367,7 @@
                     font-size: 12px;
                     vertical-align: middle !important;
                     text-align: center;
-                    border: 1px solid #dee2e6;
+                    border: 1px solid var(--border-color);
                   "
                 >
                   {{
@@ -381,8 +381,8 @@
               <tr
                 style="
                   vertical-align: middle !important;
-                  border: 1px solid #dee2e6;
-                  background-color: blanchedalmond;
+                  border: 1px solid var(--border-color);
+                  background-color: var(--primary-50);
                 "
               >
                 <td colspan="100%">
@@ -390,13 +390,13 @@
                 </td>
               </tr>
               } @for(salesItem of salesOrderReturnsItems;let i=$index; track $index){
-              <tr style="background-color: blanchedalmond">
+              <tr style="background-color: var(--primary-50)">
                 <td
                   style="
                     font-size: 12px;
                     vertical-align: middle !important;
                     text-align: center;
-                    border: 1px solid #dee2e6;
+                    border: 1px solid var(--border-color);
                   "
                 >
                   {{ i + 1 }}
@@ -406,7 +406,7 @@
                     font-size: 12px;
                     vertical-align: middle !important;
                     text-align: center;
-                    border: 1px solid #dee2e6;
+                    border: 1px solid var(--border-color);
                   "
                 >
                   {{ salesItem?.product?.name }}
@@ -416,7 +416,7 @@
                     font-size: 12px;
                     vertical-align: middle !important;
                     text-align: center;
-                    border: 1px solid #dee2e6;
+                    border: 1px solid var(--border-color);
                   "
                 >
                   {{ salesItem.unitPrice | customCurrency }}
@@ -426,7 +426,7 @@
                     font-size: 12px;
                     vertical-align: middle !important;
                     text-align: center;
-                    border: 1px solid #dee2e6;
+                    border: 1px solid var(--border-color);
                   "
                 >
                   {{ salesItem.quantity }}
@@ -437,7 +437,7 @@
                     font-size: 12px;
                     vertical-align: middle !important;
                     text-align: center;
-                    border: 1px solid #dee2e6;
+                    border: 1px solid var(--border-color);
                   "
                 >
                   {{ salesItem.discount | customCurrency }}
@@ -447,7 +447,7 @@
                     font-size: 12px;
                     vertical-align: middle !important;
                     text-align: center;
-                    border: 1px solid #dee2e6;
+                    border: 1px solid var(--border-color);
                   "
                 >
                   {{ salesItem.taxValue | customCurrency }}
@@ -464,7 +464,7 @@
                     font-size: 12px;
                     vertical-align: middle !important;
                     text-align: center;
-                    border: 1px solid #dee2e6;
+                    border: 1px solid var(--border-color);
                   "
                 >
                   {{
@@ -482,7 +482,7 @@
                   style="
                     font-size: 13;
                     text-align: end;
-                    border: 1px solid #dee2e6;
+                    border: 1px solid var(--border-color);
                     font-weight: bold;
                   "
                 >
@@ -493,7 +493,7 @@
                   style="
                     font-size: 13;
                     text-align: end;
-                    border: 1px solid #dee2e6;
+                    border: 1px solid var(--border-color);
                     font-weight: bold;
                   "
                 >
@@ -504,7 +504,7 @@
                   style="
                     font-size: 13;
                     text-align: end;
-                    border: 1px solid #dee2e6;
+                    border: 1px solid var(--border-color);
                     font-weight: bold;
                   "
                 >
@@ -515,7 +515,7 @@
                   style="
                     font-size: 13;
                     text-align: end;
-                    border: 1px solid #dee2e6;
+                    border: 1px solid var(--border-color);
                     font-weight: bold;
                   "
                 >
@@ -525,7 +525,7 @@
                   style="
                     font-size: 13;
                     text-align: end;
-                    border: 1px solid #dee2e6;
+                    border: 1px solid var(--border-color);
                     font-weight: bold;
                   "
                 >
@@ -539,13 +539,13 @@
                   style="
                     font-size: 13;
                     text-align: end;
-                    border: 1px solid #dee2e6;
+                    border: 1px solid var(--border-color);
                     font-weight: bold;
                   "
                 >
                   {{ 'PAID' | translate }}
                 </td>
-                <td style="font-size: 13; text-align: end; border: 1px solid #dee2e6">
+                <td style="font-size: 13; text-align: end; border: 1px solid var(--border-color)">
                   {{ salesOrderForInvoice?.totalPaidAmount | customCurrency }}
                 </td>
               </tr>
@@ -557,13 +557,13 @@
                   style="
                     font-size: 13px;
                     text-align: end;
-                    border: 1px solid #dee2e6;
+                    border: 1px solid var(--border-color);
                     font-weight: bold;
                   "
                 >
                   {{ 'REFUND' | translate }}
                 </td>
-                <td style="font-size: 13px; text-align: end; border: 1px solid #dee2e6">
+                <td style="font-size: 13px; text-align: end; border: 1px solid var(--border-color)">
                   {{ -1 * (salesOrderForInvoice?.totalRefundAmount ?? 0) | customCurrency }}
                 </td>
               </tr>
@@ -577,13 +577,13 @@
                   style="
                     font-size: 13px;
                     text-align: end;
-                    border: 1px solid #dee2e6;
+                    border: 1px solid var(--border-color);
                     font-weight: bold;
                   "
                 >
                   {{ 'BALANCE' | translate }}
                 </td>
-                <td style="font-size: 13px; text-align: end; border: 1px solid #dee2e6">
+                <td style="font-size: 13px; text-align: end; border: 1px solid var(--border-color)">
                   {{
                     (salesOrderForInvoice?.totalAmount ?? 0) +
                       (salesOrderForInvoice?.totalRefundAmount ?? 0) -

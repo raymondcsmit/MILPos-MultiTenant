@@ -62,7 +62,6 @@ export class ProductStockBulkUpdateComponent implements OnInit, OnDestroy {
   ngOnInit(): void {
     this.loadLocations();
     this.loadTaxes();
-    this.loadProducts();
   }
 
   ngOnDestroy(): void {
@@ -75,6 +74,8 @@ export class ProductStockBulkUpdateComponent implements OnInit, OnDestroy {
           this.locations = res.locations;
           if(this.locations.length > 0 && this.locations[0].id) {
               this.currentUpdate.locationId = this.locations[0].id;
+              // Now that we have a location, load products
+              this.loadProducts();
           }
       });
   }
@@ -86,10 +87,13 @@ export class ProductStockBulkUpdateComponent implements OnInit, OnDestroy {
   }
 
   loadProducts(): void {
+    if (!this.currentUpdate.locationId) return;
+
     this.loading = true;
     const resource = new InventoryResourceParameter();
-    resource.pageSize = 1000; // Fetch enough
+    resource.pageSize = 1000;
     resource.orderBy = 'productName asc';
+    resource.locationId = this.currentUpdate.locationId;
     
     this.inventoryService.getInventories(resource)
       .pipe(takeUntil(this.destroy$))

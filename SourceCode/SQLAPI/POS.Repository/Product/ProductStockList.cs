@@ -55,9 +55,11 @@ namespace POS.Repository
                 ProductId = c.ProductId,
                 ProductName = c.Product.Name,
                 Stock = c.CurrentStock,
-                UnitName = c.Product.Unit.Name,
-                UnitId = c.Product.Unit.Id,
-                LocationId = c.LocationId,
+                 UnitName = c.Product.Unit.Name,
+                 UnitId = c.Product.Unit.Id,
+                 LocationId = c.LocationId,
+                 CategoryName = c.Product.ProductCategory.Name,
+                 BrandName = c.Product.Brand.Name
             }).ToListAsync();
                 return entities;
             }
@@ -76,6 +78,8 @@ namespace POS.Repository
                    UnitName = c.Product.Unit.Name,
                    UnitId = c.Product.Unit.Id,
                    LocationId = c.LocationId,
+                   CategoryName = c.Product.ProductCategory.Name,
+                   BrandName = c.Product.Brand.Name
                }).ToListAsync();
                 return entities;
             }

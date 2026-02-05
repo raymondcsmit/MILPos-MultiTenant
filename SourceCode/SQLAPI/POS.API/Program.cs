@@ -15,6 +15,7 @@ using POS.API;
 using POS.API.Helpers;
 using POS.Domain;
 using System;
+using System.IO;
 
 using OfficeOpenXml; // Add this namespace
 
@@ -22,6 +23,7 @@ var builder = WebApplication.CreateBuilder(args);
 ExcelPackage.License.SetNonCommercialOrganization("MIL POS");
 //ExcelPackage.License.LicenseContext = LicenseContext.NonCommercial; // Set license globally
 builder.Services.AddTransient<JobService>();
+builder.Services.AddMemoryCache();
 
 
 builder.Logging.ClearProviders();
@@ -47,7 +49,20 @@ builder.Services.AddHangfire(configuration =>
 
     if (provider == "Sqlite")
     {
-        var sqliteconnectionString = builder.Configuration.GetConnectionString("SqliteHangfirConnectionString");  
+        var sqliteconnectionString = builder.Configuration.GetConnectionString("SqliteHangfirConnectionString");
+        
+        var env = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT");
+        if (env == "Desktop")
+        {
+             var appDataPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "milpos");
+             if (!Directory.Exists(appDataPath))
+             {
+                 Directory.CreateDirectory(appDataPath);
+             }
+             var dbPath = Path.Combine(appDataPath, "HangFireDB.db");
+             sqliteconnectionString = dbPath;
+        }
+
         configuration.UseSQLiteStorage(sqliteconnectionString);
     }
     else
@@ -96,7 +111,7 @@ catch (System.Exception ex)
     // Log error but allow app to start if possible, or rethrow
     var logger = app.Services.GetRequiredService<ILogger<Program>>();
     logger.LogError(ex, "An error occurred while upgrading the database.");
-    throw;
+    // throw; // Prevent crash to allow debugging
 }
 
 ILoggerFactory loggerFactory = app.Services.GetRequiredService<ILoggerFactory>();

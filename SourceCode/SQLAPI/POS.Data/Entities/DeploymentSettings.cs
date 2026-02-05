@@ -11,6 +11,7 @@ namespace POS.Data.Entities
         public MultiTenancySettings MultiTenancy { get; set; }
         public DesktopSettings DesktopSettings { get; set; }
         public CloudSettings CloudSettings { get; set; }
+        public SyncSettings SyncSettings { get; set; }
     }
 
     public class MultiTenancySettings
@@ -38,5 +39,10 @@ namespace POS.Data.Entities
         public string CdnUrl { get; set; }
         public bool EnableRateLimiting { get; set; }
         public int MaxRequestsPerMinute { get; set; }
+    }
+
+    public class SyncSettings
+    {
+        public string CloudApiUrl { get; set; }
     }
 }

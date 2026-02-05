@@ -1,0 +1,13 @@
+<div class="theme-selector-container">
+  <h5>{{ 'THEME_SELECTION' | translate }}</h5>
+  <div class="theme-grid">
+    <div *ngFor="let theme of themes" 
+         class="theme-btn" 
+         [class.active]="(themeService.currentTheme()) === theme.id"
+         (click)="setTheme(theme.id)">
+         
+      <div class="color-swatch" [style.background-color]="theme.color"></div>
+      <span class="small">{{ theme.name }}</span>
+    </div>
+  </div>
+</div>

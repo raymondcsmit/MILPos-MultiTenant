@@ -103,7 +103,7 @@ namespace POS.MediatR.Product.Handler
 
                     foreach (var brancId in branchIds)
                     {
-                        var ProductStock = new ProductStock
+                        var ProductStock = new Data.Entities.ProductStock
                         {
                             PurchasePrice = variant.PurchasePrice.Value,
                             CurrentStock = 0.0m,
@@ -134,7 +134,7 @@ namespace POS.MediatR.Product.Handler
             {
                 foreach (var branchId in branchIds)
                 {
-                    var ProductStock = new ProductStock
+                    var ProductStock = new Data.Entities.ProductStock
                     {
                         PurchasePrice = request.PurchasePrice.Value,
                         CurrentStock = 0.0m,

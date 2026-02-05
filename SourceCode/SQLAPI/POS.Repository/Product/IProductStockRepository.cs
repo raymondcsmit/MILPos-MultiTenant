@@ -14,6 +14,7 @@ namespace POS.Repository
         Task<ProductStockAlertList> GetProductStockAlertsAsync(ProductStockAlertResource productStockAlertResource);
         decimal ConvertStockAndPriceBaseUnitToUnit(Guid UnitId, ProductStock productStock);
         Task<ProductStockList> GetProducStocks(ProductStockResource productStockResource);
+        Task UpdateProductStockAsync(Guid locationId, Guid productId, decimal newStockValue);
 
     }
 }

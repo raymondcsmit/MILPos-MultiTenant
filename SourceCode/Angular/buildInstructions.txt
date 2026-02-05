@@ -1,0 +1,11 @@
+ng build --configuration=electron --base-href ./
+npm run build:api
+npm run electron:prod
+
+
+### How the GitHub Strategy Works
+1. Build : Run npm run electron:package . This creates MIL POS Setup X.X.X.exe , latest.yml , and latest.yml.blockmap .
+2. Release : Go to your GitHub Repo > Releases > Draft a new release .
+3. Upload : Upload those 3 files to the release assets.
+4. Auto-Update : When your users open the app, it automatically checks GitHub. If the release version is higher than their installed version, it downloads and installs it.
+Your database migrations will still run automatically on startup ( Program.cs ), so data syncing remains seamless.

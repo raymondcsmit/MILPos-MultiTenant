@@ -31,6 +31,11 @@ export const routes: Routes = [
           import('./activate-license/activate-license.component').then((m) => m.ActivateLicenseComponent),
       },
       {
+        path: 'subscription',
+        loadComponent: () =>
+          import('./subscription/subscription.component').then((m) => m.SubscriptionComponent),
+      },
+      {
         path: 'forgot-password',
         loadComponent: () =>
           import('./forgot-password/forgot-password.component')
@@ -342,6 +347,15 @@ export const routes: Routes = [
             loadComponent: () =>
               import('./inventory/product-stock-bulk-update/product-stock-bulk-update.component').then(
                 (m) => m.ProductStockBulkUpdateComponent
+              ),
+          },
+          {
+            path: 'inventory/bulk-adjust',
+            data: { claimType: 'INVE_MANAGE_INVENTORY' },
+            canActivate: [AuthGuard],
+            loadComponent: () =>
+              import('./inventory/product-stock-bulk-adjust/product-stock-bulk-adjust.component').then(
+                (m) => m.ProductStockBulkAdjustComponent
               ),
           },
           {

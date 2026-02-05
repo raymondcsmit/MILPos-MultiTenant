@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MIL POS - Midnight Gold</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            /* Midnight Gold: Dark Blue to Gold */
+            background: linear-gradient(135deg, #000000 0%, #141E30 60%, #FDC830 100%);
+            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            overflow: hidden;
+            user-select: none;
+        }
+
+        .glass-card {
+            background: rgba(20, 30, 48, 0.6);
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.7);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border-radius: 20px;
+            border: 1px solid rgba(253, 200, 48, 0.3);
+            width: 450px;
+            height: 280px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            position: relative;
+        }
+
+        .logo-text {
+            font-size: 56px;
+            font-weight: 800;
+            color: #FDC830;
+            background: linear-gradient(to bottom, #FDC830, #F37335);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            filter: drop-shadow(0px 2px 2px rgba(0,0,0,0.5));
+            margin: 0;
+            letter-spacing: -2px;
+        }
+
+        .subtitle {
+            font-size: 16px;
+            color: #FDC830;
+            font-weight: 500;
+            margin-bottom: 25px;
+            opacity: 0.9;
+        }
+
+        .dots-loader {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 20px;
+        }
+
+        .dot {
+            width: 12px;
+            height: 12px;
+            background: #FDC830;
+            border-radius: 50%;
+            animation: bounce 1.4s infinite ease-in-out both;
+        }
+
+        .dot:nth-child(1) { animation-delay: -0.32s; opacity: 0.8; }
+        .dot:nth-child(2) { animation-delay: -0.16s; opacity: 1; }
+
+        @keyframes bounce {
+            0%, 80%, 100% { transform: scale(0); opacity: 0.5; }
+            40% { transform: scale(1); opacity: 1; }
+        }
+
+        .status-text {
+            font-size: 13px;
+            color: #FDC830;
+            font-family: Consolas, 'Courier New', monospace;
+            background: rgba(0, 0, 0, 0.4);
+            padding: 4px 12px;
+            border-radius: 12px;
+            min-width: 200px;
+            text-align: center;
+            border: 1px solid rgba(253, 200, 48, 0.2);
+        }
+
+        .footer {
+            position: absolute;
+            bottom: 15px;
+            font-size: 11px;
+            color: rgba(253, 200, 48, 0.5);
+        }
+        
+        .fade-in {
+            animation: fadeIn 0.5s ease-in;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(5px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+    </style>
+</head>
+<body>
+    <div class="glass-card">
+        <h1 class="logo-text">MIL POS</h1>
+        <div class="subtitle">Smart Inventory & Retail System</div>
+        
+        <div class="dots-loader">
+            <div class="dot"></div>
+            <div class="dot"></div>
+            <div class="dot"></div>
+        </div>
+
+        <div id="status" class="status-text">Initializing Core...</div>
+
+        <div class="footer">
+            &copy; 2026 MIL POS Systems
+        </div>
+    </div>
+
+    <script>
+        const statuses = [
+            "Initializing Core...",
+            "Loading Modules...",
+            "Connecting to Database...",
+            "Syncing Inventory...",
+            "Verifying License...",
+            "Starting Application..."
+        ];
+        
+        let i = 0;
+        const statusEl = document.getElementById('status');
+        
+        setInterval(() => {
+            i = (i + 1) % statuses.length;
+            statusEl.classList.remove('fade-in');
+            void statusEl.offsetWidth; 
+            statusEl.innerText = statuses[i];
+            statusEl.classList.add('fade-in');
+        }, 1200);
+    </script>
+</body>
+</html>

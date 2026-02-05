@@ -1,6 +1,17 @@
 {
   "name": "milpos",
-  "version": "0.0.3",
+  "version": "0.0.2",
+  "description": "A comprehensive, multi-tenant POS with Inventory Management System designed to streamline retail operations, integrating POS, inventory tracking, accounting, purchasing, and CRM.",
+  "author": {
+    "name": "Waqar Habib",
+    "role": "Architect and Developer"
+  },
+  "contributors": [
+    {
+      "name": "Muhammad Illyas",
+      "role": "Stakeholder and Primary Client"
+    }
+  ],
   "main": "main.js",
   "scripts": {
     "ng": "ng",
@@ -10,6 +21,7 @@
     "electron:build": "ng build --configuration=electron --base-href ./ && electron-builder",
     "build:api": "dotnet publish ../SQLAPI/POS.API/POS.API.csproj -c Release -r win-x64 --self-contained true",
     "electron:package": "npm run build:api && npm run electron:build",
+    "electron:publish": "npm run build:api && npm run electron:build -- --publish always",
     "build": "ng build",
     "watch": "ng build --watch --configuration development",
     "test": "ng test"
@@ -23,6 +35,7 @@
     "files": [
       "main.js",
       "splash.html",
+      "icon.png",
       {
         "from": "../SQLAPI/POS.API/ClientApp/browser",
         "to": "dist",
@@ -41,13 +54,23 @@
       }
     ],
     "win": {
-      "target": "nsis"
+      "target": "nsis",
+      "icon": "icon.ico"
     },
     "nsis": {
       "oneClick": false,
       "perMachine": false,
       "allowToChangeInstallationDirectory": true
-    }
+    },
+    "publish": [
+      {
+        "provider": "github"
+      }
+    ]
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/raymondcsmit/MILPOS-Release"
   },
   "prettier": {
     "printWidth": 100,
@@ -93,7 +116,9 @@
     "crypto-js": "^4.2.0",
     "dayjs": "^1.11.13",
     "echarts": "^5.4.3",
+    "electron-updater": "^6.7.3",
     "html2canvas": "^1.4.1",
+    "jimp": "^1.6.0",
     "jsbarcode": "^3.11.6",
     "jspdf": "^3.0.3",
     "jspdf-autotable": "^5.0.2",
@@ -103,6 +128,7 @@
     "rxjs": "~7.8.0",
     "subsink": "^1.0.2",
     "tslib": "^2.3.0",
+    "ws": "^8.19.0",
     "xlsx": "^0.18.5",
     "zone.js": "~0.15.0"
   },
@@ -120,6 +146,7 @@
     "karma-coverage": "~2.2.0",
     "karma-jasmine": "~5.1.0",
     "karma-jasmine-html-reporter": "~2.1.0",
+    "png-to-ico": "^3.0.1",
     "typescript": "~5.9.2"
   }
 }

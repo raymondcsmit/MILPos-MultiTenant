@@ -334,6 +334,7 @@ namespace POS.API
             }
             app.UseRouting();
             app.UseAuthorization();
+            app.UseMiddleware<POS.API.Middleware.TrialEnforcementMiddleware>();
             app.UseResponseCompression();
 
             app.UseEndpoints(endpoints =>

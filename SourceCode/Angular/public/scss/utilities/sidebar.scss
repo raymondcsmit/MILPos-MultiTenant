@@ -21,7 +21,7 @@
 .sidebar {
   @include vars.transition(all 0.5s);
   font-family: vars.$sidebar-font-family;
-  background: vars.$theme-navbar-brand;
+  background: var(--sidenav-bg);
   width: 260px;
   overflow: hidden;
   display: inline-block;
@@ -58,14 +58,14 @@
         @include vars.three-dots-overflow();
         font-size: 14px;
         max-width: 200px;
-        color: #fff;
+        color: var(--text-color);
       }
 
       .email {
         @include vars.three-dots-overflow();
         font-size: 12px;
         max-width: 200px;
-        color: #fff;
+        color: var(--text-color);
       }
 
       .user-helper-dropdown {
@@ -74,7 +74,7 @@
         bottom: -12px;
         @include vars.box-shadow(none);
         cursor: pointer;
-        color: #fff;
+        color: var(--text-color);
       }
     }
   }
@@ -178,7 +178,7 @@
           transform: scale(1);
           font-weight: 600;
           font-size: 12px;
-          color: #fff;
+          color: var(--text-color);
           @include vars.transform(scale(1));
         }
 
@@ -226,7 +226,7 @@
       }
 
       a {
-        color: vars.$theme-white;
+        color: var(--text-color);
         position: relative;
         font-size: 14px;
         display: block;
@@ -251,7 +251,7 @@
 
         span {
           margin: 7px 0 7px 3px;
-          color: vars.$theme-white;
+          color: var(--text-color);
           font-size: 13px;
           overflow: hidden;
           letter-spacing: 1px;
@@ -638,7 +638,7 @@
 
     .ml-menu .active a {
       background-color: #181b23;
-      color: #fff;
+      color: var(--text-color);
     }
   }
 }
@@ -646,7 +646,7 @@
 .user-panel {
   float: left;
   width: 100%;
-  color: #ccc;
+  color: var(--text-color);
   padding: 25px 10px 10px 0;
 
   .image {

@@ -90,7 +90,7 @@ namespace POS.Domain.Sync
         private async Task PullChangesAsync(SyncResult result)
         {
             // Get list of entity types to sync
-            var entityTypes = new[] { "Product", "Customer", "SalesOrder", "Supplier", "Category" };
+            var entityTypes = new[] { "Product", "Customer", "SalesOrder", "Supplier", "Category", "CompanyProfile" };
 
             foreach (var entityType in entityTypes)
             {

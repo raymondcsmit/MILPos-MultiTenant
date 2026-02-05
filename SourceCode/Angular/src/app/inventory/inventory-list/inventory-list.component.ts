@@ -170,6 +170,10 @@ export class InventoryListComponent extends BaseComponent implements OnInit {
     this.router.navigate(['/inventory/bulk-update']);
   }
 
+  navigateToBulkAdjust() {
+    this.router.navigate(['/inventory/bulk-adjust']);
+  }
+
   addInvenotry(inventory?: Inventory | null) {
     const dialogRef = this.dialog.open(ManageInventoryComponent, {
       maxHeight: '90vh',

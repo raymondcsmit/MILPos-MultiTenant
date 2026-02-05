@@ -109,8 +109,8 @@ namespace POS.Repository
                 Phone = tenant.ContactPhone,
                 CreatedBy = adminUser.Id,
                 CreatedDate = DateTime.UtcNow,
-                LicenseKey = Guid.NewGuid().ToString("N").ToUpper(),
-                PurchaseCode = Guid.NewGuid().ToString("N").ToUpper()
+                LicenseKey = "AAABBB",
+                PurchaseCode = "CCCCRR"
             };
 
             _context.CompanyProfiles.Add(companyProfile);

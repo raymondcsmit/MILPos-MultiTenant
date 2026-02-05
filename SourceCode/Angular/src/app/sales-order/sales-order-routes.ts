@@ -20,7 +20,7 @@ export const SALE_RODER_ROUTES: Routes = [
   },
   {
     path: ':id',
-    component: SalesOrderContainerComponent,
+    component: SalesOrderAddEditComponent,
     data: {
       claimType: ['SO_ADD_SO', 'SO_UPDATE_SO', 'SOR_CONVERT_TO_SO'],
       productType: ProductType.VariantProduct,
@@ -32,6 +32,20 @@ export const SALE_RODER_ROUTES: Routes = [
       salesorder: salesOrderDetailResolver
     },
   },
+  // {
+  //   path: ':id',
+  //   component: SalesOrderContainerComponent,
+  //   data: {
+  //     claimType: ['SO_ADD_SO', 'SO_UPDATE_SO', 'SOR_CONVERT_TO_SO'],
+  //     productType: ProductType.VariantProduct,
+  //   },
+  //   canActivate: [AuthGuard],
+  //   resolve: {
+  //     units: salesOrderUnitResolver,
+  //     taxs: salesOrderTaxResolver,
+  //     salesorder: salesOrderDetailResolver
+  //   },
+  // },
   {
     path: 'detail/:id',
     component: SalesOrderDetailComponent,

@@ -61,9 +61,13 @@ export const HttpRequestInterceptor: HttpInterceptorFn = (
             if (err.status === 401) {
               router.navigate(['login']);
             } else if (err.status === 403) {
-              toastrService.error(
-                translationService.getValue('ACCESS_FORBIDDEN')
-              );
+              if (err.error && (err.error.isTrialExpired || (typeof err.error === 'string' && err.error.includes('Trial')))) {
+                router.navigate(['/subscription']);
+              } else {
+                  toastrService.error(
+                    translationService.getValue('ACCESS_FORBIDDEN')
+                  );
+              }
             } else if (err.error && err.error.length >= 0) {
               toastrService.error(err.error[0]);
             } else if (err.error && err.error?.messages?.length > 0) {

@@ -159,7 +159,7 @@ namespace POS.MediatR.Product.Handler
                         // create stocks for new variant
                         foreach (var branchId in branchIds)
                         {
-                            _productStockRepository.Add(new ProductStock
+                            _productStockRepository.Add(new Data.Entities.ProductStock
                             {
                                 PurchasePrice = variant.PurchasePrice ?? 0,
                                 CurrentStock = 0.0m,

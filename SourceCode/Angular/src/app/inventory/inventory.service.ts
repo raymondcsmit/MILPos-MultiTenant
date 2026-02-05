@@ -98,4 +98,9 @@ export class InventoryService {
     const url = 'ProductStock/bulk-update';
     return this.http.post(url, command);
   }
+
+  bulkAdjustProductStock(command: any): Observable<any> {
+    const url = 'ProductStock/bulk-adjust';
+    return this.http.post(url, command);
+  }
 }
