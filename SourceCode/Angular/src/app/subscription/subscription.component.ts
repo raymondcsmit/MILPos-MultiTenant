@@ -26,8 +26,9 @@ export class SubscriptionComponent implements OnInit {
   }
 
   payOnline(): void {
-    // Open Stripe Payment Link in new tab
-    window.open('https://buy.stripe.com/test_...', '_blank'); 
+    // TODO: Replace with your actual Stripe Payment Link
+    const paymentLink = 'https://stripe.com'; 
+    window.open(paymentLink, '_blank');
   }
 
   contactSales(): void {

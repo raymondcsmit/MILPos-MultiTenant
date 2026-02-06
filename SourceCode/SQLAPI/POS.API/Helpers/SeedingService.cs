@@ -319,6 +319,19 @@ namespace POS.API.Helpers
                     }
                 }
                 
+                // Smart Fill for BaseEntity dates
+                if (entity is BaseEntity baseEntity)
+                {
+                     if (baseEntity.CreatedDate == DateTime.MinValue)
+                     {
+                         baseEntity.CreatedDate = DateTime.UtcNow;
+                     }
+                     if (baseEntity.ModifiedDate == DateTime.MinValue)
+                     {
+                         baseEntity.ModifiedDate = DateTime.UtcNow;
+                     }
+                }
+                
                 // Auto-fill TenantId property if it exists and is currently Guid.Empty or null
                 if (this._defaultTenantId != null && this._defaultTenantId != Guid.Empty)
                 {

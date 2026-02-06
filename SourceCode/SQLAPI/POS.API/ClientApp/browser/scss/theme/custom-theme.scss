@@ -129,9 +129,23 @@ $my-theme: mat.m2-define-light-theme((
     // Custom button overrides
     --mdc-filled-button-container-color: var(--primary-500);
     --mdc-filled-button-label-text-color: #ffffff;
+    background-color: var(--primary-500) !important;
+    color: #ffffff !important;
 }
 
 .secondary {
     --mdc-filled-button-container-color: var(--secondary-500);
     --mdc-filled-button-label-text-color: #ffffff;
+    background-color: var(--secondary-500) !important;
+    color: #ffffff !important;
+}
+
+.success {
+    background-color: var(--primary-500) !important; // Or a specific success color if available
+    color: #ffffff !important;
+}
+
+.error {
+    background-color: var(--warn-500) !important;
+    color: #ffffff !important;
 }
