@@ -62,6 +62,7 @@
 		<PackageReference Include="NLog.Database" Version="6.0.3" />
 		<PackageReference Include="NLog.Extensions.Logging" Version="6.1.0" />
 		<PackageReference Include="NLog.Web.AspNetCore" Version="6.1.0" />
+		<PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="10.0.0" />
 		<PackageReference Include="Swashbuckle.AspNetCore" Version="6.6.2" />
 	</ItemGroup>
 
@@ -71,6 +72,7 @@
 		<ProjectReference Include="..\POS.Domain\POS.Domain.csproj" />
 		<ProjectReference Include="..\POS.Helper\POS.Helper.csproj" />
 		<ProjectReference Include="..\POS.MediatR\POS.MediatR.csproj" />
+		<ProjectReference Include="..\POS.Migrations.PostgreSQL\POS.Migrations.PostgreSQL.csproj" />
 		<ProjectReference Include="..\POS.Migrations.Sqlite\POS.Migrations.Sqlite.csproj" />
 		<ProjectReference Include="..\POS.Migrations.SqlServer\POS.Migrations.SqlServer.csproj" />
 	</ItemGroup>

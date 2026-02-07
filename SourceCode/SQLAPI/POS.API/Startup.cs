@@ -109,6 +109,13 @@ namespace POS.API
                         b => b.MigrationsAssembly("POS.Migrations.Sqlite"))
                     .EnableSensitiveDataLogging();
                 }
+                else if (provider == "PostgreSql")
+                {
+                    AppContext.SetSwitch("Npgsql.EnableLegacyTimestampBehavior", true);
+                    options.UseNpgsql(Configuration.GetConnectionString("PostgresConnectionString"),
+                        b => b.MigrationsAssembly("POS.Migrations.PostgreSQL"))
+                    .EnableSensitiveDataLogging();
+                }
                 else
                 {
                     options.UseSqlServer(Configuration.GetConnectionString("DbConnectionString"),

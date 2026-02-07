@@ -19,18 +19,26 @@ namespace POS.API.Context
                 .AddJsonFile("appsettings.json")
                 .AddJsonFile($"appsettings.{Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT") ?? "Development"}.json", optional: true)
                 .AddEnvironmentVariables()
+                .AddCommandLine(args)
                 .Build();
 
             var provider = configuration["DatabaseProvider"] ?? "SqlServer";
-            var connectionString = configuration.GetConnectionString(provider == "Sqlite" ? "SqliteConnectionString" : "DbConnectionString");
-
+            
             if (string.Equals(provider, "Sqlite", StringComparison.OrdinalIgnoreCase))
             {
-                optionsBuilder.UseSqlite(connectionString, b => b.MigrationsAssembly("POS.Migrations.Sqlite"));
+                 var connectionString = configuration.GetConnectionString("SqliteConnectionString");
+                 optionsBuilder.UseSqlite(connectionString, b => b.MigrationsAssembly("POS.Migrations.Sqlite"));
+            }
+            else if (string.Equals(provider, "PostgreSql", StringComparison.OrdinalIgnoreCase))
+            {
+                 var connectionString = configuration.GetConnectionString("PostgresConnectionString");
+                 AppContext.SetSwitch("Npgsql.EnableLegacyTimestampBehavior", true);
+                 optionsBuilder.UseNpgsql(connectionString, b => b.MigrationsAssembly("POS.Migrations.PostgreSQL"));
             }
             else
             {
-                optionsBuilder.UseSqlServer(connectionString, b => b.MigrationsAssembly("POS.Migrations.SqlServer"));
+                 var connectionString = configuration.GetConnectionString("DbConnectionString");
+                 optionsBuilder.UseSqlServer(connectionString, b => b.MigrationsAssembly("POS.Migrations.SqlServer"));
             }
 
             return new POSDbContext(optionsBuilder.Options, new SingleTenantProvider());
