@@ -131,7 +131,11 @@
       <ul class="nav navbar-nav navbar-right">
         <li>
           <div class="d-flex gap-2">
-            
+            @if(isSuperAdmin){
+            <button matTooltip="Manage Tenants" matMiniFab class="accent" [routerLink]="['/tenants']">
+              <mat-icon class="header-icon fs-4">business</mat-icon>
+            </button>
+            }
             <button matTooltip="Today's Summary Report" matMiniFab class="error">
               <mat-icon class="header-icon fs-4" (click)="openDailyReport()">assignment</mat-icon>
             </button>

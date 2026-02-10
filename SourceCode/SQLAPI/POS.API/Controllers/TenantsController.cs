@@ -71,7 +71,7 @@ namespace POS.API.Controllers
         /// Get all tenants (SuperAdmin only)
         /// </summary>
         [HttpGet]
-        [Authorize(Roles = "SuperAdmin")]
+        [Authorize(Policy = "SuperAdminPolicy")]
         public async Task<ActionResult<List<Tenant>>> GetAllTenants()
         {
             var tenants = await _context.Tenants
@@ -86,7 +86,7 @@ namespace POS.API.Controllers
         /// Get tenant by ID (SuperAdmin only)
         /// </summary>
         [HttpGet("{id}")]
-        [Authorize(Roles = "SuperAdmin")]
+        [Authorize(Policy = "SuperAdminPolicy")]
         public async Task<ActionResult<Tenant>> GetTenant(Guid id)
         {
             var tenant = await _context.Tenants
@@ -103,7 +103,7 @@ namespace POS.API.Controllers
         /// Create a new tenant (SuperAdmin only)
         /// </summary>
         [HttpPost]
-        [Authorize(Roles = "SuperAdmin")]
+        [Authorize(Policy = "SuperAdminPolicy")]
         public async Task<ActionResult<Tenant>> CreateTenant([FromBody] CreateTenantDto dto)
         {
             // Check if subdomain already exists
@@ -125,7 +125,8 @@ namespace POS.API.Controllers
         /// Update tenant (SuperAdmin only)
         /// </summary>
         [HttpPut("{id}")]
-        [Authorize(Roles = "SuperAdmin")]
+        //[Authorize(Roles = "SuperAdmin")]
+        [Authorize(Policy = "SuperAdminPolicy")]
         public async Task<ActionResult<Tenant>> UpdateTenant(Guid id, [FromBody] UpdateTenantDto dto)
         {
             var tenant = await _context.Tenants
@@ -152,7 +153,8 @@ namespace POS.API.Controllers
         /// Deactivate tenant (SuperAdmin only)
         /// </summary>
         [HttpDelete("{id}")]
-        [Authorize(Roles = "SuperAdmin")]
+        //[Authorize(Roles = "SuperAdmin")]
+        [Authorize(Policy = "SuperAdminPolicy")]
         public async Task<ActionResult> DeactivateTenant(Guid id)
         {
             var tenant = await _context.Tenants
@@ -172,7 +174,8 @@ namespace POS.API.Controllers
         /// Migrate existing data to default tenant (SuperAdmin only, one-time operation)
         /// </summary>
         [HttpPost("migrate-to-default")]
-        [Authorize(Roles = "SuperAdmin")]
+        [Authorize(Policy = "SuperAdminPolicy")]
+        //[Authorize(Roles = "SuperAdmin")]
         public async Task<ActionResult> MigrateToDefaultTenant()
         {
             try
@@ -189,13 +192,14 @@ namespace POS.API.Controllers
         /// Update tenant subscription/license type
         /// </summary>
         [HttpPut("{id}/license")]
-        [Authorize(Roles = "SuperAdmin")]
+        //[Authorize(Roles = "SuperAdmin")]
+        [Authorize(Policy = "SuperAdminPolicy")]
         public async Task<ActionResult> UpdateLicense(Guid id, [FromBody] UpdateLicenseDto dto)
         {
             var command = new UpdateTenantLicenseCommand
             {
                 TenantId = id,
-                LicenseType = Enum.Parse<LicenseType>(dto.LicenseType)
+                LicenseType = Enum.Parse<LicenseType>(dto.LicenseType).ToString()
             };
             var response = await _mediator.Send(command);
             if (!response.Success) return NotFound();
@@ -206,7 +210,8 @@ namespace POS.API.Controllers
         /// Toggle tenant status (Active/Inactive)
         /// </summary>
         [HttpPut("{id}/status")]
-        [Authorize(Roles = "SuperAdmin")]
+        //[Authorize(Roles = "SuperAdmin")]
+        [Authorize(Policy = "SuperAdminPolicy")]
         public async Task<ActionResult> ToggleStatus(Guid id, [FromBody] UpdateStatusDto dto)
         {
             var command = new ToggleTenantStatusCommand { TenantId = id };
@@ -219,13 +224,15 @@ namespace POS.API.Controllers
         /// Switch to a specific tenant (Impersonation)
         /// </summary>
         [HttpPost("{id}/switch")]
-        [Authorize(Roles = "SuperAdmin")]
+        //[Authorize(Roles = "SuperAdmin")]
+        [Authorize(Policy = "SuperAdminPolicy")]
         public async Task<ActionResult> SwitchTenant(Guid id)
         {
             var command = new SwitchTenantCommand
             {
                 TenantId = id,
-                Email = User.FindFirstValue(ClaimTypes.Email)
+                //Email = User.FindFirstValue(ClaimTypes.Email)
+                Email = User.FindFirstValue("Email") ?? User.FindFirstValue(ClaimTypes.Email)
             };
 
             var response = await _mediator.Send(command);
@@ -242,7 +249,8 @@ namespace POS.API.Controllers
         /// Generate License Key and Purchase Code for a tenant
         /// </summary>
         [HttpPost("{id}/license/generate")]
-        [Authorize(Roles = "SuperAdmin")]
+        //[Authorize(Roles = "SuperAdmin")]
+        [Authorize(Policy = "SuperAdminPolicy")]
         public async Task<ActionResult> GenerateLicenseKeys(Guid id)
         {
             var command = new GenerateTenantLicenseKeysCommand { TenantId = id };

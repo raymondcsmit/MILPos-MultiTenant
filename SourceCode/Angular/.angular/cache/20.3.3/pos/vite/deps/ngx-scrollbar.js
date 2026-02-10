@@ -89,12 +89,12 @@ import {
   ɵɵdefineInjector,
   ɵɵnamespaceSVG
 } from "./chunk-NMUC745S.js";
+import "./chunk-JRFR6BLO.js";
 import {
   animationFrameScheduler,
   fromEvent,
   merge
 } from "./chunk-HWYXSU2G.js";
-import "./chunk-JRFR6BLO.js";
 import {
   EMPTY,
   Observable,

@@ -1,4 +1,4 @@
-﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -16,7 +16,7 @@ namespace POS.Common.GenericRepository
         protected readonly TContext Context;
         internal readonly DbSet<TC> DbSet;
         protected IUnitOfWork<TContext> _uow;
-        protected GenericRepository(IUnitOfWork<TContext> uow
+        public GenericRepository(IUnitOfWork<TContext> uow
             )
         {
             Context = uow.Context;

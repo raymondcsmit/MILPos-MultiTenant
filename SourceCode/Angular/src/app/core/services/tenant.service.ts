@@ -36,7 +36,7 @@ export class TenantService {
     return this.httpClient.post<any>(`Tenants/${id}/switch`, {});
   }
 
-  generateLicenseKeys(id: string): Observable<any> {
+  generateLicenseKeys(id: string): Observable<Tenant> {
     return this.httpClient.post<any>(`Tenants/${id}/license/generate`, {});
   }
 

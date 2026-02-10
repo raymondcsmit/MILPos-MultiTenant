@@ -159,11 +159,23 @@ export class HeaderComponent extends BaseComponent implements OnInit {
   }
 
   get isSuperAdmin(): boolean {
-    const roles = this.securityService.Token && this.securityService.Token['role'];
-    if (Array.isArray(roles)) {
-      return roles.includes('Super Admin');
+    // First check if user object has isSuperAdmin property
+    if (this.appUserAuth && this.appUserAuth.isSuperAdmin !== undefined) {
+      return this.appUserAuth.isSuperAdmin;
     }
-    return roles === 'Super Admin';
+    
+    // Fallback: check JWT token claim
+    const token = this.securityService.Token;
+    if (token && token['isSuperAdmin']) {
+      const value = token['isSuperAdmin'];
+      // Handle both string and boolean types
+      if (typeof value === 'boolean') {
+        return value;
+      }
+      return value === 'true';
+    }
+    
+    return false;
   }
 
   // getLangDir() {

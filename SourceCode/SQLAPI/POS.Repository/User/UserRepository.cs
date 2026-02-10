@@ -114,6 +114,7 @@ public class UserRepository : GenericRepository<User, POSDbContext>,
         ret.PhoneNumber = appUser.PhoneNumber;
         ret.IsAuthenticated = true;
         ret.ProfilePhoto = appUser.ProfilePhoto;
+        ret.IsSuperAdmin = appUser.IsSuperAdmin;
         ret.LicenseKey = string.IsNullOrEmpty(companyProfile.LicenseKey) ? "" : HttpUtility.UrlEncode(companyProfile.LicenseKey.ToString());
         ret.PurchaseCode = string.IsNullOrEmpty(companyProfile.PurchaseCode) ? "" : HttpUtility.UrlEncode(companyProfile.PurchaseCode.ToString());
         // Get all claims for this user
@@ -122,6 +123,7 @@ public class UserRepository : GenericRepository<User, POSDbContext>,
         var claims = appClaimDtos.Select(c => new Claim(c, "true")).ToList(); // Convert to List<Claim>
         claims.Add(new Claim("licensekey", string.IsNullOrEmpty(companyProfile.LicenseKey) ? "" : HttpUtility.UrlEncode(companyProfile.LicenseKey.ToString())));
         claims.Add(new Claim("purchasecode", string.IsNullOrEmpty(companyProfile.PurchaseCode) ? "" : HttpUtility.UrlEncode(companyProfile.PurchaseCode.ToString())));
+        claims.Add(new Claim("isSuperAdmin", appUser.IsSuperAdmin.ToString().ToLower()));
         // Set JWT bearer token
         ret.BearerToken = BuildJwtToken(ret, claims, appUser.Id, locations);
 

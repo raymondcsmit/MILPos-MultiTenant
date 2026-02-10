@@ -64,7 +64,12 @@ namespace POS.API.Helpers
                     }
                 };
             });
-            services.AddAuthorization();
+            services.AddAuthorization(options =>
+            {
+                options.AddPolicy("SuperAdminPolicy", policy =>
+                    policy.RequireAssertion(context =>
+                        context.User.HasClaim(c => c.Type == "isSuperAdmin" && c.Value == "true")));
+            });
         }
     }
 }
