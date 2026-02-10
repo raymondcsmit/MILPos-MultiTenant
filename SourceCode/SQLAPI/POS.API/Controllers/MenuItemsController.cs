@@ -24,7 +24,7 @@ namespace POS.API.Controllers
         }
 
         [HttpGet("user-menu")]
-        [ClaimCheck("MENU_VIEW_MENU")]
+        [ClaimCheck("MENU_VIEW_MENUS")]
         public async Task<IActionResult> GetUserMenu()
         {
             var userIdClaim = User.FindFirst("Id") ?? User.FindFirst("sub") ?? User.FindFirst(ClaimTypes.NameIdentifier);

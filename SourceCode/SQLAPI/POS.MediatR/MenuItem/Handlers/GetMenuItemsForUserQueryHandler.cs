@@ -33,7 +33,11 @@ namespace POS.MediatR.MenuItem.Handlers
             var userRoles = await _userRoleRepository.FindBy(ur => ur.UserId == request.UserId).ToListAsync();
             var roleIds = userRoles.Select(ur => ur.RoleId).ToList();
 
-            var menuItems = await _menuItemRepository.GetMenuItemsByRolesAsync(roleIds);
+            // var menuItems = await _menuItemRepository.GetMenuItemsByRolesAsync(roleIds);
+            var menuItems = await _menuItemRepository.AllIncluding(c => c.RoleMenuItems)
+                .Where(c => c.IsActive)
+                .OrderBy(c => c.Order)
+                .ToListAsync();
 
             var dtos = _mapper.Map<List<MenuItemDto>>(menuItems);
 
