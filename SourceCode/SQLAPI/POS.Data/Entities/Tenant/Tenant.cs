@@ -21,5 +21,7 @@ namespace POS.Data.Entities
         public string TimeZone { get; set; }
         public string Currency { get; set; }
         public string BusinessType { get; set; } = "Retail";
+        public string LicenseType { get; set; } = "Trial"; // Trial, Full
+        public DateTime? TrialExpiryDate { get; set; }
     }
 }

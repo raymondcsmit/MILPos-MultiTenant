@@ -2,6 +2,7 @@ using Hangfire;
 using Hangfire.SqlServer;
 using Hangfire.MemoryStorage;
 using Hangfire.Storage.SQLite;
+using Hangfire.PostgreSql; // Added for PostgreSQL support
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting.Server;
 using Microsoft.AspNetCore.Hosting.Server.Features;
@@ -64,6 +65,12 @@ builder.Services.AddHangfire(configuration =>
         }
 
         configuration.UseSQLiteStorage(sqliteconnectionString);
+    }
+    else if (provider == "PostgreSql")
+    {
+        var connectionString = builder.Configuration.GetConnectionString("PostgresConnectionString");
+        configuration.UsePostgreSqlStorage(options =>
+            options.UseNpgsqlConnection(connectionString));
     }
     else
     {

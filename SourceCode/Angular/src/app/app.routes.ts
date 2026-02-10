@@ -591,6 +591,14 @@ export const routes: Routes = [
               )
           },
           {
+            path: 'tenants',
+            loadChildren: () =>
+              import('./tenant/tenant-module').then((m) => m.TenantModule),
+            // canActivate: [AuthGuard] // AuthGuard is good, but maybe a specific SuperAdmin guard? Authorization is handled in Controller mostly.
+            // Using AuthGuard for now.
+             canLoad: [AuthGuard]
+          },
+          {
             path: '**',
             redirectTo: '/',
           },

@@ -1,0 +1,103 @@
+<div class="modal-header">
+  <h4 class="modal-title" id="modal-basic-title">
+    {{ (isEdit ? 'Update Tenant' : 'Add Tenant') }}
+  </h4>
+  <button type="button" class="close" aria-label="Close" (click)="close()">
+    <span aria-hidden="true">&times;</span>
+  </button>
+</div>
+<div class="modal-body">
+  <form [formGroup]="tenantForm">
+    <div class="row">
+      <div class="col-md-6">
+        <mat-form-field appearance="outline" class="w-100">
+          <mat-label>Name</mat-label>
+          <input matInput formControlName="name" required>
+          <mat-error *ngIf="tenantForm.get('name')?.hasError('required')">
+            Name is required
+          </mat-error>
+        </mat-form-field>
+      </div>
+      <div class="col-md-6">
+        <mat-form-field appearance="outline" class="w-100">
+          <mat-label>Subdomain</mat-label>
+          <input matInput formControlName="subdomain" required placeholder="e.g. mytenant">
+          <mat-error *ngIf="tenantForm.get('subdomain')?.hasError('required')">
+            Subdomain is required
+          </mat-error>
+          <mat-error *ngIf="tenantForm.get('subdomain')?.hasError('pattern')">
+            Only lowercase letters, numbers and hyphens allowed
+          </mat-error>
+        </mat-form-field>
+      </div>
+    </div>
+
+    <div class="row">
+      <div class="col-md-6">
+        <mat-form-field appearance="outline" class="w-100">
+          <mat-label>Contact Email</mat-label>
+          <input matInput formControlName="contactEmail" required>
+          <mat-error *ngIf="tenantForm.get('contactEmail')?.hasError('required')">
+            Email is required
+          </mat-error>
+          <mat-error *ngIf="tenantForm.get('contactEmail')?.hasError('email')">
+            Invalid email format
+          </mat-error>
+        </mat-form-field>
+      </div>
+      <div class="col-md-6">
+        <mat-form-field appearance="outline" class="w-100">
+          <mat-label>Contact Phone</mat-label>
+          <input matInput formControlName="contactPhone">
+        </mat-form-field>
+      </div>
+    </div>
+
+    <div class="row">
+      <div class="col-md-12">
+        <mat-form-field appearance="outline" class="w-100">
+          <mat-label>Address</mat-label>
+          <textarea matInput formControlName="address"></textarea>
+        </mat-form-field>
+      </div>
+    </div>
+
+    <h5 class="mt-2" *ngIf="!isEdit">Admin User</h5>
+    <div class="row" *ngIf="!isEdit">
+      <div class="col-md-6">
+        <mat-form-field appearance="outline" class="w-100">
+          <mat-label>Admin Email</mat-label>
+          <input matInput formControlName="adminEmail" required>
+        </mat-form-field>
+      </div>
+      <div class="col-md-6">
+        <mat-form-field appearance="outline" class="w-100">
+          <mat-label>Admin Password</mat-label>
+          <input matInput formControlName="adminPassword" required type="password">
+        </mat-form-field>
+      </div>
+    </div>
+    
+    <div class="row">
+      <div class="col-md-6">
+        <mat-form-field appearance="outline" class="w-100">
+          <mat-label>License Type</mat-label>
+          <mat-select formControlName="licenseType">
+            <mat-option value="Trial">Trial</mat-option>
+            <mat-option value="Full">Full</mat-option>
+          </mat-select>
+        </mat-form-field>
+      </div>
+      <div class="col-md-6 pt-3">
+        <mat-slide-toggle formControlName="isActive" color="primary">
+          Active
+        </mat-slide-toggle>
+      </div>
+    </div>
+
+  </form>
+</div>
+<div class="modal-footer">
+  <button type="button" class="btn btn-secondary" (click)="close()">Close</button>
+  <button type="button" class="btn btn-success" (click)="save()">Save</button>
+</div>

@@ -1,0 +1,94 @@
+<section class="content">
+  <div class="container-fluid">
+    <div class="d-flex mb-2">
+      <div class="me-auto">
+        <span class="mb-0 page-title"> Tenants Management </span>
+      </div>
+      <div class="d-flex justify-content-end">
+        <button class="primary" matButton="filled" (click)="manageTenant(null)">
+          <mat-icon class="medium-icon fs-5 align-middle">add</mat-icon>
+          <span class="d-none d-sm-inline"> Add Tenant </span>
+        </button>
+      </div>
+    </div>
+    <mat-card appearance="outlined">
+      <mat-card-content>
+        <div class="table-responsive">
+          <table mat-table [dataSource]="tenants" class="w-100">
+            <!-- Action Column -->
+            <ng-container matColumnDef="action">
+              <th mat-header-cell *matHeaderCellDef> Action </th>
+              <td mat-cell *matCellDef="let element">
+                <button mat-icon-button [matMenuTriggerFor]="menu">
+                  <mat-icon>more_vert</mat-icon>
+                </button>
+                <mat-menu #menu="matMenu">
+                  <button mat-menu-item (click)="manageTenant(element)">
+                    <mat-icon>edit</mat-icon>
+                    <span>Edit</span>
+                  </button>
+                  <button mat-menu-item (click)="toggleStatus(element)">
+                    <mat-icon>{{element.isActive ? 'block' : 'check_circle'}}</mat-icon>
+                    <span>{{element.isActive ? 'Deactivate' : 'Activate'}}</span>
+                  </button>
+                  <button mat-menu-item (click)="generateLicense(element)">
+                    <mat-icon>vpn_key</mat-icon>
+                    <span>Generate License</span>
+                  </button>
+                  <button mat-menu-item (click)="switchTenant(element)">
+                    <mat-icon>login</mat-icon>
+                    <span>Switch Tenant</span>
+                  </button>
+                </mat-menu>
+              </td>
+            </ng-container>
+
+            <!-- Name Column -->
+            <ng-container matColumnDef="name">
+              <th mat-header-cell *matHeaderCellDef> Name </th>
+              <td mat-cell *matCellDef="let element"> {{element.name}} </td>
+            </ng-container>
+
+            <!-- Subdomain Column -->
+            <ng-container matColumnDef="subdomain">
+              <th mat-header-cell *matHeaderCellDef> Subdomain </th>
+              <td mat-cell *matCellDef="let element"> {{element.subdomain}} </td>
+            </ng-container>
+
+            <!-- License Type Column -->
+            <ng-container matColumnDef="licenseType">
+              <th mat-header-cell *matHeaderCellDef> License </th>
+              <td mat-cell *matCellDef="let element"> 
+                <span class="badge" [ngClass]="{'bg-success': element.licenseType !== 'Trial', 'bg-warning': element.licenseType === 'Trial'}">
+                  {{element.licenseType}}
+                </span>
+                <div *ngIf="element.trialExpiryDate" class="text-xs text-muted">
+                  Exp: {{element.trialExpiryDate | date:'shortDate'}}
+                </div>
+              </td>
+            </ng-container>
+
+            <!-- Status Column -->
+            <ng-container matColumnDef="status">
+              <th mat-header-cell *matHeaderCellDef> Status </th>
+              <td mat-cell *matCellDef="let element"> 
+                <span class="badge" [ngClass]="{'bg-success': element.isActive, 'bg-danger': !element.isActive}">
+                  {{element.isActive ? 'Active' : 'Inactive'}}
+                </span>
+              </td>
+            </ng-container>
+
+             <!-- Created Date Column -->
+             <ng-container matColumnDef="createdDate">
+              <th mat-header-cell *matHeaderCellDef> Created </th>
+              <td mat-cell *matCellDef="let element"> {{element.createdDate | date:'mediumDate'}} </td>
+            </ng-container>
+
+            <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+            <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+          </table>
+        </div>
+      </mat-card-content>
+    </mat-card>
+  </div>
+</section>

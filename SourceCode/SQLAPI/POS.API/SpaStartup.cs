@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Builder;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Collections.Generic;
@@ -27,9 +28,10 @@ namespace POS.API
 
         internal static void ConfigureServices(IServiceCollection services)
         {
+            var spaPath = ((IConfiguration)services.BuildServiceProvider().GetService(typeof(IConfiguration))).GetValue<string>("SpaRootPath");
             services.AddSpaStaticFiles(configuration =>
             {
-                configuration.RootPath = "ClientApp/browser";
+                configuration.RootPath = !string.IsNullOrEmpty(spaPath) ? spaPath : "wwwroot";
             });
         }
     }

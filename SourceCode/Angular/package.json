@@ -138,6 +138,7 @@
     "@angular/compiler-cli": "^20.2.4",
     "@types/clone": "^2.1.4",
     "@types/jasmine": "~5.1.0",
+    "baseline-browser-mapping": "^2.9.19",
     "electron": "^40.0.0",
     "electron-builder": "^26.4.0",
     "jasmine-core": "~5.9.0",

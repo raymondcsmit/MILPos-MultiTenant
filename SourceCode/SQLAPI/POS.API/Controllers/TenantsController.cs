@@ -11,7 +11,14 @@ using POS.Repository;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Claims;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Identity;
+using System.IdentityModel.Tokens.Jwt;
+using Microsoft.Extensions.Configuration;
+using Microsoft.IdentityModel.Tokens;
+using System.Text;
+using POS.Data;
 
 namespace POS.API.Controllers
 {
@@ -23,7 +30,10 @@ namespace POS.API.Controllers
         private readonly TenantDataMigrationService _migrationService;
         private readonly IMediator _mediator;
 
-        public TenantsController(POSDbContext context, TenantDataMigrationService migrationService, IMediator mediator)
+        public TenantsController(
+            POSDbContext context, 
+            TenantDataMigrationService migrationService, 
+            IMediator mediator)
         {
             _context = context;
             _migrationService = migrationService;
@@ -106,7 +116,7 @@ namespace POS.API.Controllers
                 return BadRequest(new { message = "Subdomain already exists" });
             }
 
-            var tenant = await _migrationService.CreateTenant(dto.Name, dto.Subdomain, dto.ContactEmail);
+            var tenant = await _migrationService.CreateTenant(dto.Name,dto.Subdomain,dto.ContactEmail);
 
             return CreatedAtAction(nameof(GetTenant), new { id = tenant.Id }, tenant);
         }
@@ -175,6 +185,79 @@ namespace POS.API.Controllers
                 return BadRequest(new { message = $"Migration failed: {ex.Message}" });
             }
         }
+        /// <summary>
+        /// Update tenant subscription/license type
+        /// </summary>
+        [HttpPut("{id}/license")]
+        [Authorize(Roles = "SuperAdmin")]
+        public async Task<ActionResult> UpdateLicense(Guid id, [FromBody] UpdateLicenseDto dto)
+        {
+            var command = new UpdateTenantLicenseCommand
+            {
+                TenantId = id,
+                LicenseType = Enum.Parse<LicenseType>(dto.LicenseType)
+            };
+            var response = await _mediator.Send(command);
+            if (!response.Success) return NotFound();
+            return Ok();
+        }
+
+        /// <summary>
+        /// Toggle tenant status (Active/Inactive)
+        /// </summary>
+        [HttpPut("{id}/status")]
+        [Authorize(Roles = "SuperAdmin")]
+        public async Task<ActionResult> ToggleStatus(Guid id, [FromBody] UpdateStatusDto dto)
+        {
+            var command = new ToggleTenantStatusCommand { TenantId = id };
+            var response = await _mediator.Send(command);
+            if (!response.Success) return NotFound();
+            return Ok(response.Data);
+        }
+
+        /// <summary>
+        /// Switch to a specific tenant (Impersonation)
+        /// </summary>
+        [HttpPost("{id}/switch")]
+        [Authorize(Roles = "SuperAdmin")]
+        public async Task<ActionResult> SwitchTenant(Guid id)
+        {
+            var command = new SwitchTenantCommand
+            {
+                TenantId = id,
+                Email = User.FindFirstValue(ClaimTypes.Email)
+            };
+
+            var response = await _mediator.Send(command);
+            if (!response.Success) return StatusCode(response.StatusCode, string.Join(", ", response.Errors));
+
+            return Ok(new
+            {
+                token = response.Data.BearerToken,
+                tenantId = id
+            });
+        }
+
+        /// <summary>
+        /// Generate License Key and Purchase Code for a tenant
+        /// </summary>
+        [HttpPost("{id}/license/generate")]
+        [Authorize(Roles = "SuperAdmin")]
+        public async Task<ActionResult> GenerateLicenseKeys(Guid id)
+        {
+            var command = new GenerateTenantLicenseKeysCommand { TenantId = id };
+            var response = await _mediator.Send(command);
+
+            if (!response.Success) return StatusCode(response.StatusCode, string.Join(", ", response.Errors));
+
+            return Ok(new
+            {
+                LicenseKey = response.Data.LicenseKey,
+                PurchaseCode = response.Data.PurchaseCode,
+                Message = "License keys generated and Company Profile updated."
+            });
+        }
+
     }
 
     public class CreateTenantDto
@@ -182,6 +265,10 @@ namespace POS.API.Controllers
         public string Name { get; set; }
         public string Subdomain { get; set; }
         public string ContactEmail { get; set; }
+        public string ContactPhone { get; set; }
+        public string Address { get; set; }
+        public string AdminEmail { get; set; }
+        public string AdminPassword { get; set; }
     }
 
     public class UpdateTenantDto
@@ -193,5 +280,15 @@ namespace POS.API.Controllers
         public bool? IsActive { get; set; }
         public int? MaxUsers { get; set; }
         public string SubscriptionPlan { get; set; }
+    }
+
+    public class UpdateLicenseDto
+    {
+        public string LicenseType { get; set; }
+    }
+
+    public class UpdateStatusDto
+    {
+        public bool IsActive { get; set; }
     }
 }

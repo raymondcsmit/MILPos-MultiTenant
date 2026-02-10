@@ -166,48 +166,68 @@ namespace POS.API.Helpers
                     return index == -1 ? int.MaxValue : index;
                 }).ThenBy(f => Path.GetFileNameWithoutExtension(f)).ToList();
 
-                // Disable FK constraints if possible (Provider dependent)
-                var provider = _context.Database.ProviderName;
-                if (provider == "Microsoft.EntityFrameworkCore.Sqlite")
-                {
-                    await _context.Database.ExecuteSqlRawAsync("PRAGMA foreign_keys = OFF;");
-                }
-                else if (provider == "Microsoft.EntityFrameworkCore.SqlServer")
-                {
-                    // Disable all constraints
-                    await _context.Database.ExecuteSqlRawAsync("EXEC sp_msforeachtable \"ALTER TABLE ? NOCHECK CONSTRAINT all\"");
-                }
+                // Open connection to persist session variables (like session_replication_role)
+                await _context.Database.OpenConnectionAsync();
 
                 try
                 {
-                    foreach (var file in sortedFiles)
+                    // Disable FK constraints if possible (Provider dependent)
+                    var provider = _context.Database.ProviderName;
+                    if (provider == "Microsoft.EntityFrameworkCore.Sqlite")
                     {
-                        var tableName = Path.GetFileNameWithoutExtension(file);
-                        if (tableName.StartsWith("sqlite") || tableName.StartsWith("__")) continue;
+                        await _context.Database.ExecuteSqlRawAsync("PRAGMA foreign_keys = OFF;");
+                    }
+                    else if (provider == "Microsoft.EntityFrameworkCore.SqlServer")
+                    {
+                        // Disable all constraints
+                        await _context.Database.ExecuteSqlRawAsync("EXEC sp_msforeachtable \"ALTER TABLE ? NOCHECK CONSTRAINT all\"");
+                    }
+                    else if (provider == "Npgsql.EntityFrameworkCore.PostgreSQL" || provider == "PostgreSql")
+                    {
+                        // Disable FK constraints for the session in PostgreSQL
+                        await _context.Database.ExecuteSqlRawAsync("SET session_replication_role = 'replica';");
+                    }
 
-                        if (dbSets.ContainsKey(tableName))
+                    try
+                    {
+                        foreach (var file in sortedFiles)
                         {
-                            var dbSetProperty = dbSets[tableName];
-                            var entityType = dbSetProperty.PropertyType.GetGenericArguments()[0];
+                            var tableName = Path.GetFileNameWithoutExtension(file);
+                            if (tableName.StartsWith("sqlite") || tableName.StartsWith("__")) continue;
 
-                            Console.WriteLine($"Seeding table: {tableName}...");
-                            
-                            var method = this.GetType().GetMethod(nameof(SeedTable), BindingFlags.NonPublic | BindingFlags.Instance);
-                            var genericMethod = method.MakeGenericMethod(entityType);
-                            await (Task)genericMethod.Invoke(this, new object[] { file });
+                            if (dbSets.ContainsKey(tableName))
+                            {
+                                var dbSetProperty = dbSets[tableName];
+                                var entityType = dbSetProperty.PropertyType.GetGenericArguments()[0];
+
+                                Console.WriteLine($"Seeding table: {tableName}...");
+                                
+                                var method = this.GetType().GetMethod(nameof(SeedTable), BindingFlags.NonPublic | BindingFlags.Instance);
+                                var genericMethod = method.MakeGenericMethod(entityType);
+                                await (Task)genericMethod.Invoke(this, new object[] { file });
+                            }
+                        }
+                    }
+                    finally
+                    {
+                        if (provider == "Microsoft.EntityFrameworkCore.Sqlite")
+                        {
+                            await _context.Database.ExecuteSqlRawAsync("PRAGMA foreign_keys = ON;");
+                        }
+                        else if (provider == "Microsoft.EntityFrameworkCore.SqlServer")
+                        {
+                            await _context.Database.ExecuteSqlRawAsync("EXEC sp_msforeachtable \"ALTER TABLE ? WITH CHECK CHECK CONSTRAINT all\"");
+                        }
+                        else if (provider == "Npgsql.EntityFrameworkCore.PostgreSQL" || provider == "PostgreSql")
+                        {
+                            // Re-enable FK constraints
+                            await _context.Database.ExecuteSqlRawAsync("SET session_replication_role = 'origin';");
                         }
                     }
                 }
                 finally
                 {
-                    if (provider == "Microsoft.EntityFrameworkCore.Sqlite")
-                    {
-                        await _context.Database.ExecuteSqlRawAsync("PRAGMA foreign_keys = ON;");
-                    }
-                    else if (provider == "Microsoft.EntityFrameworkCore.SqlServer")
-                    {
-                        await _context.Database.ExecuteSqlRawAsync("EXEC sp_msforeachtable \"ALTER TABLE ? WITH CHECK CHECK CONSTRAINT all\"");
-                    }
+                    await _context.Database.CloseConnectionAsync();
                 }
                 
                 Console.WriteLine("Database seeding completed successfully.");

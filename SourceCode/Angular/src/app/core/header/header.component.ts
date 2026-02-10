@@ -158,6 +158,14 @@ export class HeaderComponent extends BaseComponent implements OnInit {
     this.hasOnlyPOSPermission = this.securityService.isPOSPermissionOnly;
   }
 
+  get isSuperAdmin(): boolean {
+    const roles = this.securityService.Token && this.securityService.Token['role'];
+    if (Array.isArray(roles)) {
+      return roles.includes('Super Admin');
+    }
+    return roles === 'Super Admin';
+  }
+
   // getLangDir() {
   //   this.translationService.lanDir$.subscribe((c: string) => {
   //     this.direction = c;

@@ -136,15 +136,7 @@ namespace POS.MediatR.Handlers
             var result = _mapper.Map<CompanyProfileDto>(companyProfile);
             if (!string.IsNullOrWhiteSpace(result.LogoUrl))
             {
-                 var physicalPath = _fileStorageService.GetPhysicalPath(Path.Combine(_pathHelper.CompanyLogo, result.LogoUrl));
-                 if (File.Exists(physicalPath))
-                 {
-                     result.LogoUrl = Path.Combine(_pathHelper.CompanyLogo, result.LogoUrl).Replace("\\", "/");
-                 }
-                 else
-                 {
-                     result.LogoUrl = null;
-                 }
+                result.LogoUrl = Path.Combine(_pathHelper.CompanyLogo, result.LogoUrl).Replace("\\", "/");
             }
 
             result.Languages = await _mediator.Send(new GetAllLanguageCommand());

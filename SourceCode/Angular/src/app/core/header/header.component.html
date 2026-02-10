@@ -101,6 +101,12 @@
                 </button>
               </div>
             </mat-menu>
+            @if(isSuperAdmin){
+            <button class="accent mt-4" matButton="filled" [routerLink]="['/tenants']">
+              <mat-icon class="medium-icon text-white">business</mat-icon>
+              Tenants
+            </button>
+            }
             <button class="primary mt-4" matButton="filled" *hasClaim="'POS_POS'" [routerLink]="['/pos']">
               <mat-icon class="medium-icon text-white">point_of_sale</mat-icon>
               {{'POS' | translate }}
@@ -125,6 +131,7 @@
       <ul class="nav navbar-nav navbar-right">
         <li>
           <div class="d-flex gap-2">
+            
             <button matTooltip="Today's Summary Report" matMiniFab class="error">
               <mat-icon class="header-icon fs-4" (click)="openDailyReport()">assignment</mat-icon>
             </button>

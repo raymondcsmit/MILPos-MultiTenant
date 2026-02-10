@@ -62,7 +62,7 @@ export class RegisterTenantComponent implements OnInit {
         this.toastr.success('Tenant registered successfully. Please login.');
         this.router.navigate(['/login']);
       },
-      error: (err) => {
+      error: (err: any) => {
         this.isLoading = false;
         this.toastr.error(err.error || 'Registration failed.');
       }
