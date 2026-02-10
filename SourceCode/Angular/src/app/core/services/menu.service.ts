@@ -2,6 +2,7 @@ import { Injectable, signal, computed } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { MenuItem } from '../domain-classes/menu-item';
 import { firstValueFrom } from 'rxjs';
+import { ApiEndpoints } from '../constants/api-endpoints';
 
 @Injectable({ providedIn: 'root' })
 export class MenuService {
@@ -16,7 +17,7 @@ export class MenuService {
 
   async loadUserMenu() {
     try {
-        const menu = await firstValueFrom(this.http.get<MenuItem[]>('api/MenuItems/user-menu'));
+        const menu = await firstValueFrom(this.http.get<MenuItem[]>(ApiEndpoints.MenuItems.UserMenu));
         this._menuItems.set(menu);
     } catch (e) {
         console.error('Failed to load menu', e);

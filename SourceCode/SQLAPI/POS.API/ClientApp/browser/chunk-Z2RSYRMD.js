@@ -1,0 +1,1 @@
+import{a as n}from"./chunk-NNBXEI3S.js";import{a as i}from"./chunk-6RV2GAZ2.js";import{a as t}from"./chunk-WZR7HRBM.js";import{ka as r}from"./chunk-UHPQPNMQ.js";var c=e=>{let s=r(n),o=e.paramMap.get("id");return o==="add"?null:s.getPurchaseOrderById(o??"")};var u=()=>r(t).getAll();var b=()=>r(i).getAll();export{c as a,u as b,b as c};

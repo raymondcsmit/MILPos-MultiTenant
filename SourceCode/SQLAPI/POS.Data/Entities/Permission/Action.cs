@@ -3,7 +3,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace POS.Data
 {
-    public class Action : BaseEntity
+    public class Action : SharedBaseEntity
     {
         public Guid Id { get; set; }
         public string Name { get; set; }

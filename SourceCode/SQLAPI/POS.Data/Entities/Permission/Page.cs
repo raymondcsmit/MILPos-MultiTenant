@@ -4,7 +4,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace POS.Data
 {
-    public class Page : BaseEntity
+    public class Page : SharedBaseEntity
     {
         public Guid Id { get; set; }
         public string Name { get; set; }

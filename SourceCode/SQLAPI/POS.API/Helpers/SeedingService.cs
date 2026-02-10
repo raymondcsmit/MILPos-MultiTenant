@@ -1,8 +1,10 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.AspNetCore.Identity;
 using POS.Data;
 using POS.Data.Entities;
 using POS.Domain;
+using POS.Common;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -17,10 +19,12 @@ namespace POS.API.Helpers
     public class SeedingService
     {
         private readonly POSDbContext _context;
+        private readonly IPasswordHasher<User> _passwordHasher;
 
-        public SeedingService(POSDbContext context)
+        public SeedingService(POSDbContext context, IPasswordHasher<User> passwordHasher)
         {
             _context = context;
+            _passwordHasher = passwordHasher;
         }
 
         public async Task SeedAsync()
@@ -40,13 +44,13 @@ namespace POS.API.Helpers
                      
                      // OPTIMIZATION: If tenants exist, we assume the initial seeding is complete.
                      // Skipping the expensive CSV parsing and per-record existence checks significantly improves startup time.
-                     Console.WriteLine("Skipping seeding process as database is already initialized.");
-                     return;
+                     Console.WriteLine("Database is initialized. Checking for new seed data...");
+                     // return; // Allow continuing to seed new tables/records
                 }
 
                 Console.WriteLine("Starting database seeding from CSV files...");
 
-                string seedDataPath = Path.Combine(AppContext.BaseDirectory, "SeedData");
+                string seedDataPath = Path.Combine(AppContext.BaseDirectory, AppConstants.Seeding.SeedDataFolder);
                 
                 // Fallback searching logic
                 if (!Directory.Exists(seedDataPath))
@@ -54,7 +58,7 @@ namespace POS.API.Helpers
                     var current = new DirectoryInfo(AppContext.BaseDirectory);
                     while (current != null)
                     {
-                        var candidate = Path.Combine(current.FullName, "SeedData");
+                        var candidate = Path.Combine(current.FullName, AppConstants.Seeding.SeedDataFolder);
                         if (Directory.Exists(candidate))
                         {
                             seedDataPath = candidate;
@@ -77,79 +81,8 @@ namespace POS.API.Helpers
                 Console.WriteLine($"Found SeedData at: {seedDataPath}");
 
                 // Order of seeding is critical for Foreign Keys even if we disable constraints
-                var priorityTables = new List<string>
-                {
-                    "Tenants",
-                    "Users", 
-                    "Roles",
-                    "UserRoles",
-                    "RoleClaims",
-                    "UserClaims",
-                    "UserLogins",
-                    "UserTokens",
-                    "UserLocations",
-                    "CompanyProfiles",
-                    "Currencies",
-                    "Countries",
-                    "Cities",
-                    "Locations",
-                    "FinancialYears",
-                    "LedgerAccounts",
-                    "Taxes",
-                    "UnitConversations", // Fixed from "Units"
-                    "Brands",
-                    "ProductCategories",
-                    "ExpenseCategories",
-                    "Suppliers",
-                    "SupplierAddresses",
-                    "Customers",
-                    "ContactAddresses",
-                    "Products",
-                    "ProductTaxes",
-                    "ProductStocks",
-                    "PurchaseOrders",
-                    "PurchaseOrderItems",
-                    "PurchaseOrderItemTaxes",
-                    "PurchaseOrderPayments",
-                    "SalesOrders",
-                    "SalesOrderItems",
-                    "SalesOrderItemTaxes",
-                    "SalesOrderPayments",
-                    "Transactions",
-                    "TransactionItems",
-                    "TransactionItemTaxes",
-                    "AccountingEntries",
-                    "PaymentEntries",
-                    "TaxEntries",
-                    "StockAdjustments",
-                    "DamagedStocks",
-                    "StockTransfers",
-                    "StockTransferItems",
-                    "Expenses",
-                    "ExpenseTaxes",
-                    "LoanDetails",
-                    "LoanRepayments",
-                    "InquiryStatuses",
-                    "InquirySources",
-                    "Inquiries",
-                    "InquiryProducts",
-                    "InquiryActivities",
-                    "InquiryAttachments",
-                    "InquiryNotes",
-                    "Reminders",
-                    "ReminderUsers",
-                    "ReminderSchedulers",
-                    "ReminderNotifications",
-                    "DailyReminders",
-                    "QuarterlyReminders",
-                    "HalfYearlyReminders",
-                    "EmailTemplates",
-                    "EmailSMTPSettings",
-                    "Actions",
-                    "Pages",
-                    "Pagehelpers",
-                    "Languages"
-                };
+                // Order of seeding is critical for Foreign Keys even if we disable constraints
+                var priorityTables = AppConstants.SeedingConstants.PriorityTables;
 
                 // Get all DbSet properties from Context
                 var dbSets = _context.GetType().GetProperties()
@@ -173,16 +106,16 @@ namespace POS.API.Helpers
                 {
                     // Disable FK constraints if possible (Provider dependent)
                     var provider = _context.Database.ProviderName;
-                    if (provider == "Microsoft.EntityFrameworkCore.Sqlite")
+                    if (provider == AppConstants.DatabaseProviders.Sqlite)
                     {
                         await _context.Database.ExecuteSqlRawAsync("PRAGMA foreign_keys = OFF;");
                     }
-                    else if (provider == "Microsoft.EntityFrameworkCore.SqlServer")
+                    else if (provider == AppConstants.DatabaseProviders.SqlServer)
                     {
                         // Disable all constraints
                         await _context.Database.ExecuteSqlRawAsync("EXEC sp_msforeachtable \"ALTER TABLE ? NOCHECK CONSTRAINT all\"");
                     }
-                    else if (provider.Contains("PostgreSQL", StringComparison.OrdinalIgnoreCase))
+                    else if (provider.Contains(AppConstants.DatabaseProviders.PostgreSql, StringComparison.OrdinalIgnoreCase))
                     {
                         try
                         {
@@ -218,15 +151,15 @@ namespace POS.API.Helpers
                     }
                     finally
                     {
-                        if (provider == "Microsoft.EntityFrameworkCore.Sqlite")
+                        if (provider == AppConstants.DatabaseProviders.Sqlite)
                         {
                             await _context.Database.ExecuteSqlRawAsync("PRAGMA foreign_keys = ON;");
                         }
-                        else if (provider == "Microsoft.EntityFrameworkCore.SqlServer")
+                        else if (provider == AppConstants.DatabaseProviders.SqlServer)
                         {
                             await _context.Database.ExecuteSqlRawAsync("EXEC sp_msforeachtable \"ALTER TABLE ? WITH CHECK CHECK CONSTRAINT all\"");
                         }
-                        else if (provider.Contains("PostgreSQL", StringComparison.OrdinalIgnoreCase))
+                        else if (provider.Contains(AppConstants.DatabaseProviders.PostgreSql, StringComparison.OrdinalIgnoreCase))
                         {
                             try
                             {
@@ -350,6 +283,13 @@ namespace POS.API.Helpers
                         this._defaultTenantId = tenant.Id;
                     }
                 }
+
+                // Force default password for seeded users
+                if (entity is User user)
+                {
+                    user.PasswordHash = _passwordHasher.HashPassword(user, AppConstants.Seeding.DefaultPassword);
+                    user.SecurityStamp = Guid.NewGuid().ToString();
+                }
                 
                 // Smart Fill for BaseEntity dates
                 if (entity is BaseEntity baseEntity)
@@ -361,6 +301,19 @@ namespace POS.API.Helpers
                      if (baseEntity.ModifiedDate == DateTime.MinValue)
                      {
                          baseEntity.ModifiedDate = DateTime.UtcNow;
+                     }
+                }
+                
+                // Smart Fill for SharedBaseEntity dates (Global/Shared Entities)
+                if (entity is SharedBaseEntity sharedEntity)
+                {
+                     if (sharedEntity.CreatedDate == DateTime.MinValue)
+                     {
+                         sharedEntity.CreatedDate = DateTime.UtcNow;
+                     }
+                     if (sharedEntity.ModifiedDate == DateTime.MinValue)
+                     {
+                         sharedEntity.ModifiedDate = DateTime.UtcNow;
                      }
                 }
                 
@@ -515,7 +468,7 @@ namespace POS.API.Helpers
                  var schema = entityType.GetSchema();
                  var fullTableName = string.IsNullOrEmpty(schema) ? $"[{tableName}]" : $"[{schema}].[{tableName}]";
 
-                 bool isSqlServer = provider == "Microsoft.EntityFrameworkCore.SqlServer";
+                 bool isSqlServer = provider == AppConstants.DatabaseProviders.SqlServer;
                  
                  // Robust identity check for SQL Server: if it's SQL Server and has an 'Id' property of type int/long
                  // we assume it might be an identity column if we are trying to seed it explicitly.

@@ -69,9 +69,6 @@ namespace POS.Migrations.PostgreSQL.Migrations
                     b.Property<long>("SyncVersion")
                         .HasColumnType("bigint");
 
-                    b.Property<Guid>("TenantId")
-                        .HasColumnType("uuid");
-
                     b.HasKey("Id");
 
                     b.HasIndex("CreatedBy");
@@ -3413,9 +3410,6 @@ namespace POS.Migrations.PostgreSQL.Migrations
 
                     b.Property<long>("SyncVersion")
                         .HasColumnType("bigint");
-
-                    b.Property<Guid>("TenantId")
-                        .HasColumnType("uuid");
 
                     b.HasKey("Id");
 

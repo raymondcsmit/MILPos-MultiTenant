@@ -73,7 +73,7 @@ namespace POS.MediatR.Handlers
                 var userInfo = await _userRepository
                     .All
                     .IgnoreQueryFilters()
-                    .Where(c => c.UserName == request.UserName)
+                    .Where(c => c.UserName == request.UserName || c.Email== request.UserName)
                     .FirstOrDefaultAsync();
                 if (!userInfo.IsActive)
                 {

@@ -1,1 +1,0 @@
-import{xb as e}from"./chunk-M33PSAPW.js";var s=class r{transform(t,i){if(!t)return"";let n=i?parseInt(i,10):100;return t.length>n?t.substring(0,n)+"...":t}static \u0275fac=function(i){return new(i||r)};static \u0275pipe=e({name:"limitTo",type:r,pure:!0})};export{s as a};

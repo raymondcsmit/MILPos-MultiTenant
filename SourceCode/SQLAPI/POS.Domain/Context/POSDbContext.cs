@@ -4,6 +4,7 @@ using POS.Data;
 using POS.Data.Entities;
 using POS.Data.Entities.Accounts;
 using POS.Data.Entities.Inventory;
+using POS.Common;
 using System;
 using System.Linq;
 using System.Threading.Tasks;
@@ -169,10 +170,10 @@ namespace POS.Domain
             {
                 b.HasKey(t => t.Id);
                 b.HasIndex(t => t.Subdomain).IsUnique();
-                b.Property(t => t.Name).IsRequired().HasMaxLength(200);
-                b.Property(t => t.Subdomain).IsRequired().HasMaxLength(100);
-                b.Property(t => t.ContactEmail).HasMaxLength(200);
-                b.Property(t => t.TimeZone).HasMaxLength(100);
+                b.Property(t => t.Name).IsRequired().HasMaxLength(AppConstants.Database.MaxNameLength);
+                b.Property(t => t.Subdomain).IsRequired().HasMaxLength(AppConstants.Database.MaxShortLength);
+                b.Property(t => t.ContactEmail).HasMaxLength(AppConstants.Database.MaxNameLength);
+                b.Property(t => t.TimeZone).HasMaxLength(AppConstants.Database.MaxShortLength);
                 b.Property(t => t.Currency).HasMaxLength(10);
             });
 
@@ -1126,8 +1127,6 @@ namespace POS.Domain
                 typeof(POS.Data.Country),
                 typeof(POS.Data.City),
                 typeof(POS.Data.Entities.Language),
-                typeof(POS.Data.Action),
-                typeof(POS.Data.Page),
                 typeof(POS.Data.Entities.PageHelper)
             };
 
@@ -1146,11 +1145,31 @@ namespace POS.Domain
                 var method = setGlobalQueryFilterMethod.MakeGenericMethod(entityType.ClrType);
                 method.Invoke(this, new object[] { builder });
             }
+            
+            // Apply similar filter for SharedBaseEntity (Global but track IsDeleted)
+             var sharedEntityTypes = builder.Model.GetEntityTypes()
+                .Where(t => typeof(SharedBaseEntity).IsAssignableFrom(t.ClrType))
+                .ToList();
+
+            var setSharedQueryFilterMethod = typeof(POSDbContext)
+                .GetMethods(System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance)
+                .Single(t => t.IsGenericMethod && t.Name == nameof(SetSharedQueryFilter));
+
+            foreach (var entityType in sharedEntityTypes)
+            {
+                var method = setSharedQueryFilterMethod.MakeGenericMethod(entityType.ClrType);
+                method.Invoke(this, new object[] { builder });
+            }
         }
 
         private void SetGlobalQueryFilter<T>(ModelBuilder builder) where T : BaseEntity
         {
             builder.Entity<T>().HasQueryFilter(e => e.TenantId == CurrentTenantId && !e.IsDeleted);
+        }
+        
+        private void SetSharedQueryFilter<T>(ModelBuilder builder) where T : SharedBaseEntity
+        {
+            builder.Entity<T>().HasQueryFilter(e => !e.IsDeleted);
         }
 
         public override int SaveChanges()

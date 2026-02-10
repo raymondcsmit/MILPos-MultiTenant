@@ -12,6 +12,7 @@ namespace POS.API.Helpers.Mapping
         {
             CreateMap<MenuItem, MenuItemDto>().ReverseMap();
             CreateMap<CreateMenuItemCommand, MenuItem>();
+            CreateMap<UpdateMenuItemCommand, MenuItem>();
         }
     }
 }

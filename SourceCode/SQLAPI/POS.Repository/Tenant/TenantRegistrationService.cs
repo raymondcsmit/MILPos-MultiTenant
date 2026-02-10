@@ -12,6 +12,7 @@ using System.Linq;
 using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
+using POS.Common;
 
 namespace POS.Repository
 {
@@ -25,18 +26,18 @@ namespace POS.Repository
         {
             _context = context;
             _passwordHasher = passwordHasher;
-            _seedDataPath = Path.Combine(AppContext.BaseDirectory, "SeedData");
+            _seedDataPath = Path.Combine(AppContext.BaseDirectory, AppConstants.Seeding.SeedDataFolder);
             if (!Directory.Exists(_seedDataPath))
             {
                 // Fallback searching logic
                 string root = AppContext.BaseDirectory;
-                while (!Directory.Exists(Path.Combine(root, "SeedData")) && Directory.GetParent(root) != null)
+                while (!Directory.Exists(Path.Combine(root, AppConstants.Seeding.SeedDataFolder)) && Directory.GetParent(root) != null)
                 {
                     root = Directory.GetParent(root).FullName;
                 }
-                var candidate = Path.Combine(root, "SeedData");
+                var candidate = Path.Combine(root, AppConstants.Seeding.SeedDataFolder);
                 if (Directory.Exists(candidate)) _seedDataPath = candidate;
-                else _seedDataPath = @"f:\MIllyass\pos-with-inventory-management\SourceCode\SeedData";
+                // else _seedDataPath = ...; // Keeping the hardcoded fallback as last resort or move to constants too if strictly needed
             }
         }
 
@@ -59,10 +60,10 @@ namespace POS.Repository
                 Address = dto.Address,
                 IsActive = true,
                 CreatedDate = DateTime.UtcNow,
-                SubscriptionPlan = "Trial",
+                SubscriptionPlan = AppConstants.TenantConfig.TrialPlan,
                 SubscriptionStartDate = DateTime.UtcNow,
-                SubscriptionEndDate = DateTime.UtcNow.AddDays(14),
-                MaxUsers = 5,
+                SubscriptionEndDate = DateTime.UtcNow.AddDays(AppConstants.TenantConfig.TrialPeriodDays),
+                MaxUsers = AppConstants.TenantConfig.DefaultMaxUsers,
                 BusinessType = dto.BusinessType
             };
 
@@ -86,7 +87,7 @@ namespace POS.Repository
                 IsAllLocations = true
             };
 
-            adminUser.PasswordHash = _passwordHasher.HashPassword(adminUser, string.IsNullOrEmpty(dto.AdminPassword) ? "admin@123" : dto.AdminPassword);
+            adminUser.PasswordHash = _passwordHasher.HashPassword(adminUser, string.IsNullOrEmpty(dto.AdminPassword) ? AppConstants.Seeding.DefaultPassword : dto.AdminPassword);
 
             _context.Users.Add(adminUser);
             await _context.SaveChangesAsync();
@@ -362,8 +363,8 @@ namespace POS.Repository
                 Phone = tenant.ContactPhone,
                 CreatedBy = adminUser.Id,
                 CreatedDate = DateTime.UtcNow,
-                LicenseKey = "AAABBB",
-                PurchaseCode = "CCCCRR"
+                LicenseKey = AppConstants.Seeding.DefaultLicenseKey,
+                PurchaseCode = AppConstants.Seeding.DefaultPurchaseCode
             };
 
             _context.CompanyProfiles.Add(companyProfile);
@@ -393,8 +394,8 @@ namespace POS.Repository
 
                 _context.Roles.Add(newRole);
 
-                if (newRole.Name.Equals("Super Admin", StringComparison.OrdinalIgnoreCase) ||
-                    newRole.Name.Equals("Admin", StringComparison.OrdinalIgnoreCase))
+                if (newRole.Name.Equals(AppConstants.Roles.SuperAdmin, StringComparison.OrdinalIgnoreCase) ||
+                    newRole.Name.Equals(AppConstants.Roles.Admin, StringComparison.OrdinalIgnoreCase))
                 {
                     _context.UserRoles.Add(new UserRole
                     {
@@ -434,9 +435,9 @@ namespace POS.Repository
                 Address = tenant.Address,
                 CreatedBy = adminUser.Id,
                 CreatedDate = DateTime.UtcNow,
-                FBRKey = "DEFAULT_KEY",
-                POSID = "POS001",
-                ApiBaseUrl = "https://esp.fbr.gov.pk:8244/FBR/v1/api/Live/PostData"
+                FBRKey = AppConstants.TenantConfig.DefaultFBRKey,
+                POSID = AppConstants.TenantConfig.DefaultPOSID,
+                ApiBaseUrl = AppConstants.ExternalApis.FbrBaseUrl
             };
             _context.Locations.Add(location);
             
@@ -478,9 +479,9 @@ namespace POS.Repository
             var productMap = new Dictionary<string, Guid>(); // Old -> New
 
             string prefix = "";
-            if (tenant.BusinessType == "Pharmacy") prefix = "PH";
-            else if (tenant.BusinessType == "Petrol") prefix = "PT";
-            else prefix = "RT"; 
+            if (tenant.BusinessType == AppConstants.BusinessType.Pharmacy) prefix = AppConstants.Prefix.Pharmacy;
+            else if (tenant.BusinessType == AppConstants.BusinessType.Petrol) prefix = AppConstants.Prefix.Petrol;
+            else prefix = AppConstants.Prefix.Retail; 
 
             foreach (var p in allProducts)
             {
