@@ -12,8 +12,8 @@ using POS.Domain;
 namespace POS.Migrations.PostgreSQL.Migrations
 {
     [DbContext(typeof(POSDbContext))]
-    [Migration("20260210084722_TenantUpdatePostgreSQL")]
-    partial class TenantUpdatePostgreSQL
+    [Migration("20260210125926_MainPostgreSQL")]
+    partial class MainPostgreSQL
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -176,9 +176,6 @@ namespace POS.Migrations.PostgreSQL.Migrations
 
                     b.Property<long>("SyncVersion")
                         .HasColumnType("bigint");
-
-                    b.Property<Guid>("TenantId")
-                        .HasColumnType("uuid");
 
                     b.HasKey("Id");
 
@@ -365,9 +362,6 @@ namespace POS.Migrations.PostgreSQL.Migrations
                     b.Property<long>("SyncVersion")
                         .HasColumnType("bigint");
 
-                    b.Property<Guid>("TenantId")
-                        .HasColumnType("uuid");
-
                     b.HasKey("Id");
 
                     b.HasIndex("CreatedBy");
@@ -381,6 +375,30 @@ namespace POS.Migrations.PostgreSQL.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uuid");
 
+                    b.Property<Guid>("CreatedBy")
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTime>("CreatedDate")
+                        .HasColumnType("timestamp without time zone");
+
+                    b.Property<Guid?>("DeletedBy")
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTime?>("DeletedDate")
+                        .HasColumnType("timestamp without time zone");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("boolean");
+
+                    b.Property<DateTime?>("LastSyncedAt")
+                        .HasColumnType("timestamp without time zone");
+
+                    b.Property<Guid>("ModifiedBy")
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTime>("ModifiedDate")
+                        .HasColumnType("timestamp without time zone");
+
                     b.Property<string>("Name")
                         .HasMaxLength(100)
                         .HasColumnType("character varying(100)");
@@ -389,7 +407,12 @@ namespace POS.Migrations.PostgreSQL.Migrations
                         .HasMaxLength(10)
                         .HasColumnType("character varying(10)");
 
+                    b.Property<long>("SyncVersion")
+                        .HasColumnType("bigint");
+
                     b.HasKey("Id");
+
+                    b.HasIndex("CreatedBy");
 
                     b.ToTable("Currencies");
                 });
@@ -1966,9 +1989,6 @@ namespace POS.Migrations.PostgreSQL.Migrations
                     b.Property<long>("SyncVersion")
                         .HasColumnType("bigint");
 
-                    b.Property<Guid>("TenantId")
-                        .HasColumnType("uuid");
-
                     b.HasKey("Id");
 
                     b.HasIndex("CreatedBy");
@@ -3227,6 +3247,93 @@ namespace POS.Migrations.PostgreSQL.Migrations
                     b.ToTable("LoginAudits");
                 });
 
+            modelBuilder.Entity("POS.Data.MenuItem", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<Guid>("CreatedBy")
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTime>("CreatedDate")
+                        .HasColumnType("timestamp without time zone");
+
+                    b.Property<string>("CssClass")
+                        .HasColumnType("text");
+
+                    b.Property<Guid?>("DeletedBy")
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTime?>("DeletedDate")
+                        .HasColumnType("timestamp without time zone");
+
+                    b.Property<string>("Icon")
+                        .HasColumnType("text");
+
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("boolean");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("boolean");
+
+                    b.Property<bool>("IsVisible")
+                        .HasColumnType("boolean");
+
+                    b.Property<DateTime?>("LastSyncedAt")
+                        .HasColumnType("timestamp without time zone");
+
+                    b.Property<Guid>("ModifiedBy")
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTime>("ModifiedDate")
+                        .HasColumnType("timestamp without time zone");
+
+                    b.Property<int>("Order")
+                        .HasColumnType("integer");
+
+                    b.Property<Guid?>("ParentId")
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("Path")
+                        .HasColumnType("text");
+
+                    b.Property<long>("SyncVersion")
+                        .HasColumnType("bigint");
+
+                    b.Property<Guid>("TenantId")
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("Title")
+                        .HasColumnType("text");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CreatedBy");
+
+                    b.HasIndex("ParentId");
+
+                    b.ToTable("MenuItems");
+                });
+
+            modelBuilder.Entity("POS.Data.MenuItemAction", b =>
+                {
+                    b.Property<Guid>("MenuItemId")
+                        .HasColumnType("uuid");
+
+                    b.Property<Guid>("ActionId")
+                        .HasColumnType("uuid");
+
+                    b.Property<int>("Operation")
+                        .HasColumnType("integer");
+
+                    b.HasKey("MenuItemId", "ActionId");
+
+                    b.HasIndex("ActionId");
+
+                    b.ToTable("MenuItemActions");
+                });
+
             modelBuilder.Entity("POS.Data.NLog", b =>
                 {
                     b.Property<Guid>("Id")
@@ -3986,6 +4093,47 @@ namespace POS.Migrations.PostgreSQL.Migrations
                     b.HasIndex("RoleId");
 
                     b.ToTable("RoleClaims", (string)null);
+                });
+
+            modelBuilder.Entity("POS.Data.RoleMenuItem", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<Guid>("AssignedBy")
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTime>("AssignedDate")
+                        .HasColumnType("timestamp without time zone");
+
+                    b.Property<bool>("CanCreate")
+                        .HasColumnType("boolean");
+
+                    b.Property<bool>("CanDelete")
+                        .HasColumnType("boolean");
+
+                    b.Property<bool>("CanEdit")
+                        .HasColumnType("boolean");
+
+                    b.Property<bool>("CanView")
+                        .HasColumnType("boolean");
+
+                    b.Property<Guid>("MenuItemId")
+                        .HasColumnType("uuid");
+
+                    b.Property<Guid>("RoleId")
+                        .HasColumnType("uuid");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("AssignedBy");
+
+                    b.HasIndex("MenuItemId");
+
+                    b.HasIndex("RoleId");
+
+                    b.ToTable("RoleMenuItems");
                 });
 
             modelBuilder.Entity("POS.Data.SalesOrder", b =>
@@ -4913,6 +5061,17 @@ namespace POS.Migrations.PostgreSQL.Migrations
                     b.Navigation("CreatedByUser");
                 });
 
+            modelBuilder.Entity("POS.Data.Currency", b =>
+                {
+                    b.HasOne("POS.Data.User", "CreatedByUser")
+                        .WithMany()
+                        .HasForeignKey("CreatedBy")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("CreatedByUser");
+                });
+
             modelBuilder.Entity("POS.Data.Customer", b =>
                 {
                     b.HasOne("POS.Data.Entities.ContactAddress", "BillingAddress")
@@ -5824,6 +5983,43 @@ namespace POS.Migrations.PostgreSQL.Migrations
                     b.Navigation("CreatedByUser");
                 });
 
+            modelBuilder.Entity("POS.Data.MenuItem", b =>
+                {
+                    b.HasOne("POS.Data.User", "CreatedByUser")
+                        .WithMany()
+                        .HasForeignKey("CreatedBy")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("POS.Data.MenuItem", "Parent")
+                        .WithMany("Children")
+                        .HasForeignKey("ParentId")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.Navigation("CreatedByUser");
+
+                    b.Navigation("Parent");
+                });
+
+            modelBuilder.Entity("POS.Data.MenuItemAction", b =>
+                {
+                    b.HasOne("POS.Data.Action", "Action")
+                        .WithMany()
+                        .HasForeignKey("ActionId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("POS.Data.MenuItem", "MenuItem")
+                        .WithMany("MenuItemActions")
+                        .HasForeignKey("MenuItemId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Action");
+
+                    b.Navigation("MenuItem");
+                });
+
             modelBuilder.Entity("POS.Data.Page", b =>
                 {
                     b.HasOne("POS.Data.User", "CreatedByUser")
@@ -6105,6 +6301,33 @@ namespace POS.Migrations.PostgreSQL.Migrations
                         .IsRequired();
 
                     b.Navigation("Action");
+
+                    b.Navigation("Role");
+                });
+
+            modelBuilder.Entity("POS.Data.RoleMenuItem", b =>
+                {
+                    b.HasOne("POS.Data.User", "AssignedByUser")
+                        .WithMany()
+                        .HasForeignKey("AssignedBy")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("POS.Data.MenuItem", "MenuItem")
+                        .WithMany("RoleMenuItems")
+                        .HasForeignKey("MenuItemId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("POS.Data.Role", "Role")
+                        .WithMany()
+                        .HasForeignKey("RoleId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("AssignedByUser");
+
+                    b.Navigation("MenuItem");
 
                     b.Navigation("Role");
                 });
@@ -6429,6 +6652,15 @@ namespace POS.Migrations.PostgreSQL.Migrations
                     b.Navigation("InquiryNotes");
 
                     b.Navigation("InquiryProducts");
+                });
+
+            modelBuilder.Entity("POS.Data.MenuItem", b =>
+                {
+                    b.Navigation("Children");
+
+                    b.Navigation("MenuItemActions");
+
+                    b.Navigation("RoleMenuItems");
                 });
 
             modelBuilder.Entity("POS.Data.Page", b =>

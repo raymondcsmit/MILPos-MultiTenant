@@ -55,6 +55,7 @@ namespace POS.API
 
             services.AddMediatR(cfg => cfg.RegisterServicesFromAssemblies(assembly));
 
+            services.AddTransient(typeof(IPipelineBehavior<,>), typeof(CachingBehavior<,>));
             services.AddTransient(typeof(IPipelineBehavior<,>), typeof(ValidationBehavior<,>));
             services.AddValidatorsFromAssemblies(Enumerable.Repeat(assembly, 1));
 
@@ -98,7 +99,9 @@ namespace POS.API
             services.AddSingleton(new PathHelper(Configuration));
             services.AddSingleton<IConnectionMappingRepository, ConnectionMappingRepository>();
             services.AddScoped(c => new UserInfoToken() { Id = Guid.Parse(defaultUserId) });
-            
+
+            services.AddMemoryCache();
+
             // Configure DbContext - Scoped lifetime
             services.AddDbContext<POSDbContext>((serviceProvider, options) =>
             {
@@ -145,6 +148,7 @@ namespace POS.API
             });
             services.AddSingleton(MapperConfig.GetMapperConfigs());
             services.AddScoped<SeedingService>();
+            services.AddScoped<MenuItemSeedingService>();
             services.AddScoped<ITenantRegistrationService, TenantRegistrationService>();
             services.AddScoped<TenantDataMigrationService>();
             services.AddScoped<POS.Common.Services.IFileStorageService, POS.Helper.Services.FileStorageService>();

@@ -18,6 +18,8 @@ import { TranslateModule } from '@ngx-translate/core';
 import { NgScrollbarModule } from 'ngx-scrollbar';
 import { BreakpointObserver } from '@angular/cdk/layout';
 import { Subject, takeUntil } from 'rxjs';
+import { MenuService } from '../services/menu.service';
+import { MenuItem } from '../domain-classes/menu-item';
 @Component({
   selector: 'app-sidebar',
   templateUrl: './sidebar.component.html',
@@ -48,6 +50,7 @@ export class SidebarComponent implements OnInit, OnDestroy {
     public elementRef: ElementRef,
     private router: Router,
     private breakpointObserver: BreakpointObserver,
+    private menuService: MenuService
   ) {
     this.router.events.subscribe((event) => {
       if (event instanceof NavigationEnd) {
@@ -74,7 +77,9 @@ export class SidebarComponent implements OnInit, OnDestroy {
     }
   }
   ngOnInit() {
-    this.sidebarItems = ROUTES.filter((sidebarItem) => sidebarItem);
+    this.menuService.loadUserMenu().then(() => {
+        this.sidebarItems = this.mapMenuItems(this.menuService.visibleMenuItems());
+    });
     this.bodyTag = this.document.body;
     this.initLeftSidebar();
     // programmatic subscription example
@@ -96,6 +101,17 @@ export class SidebarComponent implements OnInit, OnDestroy {
         this.renderer.removeClass(this.document.body, 'overlay-open');
       }
     });
+  }
+
+  mapMenuItems(items: MenuItem[]): MenuInfo[] {
+      return items.map(item => ({
+          path: item.path,
+          title: item.title,
+          icon: item.icon,
+          class: item.cssClass,
+          submenu: this.mapMenuItems(item.children),
+          hasClaims: [] // Backend filters by role, so we don't need client-side claim check for visibility
+      }));
   }
   initLeftSidebar() {
     // eslint-disable-next-line @typescript-eslint/no-this-alias

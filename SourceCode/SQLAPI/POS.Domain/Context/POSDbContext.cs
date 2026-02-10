@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using POS.Data;
 using POS.Data.Entities;
@@ -106,6 +106,11 @@ namespace POS.Domain
         public DbSet<CustomerLedger> CustomerLedgers { get; set; }
         public DbSet<LoanDetail> LoanDetails { get; set; }
         public DbSet<LoanRepayment> LoanRepayments { get; set; }
+
+        // Dynamic Menu System
+        public DbSet<MenuItem> MenuItems { get; set; }
+        public DbSet<MenuItemAction> MenuItemActions { get; set; }
+        public DbSet<RoleMenuItem> RoleMenuItems { get; set; }
         
         // FBR Integration
         public DbSet<POS.Data.Entities.FBR.FBRSubmissionLog> FBRSubmissionLogs { get; set; }
@@ -846,6 +851,48 @@ namespace POS.Domain
                 b.Property(d => d.IsSystem).HasDefaultValue(true);
             });
 
+            // Dynamic Menu System Configuration
+            builder.Entity<MenuItem>(entity =>
+            {
+                entity.HasOne(m => m.Parent)
+                    .WithMany(m => m.Children)
+                    .HasForeignKey(m => m.ParentId)
+                    .OnDelete(DeleteBehavior.Restrict);
+            });
+
+            builder.Entity<MenuItemAction>(entity =>
+            {
+                entity.HasKey(e => new { e.MenuItemId, e.ActionId });
+                
+                entity.HasOne(e => e.MenuItem)
+                    .WithMany(m => m.MenuItemActions)
+                    .HasForeignKey(e => e.MenuItemId)
+                    .OnDelete(DeleteBehavior.Cascade);
+                
+                entity.HasOne(e => e.Action)
+                    .WithMany()
+                    .HasForeignKey(e => e.ActionId)
+                    .OnDelete(DeleteBehavior.Cascade);
+            });
+
+            builder.Entity<RoleMenuItem>(entity =>
+            {
+                entity.HasOne(e => e.Role)
+                    .WithMany()
+                    .HasForeignKey(e => e.RoleId)
+                    .OnDelete(DeleteBehavior.Cascade);
+                    
+                entity.HasOne(e => e.MenuItem)
+                    .WithMany(m => m.RoleMenuItems)
+                    .HasForeignKey(e => e.MenuItemId)
+                    .OnDelete(DeleteBehavior.Cascade);
+
+                entity.HasOne(e => e.AssignedByUser)
+                    .WithMany()
+                    .HasForeignKey(e => e.AssignedBy)
+                    .OnDelete(DeleteBehavior.Restrict);
+            });
+
             // --- String Length Optimizations ---
 
             // 1. Identity & Tenant Updates
@@ -865,9 +912,15 @@ namespace POS.Domain
                 b.Property(u => u.ResetPasswordCode).HasMaxLength(500);
             });
 
-            // 2. Master Data
-            builder.Entity<Country>(b => b.Property(c => c.CountryName).HasMaxLength(200));
-            builder.Entity<City>(b => b.Property(c => c.CityName).HasMaxLength(200));
+            // 2. Master Data (Shared/Global Entities - Bypass Tenant Filter)
+            builder.Entity<Country>(b => {
+                b.Property(c => c.CountryName).HasMaxLength(200);
+                b.HasQueryFilter(x => true); // Bypass Global Tenant Filter
+            });
+            builder.Entity<City>(b => {
+                b.Property(c => c.CityName).HasMaxLength(200);
+                b.HasQueryFilter(x => true); // Bypass Global Tenant Filter
+            });
             
             builder.Entity<Location>(b => {
                 b.Property(l => l.Name).HasMaxLength(200);
@@ -884,12 +937,14 @@ namespace POS.Domain
             builder.Entity<Currency>(b => {
                 b.Property(c => c.Name).HasMaxLength(100);
                 b.Property(c => c.Symbol).HasMaxLength(10);
+                b.HasQueryFilter(x => true); // Bypass Global Tenant Filter
             });
 
             builder.Entity<Language>(b => {
                 b.Property(l => l.Name).HasMaxLength(100);
                 b.Property(l => l.Code).HasMaxLength(20);
                 b.Property(l => l.ImageUrl).HasMaxLength(500);
+                b.HasQueryFilter(x => true); // Bypass Global Tenant Filter
             });
 
             // 3. Business Entities

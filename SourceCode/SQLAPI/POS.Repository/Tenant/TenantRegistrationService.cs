@@ -9,6 +9,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -27,8 +28,15 @@ namespace POS.Repository
             _seedDataPath = Path.Combine(AppContext.BaseDirectory, "SeedData");
             if (!Directory.Exists(_seedDataPath))
             {
-                // Fallback for dev environment
-                _seedDataPath = @"f:\MIllyass\pos-with-inventory-management\SourceCode\SeedData";
+                // Fallback searching logic
+                string root = AppContext.BaseDirectory;
+                while (!Directory.Exists(Path.Combine(root, "SeedData")) && Directory.GetParent(root) != null)
+                {
+                    root = Directory.GetParent(root).FullName;
+                }
+                var candidate = Path.Combine(root, "SeedData");
+                if (Directory.Exists(candidate)) _seedDataPath = candidate;
+                else _seedDataPath = @"f:\MIllyass\pos-with-inventory-management\SourceCode\SeedData";
             }
         }
 
@@ -69,7 +77,7 @@ namespace POS.Repository
                 Email = dto.AdminEmail,
                 UserName = dto.AdminEmail,
                 NormalizedEmail = dto.AdminEmail.ToUpper(),
-                NormalizedUserName= dto.AdminEmail.ToUpper(),
+                NormalizedUserName = dto.AdminEmail.ToUpper(),
                 FirstName = "Admin",
                 LastName = "User",
                 IsActive = true,
@@ -91,10 +99,255 @@ namespace POS.Repository
 
         private async Task SeedTenantDataAsync(Tenant tenant, User adminUser)
         {
+            // Global Map to track OldGuid -> NewGuid across all tables for FK resolution
+            var globalIdMap = new Dictionary<string, Guid>();
+
+            // 1. Company Profile
             await SeedCompanyProfileAsync(tenant, adminUser);
+
+            // 2. Roles (Special handling for Admin assignment)
             var roleMap = await SeedRolesAsync(tenant, adminUser);
-            await SeedMasterDataAsync(tenant, adminUser);
-            await SeedFinancialDataAsync(tenant, adminUser);
+            foreach (var kvp in roleMap) globalIdMap[kvp.Key] = kvp.Value;
+
+            // 3. Generic System Data (Order matters for dependencies)
+            // Hierarchy: Countries -> Cities -> Locations
+            // Countries and Cities are now Global (SharedBaseEntity) and seeded via SeedingService only.
+            
+            // Ensure Main Location (Manual)
+            var mainLocationId = await EnsureMainLocationAsync(tenant, adminUser);
+
+            // Seed other locations if any (Generic)
+            await SeedTenantTableAsync<Location>("Locations.csv", tenant, adminUser, globalIdMap);
+
+            // Financials
+            await SeedTenantTableAsync<FinancialYear>("FinancialYears.csv", tenant, adminUser, globalIdMap);
+            await EnsureCurrentFinancialYearAsync(tenant, adminUser);
+            await SeedTenantTableAsync<LedgerAccount>("LedgerAccounts.csv", tenant, adminUser, globalIdMap);
+            await SeedTenantTableAsync<Tax>("Taxes.csv", tenant, adminUser, globalIdMap);
+
+            // Lookups
+            await SeedTenantTableAsync<UnitConversation>("UnitConversations.csv", tenant, adminUser, globalIdMap);
+            await SeedTenantTableAsync<Brand>("Brands.csv", tenant, adminUser, globalIdMap);
+            await SeedTenantTableAsync<ProductCategory>("ProductCategories.csv", tenant, adminUser, globalIdMap);
+            await SeedTenantTableAsync<ExpenseCategory>("ExpenseCategories.csv", tenant, adminUser, globalIdMap);
+
+            // Settings & Permissions
+            await SeedTenantTableAsync<EmailTemplate>("EmailTemplates.csv", tenant, adminUser, globalIdMap);
+            await SeedTenantTableAsync<EmailSMTPSetting>("EmailSMTPSettings.csv", tenant, adminUser, globalIdMap);
+            await SeedTenantTableAsync<Data.Action>("Actions.csv", tenant, adminUser, globalIdMap);
+            await SeedTenantTableAsync<Page>("Pages.csv", tenant, adminUser, globalIdMap);
+            await SeedTenantTableAsync<PageHelper>("Pagehelpers.csv", tenant, adminUser, globalIdMap);
+            // Language is now Global (SharedBaseEntity) and seeded via SeedingService only.
+            await SeedTenantTableAsync<InquiryStatus>("InquiryStatuses.csv", tenant, adminUser, globalIdMap);
+            await SeedTenantTableAsync<InquirySource>("InquirySources.csv", tenant, adminUser, globalIdMap);
+
+            // CRM / Partners
+            await SeedTenantTableAsync<Supplier>("Suppliers.csv", tenant, adminUser, globalIdMap);
+            await SeedTenantTableAsync<SupplierAddress>("SupplierAddresses.csv", tenant, adminUser, globalIdMap);
+            await SeedTenantTableAsync<Customer>("Customers.csv", tenant, adminUser, globalIdMap);
+            await SeedTenantTableAsync<ContactAddress>("ContactAddresses.csv", tenant, adminUser, globalIdMap);
+
+            // 4. Products (Special handling due to filtering and multi-table dependencies)
+            await SeedProductsAsync(tenant, adminUser, globalIdMap, mainLocationId);
+            
+            // Product Taxes (Depends on Products)
+            await SeedTenantTableAsync<ProductTax>("ProductTaxes.csv", tenant, adminUser, globalIdMap);
+
+            // Transactions (Depends on Suppliers, Customers, Products, Locations)
+            await SeedTenantTableAsync<PurchaseOrder>("PurchaseOrders.csv", tenant, adminUser, globalIdMap);
+            await SeedTenantTableAsync<PurchaseOrderItem>("PurchaseOrderItems.csv", tenant, adminUser, globalIdMap);
+            await SeedTenantTableAsync<PurchaseOrderItemTax>("PurchaseOrderItemTaxes.csv", tenant, adminUser, globalIdMap);
+            await SeedTenantTableAsync<PurchaseOrderPayment>("PurchaseOrderPayments.csv", tenant, adminUser, globalIdMap);
+            
+            await SeedTenantTableAsync<SalesOrder>("SalesOrders.csv", tenant, adminUser, globalIdMap);
+            await SeedTenantTableAsync<SalesOrderItem>("SalesOrderItems.csv", tenant, adminUser, globalIdMap);
+            await SeedTenantTableAsync<SalesOrderItemTax>("SalesOrderItemTaxes.csv", tenant, adminUser, globalIdMap);
+            await SeedTenantTableAsync<SalesOrderPayment>("SalesOrderPayments.csv", tenant, adminUser, globalIdMap);
+            
+            await SeedTenantTableAsync<Transaction>("Transactions.csv", tenant, adminUser, globalIdMap);
+            await SeedTenantTableAsync<TransactionItem>("TransactionItems.csv", tenant, adminUser, globalIdMap);
+            await SeedTenantTableAsync<TransactionItemTax>("TransactionItemTaxes.csv", tenant, adminUser, globalIdMap);
+            
+            await SeedTenantTableAsync<AccountingEntry>("AccountingEntries.csv", tenant, adminUser, globalIdMap);
+            await SeedTenantTableAsync<PaymentEntry>("PaymentEntries.csv", tenant, adminUser, globalIdMap);
+            await SeedTenantTableAsync<TaxEntry>("TaxEntries.csv", tenant, adminUser, globalIdMap);
+            
+            await SeedTenantTableAsync<StockAdjustment>("StockAdjustments.csv", tenant, adminUser, globalIdMap);
+            await SeedTenantTableAsync<DamagedStock>("DamagedStocks.csv", tenant, adminUser, globalIdMap);
+            await SeedTenantTableAsync<StockTransfer>("StockTransfers.csv", tenant, adminUser, globalIdMap);
+            await SeedTenantTableAsync<StockTransferItem>("StockTransferItems.csv", tenant, adminUser, globalIdMap);
+            
+            await SeedTenantTableAsync<Expense>("Expenses.csv", tenant, adminUser, globalIdMap);
+            await SeedTenantTableAsync<ExpenseTax>("ExpenseTaxes.csv", tenant, adminUser, globalIdMap);
+            
+            await SeedTenantTableAsync<LoanDetail>("LoanDetails.csv", tenant, adminUser, globalIdMap);
+            await SeedTenantTableAsync<LoanRepayment>("LoanRepayments.csv", tenant, adminUser, globalIdMap);
+            
+            // Inquiries / Reminders
+            await SeedTenantTableAsync<Inquiry>("Inquiries.csv", tenant, adminUser, globalIdMap);
+            await SeedTenantTableAsync<InquiryProduct>("InquiryProducts.csv", tenant, adminUser, globalIdMap);
+            await SeedTenantTableAsync<InquiryActivity>("InquiryActivities.csv", tenant, adminUser, globalIdMap);
+            await SeedTenantTableAsync<InquiryAttachment>("InquiryAttachments.csv", tenant, adminUser, globalIdMap);
+            await SeedTenantTableAsync<InquiryNote>("InquiryNotes.csv", tenant, adminUser, globalIdMap);
+            
+            await SeedTenantTableAsync<Reminder>("Reminders.csv", tenant, adminUser, globalIdMap);
+            await SeedTenantTableAsync<ReminderUser>("ReminderUsers.csv", tenant, adminUser, globalIdMap);
+            await SeedTenantTableAsync<ReminderScheduler>("ReminderSchedulers.csv", tenant, adminUser, globalIdMap);
+            await SeedTenantTableAsync<ReminderNotification>("ReminderNotifications.csv", tenant, adminUser, globalIdMap);
+            await SeedTenantTableAsync<DailyReminder>("DailyReminders.csv", tenant, adminUser, globalIdMap);
+            await SeedTenantTableAsync<QuarterlyReminder>("QuarterlyReminders.csv", tenant, adminUser, globalIdMap);
+            await SeedTenantTableAsync<HalfYearlyReminder>("HalfYearlyReminders.csv", tenant, adminUser, globalIdMap);
+
+            // 5. Menu (Special handling for hierarchical remapping)
+            await SeedMenuItemsAsync(tenant, adminUser, roleMap);
+        }
+
+        private async Task SeedTenantTableAsync<T>(string fileName, Tenant tenant, User adminUser, Dictionary<string, Guid> globalIdMap) where T : class, new()
+        {
+            var items = ReadCsv<T>(fileName);
+            if (!items.Any()) return;
+
+            var entityType = typeof(T);
+            var idProp = entityType.GetProperty("Id");
+            var parentIdProp = entityType.GetProperty("ParentId") ?? entityType.GetProperty("ParentAccountId");
+            var tenantIdProp = entityType.GetProperty("TenantId");
+            var createdByProp = entityType.GetProperty("CreatedBy");
+            var createdDateProp = entityType.GetProperty("CreatedDate");
+
+            // Skip if no Id property or not a Guid (shouldn't happen for BaseEntity)
+            if (idProp == null || idProp.PropertyType != typeof(Guid)) return;
+
+            // Pass 1: Generate New IDs and Map
+            foreach (var item in items)
+            {
+                var oldIdVal = idProp.GetValue(item);
+                if (oldIdVal is Guid oldId)
+                {
+                    var newId = Guid.NewGuid();
+                    idProp.SetValue(item, newId);
+
+                    var key = oldId.ToString().ToUpper();
+                    globalIdMap[key] = newId;
+                }
+            }
+
+            // Pass 2: Set Tenant/Audit Props and Fix FKs
+            foreach (var item in items)
+            {
+                if (tenantIdProp != null) tenantIdProp.SetValue(item, tenant.Id);
+                if (createdByProp != null) createdByProp.SetValue(item, adminUser.Id);
+                if (createdDateProp != null) createdDateProp.SetValue(item, DateTime.UtcNow);
+
+                // Fix Parent ID (Self Referencing)
+                if (parentIdProp != null)
+                {
+                    var parentVal = parentIdProp.GetValue(item);
+                    if (parentVal != null)
+                    {
+                        var key = parentVal.ToString().ToUpper();
+                        if (globalIdMap.TryGetValue(key, out var newParentId))
+                        {
+                            parentIdProp.SetValue(item, newParentId);
+                        }
+                        else
+                        {
+                            parentIdProp.SetValue(item, null); // Parent not found (maybe filtered out or missing)
+                        }
+                    }
+                }
+
+                // Fix other FKs (Generic check for Guid properties ending in 'Id')
+                var props = entityType.GetProperties();
+                foreach (var prop in props)
+                {
+                    // Skip primary key and audit fields
+                    if (prop.Name == "Id" || prop.Name == "TenantId" || prop.Name == "CreatedBy" || prop.Name == "ModifiedBy" || prop.Name == "DeletedBy") continue;
+
+                    if ((prop.PropertyType == typeof(Guid) || prop.PropertyType == typeof(Guid?)) && prop.Name.EndsWith("Id"))
+                    {
+                        var val = prop.GetValue(item);
+                        if (val != null)
+                        {
+                            var key = val.ToString().ToUpper();
+                            if (globalIdMap.TryGetValue(key, out var newId))
+                            {
+                                prop.SetValue(item, newId);
+                            }
+                        }
+                    }
+                }
+
+                _context.Set<T>().Add(item);
+            }
+            await _context.SaveChangesAsync();
+        }
+
+        private async Task SeedMenuItemsAsync(Tenant tenant, User adminUser, Dictionary<string, Guid> roleMap)
+        {
+            var menuItems = ReadCsv<MenuItem>("MenuItems.csv");
+            var menuMap = new Dictionary<string, Guid>(); // OldIdStr -> NewId
+
+            // 1. First pass: Generate New IDs and populate map
+            foreach (var item in menuItems)
+            {
+                var oldId = item.Id.ToString().ToUpper();
+                var newId = Guid.NewGuid();
+                menuMap[oldId] = newId;
+                item.Id = newId; 
+            }
+
+            // 2. Second pass: Set properties and fix ParentId
+            foreach (var item in menuItems)
+            {
+                item.TenantId = tenant.Id;
+                item.CreatedBy = adminUser.Id;
+                item.CreatedDate = DateTime.UtcNow;
+
+                // Remap ParentId
+                if (item.ParentId.HasValue && item.ParentId != Guid.Empty)
+                {
+                    if (menuMap.TryGetValue(item.ParentId.Value.ToString().ToUpper(), out var newParentId))
+                    {
+                        item.ParentId = newParentId;
+                    }
+                    else
+                    {
+                        item.ParentId = null;
+                    }
+                }
+
+                _context.MenuItems.Add(item);
+            }
+            await _context.SaveChangesAsync();
+
+            // 3. Assign to Roles (Default Logic)
+            var roleMenuItems = new List<RoleMenuItem>();
+            var superAdminRoleId = await _context.Roles
+                .Where(r => r.TenantId == tenant.Id && r.Name == "Super Admin")
+                .Select(r => r.Id)
+                .FirstOrDefaultAsync();
+
+            if (superAdminRoleId != Guid.Empty)
+            {
+                foreach (var menuId in menuMap.Values)
+                {
+                    roleMenuItems.Add(new RoleMenuItem
+                    {
+                        Id = Guid.NewGuid(),
+                        RoleId = superAdminRoleId,
+                        MenuItemId = menuId,
+                        CanView = true,
+                        CanCreate = true,
+                        CanEdit = true,
+                        CanDelete = true,
+                        AssignedBy = adminUser.Id,
+                        AssignedDate = DateTime.UtcNow
+                    });
+                }
+            }
+
+            _context.RoleMenuItems.AddRange(roleMenuItems);
+            await _context.SaveChangesAsync();
         }
 
         private async Task SeedCompanyProfileAsync(Tenant tenant, User adminUser)
@@ -119,9 +372,8 @@ namespace POS.Repository
 
         private async Task<Dictionary<string, Guid>> SeedRolesAsync(Tenant tenant, User adminUser)
         {
-            // Read Roles.csv and Clone
             var roles = ReadCsv<Role>("Roles.csv");
-            var roleMap = new Dictionary<string, Guid>(); // OldIdStr -> NewGuid
+            var roleMap = new Dictionary<string, Guid>(); 
 
             foreach (var oldRole in roles)
             {
@@ -138,11 +390,10 @@ namespace POS.Repository
                     CreatedDate = DateTime.UtcNow,
                     CreatedBy = adminUser.Id
                 };
-                
+
                 _context.Roles.Add(newRole);
 
-                // Assign Admin Role
-                if (newRole.Name.Equals("Super Admin", StringComparison.OrdinalIgnoreCase) || 
+                if (newRole.Name.Equals("Super Admin", StringComparison.OrdinalIgnoreCase) ||
                     newRole.Name.Equals("Admin", StringComparison.OrdinalIgnoreCase))
                 {
                     _context.UserRoles.Add(new UserRole
@@ -155,7 +406,6 @@ namespace POS.Repository
 
             await _context.SaveChangesAsync();
 
-            // Seed Role Claims
             var claims = ReadCsv<RoleClaim>("RoleClaims.csv");
             foreach (var claim in claims)
             {
@@ -174,59 +424,8 @@ namespace POS.Repository
             return roleMap;
         }
 
-        private async Task SeedMasterDataAsync(Tenant tenant, User adminUser)
+        private async Task<Guid> EnsureMainLocationAsync(Tenant tenant, User adminUser)
         {
-            // Taxes
-            var taxes = ReadCsv<POS.Data.Tax>("Taxes.csv");
-            foreach(var item in taxes)
-            {
-                item.Id = Guid.NewGuid();
-                item.TenantId = tenant.Id;
-                item.CreatedBy = adminUser.Id;
-                item.CreatedDate = DateTime.UtcNow;
-                _context.Taxes.Add(item);
-            }
-
-            // Units
-            var units = ReadCsv<POS.Data.UnitConversation>("UnitConversations.csv");
-            var unitMap = new Dictionary<string, Guid>();
-            foreach(var item in units)
-            {
-                var oldId = item.Id.ToString().ToUpper();
-                item.Id = Guid.NewGuid();
-                item.TenantId = tenant.Id;
-                item.CreatedBy = adminUser.Id;
-                item.CreatedDate = DateTime.UtcNow;
-                _context.UnitConversations.Add(item);
-                unitMap[oldId] = item.Id;
-            }
-
-            // Categories
-            var cats = ReadCsv<POS.Data.Entities.ProductCategory>("ProductCategories.csv");
-            var categoryMap = new Dictionary<string, Guid>();
-            foreach(var item in cats)
-            {
-                var oldId = item.Id.ToString().ToUpper();
-                item.Id = Guid.NewGuid();
-                item.TenantId = tenant.Id;
-                item.CreatedBy = adminUser.Id;
-                item.CreatedDate = DateTime.UtcNow;
-                _context.ProductCategories.Add(item);
-                categoryMap[oldId] = item.Id;
-            }
-            
-            // Expense Categories
-            var expCats = ReadCsv<POS.Data.ExpenseCategory>("ExpenseCategories.csv");
-            foreach(var item in expCats)
-            {
-                item.Id = Guid.NewGuid();
-                item.TenantId = tenant.Id;
-                item.CreatedBy = adminUser.Id;
-                item.CreatedDate = DateTime.UtcNow;
-                _context.ExpenseCategories.Add(item);
-            }
-            
-            // Main Location
             var location = new Location
             {
                 Id = Guid.NewGuid(),
@@ -241,9 +440,6 @@ namespace POS.Repository
             };
             _context.Locations.Add(location);
             
-            var mainLocationId = location.Id; // Capture for stocks
-
-            // Link Admin to this location
             _context.UserLocations.Add(new UserLocation
             {
                 UserId = adminUser.Id,
@@ -251,38 +447,43 @@ namespace POS.Repository
             });
 
             await _context.SaveChangesAsync();
+            return location.Id;
+        }
 
-            // ---------------------------------------------------------
-            // Seed Brands (Missing in original, needed for Products)
-            // ---------------------------------------------------------
-            var brands = ReadCsv<Brand>("Brands.csv");
-            var brandMap = new Dictionary<string, Guid>();
-            foreach (var item in brands)
+        private async Task EnsureCurrentFinancialYearAsync(Tenant tenant, User adminUser)
+        {
+            var year = DateTime.UtcNow.Year;
+            if (!await _context.FinancialYears.AnyAsync(fy => fy.TenantId == tenant.Id && fy.StartDate.Year == year))
             {
-                var oldId = item.Id.ToString().ToUpper();
-                item.Id = Guid.NewGuid();
-                item.TenantId = tenant.Id;
-                item.CreatedBy = adminUser.Id;
-                item.CreatedDate = DateTime.UtcNow;
-                _context.Brands.Add(item);
-                brandMap[oldId] = item.Id;
+                var fy = new FinancialYear
+                {
+                    Id = Guid.NewGuid(),
+                    TenantId = tenant.Id,
+                    StartDate = new DateTime(year, 1, 1),
+                    EndDate = new DateTime(year, 12, 31),
+                    IsClosed = false,
+                    CreatedBy = adminUser.Id,
+                    CreatedDate = DateTime.UtcNow
+                };
+                _context.FinancialYears.Add(fy);
+                await _context.SaveChangesAsync();
             }
+        }
 
-            // ---------------------------------------------------------
-            // Seed Products (Filtered by BusinessType) with Dependencies
-            // ---------------------------------------------------------
+        private async Task SeedProductsAsync(Tenant tenant, User adminUser, Dictionary<string, Guid> globalIdMap, Guid mainLocationId)
+        {
+            // Seed Products
             var allProducts = ReadCsv<POS.Data.Product>("Products.csv");
-            var productMap = new Dictionary<string, Guid>(); // OldId -> NewId
             var seededProducts = new List<Product>();
+            var productMap = new Dictionary<string, Guid>(); // Old -> New
 
             string prefix = "";
             if (tenant.BusinessType == "Pharmacy") prefix = "PH";
             else if (tenant.BusinessType == "Petrol") prefix = "PT";
-            else prefix = "RT"; // Default to Retail
+            else prefix = "RT"; 
 
             foreach (var p in allProducts)
             {
-                // Filter logic
                 if (string.IsNullOrEmpty(p.Code)) continue;
                 if (!p.Code.StartsWith(prefix, StringComparison.OrdinalIgnoreCase)) continue;
 
@@ -292,69 +493,52 @@ namespace POS.Repository
                 p.CreatedBy = adminUser.Id;
                 p.CreatedDate = DateTime.UtcNow;
 
-                // Remap Foreign Keys
-                if (p.UnitId != Guid.Empty)
+                // Remap FKs using globalIdMap
+                if (p.UnitId != Guid.Empty && globalIdMap.TryGetValue(p.UnitId.ToString().ToUpper(), out var newUnitId))
                 {
-                    if (unitMap.TryGetValue(p.UnitId.ToString().ToUpper(), out var newUnitId))
-                    {
-                        p.UnitId = newUnitId;
-                    }
-                    else
-                    {
-                        // Critical dependency missing
-                        throw new Exception($"Missing Unit mapping for Product {p.Name} (Old UnitId: {p.UnitId})");
-                    }
+                    p.UnitId = newUnitId;
                 }
                 
-                if (p.CategoryId != Guid.Empty)
+                if (p.CategoryId != Guid.Empty && globalIdMap.TryGetValue(p.CategoryId.ToString().ToUpper(), out var newCatId))
                 {
-                    if (categoryMap.TryGetValue(p.CategoryId.ToString().ToUpper(), out var newCatId))
-                    {
-                        p.CategoryId = newCatId;
-                    }
-                    else
-                    {
-                        // Critical dependency missing
-                        throw new Exception($"Missing Category mapping for Product {p.Name} (Old CategoryId: {p.CategoryId})");
-                    }
+                    p.CategoryId = newCatId;
                 }
 
-                if (p.BrandId.HasValue && p.BrandId != Guid.Empty && brandMap.TryGetValue(p.BrandId.Value.ToString().ToUpper(), out var newBrandId))
+                if (p.BrandId.HasValue && p.BrandId != Guid.Empty)
                 {
-                    p.BrandId = newBrandId;
-                }
-                else
-                {
-                    p.BrandId = null; // Ensure null if not found or empty
+                     if (globalIdMap.TryGetValue(p.BrandId.Value.ToString().ToUpper(), out var newBrandId))
+                     {
+                         p.BrandId = newBrandId;
+                     }
+                     else
+                     {
+                         p.BrandId = null;
+                     }
                 }
 
                 seededProducts.Add(p);
                 productMap[oldId] = p.Id;
             }
-            
+
             if (seededProducts.Any())
             {
                 _context.Products.AddRange(seededProducts);
+                await _context.SaveChangesAsync();
             }
 
-            // ---------------------------------------------------------
             // Seed Product Stocks
-            // ---------------------------------------------------------
             var allStocks = ReadCsv<POS.Data.Entities.ProductStock>("ProductStocks.csv");
             var seededStocks = new List<ProductStock>();
 
             foreach (var s in allStocks)
             {
                 var oldProdId = s.ProductId.ToString().ToUpper();
-                
-                // Only seed stock if the product was seeded
                 if (productMap.TryGetValue(oldProdId, out var newProdId))
                 {
                     s.Id = Guid.NewGuid();
                     s.ProductId = newProdId;
-                    s.LocationId = mainLocationId; // Assign to the main location we just created
+                    s.LocationId = mainLocationId;
                     s.ModifiedDate = DateTime.UtcNow;
-                    
                     seededStocks.Add(s);
                 }
             }
@@ -362,72 +546,8 @@ namespace POS.Repository
             if (seededStocks.Any())
             {
                 _context.ProductStocks.AddRange(seededStocks);
-            }
-
-            try 
-            {
                 await _context.SaveChangesAsync();
             }
-            catch (Exception ex)
-            {
-                // Log error (simple console for now, or throw with detail)
-                throw new Exception($"Seeding failed: {ex.Message} {ex.InnerException?.Message}", ex);
-            }
-        }
-
-        private async Task SeedFinancialDataAsync(Tenant tenant, User adminUser)
-        {
-            var year = DateTime.UtcNow.Year;
-            var fy = new FinancialYear
-            {
-                Id = Guid.NewGuid(),
-                TenantId = tenant.Id,
-                StartDate = new DateTime(year, 1, 1),
-                EndDate = new DateTime(year, 12, 31),
-                IsClosed = false,
-                CreatedBy = adminUser.Id,
-                CreatedDate = DateTime.UtcNow
-            };
-            _context.FinancialYears.Add(fy);
-
-            var accounts = ReadCsv<LedgerAccount>("LedgerAccounts.csv");
-            var accountMap = new Dictionary<string, Guid>();
-            var newAccounts = new List<LedgerAccount>();
-
-            foreach(var acc in accounts)
-            {
-                accountMap[acc.Id.ToString().ToUpper()] = Guid.NewGuid();
-            }
-
-            foreach(var oldAcc in accounts)
-            {
-                var newAcc = new LedgerAccount
-                {
-                    Id = accountMap[oldAcc.Id.ToString().ToUpper()],
-                    TenantId = tenant.Id,
-                    AccountCode = oldAcc.AccountCode,
-                    AccountName = oldAcc.AccountName,
-                    AccountType = oldAcc.AccountType,
-                    AccountGroup = oldAcc.AccountGroup,
-                    OpeningBalance = 0,
-                    IsActive = true,
-                    IsSystem = oldAcc.IsSystem,
-                    CreatedBy = adminUser.Id,
-                    CreatedDate = DateTime.UtcNow,
-                    ModifiedBy = adminUser.Id,
-                    ModifiedDate = DateTime.UtcNow
-                };
-
-                if (oldAcc.ParentAccountId.HasValue && accountMap.TryGetValue(oldAcc.ParentAccountId.Value.ToString().ToUpper(), out var newParentId))
-                {
-                    newAcc.ParentAccountId = newParentId;
-                }
-
-                newAccounts.Add(newAcc);
-            }
-            
-            _context.LedgerAccounts.AddRange(newAccounts);
-            await _context.SaveChangesAsync();
         }
 
         private List<T> ReadCsv<T>(string filename) where T : new()
@@ -460,7 +580,7 @@ namespace POS.Repository
                             var targetType = Nullable.GetUnderlyingType(prop.PropertyType) ?? prop.PropertyType;
                             object convertedValue = null;
 
-                             if (targetType == typeof(Guid))
+                            if (targetType == typeof(Guid))
                             {
                                 if (Guid.TryParse(value, out var g)) convertedValue = g;
                             }

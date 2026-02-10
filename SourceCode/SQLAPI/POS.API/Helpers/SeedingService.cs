@@ -182,10 +182,18 @@ namespace POS.API.Helpers
                         // Disable all constraints
                         await _context.Database.ExecuteSqlRawAsync("EXEC sp_msforeachtable \"ALTER TABLE ? NOCHECK CONSTRAINT all\"");
                     }
-                    else if (provider == "Npgsql.EntityFrameworkCore.PostgreSQL" || provider == "PostgreSql")
+                    else if (provider.Contains("PostgreSQL", StringComparison.OrdinalIgnoreCase))
                     {
-                        // Disable FK constraints for the session in PostgreSQL
-                        await _context.Database.ExecuteSqlRawAsync("SET session_replication_role = 'replica';");
+                        try
+                        {
+                            // Disable FK constraints for the session in PostgreSQL
+                            await _context.Database.ExecuteSqlRawAsync("SET session_replication_role = 'replica';");
+                        }
+                        catch (Exception ex)
+                        {
+                            // If this fails (e.g. standard user on AWS RDS), we continue but rely on the sorting logic below
+                            Console.WriteLine($"Warning: Could not set session_replication_role to 'replica'. FKs remain active. Error: {ex.Message}");
+                        }
                     }
 
                     try
@@ -218,10 +226,14 @@ namespace POS.API.Helpers
                         {
                             await _context.Database.ExecuteSqlRawAsync("EXEC sp_msforeachtable \"ALTER TABLE ? WITH CHECK CHECK CONSTRAINT all\"");
                         }
-                        else if (provider == "Npgsql.EntityFrameworkCore.PostgreSQL" || provider == "PostgreSql")
+                        else if (provider.Contains("PostgreSQL", StringComparison.OrdinalIgnoreCase))
                         {
-                            // Re-enable FK constraints
-                            await _context.Database.ExecuteSqlRawAsync("SET session_replication_role = 'origin';");
+                            try
+                            {
+                                // Re-enable FK constraints
+                                await _context.Database.ExecuteSqlRawAsync("SET session_replication_role = 'origin';");
+                            }
+                            catch { /* Ignore error on cleanup if we couldn't set it in the first place */ }
                         }
                     }
                 }
@@ -366,6 +378,82 @@ namespace POS.API.Helpers
                 }
 
                 if (hasData) entities.Add(entity);
+            }
+
+            // Explicit Hierarchical sorting for self-referencing tables (ParentId)
+            // This is crucial if FK constraints could not be disabled.
+            if (entities.Any() && entities.Count > 1)
+            {
+                var props = typeof(T).GetProperties();
+                var idProp = props.FirstOrDefault(p => p.Name.Equals("Id", StringComparison.OrdinalIgnoreCase) && p.PropertyType == typeof(Guid));
+                var parentIdProp = props.FirstOrDefault(p => p.Name.Equals("ParentId", StringComparison.OrdinalIgnoreCase) && (p.PropertyType == typeof(Guid?) || p.PropertyType == typeof(Guid)));
+
+                if (idProp != null && parentIdProp != null)
+                {
+                    Console.WriteLine($"Sorting {typeof(T).Name} hierarchically to Satisfy FKs...");
+                    var sortedList = new List<T>();
+                    var unsortedList = entities.ToList();
+
+                    // Function to get ID and ParentID
+                    Guid GetId(T e) => (Guid)idProp.GetValue(e);
+                    Guid? GetParentId(T e)
+                    {
+                        var val = parentIdProp.GetValue(e);
+                        if (val == null) return null;
+                        if (val is Guid g) return g == Guid.Empty ? null : (Guid?)g;
+                        return null;
+                    }
+
+                    // Pass 1: Roots (ParentId is null or not in the set)
+                    // Note: If a parent ID refers to a record ALREADY in DB, it's fine. 
+                    // But here we are sorting the NEW batch.
+                    // We assume parents are either in DB or in this Batch.
+                    
+                    // Simple topological sort
+                    var processedIds = new HashSet<Guid>();
+                    
+                    // If we want to be safe against parents already in DB, we can't easily check that without querying.
+                    // But usually, sorting Parents -> Children within the batch corrects the immediate issue.
+                    
+                    int initialCount;
+                    do
+                    {
+                        initialCount = unsortedList.Count;
+                        // Find items where ParentId is null OR ParentId is already processed OR ParentId is not in the current unsorted batch (meaning it's in DB or non-existent)
+                        var currentBatchIds = new HashSet<Guid>(unsortedList.Select(GetId));
+                        
+                        var readyItems = unsortedList.Where(e =>
+                        {
+                            var pid = GetParentId(e);
+                            return pid == null || processedIds.Contains(pid.Value) || !currentBatchIds.Contains(pid.Value);
+                        }).ToList();
+
+                        if (readyItems.Any())
+                        {
+                            sortedList.AddRange(readyItems);
+                            foreach (var item in readyItems)
+                            {
+                                processedIds.Add(GetId(item));
+                                unsortedList.Remove(item);
+                            }
+                        }
+                        else
+                        {
+                            // No progress made? Cycle or complex dependency?
+                            break;
+                        }
+
+                    } while (unsortedList.Count > 0 && unsortedList.Count < initialCount);
+
+                    // Add leftovers
+                    if (unsortedList.Any())
+                    {
+                        sortedList.AddRange(unsortedList);
+                        Console.WriteLine($"Warning: {unsortedList.Count} items in {typeof(T).Name} could not be strictly sorted (potential cycles). Appended to end.");
+                    }
+
+                    entities = sortedList;
+                }
             }
 
             // Incremental Seeding Logic: Filter out entities that already exist

@@ -1,9 +1,9 @@
-﻿using System;
+using System;
 using System.ComponentModel.DataAnnotations.Schema;
 
 namespace POS.Data
 {
-    public class City : BaseEntity
+    public class City : SharedBaseEntity
     {
         public string CityName { get; set; }
         public Guid CountryId { get; set; }

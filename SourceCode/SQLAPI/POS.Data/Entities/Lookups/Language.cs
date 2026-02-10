@@ -1,8 +1,8 @@
-﻿using System;
+using System;
 
 namespace POS.Data.Entities
 {
-    public class Language : BaseEntity
+    public class Language : SharedBaseEntity
     {
         public string Name { get; set; }
         public string Code { get; set; }

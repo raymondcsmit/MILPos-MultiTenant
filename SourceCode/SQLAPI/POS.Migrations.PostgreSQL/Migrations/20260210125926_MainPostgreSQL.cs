@@ -7,7 +7,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace POS.Migrations.PostgreSQL.Migrations
 {
     /// <inheritdoc />
-    public partial class MainInitPostgreSQL : Migration
+    public partial class MainPostgreSQL : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -29,19 +29,6 @@ namespace POS.Migrations.PostgreSQL.Migrations
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_ContactAddresses", x => x.Id);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "Currencies",
-                columns: table => new
-                {
-                    Id = table.Column<Guid>(type: "uuid", nullable: false),
-                    Name = table.Column<string>(type: "character varying(100)", maxLength: 100, nullable: true),
-                    Symbol = table.Column<string>(type: "character varying(10)", maxLength: 10, nullable: true)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_Currencies", x => x.Id);
                 });
 
             migrationBuilder.CreateTable(
@@ -172,7 +159,9 @@ namespace POS.Migrations.PostgreSQL.Migrations
                     LogoUrl = table.Column<string>(type: "text", nullable: true),
                     TimeZone = table.Column<string>(type: "character varying(100)", maxLength: 100, nullable: true),
                     Currency = table.Column<string>(type: "character varying(10)", maxLength: 10, nullable: true),
-                    BusinessType = table.Column<string>(type: "text", nullable: true)
+                    BusinessType = table.Column<string>(type: "text", nullable: true),
+                    LicenseType = table.Column<string>(type: "text", nullable: true),
+                    TrialExpiryDate = table.Column<DateTime>(type: "timestamp without time zone", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -351,7 +340,6 @@ namespace POS.Migrations.PostgreSQL.Migrations
                 {
                     Id = table.Column<Guid>(type: "uuid", nullable: false),
                     CountryName = table.Column<string>(type: "character varying(200)", maxLength: 200, nullable: true),
-                    TenantId = table.Column<Guid>(type: "uuid", nullable: false),
                     CreatedDate = table.Column<DateTime>(type: "timestamp without time zone", nullable: false),
                     CreatedBy = table.Column<Guid>(type: "uuid", nullable: false),
                     ModifiedDate = table.Column<DateTime>(type: "timestamp without time zone", nullable: false, defaultValueSql: "CURRENT_TIMESTAMP"),
@@ -367,6 +355,34 @@ namespace POS.Migrations.PostgreSQL.Migrations
                     table.PrimaryKey("PK_Countries", x => x.Id);
                     table.ForeignKey(
                         name: "FK_Countries_Users_CreatedBy",
+                        column: x => x.CreatedBy,
+                        principalTable: "Users",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Currencies",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(type: "uuid", nullable: false),
+                    Name = table.Column<string>(type: "character varying(100)", maxLength: 100, nullable: true),
+                    Symbol = table.Column<string>(type: "character varying(10)", maxLength: 10, nullable: true),
+                    CreatedDate = table.Column<DateTime>(type: "timestamp without time zone", nullable: false),
+                    CreatedBy = table.Column<Guid>(type: "uuid", nullable: false),
+                    ModifiedDate = table.Column<DateTime>(type: "timestamp without time zone", nullable: false),
+                    ModifiedBy = table.Column<Guid>(type: "uuid", nullable: false),
+                    DeletedDate = table.Column<DateTime>(type: "timestamp without time zone", nullable: true),
+                    DeletedBy = table.Column<Guid>(type: "uuid", nullable: true),
+                    SyncVersion = table.Column<long>(type: "bigint", nullable: false),
+                    LastSyncedAt = table.Column<DateTime>(type: "timestamp without time zone", nullable: true),
+                    IsDeleted = table.Column<bool>(type: "boolean", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Currencies", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_Currencies_Users_CreatedBy",
                         column: x => x.CreatedBy,
                         principalTable: "Users",
                         principalColumn: "Id",
@@ -616,7 +632,6 @@ namespace POS.Migrations.PostgreSQL.Migrations
                     ImageUrl = table.Column<string>(type: "character varying(500)", maxLength: 500, nullable: true),
                     Isrtl = table.Column<bool>(type: "boolean", nullable: false),
                     Order = table.Column<int>(type: "integer", nullable: false),
-                    TenantId = table.Column<Guid>(type: "uuid", nullable: false),
                     CreatedDate = table.Column<DateTime>(type: "timestamp without time zone", nullable: false),
                     CreatedBy = table.Column<Guid>(type: "uuid", nullable: false),
                     ModifiedDate = table.Column<DateTime>(type: "timestamp without time zone", nullable: false),
@@ -711,6 +726,47 @@ namespace POS.Migrations.PostgreSQL.Migrations
                     table.PrimaryKey("PK_Locations", x => x.Id);
                     table.ForeignKey(
                         name: "FK_Locations_Users_CreatedBy",
+                        column: x => x.CreatedBy,
+                        principalTable: "Users",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "MenuItems",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(type: "uuid", nullable: false),
+                    Title = table.Column<string>(type: "text", nullable: true),
+                    Path = table.Column<string>(type: "text", nullable: true),
+                    Icon = table.Column<string>(type: "text", nullable: true),
+                    CssClass = table.Column<string>(type: "text", nullable: true),
+                    Order = table.Column<int>(type: "integer", nullable: false),
+                    ParentId = table.Column<Guid>(type: "uuid", nullable: true),
+                    IsActive = table.Column<bool>(type: "boolean", nullable: false),
+                    IsVisible = table.Column<bool>(type: "boolean", nullable: false),
+                    TenantId = table.Column<Guid>(type: "uuid", nullable: false),
+                    CreatedDate = table.Column<DateTime>(type: "timestamp without time zone", nullable: false),
+                    CreatedBy = table.Column<Guid>(type: "uuid", nullable: false),
+                    ModifiedDate = table.Column<DateTime>(type: "timestamp without time zone", nullable: false),
+                    ModifiedBy = table.Column<Guid>(type: "uuid", nullable: false),
+                    DeletedDate = table.Column<DateTime>(type: "timestamp without time zone", nullable: true),
+                    DeletedBy = table.Column<Guid>(type: "uuid", nullable: true),
+                    SyncVersion = table.Column<long>(type: "bigint", nullable: false),
+                    LastSyncedAt = table.Column<DateTime>(type: "timestamp without time zone", nullable: true),
+                    IsDeleted = table.Column<bool>(type: "boolean", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_MenuItems", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_MenuItems_MenuItems_ParentId",
+                        column: x => x.ParentId,
+                        principalTable: "MenuItems",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
+                        name: "FK_MenuItems_Users_CreatedBy",
                         column: x => x.CreatedBy,
                         principalTable: "Users",
                         principalColumn: "Id",
@@ -1064,7 +1120,6 @@ namespace POS.Migrations.PostgreSQL.Migrations
                     Id = table.Column<Guid>(type: "uuid", nullable: false),
                     CityName = table.Column<string>(type: "character varying(200)", maxLength: 200, nullable: true),
                     CountryId = table.Column<Guid>(type: "uuid", nullable: false),
-                    TenantId = table.Column<Guid>(type: "uuid", nullable: false),
                     CreatedDate = table.Column<DateTime>(type: "timestamp without time zone", nullable: false),
                     CreatedBy = table.Column<Guid>(type: "uuid", nullable: false),
                     ModifiedDate = table.Column<DateTime>(type: "timestamp without time zone", nullable: false, defaultValueSql: "CURRENT_TIMESTAMP"),
@@ -1642,6 +1697,43 @@ namespace POS.Migrations.PostgreSQL.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "RoleMenuItems",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(type: "uuid", nullable: false),
+                    RoleId = table.Column<Guid>(type: "uuid", nullable: false),
+                    MenuItemId = table.Column<Guid>(type: "uuid", nullable: false),
+                    CanView = table.Column<bool>(type: "boolean", nullable: false),
+                    CanCreate = table.Column<bool>(type: "boolean", nullable: false),
+                    CanEdit = table.Column<bool>(type: "boolean", nullable: false),
+                    CanDelete = table.Column<bool>(type: "boolean", nullable: false),
+                    AssignedDate = table.Column<DateTime>(type: "timestamp without time zone", nullable: false),
+                    AssignedBy = table.Column<Guid>(type: "uuid", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_RoleMenuItems", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_RoleMenuItems_MenuItems_MenuItemId",
+                        column: x => x.MenuItemId,
+                        principalTable: "MenuItems",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_RoleMenuItems_Roles_RoleId",
+                        column: x => x.RoleId,
+                        principalTable: "Roles",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_RoleMenuItems_Users_AssignedBy",
+                        column: x => x.AssignedBy,
+                        principalTable: "Users",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "UserRoles",
                 columns: table => new
                 {
@@ -2094,6 +2186,31 @@ namespace POS.Migrations.PostgreSQL.Migrations
                         name: "FK_TaxEntries_Users_CreatedBy",
                         column: x => x.CreatedBy,
                         principalTable: "Users",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "MenuItemActions",
+                columns: table => new
+                {
+                    MenuItemId = table.Column<Guid>(type: "uuid", nullable: false),
+                    ActionId = table.Column<Guid>(type: "uuid", nullable: false),
+                    Operation = table.Column<int>(type: "integer", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_MenuItemActions", x => new { x.MenuItemId, x.ActionId });
+                    table.ForeignKey(
+                        name: "FK_MenuItemActions_Actions_ActionId",
+                        column: x => x.ActionId,
+                        principalTable: "Actions",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_MenuItemActions_MenuItems_MenuItemId",
+                        column: x => x.MenuItemId,
+                        principalTable: "MenuItems",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                 });
@@ -3120,6 +3237,11 @@ namespace POS.Migrations.PostgreSQL.Migrations
                 column: "CreatedBy");
 
             migrationBuilder.CreateIndex(
+                name: "IX_Currencies_CreatedBy",
+                table: "Currencies",
+                column: "CreatedBy");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_CustomerLedgers_CreatedBy",
                 table: "CustomerLedgers",
                 column: "CreatedBy");
@@ -3406,6 +3528,21 @@ namespace POS.Migrations.PostgreSQL.Migrations
                 column: "CreatedBy");
 
             migrationBuilder.CreateIndex(
+                name: "IX_MenuItemActions_ActionId",
+                table: "MenuItemActions",
+                column: "ActionId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_MenuItems_CreatedBy",
+                table: "MenuItems",
+                column: "CreatedBy");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_MenuItems_ParentId",
+                table: "MenuItems",
+                column: "ParentId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_Pagehelpers_CreatedBy",
                 table: "Pagehelpers",
                 column: "CreatedBy");
@@ -3588,6 +3725,21 @@ namespace POS.Migrations.PostgreSQL.Migrations
             migrationBuilder.CreateIndex(
                 name: "IX_RoleClaims_RoleId",
                 table: "RoleClaims",
+                column: "RoleId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_RoleMenuItems_AssignedBy",
+                table: "RoleMenuItems",
+                column: "AssignedBy");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_RoleMenuItems_MenuItemId",
+                table: "RoleMenuItems",
+                column: "MenuItemId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_RoleMenuItems_RoleId",
+                table: "RoleMenuItems",
                 column: "RoleId");
 
             migrationBuilder.CreateIndex(
@@ -3959,6 +4111,9 @@ namespace POS.Migrations.PostgreSQL.Migrations
                 name: "LoginAudits");
 
             migrationBuilder.DropTable(
+                name: "MenuItemActions");
+
+            migrationBuilder.DropTable(
                 name: "NLog");
 
             migrationBuilder.DropTable(
@@ -3996,6 +4151,9 @@ namespace POS.Migrations.PostgreSQL.Migrations
 
             migrationBuilder.DropTable(
                 name: "RoleClaims");
+
+            migrationBuilder.DropTable(
+                name: "RoleMenuItems");
 
             migrationBuilder.DropTable(
                 name: "SalesOrderItemTaxes");
@@ -4059,6 +4217,9 @@ namespace POS.Migrations.PostgreSQL.Migrations
 
             migrationBuilder.DropTable(
                 name: "Reminders");
+
+            migrationBuilder.DropTable(
+                name: "MenuItems");
 
             migrationBuilder.DropTable(
                 name: "SalesOrderItems");
