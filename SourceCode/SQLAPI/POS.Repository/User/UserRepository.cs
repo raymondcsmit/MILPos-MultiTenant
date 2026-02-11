@@ -125,7 +125,7 @@ public class UserRepository : GenericRepository<User, POSDbContext>,
         claims.Add(new Claim("purchasecode", string.IsNullOrEmpty(companyProfile.PurchaseCode) ? "" : HttpUtility.UrlEncode(companyProfile.PurchaseCode.ToString())));
         claims.Add(new Claim("isSuperAdmin", appUser.IsSuperAdmin.ToString().ToLower()));
         // Set JWT bearer token
-        ret.BearerToken = BuildJwtToken(ret, claims, appUser.Id, locations);
+        ret.BearerToken = BuildJwtToken(ret, claims, appUser.Id, locations, appUser.TenantId);
 
         return ret;
     }
@@ -165,13 +165,14 @@ public class UserRepository : GenericRepository<User, POSDbContext>,
         return roleClaims;
     }
 
-    protected string BuildJwtToken(UserAuthDto authUser, IList<Claim> claims, Guid Id, List<Guid> locationIds)
+    protected string BuildJwtToken(UserAuthDto authUser, IList<Claim> claims, Guid Id, List<Guid> locationIds, Guid tenantId)
     {
         SymmetricSecurityKey key = new SymmetricSecurityKey(
           Encoding.UTF8.GetBytes(_settings.Key));
         claims.Add(new Claim(Microsoft.IdentityModel.JsonWebTokens.JwtRegisteredClaimNames.Sub.ToString(), Id.ToString()));
         claims.Add(new Claim("Email", authUser.Email));
         claims.Add(new Claim("locationIds", String.Join(",", locationIds)));
+        claims.Add(new Claim("TenantId", tenantId.ToString())); // ✅ CRITICAL FIX: Add TenantId to JWT
         // Create the JwtSecurityToken object
         var token = new JwtSecurityToken(
           issuer: _settings.Issuer,

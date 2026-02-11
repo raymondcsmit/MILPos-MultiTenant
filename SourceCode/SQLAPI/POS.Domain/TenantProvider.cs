@@ -26,6 +26,20 @@ namespace POS.Domain
             var httpContext = _httpContextAccessor.HttpContext;
             if (httpContext?.User?.Identity?.IsAuthenticated == true)
             {
+                // Check if user is SuperAdmin
+                var isSuperAdminClaim = httpContext.User.FindFirst("isSuperAdmin");
+                bool isSuperAdmin = isSuperAdminClaim?.Value?.ToLower() == "true";
+                
+                // SuperAdmin can override TenantId via X-Tenant-ID header for impersonation
+                if (isSuperAdmin && httpContext.Request.Headers.ContainsKey("X-Tenant-ID"))
+                {
+                    if (Guid.TryParse(httpContext.Request.Headers["X-Tenant-ID"].FirstOrDefault(), out var headerTenantId))
+                    {
+                        return headerTenantId; // SuperAdmin impersonating this tenant
+                    }
+                }
+                
+                // Read TenantId from JWT claims
                 var tenantClaim = httpContext.User.FindFirst("TenantId");
                 if (tenantClaim != null && Guid.TryParse(tenantClaim.Value, out var tenantId))
                 {
