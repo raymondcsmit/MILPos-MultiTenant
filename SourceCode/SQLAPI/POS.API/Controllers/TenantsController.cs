@@ -266,6 +266,24 @@ namespace POS.API.Controllers
             });
         }
 
+        /// <summary>
+        /// Export Tenant Data to SQLite (Offline Mode)
+        /// </summary>
+        [HttpPost("{id}/export-sqlite")]
+        [Authorize(Policy = AppConstants.Policies.SuperAdmin)]
+        public async Task<IActionResult> ExportTenantToSqlite(Guid id)
+        {
+            var command = new ExportTenantToSqliteCommand { TenantId = id };
+            var response = await _mediator.Send(command);
+
+            if (!response.Success)
+            {
+                return StatusCode(response.StatusCode, string.Join(", ", response.Errors));
+            }
+
+            return File(response.Data.FileContent, response.Data.ContentType, response.Data.FileName);
+        }
+
     }
 
     public class CreateTenantDto

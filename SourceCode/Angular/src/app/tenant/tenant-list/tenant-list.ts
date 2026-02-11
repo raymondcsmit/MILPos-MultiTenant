@@ -106,4 +106,21 @@ export class TenantListComponent extends BaseComponent implements OnInit {
       );
     });
   }
+
+  exportTenant(tenant: Tenant): void {
+    this.sub$.sink = this.tenantService.exportToSqlite(tenant.id).subscribe(
+      (data: Blob) => {
+        const url = window.URL.createObjectURL(data);
+        const link = document.createElement('a');
+        link.href = url;
+        link.download = `tenant_${tenant.name}_export.zip`;
+        link.click();
+        window.URL.revokeObjectURL(url);
+        this.toastrService.success('Tenant Data Exported Successfully');
+      },
+      (err) => {
+        this.toastrService.error('Failed to export tenant data');
+      }
+    );
+  }
 }

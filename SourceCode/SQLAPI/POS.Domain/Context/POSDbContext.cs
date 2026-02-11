@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using POS.Data;
+using POS.Data.Dto;
 using POS.Data.Entities;
 using POS.Data.Entities.Accounts;
 using POS.Data.Entities.Inventory;
@@ -14,10 +15,12 @@ namespace POS.Domain
     public class POSDbContext : IdentityDbContext<User, Role, Guid, UserClaim, UserRole, UserLogin, RoleClaim, UserToken>
     {
         private readonly ITenantProvider _tenantProvider;
+        private readonly UserInfoToken _userInfoToken;
 
-        public POSDbContext(DbContextOptions options, ITenantProvider tenantProvider) : base(options)
+        public POSDbContext(DbContextOptions options, ITenantProvider tenantProvider, UserInfoToken userInfoToken = null) : base(options)
         {
             _tenantProvider = tenantProvider;
+            _userInfoToken = userInfoToken;
         }
         public override DbSet<User> Users { get; set; }
         public override DbSet<Role> Roles { get; set; }
@@ -800,6 +803,11 @@ namespace POS.Domain
                    .OnDelete(DeleteBehavior.NoAction);
             });
 
+            // MenuItem Configuration for Hybrid Tenant/Global Filter
+            builder.Entity<MenuItem>().HasQueryFilter(m =>
+                (m.TenantId == _tenantProvider.GetTenantId() || m.TenantId == null)
+                && !m.IsDeleted);
+
 
             builder.Entity<CustomerLedger>(b =>
             {
@@ -1194,15 +1202,47 @@ namespace POS.Domain
                 return;
             }
 
+            var userId = _userInfoToken?.Id ?? Guid.Empty;
+
+            // Handle BaseEntity - Added state
             foreach (var entry in ChangeTracker.Entries<BaseEntity>()
                 .Where(e => e.State == EntityState.Added))
             {
-                if (entry.Entity.TenantId == Guid.Empty)
+                // Auto-populate TenantId
+                if (entry.Entity.TenantId == Guid.Empty || entry.Entity.TenantId == null)
                 {
                     entry.Entity.TenantId = tenantId.Value;
                 }
+                
+                // Auto-populate audit fields as fallback (only if not already set)
+                if (entry.Entity.CreatedBy == Guid.Empty && userId != Guid.Empty)
+                {
+                    entry.Entity.CreatedBy = userId;
+                }
+                
+                if (entry.Entity.CreatedDate == default(DateTime))
+                {
+                    entry.Entity.CreatedDate = DateTime.UtcNow;
+                }
+            }
+            
+            // Handle BaseEntity - Modified state
+            foreach (var entry in ChangeTracker.Entries<BaseEntity>()
+                .Where(e => e.State == EntityState.Modified))
+            {
+                // Auto-populate modified audit fields as fallback
+                if (entry.Entity.ModifiedBy == Guid.Empty && userId != Guid.Empty)
+                {
+                    entry.Entity.ModifiedBy = userId;
+                }
+                
+                if (entry.Entity.ModifiedDate == default(DateTime))
+                {
+                    entry.Entity.ModifiedDate = DateTime.UtcNow;
+                }
             }
 
+            // Handle User - Added state
             foreach (var entry in ChangeTracker.Entries<User>()
                 .Where(e => e.State == EntityState.Added))
             {
@@ -1212,6 +1252,7 @@ namespace POS.Domain
                 }
             }
 
+            // Handle Role - Added state
             foreach (var entry in ChangeTracker.Entries<Role>()
                 .Where(e => e.State == EntityState.Added))
             {

@@ -1,0 +1,1 @@
+import{ga as m,q as t}from"./chunk-3I6G7UJT.js";var s=class o{constructor(){}handleError(r){let e={statusText:r.statusText,code:r.status,messages:r.error.messages,friendlyMessage:"Error from service",error:r.error};return console.error(r),t(e)}static \u0275fac=function(e){return new(e||o)};static \u0275prov=m({token:o,factory:o.\u0275fac,providedIn:"root"})};export{s as a};

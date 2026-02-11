@@ -1137,7 +1137,28 @@ namespace POS.Migrations.PostgreSQL.Migrations
                     b.Property<Guid>("BranchId")
                         .HasColumnType("uuid");
 
-                    b.Property<DateTime>("CreatedAt")
+                    b.Property<Guid>("CreatedBy")
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTime>("CreatedDate")
+                        .HasColumnType("timestamp without time zone");
+
+                    b.Property<Guid?>("DeletedBy")
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTime?>("DeletedDate")
+                        .HasColumnType("timestamp without time zone");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("boolean");
+
+                    b.Property<DateTime?>("LastSyncedAt")
+                        .HasColumnType("timestamp without time zone");
+
+                    b.Property<Guid>("ModifiedBy")
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTime>("ModifiedDate")
                         .HasColumnType("timestamp without time zone");
 
                     b.Property<string>("Narration")
@@ -1157,12 +1178,20 @@ namespace POS.Migrations.PostgreSQL.Migrations
                     b.Property<int>("Status")
                         .HasColumnType("integer");
 
+                    b.Property<long>("SyncVersion")
+                        .HasColumnType("bigint");
+
+                    b.Property<Guid>("TenantId")
+                        .HasColumnType("uuid");
+
                     b.Property<Guid>("TransactionId")
                         .HasColumnType("uuid");
 
                     b.HasKey("Id");
 
                     b.HasIndex("BranchId");
+
+                    b.HasIndex("CreatedBy");
 
                     b.HasIndex("TransactionId");
 
@@ -1184,11 +1213,32 @@ namespace POS.Migrations.PostgreSQL.Migrations
                     b.Property<Guid>("BranchId")
                         .HasColumnType("uuid");
 
-                    b.Property<DateTime>("CreatedAt")
+                    b.Property<Guid>("CreatedBy")
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTime>("CreatedDate")
+                        .HasColumnType("timestamp without time zone");
+
+                    b.Property<Guid?>("DeletedBy")
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTime?>("DeletedDate")
                         .HasColumnType("timestamp without time zone");
 
                     b.Property<Guid>("InventoryItemId")
                         .HasColumnType("uuid");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("boolean");
+
+                    b.Property<DateTime?>("LastSyncedAt")
+                        .HasColumnType("timestamp without time zone");
+
+                    b.Property<Guid>("ModifiedBy")
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTime>("ModifiedDate")
+                        .HasColumnType("timestamp without time zone");
 
                     b.Property<decimal>("Quantity")
                         .HasColumnType("decimal(18,2)");
@@ -1201,6 +1251,12 @@ namespace POS.Migrations.PostgreSQL.Migrations
                         .HasMaxLength(50)
                         .HasColumnType("character varying(50)");
 
+                    b.Property<long>("SyncVersion")
+                        .HasColumnType("bigint");
+
+                    b.Property<Guid>("TenantId")
+                        .HasColumnType("uuid");
+
                     b.Property<decimal>("TotalValue")
                         .HasColumnType("decimal(18,2)");
 
@@ -1210,6 +1266,8 @@ namespace POS.Migrations.PostgreSQL.Migrations
                     b.HasKey("Id");
 
                     b.HasIndex("BranchId");
+
+                    b.HasIndex("CreatedBy");
 
                     b.HasIndex("InventoryItemId");
 
@@ -1377,13 +1435,42 @@ namespace POS.Migrations.PostgreSQL.Migrations
                     b.Property<string>("CountryName")
                         .HasColumnType("text");
 
+                    b.Property<Guid>("CreatedBy")
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTime>("CreatedDate")
+                        .HasColumnType("timestamp without time zone");
+
+                    b.Property<Guid?>("DeletedBy")
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTime?>("DeletedDate")
+                        .HasColumnType("timestamp without time zone");
+
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("boolean");
+
+                    b.Property<DateTime?>("LastSyncedAt")
+                        .HasColumnType("timestamp without time zone");
 
                     b.Property<string>("MobileNo")
                         .HasColumnType("text");
 
+                    b.Property<Guid>("ModifiedBy")
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTime>("ModifiedDate")
+                        .HasColumnType("timestamp without time zone");
+
+                    b.Property<long>("SyncVersion")
+                        .HasColumnType("bigint");
+
+                    b.Property<Guid>("TenantId")
+                        .HasColumnType("uuid");
+
                     b.HasKey("Id");
+
+                    b.HasIndex("CreatedBy");
 
                     b.ToTable("ContactAddresses");
                 });
@@ -1483,8 +1570,26 @@ namespace POS.Migrations.PostgreSQL.Migrations
                     b.Property<decimal>("DamagedQuantity")
                         .HasColumnType("decimal(18,2)");
 
+                    b.Property<Guid?>("DeletedBy")
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTime?>("DeletedDate")
+                        .HasColumnType("timestamp without time zone");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("boolean");
+
+                    b.Property<DateTime?>("LastSyncedAt")
+                        .HasColumnType("timestamp without time zone");
+
                     b.Property<Guid>("LocationId")
                         .HasColumnType("uuid");
+
+                    b.Property<Guid>("ModifiedBy")
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTime>("ModifiedDate")
+                        .HasColumnType("timestamp without time zone");
 
                     b.Property<Guid>("ProductId")
                         .HasColumnType("uuid");
@@ -1493,6 +1598,12 @@ namespace POS.Migrations.PostgreSQL.Migrations
                         .HasColumnType("text");
 
                     b.Property<Guid>("ReportedId")
+                        .HasColumnType("uuid");
+
+                    b.Property<long>("SyncVersion")
+                        .HasColumnType("bigint");
+
+                    b.Property<Guid>("TenantId")
                         .HasColumnType("uuid");
 
                     b.HasKey("Id");
@@ -2120,9 +2231,6 @@ namespace POS.Migrations.PostgreSQL.Migrations
                     b.Property<long>("SyncVersion")
                         .HasColumnType("bigint");
 
-                    b.Property<Guid>("TenantId")
-                        .HasColumnType("uuid");
-
                     b.HasKey("Id");
 
                     b.HasIndex("CreatedBy");
@@ -2157,6 +2265,18 @@ namespace POS.Migrations.PostgreSQL.Migrations
                     b.Property<decimal>("Commission")
                         .HasColumnType("decimal(18,2)");
 
+                    b.Property<Guid>("CreatedBy")
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTime>("CreatedDate")
+                        .HasColumnType("timestamp without time zone");
+
+                    b.Property<Guid?>("DeletedBy")
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTime?>("DeletedDate")
+                        .HasColumnType("timestamp without time zone");
+
                     b.Property<Guid>("EmployeeId")
                         .HasColumnType("uuid");
 
@@ -2169,8 +2289,20 @@ namespace POS.Migrations.PostgreSQL.Migrations
                     b.Property<decimal>("FoodBill")
                         .HasColumnType("decimal(18,2)");
 
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("boolean");
+
+                    b.Property<DateTime?>("LastSyncedAt")
+                        .HasColumnType("timestamp without time zone");
+
                     b.Property<decimal>("MobileBill")
                         .HasColumnType("decimal(18,2)");
+
+                    b.Property<Guid>("ModifiedBy")
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTime>("ModifiedDate")
+                        .HasColumnType("timestamp without time zone");
 
                     b.Property<string>("Note")
                         .HasColumnType("text");
@@ -2187,6 +2319,12 @@ namespace POS.Migrations.PostgreSQL.Migrations
                     b.Property<int>("SalaryMonth")
                         .HasColumnType("integer");
 
+                    b.Property<long>("SyncVersion")
+                        .HasColumnType("bigint");
+
+                    b.Property<Guid>("TenantId")
+                        .HasColumnType("uuid");
+
                     b.Property<decimal>("TotalSalary")
                         .HasColumnType("decimal(18,2)");
 
@@ -2196,6 +2334,8 @@ namespace POS.Migrations.PostgreSQL.Migrations
                     b.HasKey("Id");
 
                     b.HasIndex("BranchId");
+
+                    b.HasIndex("CreatedBy");
 
                     b.HasIndex("EmployeeId");
 
@@ -2268,10 +2408,31 @@ namespace POS.Migrations.PostgreSQL.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uuid");
 
+                    b.Property<Guid>("CreatedBy")
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTime>("CreatedDate")
+                        .HasColumnType("timestamp without time zone");
+
                     b.Property<decimal>("CurrentStock")
                         .HasColumnType("decimal(18,2)");
 
+                    b.Property<Guid?>("DeletedBy")
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTime?>("DeletedDate")
+                        .HasColumnType("timestamp without time zone");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("boolean");
+
+                    b.Property<DateTime?>("LastSyncedAt")
+                        .HasColumnType("timestamp without time zone");
+
                     b.Property<Guid>("LocationId")
+                        .HasColumnType("uuid");
+
+                    b.Property<Guid>("ModifiedBy")
                         .HasColumnType("uuid");
 
                     b.Property<DateTime>("ModifiedDate")
@@ -2283,7 +2444,15 @@ namespace POS.Migrations.PostgreSQL.Migrations
                     b.Property<decimal>("PurchasePrice")
                         .HasColumnType("decimal(18,2)");
 
+                    b.Property<long>("SyncVersion")
+                        .HasColumnType("bigint");
+
+                    b.Property<Guid>("TenantId")
+                        .HasColumnType("uuid");
+
                     b.HasKey("Id");
+
+                    b.HasIndex("CreatedBy");
 
                     b.HasIndex("LocationId");
 
@@ -2301,7 +2470,16 @@ namespace POS.Migrations.PostgreSQL.Migrations
                     b.Property<int?>("Application")
                         .HasColumnType("integer");
 
+                    b.Property<Guid>("CreatedBy")
+                        .HasColumnType("uuid");
+
                     b.Property<DateTime>("CreatedDate")
+                        .HasColumnType("timestamp without time zone");
+
+                    b.Property<Guid?>("DeletedBy")
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTime?>("DeletedDate")
                         .HasColumnType("timestamp without time zone");
 
                     b.Property<DateTime>("Duration")
@@ -2313,14 +2491,26 @@ namespace POS.Migrations.PostgreSQL.Migrations
                     b.Property<bool>("IsActive")
                         .HasColumnType("boolean");
 
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("boolean");
+
                     b.Property<bool>("IsEmailNotification")
                         .HasColumnType("boolean");
 
                     b.Property<bool>("IsRead")
                         .HasColumnType("boolean");
 
+                    b.Property<DateTime?>("LastSyncedAt")
+                        .HasColumnType("timestamp without time zone");
+
                     b.Property<string>("Message")
                         .HasColumnType("text");
+
+                    b.Property<Guid>("ModifiedBy")
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTime>("ModifiedDate")
+                        .HasColumnType("timestamp without time zone");
 
                     b.Property<Guid?>("ReferenceId")
                         .HasColumnType("uuid");
@@ -2328,10 +2518,18 @@ namespace POS.Migrations.PostgreSQL.Migrations
                     b.Property<string>("Subject")
                         .HasColumnType("text");
 
+                    b.Property<long>("SyncVersion")
+                        .HasColumnType("bigint");
+
+                    b.Property<Guid>("TenantId")
+                        .HasColumnType("uuid");
+
                     b.Property<Guid>("UserId")
                         .HasColumnType("uuid");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("CreatedBy");
 
                     b.HasIndex("UserId");
 
@@ -2564,6 +2762,30 @@ namespace POS.Migrations.PostgreSQL.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uuid");
 
+                    b.Property<Guid>("CreatedBy")
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTime>("CreatedDate")
+                        .HasColumnType("timestamp without time zone");
+
+                    b.Property<Guid?>("DeletedBy")
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTime?>("DeletedDate")
+                        .HasColumnType("timestamp without time zone");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("boolean");
+
+                    b.Property<DateTime?>("LastSyncedAt")
+                        .HasColumnType("timestamp without time zone");
+
+                    b.Property<Guid>("ModifiedBy")
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTime>("ModifiedDate")
+                        .HasColumnType("timestamp without time zone");
+
                     b.Property<string>("ScreenName")
                         .IsRequired()
                         .HasColumnType("text");
@@ -2571,10 +2793,18 @@ namespace POS.Migrations.PostgreSQL.Migrations
                     b.Property<string>("SettingsJson")
                         .HasColumnType("text");
 
+                    b.Property<long>("SyncVersion")
+                        .HasColumnType("bigint");
+
+                    b.Property<Guid>("TenantId")
+                        .HasColumnType("uuid");
+
                     b.Property<Guid>("UserId")
                         .HasColumnType("uuid");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("CreatedBy");
 
                     b.ToTable("TableSettings");
                 });
@@ -3295,7 +3525,7 @@ namespace POS.Migrations.PostgreSQL.Migrations
                     b.Property<long>("SyncVersion")
                         .HasColumnType("bigint");
 
-                    b.Property<Guid>("TenantId")
+                    b.Property<Guid?>("TenantId")
                         .HasColumnType("uuid");
 
                     b.Property<string>("Title")
@@ -3953,6 +4183,18 @@ namespace POS.Migrations.PostgreSQL.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uuid");
 
+                    b.Property<Guid>("CreatedBy")
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTime>("CreatedDate")
+                        .HasColumnType("timestamp without time zone");
+
+                    b.Property<Guid?>("DeletedBy")
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTime?>("DeletedDate")
+                        .HasColumnType("timestamp without time zone");
+
                     b.Property<string>("Description")
                         .HasColumnType("text");
 
@@ -3965,13 +4207,30 @@ namespace POS.Migrations.PostgreSQL.Migrations
                     b.Property<bool>("IsEmailNotification")
                         .HasColumnType("boolean");
 
+                    b.Property<DateTime?>("LastSyncedAt")
+                        .HasColumnType("timestamp without time zone");
+
+                    b.Property<Guid>("ModifiedBy")
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTime>("ModifiedDate")
+                        .HasColumnType("timestamp without time zone");
+
                     b.Property<Guid>("ReminderId")
                         .HasColumnType("uuid");
 
                     b.Property<string>("Subject")
                         .HasColumnType("text");
 
+                    b.Property<long>("SyncVersion")
+                        .HasColumnType("bigint");
+
+                    b.Property<Guid>("TenantId")
+                        .HasColumnType("uuid");
+
                     b.HasKey("Id");
+
+                    b.HasIndex("CreatedBy");
 
                     b.HasIndex("ReminderId");
 
@@ -5292,6 +5551,12 @@ namespace POS.Migrations.PostgreSQL.Migrations
                         .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
 
+                    b.HasOne("POS.Data.User", "CreatedByUser")
+                        .WithMany()
+                        .HasForeignKey("CreatedBy")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
                     b.HasOne("POS.Data.Entities.Transaction", "Transaction")
                         .WithMany("PaymentEntries")
                         .HasForeignKey("TransactionId")
@@ -5299,6 +5564,8 @@ namespace POS.Migrations.PostgreSQL.Migrations
                         .IsRequired();
 
                     b.Navigation("Branch");
+
+                    b.Navigation("CreatedByUser");
 
                     b.Navigation("Transaction");
                 });
@@ -5311,6 +5578,12 @@ namespace POS.Migrations.PostgreSQL.Migrations
                         .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
 
+                    b.HasOne("POS.Data.User", "CreatedByUser")
+                        .WithMany()
+                        .HasForeignKey("CreatedBy")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
                     b.HasOne("POS.Data.Product", "InventoryItem")
                         .WithMany()
                         .HasForeignKey("InventoryItemId")
@@ -5318,6 +5591,8 @@ namespace POS.Migrations.PostgreSQL.Migrations
                         .IsRequired();
 
                     b.Navigation("Branch");
+
+                    b.Navigation("CreatedByUser");
 
                     b.Navigation("InventoryItem");
                 });
@@ -5392,6 +5667,17 @@ namespace POS.Migrations.PostgreSQL.Migrations
                     b.Navigation("Tax");
 
                     b.Navigation("TransactionItem");
+                });
+
+            modelBuilder.Entity("POS.Data.Entities.ContactAddress", b =>
+                {
+                    b.HasOne("POS.Data.User", "CreatedByUser")
+                        .WithMany()
+                        .HasForeignKey("CreatedBy")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("CreatedByUser");
                 });
 
             modelBuilder.Entity("POS.Data.Entities.CustomerLedger", b =>
@@ -5643,6 +5929,12 @@ namespace POS.Migrations.PostgreSQL.Migrations
                         .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
 
+                    b.HasOne("POS.Data.User", "CreatedByUser")
+                        .WithMany()
+                        .HasForeignKey("CreatedBy")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
                     b.HasOne("POS.Data.User", "Employee")
                         .WithMany()
                         .HasForeignKey("EmployeeId")
@@ -5654,6 +5946,8 @@ namespace POS.Migrations.PostgreSQL.Migrations
                         .HasForeignKey("FinancialYearId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+
+                    b.Navigation("CreatedByUser");
 
                     b.Navigation("Employee");
 
@@ -5681,6 +5975,12 @@ namespace POS.Migrations.PostgreSQL.Migrations
 
             modelBuilder.Entity("POS.Data.Entities.ProductStock", b =>
                 {
+                    b.HasOne("POS.Data.User", "CreatedByUser")
+                        .WithMany()
+                        .HasForeignKey("CreatedBy")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
                     b.HasOne("POS.Data.Entities.Location", "Location")
                         .WithMany()
                         .HasForeignKey("LocationId")
@@ -5693,6 +5993,8 @@ namespace POS.Migrations.PostgreSQL.Migrations
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
+                    b.Navigation("CreatedByUser");
+
                     b.Navigation("Location");
 
                     b.Navigation("Product");
@@ -5700,11 +6002,19 @@ namespace POS.Migrations.PostgreSQL.Migrations
 
             modelBuilder.Entity("POS.Data.Entities.ReminderScheduler", b =>
                 {
+                    b.HasOne("POS.Data.User", "CreatedByUser")
+                        .WithMany()
+                        .HasForeignKey("CreatedBy")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
                     b.HasOne("POS.Data.User", "User")
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+
+                    b.Navigation("CreatedByUser");
 
                     b.Navigation("User");
                 });
@@ -5767,6 +6077,17 @@ namespace POS.Migrations.PostgreSQL.Migrations
                     b.Navigation("StockTransfer");
 
                     b.Navigation("Unit");
+                });
+
+            modelBuilder.Entity("POS.Data.Entities.TableSetting", b =>
+                {
+                    b.HasOne("POS.Data.User", "CreatedByUser")
+                        .WithMany()
+                        .HasForeignKey("CreatedBy")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("CreatedByUser");
                 });
 
             modelBuilder.Entity("POS.Data.Entities.Transaction", b =>
@@ -6216,11 +6537,19 @@ namespace POS.Migrations.PostgreSQL.Migrations
 
             modelBuilder.Entity("POS.Data.ReminderNotification", b =>
                 {
+                    b.HasOne("POS.Data.User", "CreatedByUser")
+                        .WithMany()
+                        .HasForeignKey("CreatedBy")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
                     b.HasOne("POS.Data.Reminder", "Reminder")
                         .WithMany("ReminderNotifications")
                         .HasForeignKey("ReminderId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+
+                    b.Navigation("CreatedByUser");
 
                     b.Navigation("Reminder");
                 });

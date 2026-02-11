@@ -1,9 +1,11 @@
 import {
   BidiModule,
+  Dir
+} from "./chunk-JKATN4OA.js";
+import {
   DIR_DOCUMENT,
-  Dir,
   Directionality
-} from "./chunk-3MF3UN47.js";
+} from "./chunk-NUYKRDQ6.js";
 import "./chunk-BOEYOKWK.js";
 import "./chunk-NMUC745S.js";
 import "./chunk-JRFR6BLO.js";

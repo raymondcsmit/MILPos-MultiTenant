@@ -39,6 +39,10 @@
                     <mat-icon>login</mat-icon>
                     <span>Switch Tenant</span>
                   </button>
+                  <button mat-menu-item (click)="exportTenant(element)">
+                    <mat-icon>save_alt</mat-icon>
+                    <span>Export to SQLite</span>
+                  </button>
                 </mat-menu>
               </td>
             </ng-container>

@@ -599,6 +599,11 @@ export const routes: Routes = [
              canLoad: [AuthGuard]
           },
           {
+            path: 'menus',
+            canLoad: [AuthGuard],
+            loadChildren: () => import('./menu/menu.routes').then(m => m.MENU_ROUTES)
+          },
+          {
             path: '**',
             redirectTo: '/',
           },

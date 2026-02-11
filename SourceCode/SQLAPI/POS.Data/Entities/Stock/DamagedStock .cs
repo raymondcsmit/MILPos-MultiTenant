@@ -3,9 +3,8 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace POS.Data.Entities
 {
-    public class DamagedStock
+    public class DamagedStock : BaseEntity
     {
-        public Guid Id { get; set; }
         public Guid ProductId { get; set; }
         [ForeignKey("ProductId")]
         public Product Product { get; set; }
@@ -16,10 +15,6 @@ namespace POS.Data.Entities
         [ForeignKey("ReportedId")]
         public User ReportedBy { get; set; }
         public DateTime DamagedDate { get; set; }
-        public DateTime CreatedDate { get; set; }
-        public Guid CreatedBy { get; set; }
-        [ForeignKey("CreatedBy")]
-        public User CreatedByUser { get; set; }
         public Guid LocationId { get; set; }
         [ForeignKey("LocationId")]
         public Location Location { get; set; }

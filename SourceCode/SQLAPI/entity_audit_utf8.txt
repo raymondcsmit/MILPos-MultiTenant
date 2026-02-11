@@ -1,0 +1,55 @@
+﻿
+=== Entities Needing Fix (Have own Id but don't inherit from BaseEntity) ===
+
+Entity                File           
+------                ----           
+Data.Entities.Payroll F:\MIllyass\...
+
+
+
+=== All Results ===
+
+Entity                               
+------                               
+POS.Data.MenuItem                    
+POS.Data.Customer                    
+POS.Data.Supplier                    
+POS.Data.Entities.ProductCategory    
+POS.Data.Brand                       
+POS.Data.UnitConversation            
+POS.Data.Tax                         
+POS.Data.Entities.Location           
+POS.Data.Product                     
+POS.Data.Entities.ProductStock       
+Data.Entities.Inventory.InventoryB...
+ExpenseCategory                      
+Expense                              
+CompanyProfile                       
+EmailTemplate                        
+EmailSMTPSetting                     
+POS.Data.Entities.TableSetting       
+SalesOrderEntity                     
+POS.Data.SalesOrderPayment           
+POS.Data.PurchaseOrder               
+POS.Data.PurchaseOrderPayment        
+POS.Data.Entities.StockTransfer      
+Data.Entities.Accounts.StockAdjust...
+Data.Entities.DamagedStock           
+Data.Entities.Accounts.FinancialYear 
+Data.Entities.Accounts.LedgerAccount 
+POS.Data.Entities.Transaction        
+Data.Entities.Accounts.AccountingE...
+Data.Entities.Accounts.PaymentEntry  
+Data.Entities.Accounts.TaxEntry      
+Data.Entities.Payroll                
+Data.Entities.CustomerLedger         
+Data.Entities.Accounts.LoanDetail    
+Data.Entities.Accounts.LoanRepayment 
+DailyProductPriceEntity              
+
+
+
+Summary:
+Total entities checked: 35
+Entities needing fix: 
+Entities already inheriting from BaseEntity: 17

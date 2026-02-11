@@ -4,13 +4,11 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace POS.Data.Entities
 {
-    public class ReminderScheduler
+    public class ReminderScheduler : BaseEntity
     {
-        public Guid Id { get; set; }
         public DateTime Duration { get; set; }
         public bool IsActive { get; set; } = true;
         public Frequency? Frequency { get; set; }
-        public DateTime CreatedDate { get; set; }
         public Guid UserId { get; set; }
         [ForeignKey("UserId")]
         public User User { get; set; }

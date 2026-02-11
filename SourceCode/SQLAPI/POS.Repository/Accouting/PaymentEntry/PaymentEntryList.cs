@@ -55,7 +55,7 @@ namespace POS.Repository.Accouting
                              {
                                  Amount = c.Amount,
                                  BranchId = c.BranchId,
-                                 CreatedAt = c.CreatedAt,
+                                 CreatedAt = c.CreatedDate,
                                  Id = c.Id,
                                  Narration = c.Narration,
                                  PaymentDate = c.PaymentDate,
@@ -79,7 +79,7 @@ namespace POS.Repository.Accouting
                              {
                                  Amount = c.Amount,
                                  BranchId = c.BranchId,
-                                 CreatedAt = c.CreatedAt,
+                                 CreatedAt = c.CreatedDate,
                                  Id = c.Id,
                                  Narration = c.Narration,
                                  PaymentDate = c.PaymentDate,

@@ -3,9 +3,8 @@ using System;
 using System.ComponentModel.DataAnnotations.Schema;
 
 namespace POS.Data.Entities;
-public class Payroll
+public class Payroll : BaseEntity
 {
-    public Guid Id { get; set; }
     public Guid EmployeeId { get; set; }
     [ForeignKey("EmployeeId")]
     public User Employee { get; set; }

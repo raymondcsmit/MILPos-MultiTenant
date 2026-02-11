@@ -3,7 +3,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace POS.Data
 {
-    public abstract class SharedBaseEntity
+    public abstract class SharedBaseEntity : ISoftDelete
     {
         public Guid Id { get; set; }
         

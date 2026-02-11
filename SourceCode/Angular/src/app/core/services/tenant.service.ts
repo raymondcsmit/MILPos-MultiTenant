@@ -43,4 +43,8 @@ export class TenantService {
   registerTenant(tenant: any): Observable<Tenant> {
     return this.httpClient.post<Tenant>('Tenants/register', tenant);
   }
+
+  exportToSqlite(id: string): Observable<Blob> {
+    return this.httpClient.post(`Tenants/${id}/export-sqlite`, {}, { responseType: 'blob' });
+  }
 }

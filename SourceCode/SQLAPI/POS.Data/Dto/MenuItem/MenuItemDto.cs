@@ -14,6 +14,7 @@ namespace POS.Data.Dto
         public Guid? ParentId { get; set; }
         public bool IsActive { get; set; }
         public bool IsVisible { get; set; }
+        public Guid? TenantId { get; set; }
         public List<MenuItemDto> Children { get; set; } = new List<MenuItemDto>();
 
         // Permissions (populated for user-specific queries)

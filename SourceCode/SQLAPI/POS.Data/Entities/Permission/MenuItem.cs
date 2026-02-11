@@ -4,7 +4,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace POS.Data
 {
-    public class MenuItem : BaseEntity
+    public class MenuItem : SharedBaseEntity
     {
         public string Title { get; set; }
         public string Path { get; set; }
@@ -14,6 +14,7 @@ namespace POS.Data
         public Guid? ParentId { get; set; }
         public bool IsActive { get; set; }
         public bool IsVisible { get; set; }
+        public Guid? TenantId { get; set; }
 
         [ForeignKey("ParentId")]
         public MenuItem Parent { get; set; }

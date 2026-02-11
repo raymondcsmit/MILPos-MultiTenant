@@ -1,0 +1,75 @@
+<div class="row mb-3 align-items-center justify-content-between">
+    <div class="col-md-auto col-sm-auto">
+      <div class="content-header">
+        <h1>{{'MANAGE_MENUS' | translate}}</h1>
+      </div>
+    </div>
+    <div class="col-md-auto col-sm-auto">
+      <button class="btn btn-primary" (click)="manageMenu()">
+        <i class="fas fa-plus"></i> {{'ADD_MENU' | translate}}
+      </button>
+    </div>
+  </div>
+  
+  <div class="mat-elevation-z8">
+    <mat-tree [dataSource]="dataSource" [treeControl]="treeControl">
+      <!-- This is the tree node template for leaf nodes -->
+      <mat-tree-node *matTreeNodeDef="let node" matTreeNodePadding>
+        <!-- use a disabled button to provide padding for tree leaf -->
+        <button mat-icon-button disabled></button>
+        
+        <span [class.fw-bold]="node.isGlobal" [class.text-primary]="node.isGlobal">
+            {{node.name | translate}} 
+            <span *ngIf="node.isGlobal" class="badge bg-info ms-2">Global</span>
+        </span>
+        
+        <span class="spacer"></span>
+        
+        <button mat-icon-button [matMenuTriggerFor]="menu" aria-label="Example icon-button with a menu">
+          <mat-icon>more_vert</mat-icon>
+        </button>
+        <mat-menu #menu="matMenu">
+          <button mat-menu-item (click)="manageMenu(node.id)">
+            <mat-icon>edit</mat-icon>
+            <span>{{'EDIT' | translate}}</span>
+          </button>
+          <button mat-menu-item (click)="deleteMenu(node)">
+            <mat-icon>delete</mat-icon>
+            <span>{{'DELETE' | translate}}</span>
+          </button>
+        </mat-menu>
+      </mat-tree-node>
+      
+      <!-- This is the tree node template for expandable nodes -->
+      <mat-tree-node *matTreeNodeDef="let node; when: hasChild" matTreeNodePadding>
+        <button mat-icon-button matTreeNodeToggle
+                [attr.aria-label]="'Toggle ' + node.name">
+          <mat-icon class="mat-icon-rtl-mirror">
+            {{treeControl.isExpanded(node) ? 'expand_more' : 'chevron_right'}}
+          </mat-icon>
+        </button>
+        
+        <span [class.fw-bold]="node.isGlobal" [class.text-primary]="node.isGlobal">
+            {{node.name | translate}}
+            <span *ngIf="node.isGlobal" class="badge bg-info ms-2">Global</span>
+        </span>
+
+        <span class="spacer"></span>
+
+        <button mat-icon-button [matMenuTriggerFor]="menu" aria-label="Example icon-button with a menu">
+            <mat-icon>more_vert</mat-icon>
+        </button>
+        <mat-menu #menu="matMenu">
+            <button mat-menu-item (click)="manageMenu(node.id)">
+              <mat-icon>edit</mat-icon>
+              <span>{{'EDIT' | translate}}</span>
+            </button>
+            <button mat-menu-item (click)="deleteMenu(node)">
+              <mat-icon>delete</mat-icon>
+              <span>{{'DELETE' | translate}}</span>
+            </button>
+        </mat-menu>
+
+      </mat-tree-node>
+    </mat-tree>
+  </div>

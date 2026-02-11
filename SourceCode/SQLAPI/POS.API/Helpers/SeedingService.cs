@@ -318,7 +318,8 @@ namespace POS.API.Helpers
                 }
                 
                 // Auto-fill TenantId property if it exists and is currently Guid.Empty or null
-                if (this._defaultTenantId != null && this._defaultTenantId != Guid.Empty)
+                // EXCEPTION: MenuItems should remain Global (TenantId = null) unless specified
+                if (this._defaultTenantId != null && this._defaultTenantId != Guid.Empty && !(entity is MenuItem))
                 {
                     if (properties.TryGetValue("TenantId", out var tenantIdProp) && tenantIdProp.CanWrite)
                     {

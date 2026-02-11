@@ -9,7 +9,6 @@ namespace POS.Data.Entities
 {
     public class CustomerLedger : BaseEntity
     {
-        public Guid Id { get; set; }
         public DateTime Date { get; set; }
         public Guid? CustomerId { get; set; }
         [ForeignKey("CustomerId")]

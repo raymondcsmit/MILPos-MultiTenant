@@ -63,5 +63,14 @@ namespace POS.API.Controllers
             var result = await _mediator.Send(command);
             return ReturnFormattedResponse(result);
         }
+
+        [HttpGet]
+        [ClaimCheck("MENU_VIEW_MENUS")]
+        public async Task<IActionResult> GetAllMenuItems()
+        {
+            var query = new GetAllMenuItemsQuery();
+            var result = await _mediator.Send(query);
+            return ReturnFormattedResponse(result);
+        }
     }
 }

@@ -6,7 +6,6 @@ namespace POS.Data.Entities.Inventory
 {
     public class InventoryBatch : BaseEntity
     {
-        public Guid Id { get; set; }
         public string BatchNumber { get; set; }
         public DateTime? ExpiryDate { get; set; }
         public DateTime? ManufacturingDate { get; set; }

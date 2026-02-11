@@ -1,0 +1,72 @@
+<div class="row align-items-center justify-content-between mb-3">
+    <div class="col-md-auto col-sm-auto">
+      <div class="content-header">
+        <h1>{{ (isEditMode ? 'EDIT_MENU' : 'ADD_MENU') | translate }}</h1>
+      </div>
+    </div>
+  </div>
+  
+  <div class="box box-primary">
+    <div class="box-body">
+      <form [formGroup]="menuForm" (ngSubmit)="onSubmit()">
+        <div class="row">
+          <div class="col-md-6">
+            <mat-form-field appearance="outline" class="w-100">
+              <mat-label>{{ 'TITLE' | translate }}</mat-label>
+              <input matInput formControlName="title" required>
+              <mat-error *ngIf="menuForm.get('title')?.errors?.['required']">
+                {{ 'TITLE_IS_REQUIRED' | translate }}
+              </mat-error>
+            </mat-form-field>
+          </div>
+          <div class="col-md-6">
+            <mat-form-field appearance="outline" class="w-100">
+              <mat-label>{{ 'PATH' | translate }}</mat-label>
+              <input matInput formControlName="path">
+            </mat-form-field>
+          </div>
+          <div class="col-md-6">
+            <mat-form-field appearance="outline" class="w-100">
+              <mat-label>{{ 'ICON' | translate }}</mat-label>
+              <input matInput formControlName="icon">
+            </mat-form-field>
+          </div>
+          <div class="col-md-6">
+             <mat-form-field appearance="outline" class="w-100">
+                <mat-label>{{'PARENT' | translate}}</mat-label>
+                <mat-select formControlName="parentId">
+                    <mat-option [value]="null">-- None --</mat-option>
+                    <mat-option *ngFor="let parent of parentMenuItems" [value]="parent.id">
+                        {{parent.title}}
+                    </mat-option>
+                </mat-select>
+             </mat-form-field>
+          </div>
+          <div class="col-md-6">
+            <mat-form-field appearance="outline" class="w-100">
+              <mat-label>{{ 'ORDER' | translate }}</mat-label>
+              <input matInput type="number" formControlName="order">
+            </mat-form-field>
+          </div>
+        </div>
+        <div class="row mb-2">
+            <div class="col-md-3">
+                <mat-checkbox color="primary" formControlName="isActive">{{'IS_ACTIVE' | translate}}</mat-checkbox>
+            </div>
+            <div class="col-md-3">
+                <mat-checkbox color="primary" formControlName="isVisible">{{'IS_VISIBLE' | translate}}</mat-checkbox>
+            </div>
+        </div>
+        <div class="row">
+          <div class="col-md-12">
+            <button type="submit" mat-raised-button color="primary">
+              <mat-icon>save</mat-icon> {{ 'SAVE' | translate }}
+            </button>
+            <button type="button" mat-raised-button class="ms-2" [routerLink]="['/menus']">
+                <mat-icon>cancel</mat-icon> {{ 'CANCEL' | translate }}
+            </button>
+          </div>
+        </div>
+      </form>
+    </div>
+  </div>

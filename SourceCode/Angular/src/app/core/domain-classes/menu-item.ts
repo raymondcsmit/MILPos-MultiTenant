@@ -13,4 +13,5 @@ export interface MenuItem {
   canCreate: boolean;
   canEdit: boolean;
   canDelete: boolean;
+  tenantId?: string;
 }

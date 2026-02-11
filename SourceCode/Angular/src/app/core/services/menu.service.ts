@@ -20,13 +20,33 @@ export class MenuService {
     if (savedMenus) {
         this._menuItems.set(JSON.parse(savedMenus));
     } else {
-        try {
-            const menu = await firstValueFrom(this.http.get<MenuItem[]>(ApiEndpoints.MenuItems.UserMenu));
-            this._menuItems.set(menu);
-            localStorage.setItem('userMenus', JSON.stringify(menu));
-        } catch (e) {
-            console.error('Failed to load menu', e);
-        }
+        await this.refreshUserMenu();
     }
+  }
+
+  async refreshUserMenu() {
+    try {
+        const menu = await firstValueFrom(this.http.get<MenuItem[]>(ApiEndpoints.MenuItems.UserMenu));
+        this._menuItems.set(menu);
+        localStorage.setItem('userMenus', JSON.stringify(menu));
+    } catch (e) {
+        console.error('Failed to load menu', e);
+    }
+  }
+
+  getMenuItems() {
+    return this.http.get<MenuItem[]>(ApiEndpoints.MenuItems.GetAll);
+  }
+
+  addMenuItem(menuItem: MenuItem) {
+    return this.http.post<MenuItem>(ApiEndpoints.MenuItems.Create, menuItem);
+  }
+
+  updateMenuItem(id: string, menuItem: MenuItem) {
+    return this.http.put<MenuItem>(`${ApiEndpoints.MenuItems.Update}/${id}`, menuItem);
+  }
+
+  deleteMenuItem(id: string) {
+    return this.http.delete<boolean>(`${ApiEndpoints.MenuItems.Delete}/${id}`);
   }
 }
