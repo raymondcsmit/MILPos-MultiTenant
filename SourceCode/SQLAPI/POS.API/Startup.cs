@@ -337,6 +337,7 @@ namespace POS.API
 
             
             app.UseAuthentication();
+            app.UseMiddleware<POS.API.Middleware.ApiKeyAuthenticationMiddleware>(); // ✅ Register API Key Middleware (Before Authorization)
 
             // Add tenant resolution middleware only in cloud mode
             if (deploymentSettings?.MultiTenancy?.Enabled == true)

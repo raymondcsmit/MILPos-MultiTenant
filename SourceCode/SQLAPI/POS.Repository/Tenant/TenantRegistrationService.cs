@@ -64,7 +64,12 @@ namespace POS.Repository
                 SubscriptionStartDate = DateTime.UtcNow,
                 SubscriptionEndDate = DateTime.UtcNow.AddDays(AppConstants.TenantConfig.TrialPeriodDays),
                 MaxUsers = AppConstants.TenantConfig.DefaultMaxUsers,
-                BusinessType = dto.BusinessType
+                BusinessType = dto.BusinessType,
+                
+                // Auto-generate API key
+                ApiKey = GenerateSecureApiKey(),
+                ApiKeyCreatedDate = DateTime.UtcNow,
+                ApiKeyEnabled = true
             };
 
             _context.Tenants.Add(tenant);
@@ -642,6 +647,17 @@ namespace POS.Repository
             }
             result.Add(current.ToString());
             return result;
+        }
+
+        private string GenerateSecureApiKey()
+        {
+            using var rng = System.Security.Cryptography.RandomNumberGenerator.Create();
+            var bytes = new byte[32]; // 256 bits
+            rng.GetBytes(bytes);
+            return Convert.ToBase64String(bytes)
+                .Replace("+", "-")
+                .Replace("/", "_")
+                .TrimEnd('='); // URL-safe base64
         }
     }
 }

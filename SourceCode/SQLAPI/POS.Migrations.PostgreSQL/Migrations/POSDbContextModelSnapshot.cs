@@ -2819,6 +2819,18 @@ namespace POS.Migrations.PostgreSQL.Migrations
                         .HasMaxLength(1000)
                         .HasColumnType("character varying(1000)");
 
+                    b.Property<string>("ApiKey")
+                        .HasColumnType("text");
+
+                    b.Property<DateTime?>("ApiKeyCreatedDate")
+                        .HasColumnType("timestamp without time zone");
+
+                    b.Property<bool>("ApiKeyEnabled")
+                        .HasColumnType("boolean");
+
+                    b.Property<DateTime?>("ApiKeyLastUsedDate")
+                        .HasColumnType("timestamp without time zone");
+
                     b.Property<string>("BusinessType")
                         .HasColumnType("text");
 

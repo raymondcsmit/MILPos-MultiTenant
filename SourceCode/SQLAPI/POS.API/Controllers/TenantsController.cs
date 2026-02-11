@@ -117,9 +117,26 @@ namespace POS.API.Controllers
                 return BadRequest(new { message = "Subdomain already exists" });
             }
 
-            var tenant = await _migrationService.CreateTenant(dto.Name,dto.Subdomain,dto.ContactEmail);
+            var command = new CreateTenantCommand
+            {
+                Name = dto.Name,
+                Subdomain = dto.Subdomain,
+                ContactEmail = dto.ContactEmail,
+                ContactPhone = dto.ContactPhone,
+                Address = dto.Address,
+                AdminEmail = dto.AdminEmail ?? dto.ContactEmail,
+                AdminPassword = dto.AdminPassword,
+                //BusinessType = dto.BusinessType // Assuming dto has BusinessType, if not default will be used
+            };
 
-            return CreatedAtAction(nameof(GetTenant), new { id = tenant.Id }, tenant);
+            var response = await _mediator.Send(command);
+
+            if (response.Success)
+            {
+                return CreatedAtAction(nameof(GetTenant), new { id = response.Data.Id }, response.Data);
+            }
+
+            return BadRequest(new { message = string.Join(", ", response.Errors) });
         }
 
         /// <summary>
@@ -281,7 +298,44 @@ namespace POS.API.Controllers
                 return StatusCode(response.StatusCode, string.Join(", ", response.Errors));
             }
 
-            return File(response.Data.FileContent, response.Data.ContentType, response.Data.FileName);
+            // Read file into memory to serve it
+            var fileBytes = await System.IO.File.ReadAllBytesAsync(response.Data.FilePath);
+            System.IO.File.Delete(response.Data.FilePath); // Clean up temp file
+
+            return File(fileBytes, "application/zip", response.Data.FileName);
+        }
+
+        /// <summary>
+        /// Download tenant database (For offline usage - Self Service)
+        /// </summary>
+        [HttpGet("my-database")]
+        [Authorize]
+        public async Task<IActionResult> DownloadMyDatabase()
+        {
+            var tenantIdClaim = User.FindFirst("TenantId");
+            if (tenantIdClaim == null || !Guid.TryParse(tenantIdClaim.Value, out var tenantId))
+            {
+                return Unauthorized(new { message = "Tenant ID not found in token." });
+            }
+
+            var apiBaseUrl = $"{Request.Scheme}://{Request.Host}{Request.PathBase}";
+
+            var command = new ExportTenantToSqliteCommand 
+            { 
+                TenantId = tenantId,
+                CloudApiUrl = apiBaseUrl
+            };
+            var response = await _mediator.Send(command);
+
+            if (!response.Success)
+            {
+                return StatusCode(500, new { message = string.Join(", ", response.Errors) });
+            }
+
+            var fileBytes = await System.IO.File.ReadAllBytesAsync(response.Data.FilePath);
+            System.IO.File.Delete(response.Data.FilePath);
+
+            return File(fileBytes, "application/zip", response.Data.FileName); // Changed to zip
         }
 
     }

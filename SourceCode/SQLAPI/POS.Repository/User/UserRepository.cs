@@ -117,6 +117,10 @@ public class UserRepository : GenericRepository<User, POSDbContext>,
         ret.IsSuperAdmin = appUser.IsSuperAdmin;
         ret.LicenseKey = string.IsNullOrEmpty(companyProfile.LicenseKey) ? "" : HttpUtility.UrlEncode(companyProfile.LicenseKey.ToString());
         ret.PurchaseCode = string.IsNullOrEmpty(companyProfile.PurchaseCode) ? "" : HttpUtility.UrlEncode(companyProfile.PurchaseCode.ToString());
+        // Get Tenant ApiKey
+        var tenant = await Context.Set<Data.Entities.Tenant>().IgnoreQueryFilters().FirstOrDefaultAsync(t => t.Id == appUser.TenantId);
+        ret.ApiKey = tenant?.ApiKey;
+
         // Get all claims for this user
         var appClaimDtos = await this.GetUserAndRoleClaims(appUser);
         ret.Claims = appClaimDtos.Select(c => c).ToList();
@@ -124,6 +128,11 @@ public class UserRepository : GenericRepository<User, POSDbContext>,
         claims.Add(new Claim("licensekey", string.IsNullOrEmpty(companyProfile.LicenseKey) ? "" : HttpUtility.UrlEncode(companyProfile.LicenseKey.ToString())));
         claims.Add(new Claim("purchasecode", string.IsNullOrEmpty(companyProfile.PurchaseCode) ? "" : HttpUtility.UrlEncode(companyProfile.PurchaseCode.ToString())));
         claims.Add(new Claim("isSuperAdmin", appUser.IsSuperAdmin.ToString().ToLower()));
+        if (!string.IsNullOrEmpty(ret.ApiKey))
+        {
+            claims.Add(new Claim("ApiKey", ret.ApiKey));
+        }
+
         // Set JWT bearer token
         ret.BearerToken = BuildJwtToken(ret, claims, appUser.Id, locations, appUser.TenantId);
 

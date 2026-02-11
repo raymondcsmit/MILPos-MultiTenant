@@ -1,6 +1,6 @@
 {
   "name": "milpos",
-  "version": "0.0.4",
+  "version": "0.0.6",
   "description": "A comprehensive, multi-tenant POS with Inventory Management System designed to streamline retail operations, integrating POS, inventory tracking, accounting, purchasing, and CRM.",
   "author": {
     "name": "Waqar Habib",
@@ -34,7 +34,11 @@
     },
     "files": [
       "main.js",
+      "encryption.js",
+      "preload.js",
       "splash.html",
+      "login-cloud.html",
+      "setup-splash.html",
       "icon.png",
       {
         "from": "../SQLAPI/POS.API/ClientApp/browser",
@@ -109,7 +113,10 @@
     "@ngrx/store-devtools": "^20.0.1",
     "@ngx-translate/core": "^17.0.0",
     "@ngx-translate/http-loader": "^17.0.0",
+    "@primno/dpapi": "^2.0.1",
+    "adm-zip": "^0.5.16",
     "angular-feather": "^6.5.1",
+    "axios": "^1.13.5",
     "bootstrap": "^5.3.8",
     "chart.js": "^4.4.7",
     "clone": "^2.1.2",
@@ -147,6 +154,7 @@
     "karma-coverage": "~2.2.0",
     "karma-jasmine": "~5.1.0",
     "karma-jasmine-html-reporter": "~2.1.0",
+    "node-addon-api": "^8.5.0",
     "png-to-ico": "^3.0.1",
     "typescript": "~5.9.2"
   }

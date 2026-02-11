@@ -19,6 +19,8 @@ namespace POS.API.Middleware
         private readonly HashSet<string> _allowedPaths = new HashSet<string>(StringComparer.OrdinalIgnoreCase)
         {
             "/api/User/Login",
+            "/api/authentication",
+            "/api/authentication/login",
             "/api/User/RefreshToken",
             "/api/License/Validate",
             "/api/Sync" // Allow all sync operations for now, or refine to specific endpoints

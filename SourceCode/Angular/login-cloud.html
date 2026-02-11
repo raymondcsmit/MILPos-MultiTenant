@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MIL POS - Cloud Setup</title>
+    <style>
+        :root {
+            --primary: #4158D0;
+            --secondary: #C850C0;
+            --accent: #FFCC70;
+            --text-primary: #ffffff;
+            --glass: rgba(255, 255, 255, 0.15);
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background: linear-gradient(135deg, #4158D0 0%, #C850C0 46%, #FFCC70 100%);
+            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            overflow: hidden;
+            user-select: none;
+            color: var(--text-primary);
+        }
+
+        .container {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(15px);
+            -webkit-backdrop-filter: blur(15px);
+            border-radius: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            padding: 40px;
+            width: 380px;
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.3);
+            text-align: center;
+            animation: slideUp 0.6s ease-out;
+        }
+
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .logo {
+            font-size: 48px;
+            font-weight: 800;
+            margin-bottom: 5px;
+            letter-spacing: -1.5px;
+            background: linear-gradient(to right, #fff, #eee);
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .title {
+            font-size: 18px;
+            margin-bottom: 30px;
+            opacity: 0.9;
+            font-weight: 500;
+        }
+
+        .input-group {
+            margin-bottom: 20px;
+            text-align: left;
+        }
+
+        label {
+            display: block;
+            font-size: 12px;
+            margin-bottom: 6px;
+            margin-left: 4px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            font-weight: 600;
+            opacity: 0.8;
+        }
+
+        input {
+            width: 100%;
+            padding: 12px 16px;
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 12px;
+            color: white;
+            font-size: 14px;
+            box-sizing: border-box;
+            transition: all 0.3s;
+        }
+
+        input:focus {
+            outline: none;
+            background: rgba(255, 255, 255, 0.2);
+            border-color: rgba(255, 255, 255, 0.4);
+            box-shadow: 0 0 0 4px rgba(255, 255, 255, 0.05);
+        }
+
+        button {
+            width: 100%;
+            padding: 14px;
+            margin-top: 10px;
+            background: white;
+            color: var(--primary);
+            border: none;
+            border-radius: 12px;
+            font-size: 16px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
+            background: #f8f8f8;
+        }
+
+        button:active {
+            transform: translateY(0);
+        }
+
+        button:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none !important;
+        }
+
+        .error {
+            margin-top: 20px;
+            padding: 10px;
+            background: rgba(255, 59, 48, 0.2);
+            border-radius: 8px;
+            font-size: 13px;
+            color: #ffcccc;
+            display: none;
+            border: 1px solid rgba(255, 59, 48, 0.3);
+        }
+
+        .footer {
+            margin-top: 30px;
+            font-size: 11px;
+            opacity: 0.6;
+        }
+
+        .loader {
+            display: none;
+            width: 20px;
+            height: 20px;
+            border: 3px solid rgba(255,255,255,0.3);
+            border-radius: 50%;
+            border-top-color: #fff;
+            animation: spin 0.8s linear infinite;
+            margin-left: 10px;
+            vertical-align: middle;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="logo">MIL POS</div>
+        <div class="title">Cloud Account Setup</div>
+
+        <form id="loginForm">
+            <div class="input-group">
+                <label>Email Address</label>
+                <input type="email" id="email" placeholder="name@company.com" required>
+            </div>
+            <div class="input-group">
+                <label>Password</label>
+                <input type="password" id="password" placeholder="••••••••" required>
+            </div>
+
+            <button type="submit" id="submitBtn">
+                <span>Next</span>
+                <div class="loader" id="loader"></div>
+            </button>
+        </form>
+
+        <div id="error" class="error"></div>
+
+        <div class="footer">
+            &copy; 2026 MIL POS Systems &bull; Secure Setup
+        </div>
+    </div>
+
+    <script>
+        const form = document.getElementById('loginForm');
+        const btn = document.getElementById('submitBtn');
+        const btnText = btn.querySelector('span');
+        const loader = document.getElementById('loader');
+        const errorEl = document.getElementById('error');
+
+        form.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            errorEl.style.display = 'none';
+            btn.disabled = true;
+            btnText.innerText = 'Connecting...';
+            loader.style.display = 'inline-block';
+
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+
+            try {
+                // Call Electron IPC Bridge
+                const result = await window.electronAPI.cloudLogin(email, password);
+                
+                if (!result.success) {
+                    throw new Error(result.error || 'Authentication failed');
+                }
+                
+                // Success - process will transition to splash automatically
+                btnText.innerText = 'Authenticated!';
+                loader.style.display = 'none';
+                
+            } catch (err) {
+                errorEl.innerText = err.message;
+                errorEl.style.display = 'block';
+                btn.disabled = false;
+                btnText.innerText = 'Next';
+                loader.style.display = 'none';
+            }
+        });
+    </script>
+</body>
+</html>

@@ -16,18 +16,17 @@ namespace POS.Repository
 {
     public class ReminderSchedulerRepository : GenericRepository<ReminderScheduler, POSDbContext>, IReminderSchedulerRepository
     {
-        private readonly IUnitOfWork<POSDbContext> _uow;
-        private readonly IPropertyMappingService _propertyMappingService;
         private readonly UserInfoToken _userInfoToken;
+        private readonly IPropertyMappingService _propertyMappingService;
+
         public ReminderSchedulerRepository(
             IUnitOfWork<POSDbContext> uow,
-             IPropertyMappingService propertyMappingService,
-               UserInfoToken userInfoToken
+            IPropertyMappingService propertyMappingService,
+            UserInfoToken userInfoToken
             ) : base(uow)
         {
-            _uow = uow;
-            _propertyMappingService = propertyMappingService;
             _userInfoToken = userInfoToken;
+            _propertyMappingService = propertyMappingService;
         }
 
         public async Task<bool> AddMultiReminder(List<Reminder> reminders)

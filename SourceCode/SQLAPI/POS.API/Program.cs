@@ -26,6 +26,15 @@ ExcelPackage.License.SetNonCommercialOrganization("MIL POS");
 builder.Services.AddTransient<JobService>();
 builder.Services.AddMemoryCache();
 
+// Electron-specific configuration override via environment variables
+var tenantIdEnv = Environment.GetEnvironmentVariable("TENANT_ID");
+var apiKeyEnv = Environment.GetEnvironmentVariable("API_KEY");
+var cloudApiUrlEnv = Environment.GetEnvironmentVariable("CLOUD_API_URL");
+
+if (!string.IsNullOrEmpty(tenantIdEnv)) builder.Configuration["TenantId"] = tenantIdEnv;
+if (!string.IsNullOrEmpty(apiKeyEnv)) builder.Configuration["ApiKey"] = apiKeyEnv;
+if (!string.IsNullOrEmpty(cloudApiUrlEnv)) builder.Configuration["SyncSettings:CloudApiUrl"] = cloudApiUrlEnv;
+
 
 builder.Logging.ClearProviders();
 builder.Host.UseNLog();

@@ -1,9 +1,14 @@
-const { app, BrowserWindow, dialog } = require('electron');
+const { app, BrowserWindow, dialog, ipcMain } = require('electron');
 const { autoUpdater } = require('electron-updater');
 const path = require('path');
 const url = require('url');
 const { spawn } = require('child_process');
 const fs = require('fs');
+const axios = require('axios');
+const AdmZip = require('adm-zip');
+const { encryptData, decryptData, isEncrypted } = require('./encryption');
+
+const authPath = path.join(app.getPath('userData'), 'auth.json');
 
 let win;
 let splash;
@@ -17,6 +22,237 @@ function logToFile(msg) {
         fs.appendFileSync(logTrace, `[${new Date().toISOString()}] ${msg}\n`);
     } catch(e) { 
         console.error("Log failed", e); 
+    }
+}
+
+/**
+ * Reads and decrypts auth configuration
+ * @returns {object} - Decrypted auth data
+ */
+function readAuthConfig() {
+  try {
+    if (!fs.existsSync(authPath)) {
+      return null;
+    }
+
+    const authData = JSON.parse(fs.readFileSync(authPath, 'utf8'));
+
+    // Decrypt sensitive fields if they appear to be encrypted
+    return {
+      token: isEncrypted(authData.token) 
+        ? decryptData(authData.token) 
+        : authData.token,
+      apiKey: isEncrypted(authData.apiKey) 
+        ? decryptData(authData.apiKey) 
+        : authData.apiKey,
+      tenantId: authData.tenantId,
+      cloudApiUrl: authData.cloudApiUrl,
+      user: {
+        id: authData.user?.id && isEncrypted(authData.user.id) 
+          ? decryptData(authData.user.id) 
+          : authData.user?.id,
+        email: authData.user?.email,
+        name: authData.user?.name
+      }
+    };
+  } catch (error) {
+    console.error('Failed to read auth config:', error);
+    
+    // If decryption fails, the credentials might be from another machine or corrupted
+    if (error.message.includes('decrypt') || error.message.includes('machine mismatch')) {
+      logToFile('CRITICAL: Auth decryption failed (machine mismatch?). Clearing credentials.');
+      try {
+        fs.unlinkSync(authPath);
+      } catch (e) {}
+      return null;
+    }
+    
+    return null;
+  }
+}
+
+/**
+ * Saves and encrypts auth configuration
+ * @param {object} config - Plain text auth data from login
+ */
+function saveAuthConfig(config) {
+  try {
+    const encryptedData = {
+      token: encryptData(config.token),
+      apiKey: encryptData(config.apiKey),
+      tenantId: config.tenantId,
+      cloudApiUrl: config.cloudApiUrl,
+      user: {
+        id: encryptData(config.user?.id),
+        email: config.user?.email,
+        name: config.user?.name
+      },
+      savedAt: new Date().toISOString()
+    };
+
+    fs.writeFileSync(authPath, JSON.stringify(encryptedData, null, 2));
+    logToFile('Auth configuration saved and encrypted.');
+    return true;
+  } catch (error) {
+    console.error('Failed to save auth config:', error);
+    logToFile(`ERROR: Failed to save auth config: ${error.message}`);
+    return false;
+  }
+}
+
+// IPC Handlers for Cloud Authentication
+ipcMain.handle('save-auth', async (event, config) => {
+  return saveAuthConfig(config);
+});
+
+ipcMain.handle('get-auth', async (event) => {
+  return readAuthConfig();
+});
+
+ipcMain.handle('clear-auth', async (event) => {
+  try {
+    if (fs.existsSync(authPath)) fs.unlinkSync(authPath);
+    return true;
+  } catch (e) {
+    return false;
+  }
+});
+
+const CLOUD_API_URL = 'http://localhost:5000'; // Fallback / Local testing
+
+ipcMain.handle('cloud-login', async (event, { email, password }) => {
+  try {
+    logToFile(`CLOUD LOGIN: Attempting login for ${email}`);
+    
+    // 1. Authenticate with Cloud
+    const response = await axios.post(`${CLOUD_API_URL}/api/authentication`, {
+      email,
+      password
+    });
+
+    const { bearerToken, tenantId, apiKey, user } = response.data;
+    
+    if (!bearerToken) {
+       throw new Error('Authentication failed: No token received');
+    }
+
+    // 2. Save Auth Info (Encrypted)
+    const authData = {
+      token: bearerToken,
+      tenantId,
+      apiKey,
+      cloudApiUrl: CLOUD_API_URL,
+      user
+    };
+    saveAuthConfig(authData);
+
+    // 3. Transition to Setup Splash
+    if (win) win.close();
+    showSetupSplash();
+
+    // 4. Download and Extract Database
+    await downloadAndSetupDatabase(bearerToken);
+
+    // 5. Cleanup and Start regular API
+    logToFile('CLOUD LOGIN: Setup complete. Starting regular API.');
+    if (splash) splash.close();
+    startApi();
+
+    return { success: true };
+
+  } catch (error) {
+    const errorMsg = error.response?.data?.message || error.message || 'Login failed';
+    logToFile(`ERROR: Cloud login failed: ${errorMsg}`);
+    return { success: false, error: errorMsg };
+  }
+});
+
+function showSetupSplash() {
+    splash = new BrowserWindow({
+      width: 500,
+      height: 400,
+      frame: false,
+      resizable: false,
+      alwaysOnTop: true,
+      icon: path.join(__dirname, 'icon.png'),
+      webPreferences: {
+          nodeIntegration: false,
+          contextIsolation: true,
+          preload: path.join(__dirname, 'preload.js')
+      }
+    });
+
+    splash.loadFile(path.join(__dirname, 'setup-splash.html'));
+}
+
+async function downloadAndSetupDatabase(token) {
+    const userDataPath = app.getPath('userData');
+    const tempZipPath = path.join(userDataPath, 'setup_package.zip');
+    const dbPath = path.join(userDataPath, 'POSDb.db');
+    
+    try {
+        logToFile('DOWNLOAD: Starting database download...');
+        splash.webContents.send('download-progress', { 
+            percent: 10, 
+            header: 'Connecting...', 
+            detail: 'Requesting secure database package' 
+        });
+
+        const response = await axios({
+            method: 'GET',
+            url: `${CLOUD_API_URL}/api/tenants/my-database`,
+            headers: { 'Authorization': `Bearer ${token}` },
+            responseType: 'stream'
+        });
+
+        const totalLength = response.headers['content-length'];
+        let downloadedLength = 0;
+
+        const writer = fs.createWriteStream(tempZipPath);
+        
+        response.data.on('data', (chunk) => {
+            downloadedLength += chunk.length;
+            const progress = totalLength ? Math.round((downloadedLength / totalLength) * 70) + 10 : 40;
+            splash.webContents.send('download-progress', { 
+                percent: progress, 
+                header: 'Downloading...', 
+                detail: `Received ${Math.round(downloadedLength / 1024)} KB` 
+            });
+        });
+
+        response.data.pipe(writer);
+
+        await new Promise((resolve, reject) => {
+            writer.on('finish', resolve);
+            writer.on('error', reject);
+        });
+
+        logToFile('DOWNLOAD: Extraction started.');
+        splash.webContents.send('download-progress', { 
+            percent: 85, 
+            header: 'Extracting...', 
+            detail: 'Configuring local workspace' 
+        });
+
+        // Extract ZIP
+        const zip = new AdmZip(tempZipPath);
+        zip.extractAllTo(userDataPath, true);
+
+        // Cleanup
+        fs.unlinkSync(tempZipPath);
+        
+        splash.webContents.send('download-progress', { 
+            percent: 100, 
+            header: 'Complete', 
+            detail: 'Starting MIL POS...' 
+        });
+        
+        await new Promise(r => setTimeout(r, 1000));
+
+    } catch (error) {
+        logToFile(`ERROR: Database setup failed: ${error.message}`);
+        dialog.showErrorBox('Setup Failed', `Failed to download or configure your workspace: ${error.message}`);
+        app.quit();
     }
 }
 
@@ -75,7 +311,21 @@ function startApi() {
   // 2. Database setup
   const dbPath = path.join(userDataPath, 'POSDb.db');
   
-  // ... (rest of logic)
+  // First Run Check: If no DB exists, show Cloud Login
+  if (!fs.existsSync(dbPath)) {
+      clearTimeout(startupTimeout);
+      logToFile('STARTUP: No database found. Triggering Cloud Login Flow.');
+      
+      // Close splash before showing login to prevent layering issues
+      if (splash) {
+          splash.close();
+          splash = null;
+      }
+      
+      showCloudLogin();
+      return;
+  }
+
     if (!fs.existsSync(dbPath) && fs.existsSync(sourceDbPath)) {
         try {
             fs.copyFileSync(sourceDbPath, dbPath);
@@ -87,12 +337,23 @@ function startApi() {
 
     // 3. Spawn Process
     try {
+      const auth = readAuthConfig();
       const connectionString = `Data Source=${dbPath}`;
+      
+      const env = { 
+        ...process.env, 
+        ASPNETCORE_ENVIRONMENT: 'Desktop',
+        // Pass credentials to API via environment variables
+        TENANT_ID: auth?.tenantId || '',
+        API_KEY: auth?.apiKey || '',
+        CLOUD_API_URL: auth?.cloudApiUrl || ''
+      };
+
       apiProcess = spawn(apiPath, [
         `--ConnectionStrings:SqliteConnectionString=${connectionString}`
       ], {
         cwd: path.dirname(apiPath),
-        env: { ...process.env, ASPNETCORE_ENVIRONMENT: 'Desktop' } // Ensure this env var doesn't break things
+        env: env
       });
       
       appendLog(`Process spawned with PID: ${apiProcess.pid}`);
@@ -276,3 +537,25 @@ app.on('activate', () => {
     createWindow();
   }
 });
+
+function showCloudLogin() {
+    win = new BrowserWindow({
+      width: 450,
+      height: 600,
+      frame: false,
+      resizable: false,
+      transparent: true,
+      icon: path.join(__dirname, 'icon.png'),
+      webPreferences: {
+        nodeIntegration: false,
+        contextIsolation: true,
+        preload: path.join(__dirname, 'preload.js')
+      }
+    });
+
+    win.loadFile(path.join(__dirname, 'login-cloud.html'));
+    
+    win.on('closed', () => {
+      win = null;
+    });
+}
