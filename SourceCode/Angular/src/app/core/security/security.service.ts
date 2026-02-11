@@ -244,6 +244,9 @@ export class SecurityService {
           }
           this.updateSelectedLocation(userLocations[0]);
         }
+        if (resp.menus) {
+            localStorage.setItem('userMenus', JSON.stringify(resp.menus));
+        }
         this._securityObject$.next(resp.user);
       })
     );
@@ -261,6 +264,7 @@ export class SecurityService {
   resetSecurityObject(): void {
     localStorage.removeItem(this.wrLicenseService.keyValues.authObj);
     localStorage.removeItem(this.wrLicenseService.keyValues.BEARER_TOKEN);
+    localStorage.removeItem('userMenus');
     this._securityObject$.next(null);
     this._token = null;
     this._claims = [];

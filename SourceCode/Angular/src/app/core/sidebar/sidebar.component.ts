@@ -13,7 +13,6 @@ import {
 import { ROUTES } from './menu-items';
 import { MenuInfo } from './menu-info';
 import { MatIconModule } from '@angular/material/icon';
-import { HasClaimDirective } from '@shared/has-claim.directive';
 import { TranslateModule } from '@ngx-translate/core';
 import { NgScrollbarModule } from 'ngx-scrollbar';
 import { BreakpointObserver } from '@angular/cdk/layout';
@@ -27,7 +26,6 @@ import { MenuItem } from '../domain-classes/menu-item';
   standalone: true,
   imports: [
     RouterModule,
-    HasClaimDirective,
     TranslateModule,
     NgClass,
     RouterLink,

@@ -13,7 +13,8 @@ using Microsoft.AspNetCore.SignalR;
 using Microsoft.AspNetCore.Hosting;
 using POS.Common.Services;
 using System.IO;
-
+using AutoMapper;
+using System.Collections.Generic;
 
 namespace POS.MediatR.Handlers
 {
@@ -27,6 +28,9 @@ namespace POS.MediatR.Handlers
         private readonly PathHelper _pathHelper;
         private readonly IWebHostEnvironment _webHostEnvironment;
         private readonly IFileStorageService _fileStorageService;
+        private readonly IMenuItemRepository _menuItemRepository;
+        private readonly IUserRoleRepository _userRoleRepository;
+        private readonly IMapper _mapper;
 
         public UserLoginCommandHandler(
             IUserRepository userRepository,
@@ -36,7 +40,10 @@ namespace POS.MediatR.Handlers
             IHubContext<UserHub, IHubClient> hubContext,
             PathHelper pathHelper,
             IWebHostEnvironment webHostEnvironment,
-            IFileStorageService fileStorageService
+            IFileStorageService fileStorageService,
+            IMenuItemRepository menuItemRepository,
+            IUserRoleRepository userRoleRepository,
+            IMapper mapper
             )
         {
             _userRepository = userRepository;
@@ -47,6 +54,9 @@ namespace POS.MediatR.Handlers
             _pathHelper = pathHelper;
             _webHostEnvironment = webHostEnvironment;
             _fileStorageService = fileStorageService;
+            _menuItemRepository = menuItemRepository;
+            _userRoleRepository = userRoleRepository;
+            _mapper = mapper;
         }
         public async Task<ServiceResponse<UserAuthDto>> Handle(UserLoginCommand request, CancellationToken cancellationToken)
         {
@@ -102,6 +112,36 @@ namespace POS.MediatR.Handlers
                         authUser.ProfilePhoto = null;
                     }
                 }
+
+                // Load Menus
+                var userRoles = await _userRoleRepository.FindBy(ur => ur.UserId == authUser.Id).ToListAsync();
+                var roleIds = userRoles.Select(ur => ur.RoleId).ToList();
+
+                var menuItems = await _menuItemRepository.AllIncluding(c => c.RoleMenuItems)
+                    .Where(c => c.IsActive)
+                    .OrderBy(c => c.Order)
+                    .ToListAsync();
+
+                var dtos = _mapper.Map<List<MenuItemDto>>(menuItems);
+
+                foreach (var dto in dtos)
+                {
+                    var entity = menuItems.FirstOrDefault(m => m.Id == dto.Id);
+                    if (entity != null && entity.RoleMenuItems != null)
+                    {
+                        var permissions = entity.RoleMenuItems
+                            .Where(rm => roleIds.Contains(rm.RoleId))
+                            .ToList();
+
+                        dto.CanView = permissions.Any(p => p.CanView);
+                        dto.CanCreate = permissions.Any(p => p.CanCreate);
+                        dto.CanEdit = permissions.Any(p => p.CanEdit);
+                        dto.CanDelete = permissions.Any(p => p.CanDelete);
+                    }
+                }
+
+                authUser.Menus = BuildTree(dtos);
+
                 return ServiceResponse<UserAuthDto>.ReturnResultWith200(authUser);
             }
             else
@@ -109,6 +149,25 @@ namespace POS.MediatR.Handlers
                 await _loginAuditRepository.LoginAudit(loginAudit);
                 return ServiceResponse<UserAuthDto>.ReturnFailed(401, "UserName Or Password is InCorrect.");
             }
+        }
+
+        private List<MenuItemDto> BuildTree(List<MenuItemDto> items)
+        {
+            var dict = items.ToDictionary(i => i.Id);
+            var rootItems = new List<MenuItemDto>();
+
+            foreach (var item in items)
+            {
+                if (item.ParentId.HasValue && dict.ContainsKey(item.ParentId.Value))
+                {
+                    dict[item.ParentId.Value].Children.Add(item);
+                }
+                else
+                {
+                    rootItems.Add(item);
+                }
+            }
+            return rootItems;
         }
     }
 }

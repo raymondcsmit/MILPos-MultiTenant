@@ -109,8 +109,12 @@ try
         context.Database.Migrate();
 
         // Seed data using SeedingService
-        var seedingService = serviceScope.ServiceProvider.GetRequiredService<SeedingService>();
-        await seedingService.SeedAsync();
+        var seedingEnabled = builder.Configuration.GetValue<bool>("SeedingConfig:Enabled", true);
+        if (seedingEnabled)
+        {
+            var seedingService = serviceScope.ServiceProvider.GetRequiredService<SeedingService>();
+            await seedingService.SeedAsync();
+        }
     }
 }
 catch (System.Exception ex)

@@ -23,4 +23,5 @@ public class UserAuthDto
     public string LicenseKey { get; set; }
     public string PurchaseCode { get; set; }
     public bool HasAllLocationAssigned { get; set; }
+    public List<MenuItemDto> Menus { get; set; }
 }

@@ -16,11 +16,17 @@ export class MenuService {
   constructor(private http: HttpClient) {}
 
   async loadUserMenu() {
-    try {
-        const menu = await firstValueFrom(this.http.get<MenuItem[]>(ApiEndpoints.MenuItems.UserMenu));
-        this._menuItems.set(menu);
-    } catch (e) {
-        console.error('Failed to load menu', e);
+    const savedMenus = localStorage.getItem('userMenus');
+    if (savedMenus) {
+        this._menuItems.set(JSON.parse(savedMenus));
+    } else {
+        try {
+            const menu = await firstValueFrom(this.http.get<MenuItem[]>(ApiEndpoints.MenuItems.UserMenu));
+            this._menuItems.set(menu);
+            localStorage.setItem('userMenus', JSON.stringify(menu));
+        } catch (e) {
+            console.error('Failed to load menu', e);
+        }
     }
   }
 }
