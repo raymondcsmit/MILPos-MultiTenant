@@ -78,8 +78,13 @@ builder.Services.AddHangfire(configuration =>
     else if (provider == "PostgreSql")
     {
         var connectionString = builder.Configuration.GetConnectionString("PostgresConnectionString");
-        configuration.UsePostgreSqlStorage(options =>
-            options.UseNpgsqlConnection(connectionString));
+        var options = new PostgreSqlStorageOptions
+        {
+            DistributedLockTimeout = TimeSpan.FromMinutes(1),
+            PrepareSchemaIfNecessary = true,
+            QueuePollInterval = TimeSpan.FromSeconds(15)
+        };
+        configuration.UsePostgreSqlStorage(connectionString, options);
     }
     else
     {

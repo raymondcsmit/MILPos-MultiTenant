@@ -40,22 +40,8 @@ namespace POS.MediatR.MenuItem.Handlers
                  .OrderBy(c => c.Order)
                 .ToListAsync();
 
-            // Deduplicate menu items locally
-            var menuItems = allMenuItems
-                .GroupBy(m => m.Id)
-                .Select(g =>
-                {
-                    var item = g.First();
-                    if (item.RoleMenuItems != null)
-                    {
-                        item.RoleMenuItems = g.SelectMany(x => x.RoleMenuItems ?? Enumerable.Empty<RoleMenuItem>())
-                                              .GroupBy(rm => rm.Id)
-                                              .Select(grp => grp.First())
-                                              .ToList();
-                    }
-                    return item;
-                })
-                .ToList();
+            // Deduplicate menu items using shared logic
+            var menuItems = _menuItemRepository.ProcessMenuDeduplication(allMenuItems);
 
             var dtos = _mapper.Map<List<MenuItemDto>>(menuItems);
 

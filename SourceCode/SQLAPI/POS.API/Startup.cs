@@ -116,7 +116,11 @@ namespace POS.API
                 {
                     AppContext.SetSwitch("Npgsql.EnableLegacyTimestampBehavior", true);
                     options.UseNpgsql(Configuration.GetConnectionString("PostgresConnectionString"),
-                        b => b.MigrationsAssembly("POS.Migrations.PostgreSQL"))
+                        b => {
+                            b.MigrationsAssembly("POS.Migrations.PostgreSQL");
+                            b.CommandTimeout(300);
+                            b.EnableRetryOnFailure(5, TimeSpan.FromSeconds(10), null);
+                        })
                     .EnableSensitiveDataLogging();
                 }
                 else

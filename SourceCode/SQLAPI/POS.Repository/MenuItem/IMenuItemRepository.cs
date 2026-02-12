@@ -10,5 +10,6 @@ namespace POS.Repository
     {
         Task<List<MenuItem>> GetMenuItemsByRoleAsync(Guid roleId);
         Task<List<MenuItem>> GetMenuItemsByRolesAsync(List<Guid> roleIds);
+        List<MenuItem> ProcessMenuDeduplication(List<MenuItem> allMenuItems);
     }
 }

@@ -33,5 +33,48 @@ namespace POS.Repository
                 .OrderBy(m => m.Order)
                 .ToListAsync();
         }
+
+        public List<MenuItem> ProcessMenuDeduplication(List<MenuItem> allMenuItems)
+        {
+            var groupedItems = allMenuItems.GroupBy(x => new { x.Title, x.Path }).ToList();
+            var distinctMenuItems = new List<MenuItem>();
+            var idMap = new Dictionary<Guid, Guid>();
+
+            foreach (var group in groupedItems)
+            {
+                var winner = group.OrderByDescending(x => x.TenantId.HasValue).ThenBy(x => x.Id).First();
+                if (winner.RoleMenuItems == null)
+                {
+                    winner.RoleMenuItems = new List<RoleMenuItem>();
+                }
+
+                var mergedPermissions = group
+                     .SelectMany(x => x.RoleMenuItems ?? Enumerable.Empty<RoleMenuItem>())
+                     .GroupBy(rm => rm.RoleId)
+                     .Select(g => g.First())
+                     .ToList();
+
+                winner.RoleMenuItems = mergedPermissions;
+                distinctMenuItems.Add(winner);
+
+                foreach (var item in group)
+                {
+                    if (!idMap.ContainsKey(item.Id))
+                    {
+                        idMap[item.Id] = winner.Id;
+                    }
+                }
+            }
+
+            foreach (var item in distinctMenuItems)
+            {
+                if (item.ParentId.HasValue && idMap.ContainsKey(item.ParentId.Value))
+                {
+                    item.ParentId = idMap[item.ParentId.Value];
+                }
+            }
+
+            return distinctMenuItems.OrderBy(c => c.Order).ToList();
+        }
     }
 }

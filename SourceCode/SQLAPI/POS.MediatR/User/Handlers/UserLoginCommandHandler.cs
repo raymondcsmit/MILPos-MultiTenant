@@ -70,7 +70,15 @@ namespace POS.MediatR.Handlers
                 Longitude = request.Longitude
             };
 
-            var user = await _userManager.Users.IgnoreQueryFilters().FirstOrDefaultAsync(u => u.UserName == request.UserName || u.Email==request.UserName);
+            var requestUserName = request.UserName.ToUpper();
+            var user = await _userManager.Users.IgnoreQueryFilters()
+                .FirstOrDefaultAsync(u => u.NormalizedUserName == requestUserName, cancellationToken);
+            
+            if (user == null)
+            {
+                 user = await _userManager.Users.IgnoreQueryFilters()
+                    .FirstOrDefaultAsync(u => u.NormalizedEmail == requestUserName, cancellationToken);
+            }
             if(user == null)
             {
                 await _loginAuditRepository.LoginAudit(loginAudit);
@@ -137,9 +145,11 @@ namespace POS.MediatR.Handlers
                     }
                 }
 
-                var menuItems = await menuItemsQuery
+                var allMenuItems = await menuItemsQuery
                     .OrderBy(c => c.Order)
                     .ToListAsync();
+
+                var menuItems = _menuItemRepository.ProcessMenuDeduplication(allMenuItems);
 
                 var dtos = _mapper.Map<List<MenuItemDto>>(menuItems);
 
