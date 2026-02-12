@@ -470,11 +470,16 @@ namespace POS.API.Helpers
                  var fullTableName = string.IsNullOrEmpty(schema) ? $"[{tableName}]" : $"[{schema}].[{tableName}]";
 
                  bool isSqlServer = provider == AppConstants.DatabaseProviders.SqlServer;
-                 
+                 bool isPostgres = provider.Contains(AppConstants.DatabaseProviders.PostgreSql, StringComparison.OrdinalIgnoreCase);
+
                  // Robust identity check for SQL Server: if it's SQL Server and has an 'Id' property of type int/long
                  // we assume it might be an identity column if we are trying to seed it explicitly.
                  bool hasIdentity = isSqlServer && entityType.GetProperties().Any(p => 
                         (p.Name.Equals("Id", StringComparison.OrdinalIgnoreCase)) && 
+                        (p.ClrType == typeof(int) || p.ClrType == typeof(long)));
+                
+                 bool hasPostgresIdentity = isPostgres && entityType.GetProperties().Any(p =>
+                        (p.Name.Equals("Id", StringComparison.OrdinalIgnoreCase)) &&
                         (p.ClrType == typeof(int) || p.ClrType == typeof(long)));
 
                  Console.WriteLine($"Table: {tableName}, FullPath: {fullTableName}, HasIdentity: {hasIdentity}");
@@ -506,6 +511,19 @@ namespace POS.API.Helpers
                         if (hasIdentity)
                         {
                             await _context.Database.ExecuteSqlRawAsync($"SET IDENTITY_INSERT {fullTableName} OFF");
+                        }
+
+                    if (hasPostgresIdentity)
+                        {
+                            // Reset sequence for PostgreSQL to prevent PK violations on future inserts
+                            // This assumes standard naming convention for sequences: "TableName_Id_seq" or equivalent lookup
+                            // pg_get_serial_sequence handles quoted names correctly
+                             await _context.Database.ExecuteSqlRawAsync(@$"
+                                SELECT setval(
+                                    pg_get_serial_sequence('""{tableName}""', 'Id'), 
+                                    COALESCE((SELECT MAX(""Id"") + 1 FROM ""{tableName}""), 1), 
+                                    false
+                                );");
                         }
                         
                         await transaction.CommitAsync();

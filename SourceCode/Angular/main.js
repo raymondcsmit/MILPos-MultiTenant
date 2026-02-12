@@ -118,7 +118,7 @@ ipcMain.handle('clear-auth', async (event) => {
   }
 });
 
-const CLOUD_API_URL = 'http://localhost:5000'; // Fallback / Local testing
+const CLOUD_API_URL = 'http://62.171.140.251'; // Production Cloud API
 
 ipcMain.handle('cloud-login', async (event, { email, password }) => {
   try {

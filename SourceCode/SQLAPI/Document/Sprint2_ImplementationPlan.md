@@ -27,4 +27,19 @@ Enable secure database distribution to client machines by allowing users to down
 1. Ensure solution builds without errors.
 2. Verify JWT contains the `ApiKey` claim after login.
 3. Verify `/api/tenants/my-database` returns a ZIP file containing `pos.db` and `appsettings.json`.
+3. Verify `/api/tenants/my-database` returns a ZIP file containing `pos.db` and `appsettings.json`.
 4. Verify `appsettings.json` contains correct `CloudApiUrl` and `ApiKey`.
+
+## Bug Fix: Menu Duplication on Tenant Switch
+### Problem
+When an admin switches tenants, the menu items are duplicated.
+- **Cause**: `POSDbContext` allows both Tenant-Specific items AND Global items (`TenantId == null`) for `MenuItem`.
+- **Conflict**: `TenantRegistrationService` seeds a full copy of the menu for every new tenant. This results in the user seeing both the tenant-specific copy AND the global default items.
+
+### Proposed Solution
+- **Modify** `POSDbContext.cs`: Update the global query filter for `MenuItem` to STRICTLY filter by `CurrentTenantId`. Remove the `|| m.TenantId == null` clause.
+
+### Verification
+- **Login as Admin**.
+- **Switch Tenant**.
+- **Verify Menu**: Ensure no duplicate items appear.

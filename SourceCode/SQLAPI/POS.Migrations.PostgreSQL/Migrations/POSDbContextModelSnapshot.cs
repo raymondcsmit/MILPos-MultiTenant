@@ -126,6 +126,9 @@ namespace POS.Migrations.PostgreSQL.Migrations
 
                     b.HasIndex("CreatedBy");
 
+                    b.HasIndex("TenantId", "Name")
+                        .HasDatabaseName("IX_Brand_Tenant_Name");
+
                     b.ToTable("Brands");
                 });
 
@@ -253,6 +256,9 @@ namespace POS.Migrations.PostgreSQL.Migrations
 
                     b.HasIndex("CreatedBy");
 
+                    b.HasIndex("TenantId")
+                        .HasDatabaseName("IX_CompanyProfile_TenantId");
+
                     b.ToTable("CompanyProfiles");
                 });
 
@@ -313,6 +319,9 @@ namespace POS.Migrations.PostgreSQL.Migrations
                     b.HasKey("Id");
 
                     b.HasIndex("CreatedBy");
+
+                    b.HasIndex("TenantId")
+                        .HasDatabaseName("IX_ContactRequest_TenantId");
 
                     b.ToTable("ContactRequests");
                 });
@@ -504,6 +513,17 @@ namespace POS.Migrations.PostgreSQL.Migrations
 
                     b.HasIndex("ShippingAddressId");
 
+                    b.HasIndex("TenantId", "CustomerName")
+                        .HasDatabaseName("IX_Customer_Tenant_Name");
+
+                    b.HasIndex("TenantId", "Email")
+                        .IsUnique()
+                        .HasDatabaseName("IX_Customer_Tenant_Email");
+
+                    b.HasIndex("TenantId", "MobileNo")
+                        .IsUnique()
+                        .HasDatabaseName("IX_Customer_Tenant_Mobile");
+
                     b.ToTable("Customers");
                 });
 
@@ -561,6 +581,9 @@ namespace POS.Migrations.PostgreSQL.Migrations
                     b.HasKey("Id");
 
                     b.HasIndex("CreatedBy");
+
+                    b.HasIndex("TenantId")
+                        .HasDatabaseName("IX_DailyProductPrice_TenantId");
 
                     b.HasIndex("ProductId", "PriceDate", "TenantId")
                         .IsUnique()
@@ -716,6 +739,9 @@ namespace POS.Migrations.PostgreSQL.Migrations
 
                     b.HasIndex("CreatedBy");
 
+                    b.HasIndex("TenantId")
+                        .HasDatabaseName("IX_EmailSMTPSetting_TenantId");
+
                     b.ToTable("EmailSMTPSettings");
                 });
 
@@ -767,6 +793,9 @@ namespace POS.Migrations.PostgreSQL.Migrations
                     b.HasKey("Id");
 
                     b.HasIndex("CreatedBy");
+
+                    b.HasIndex("TenantId")
+                        .HasDatabaseName("IX_EmailTemplate_TenantId");
 
                     b.ToTable("EmailTemplates");
                 });
@@ -851,6 +880,9 @@ namespace POS.Migrations.PostgreSQL.Migrations
 
                     b.HasIndex("FinancialYearId");
 
+                    b.HasIndex("TenantId")
+                        .HasDatabaseName("IX_AccountingEntry_TenantId");
+
                     b.HasIndex("TransactionId");
 
                     b.ToTable("AccountingEntries");
@@ -910,6 +942,9 @@ namespace POS.Migrations.PostgreSQL.Migrations
                     b.HasKey("Id");
 
                     b.HasIndex("CreatedBy");
+
+                    b.HasIndex("TenantId")
+                        .HasDatabaseName("IX_FinancialYear_TenantId");
 
                     b.ToTable("FinancialYears");
                 });
@@ -989,6 +1024,9 @@ namespace POS.Migrations.PostgreSQL.Migrations
 
                     b.HasIndex("ParentAccountId");
 
+                    b.HasIndex("TenantId")
+                        .HasDatabaseName("IX_LedgerAccount_TenantId");
+
                     b.ToTable("LedgerAccounts");
                 });
 
@@ -1062,6 +1100,9 @@ namespace POS.Migrations.PostgreSQL.Migrations
 
                     b.HasIndex("LoanAccountInterestExpenseId");
 
+                    b.HasIndex("TenantId")
+                        .HasDatabaseName("IX_LoanDetail_TenantId");
+
                     b.ToTable("LoanDetails");
                 });
 
@@ -1121,6 +1162,9 @@ namespace POS.Migrations.PostgreSQL.Migrations
                     b.HasIndex("CreatedBy");
 
                     b.HasIndex("LoanDetailId");
+
+                    b.HasIndex("TenantId")
+                        .HasDatabaseName("IX_LoanRepayment_TenantId");
 
                     b.ToTable("LoanRepayments");
                 });
@@ -1192,6 +1236,9 @@ namespace POS.Migrations.PostgreSQL.Migrations
                     b.HasIndex("BranchId");
 
                     b.HasIndex("CreatedBy");
+
+                    b.HasIndex("TenantId")
+                        .HasDatabaseName("IX_PaymentEntry_TenantId");
 
                     b.HasIndex("TransactionId");
 
@@ -1271,6 +1318,9 @@ namespace POS.Migrations.PostgreSQL.Migrations
 
                     b.HasIndex("InventoryItemId");
 
+                    b.HasIndex("TenantId")
+                        .HasDatabaseName("IX_StockAdjustment_TenantId");
+
                     b.ToTable("StockAdjustments");
                 });
 
@@ -1337,6 +1387,9 @@ namespace POS.Migrations.PostgreSQL.Migrations
                     b.HasIndex("BranchId");
 
                     b.HasIndex("CreatedBy");
+
+                    b.HasIndex("TenantId")
+                        .HasDatabaseName("IX_TaxEntry_TenantId");
 
                     b.HasIndex("TransactionId");
 
@@ -1472,6 +1525,9 @@ namespace POS.Migrations.PostgreSQL.Migrations
 
                     b.HasIndex("CreatedBy");
 
+                    b.HasIndex("TenantId")
+                        .HasDatabaseName("IX_ContactAddress_TenantId");
+
                     b.ToTable("ContactAddresses");
                 });
 
@@ -1549,6 +1605,9 @@ namespace POS.Migrations.PostgreSQL.Migrations
 
                     b.HasIndex("LocationId");
 
+                    b.HasIndex("TenantId")
+                        .HasDatabaseName("IX_CustomerLedger_TenantId");
+
                     b.ToTable("CustomerLedgers");
                 });
 
@@ -1616,6 +1675,9 @@ namespace POS.Migrations.PostgreSQL.Migrations
 
                     b.HasIndex("ReportedId");
 
+                    b.HasIndex("TenantId")
+                        .HasDatabaseName("IX_DamagedStock_TenantId");
+
                     b.ToTable("DamagedStocks");
                 });
 
@@ -1671,6 +1733,9 @@ namespace POS.Migrations.PostgreSQL.Migrations
                     b.HasIndex("ExpenseId");
 
                     b.HasIndex("TaxId");
+
+                    b.HasIndex("TenantId")
+                        .HasDatabaseName("IX_ExpenseTax_TenantId");
 
                     b.ToTable("ExpenseTaxes");
                 });
@@ -1746,6 +1811,9 @@ namespace POS.Migrations.PostgreSQL.Migrations
 
                     b.HasIndex("SalesOrderId");
 
+                    b.HasIndex("TenantId")
+                        .HasDatabaseName("IX_FBRSubmissionLog_TenantId");
+
                     b.ToTable("FBRSubmissionLogs");
                 });
 
@@ -1814,6 +1882,9 @@ namespace POS.Migrations.PostgreSQL.Migrations
 
                     b.HasIndex("InquiryId");
 
+                    b.HasIndex("TenantId")
+                        .HasDatabaseName("IX_InquiryActivity_TenantId");
+
                     b.ToTable("InquiryActivities");
                 });
 
@@ -1868,6 +1939,9 @@ namespace POS.Migrations.PostgreSQL.Migrations
 
                     b.HasIndex("InquiryId");
 
+                    b.HasIndex("TenantId")
+                        .HasDatabaseName("IX_InquiryAttachment_TenantId");
+
                     b.ToTable("InquiryAttachments");
                 });
 
@@ -1919,6 +1993,9 @@ namespace POS.Migrations.PostgreSQL.Migrations
 
                     b.HasIndex("InquiryId");
 
+                    b.HasIndex("TenantId")
+                        .HasDatabaseName("IX_InquiryNote_TenantId");
+
                     b.ToTable("InquiryNotes");
                 });
 
@@ -1965,6 +2042,9 @@ namespace POS.Migrations.PostgreSQL.Migrations
                     b.HasKey("Id");
 
                     b.HasIndex("CreatedBy");
+
+                    b.HasIndex("TenantId")
+                        .HasDatabaseName("IX_InquiryStatus_TenantId");
 
                     b.ToTable("InquiryStatuses");
                 });
@@ -2039,6 +2119,9 @@ namespace POS.Migrations.PostgreSQL.Migrations
                     b.HasIndex("LocationId");
 
                     b.HasIndex("ProductId");
+
+                    b.HasIndex("TenantId")
+                        .HasDatabaseName("IX_InventoryBatch_TenantId");
 
                     b.ToTable("InventoryBatches");
                 });
@@ -2185,6 +2268,9 @@ namespace POS.Migrations.PostgreSQL.Migrations
                     b.HasKey("Id");
 
                     b.HasIndex("CreatedBy");
+
+                    b.HasIndex("TenantId")
+                        .HasDatabaseName("IX_Location_TenantId");
 
                     b.ToTable("Locations");
                 });
@@ -2341,6 +2427,9 @@ namespace POS.Migrations.PostgreSQL.Migrations
 
                     b.HasIndex("FinancialYearId");
 
+                    b.HasIndex("TenantId")
+                        .HasDatabaseName("IX_Payroll_TenantId");
+
                     b.ToTable("Payrolls");
                 });
 
@@ -2398,6 +2487,9 @@ namespace POS.Migrations.PostgreSQL.Migrations
                     b.HasIndex("CreatedBy");
 
                     b.HasIndex("ParentId");
+
+                    b.HasIndex("TenantId", "Name")
+                        .HasDatabaseName("IX_ProductCategory_Tenant_Name");
 
                     b.ToTable("ProductCategories");
                 });
@@ -2457,6 +2549,10 @@ namespace POS.Migrations.PostgreSQL.Migrations
                     b.HasIndex("LocationId");
 
                     b.HasIndex("ProductId");
+
+                    b.HasIndex("TenantId", "ProductId", "LocationId")
+                        .IsUnique()
+                        .HasDatabaseName("IX_ProductStock_Tenant_Product_Location");
 
                     b.ToTable("ProductStocks");
                 });
@@ -2531,6 +2627,9 @@ namespace POS.Migrations.PostgreSQL.Migrations
 
                     b.HasIndex("CreatedBy");
 
+                    b.HasIndex("TenantId")
+                        .HasDatabaseName("IX_ReminderScheduler_TenantId");
+
                     b.HasIndex("UserId");
 
                     b.ToTable("ReminderSchedulers");
@@ -2604,6 +2703,9 @@ namespace POS.Migrations.PostgreSQL.Migrations
 
                     b.HasIndex("FromLocationId");
 
+                    b.HasIndex("TenantId")
+                        .HasDatabaseName("IX_StockTransfer_TenantId");
+
                     b.HasIndex("ToLocationId");
 
                     b.ToTable("StockTransfers");
@@ -2673,6 +2775,9 @@ namespace POS.Migrations.PostgreSQL.Migrations
                     b.HasIndex("ProductId");
 
                     b.HasIndex("StockTransferId");
+
+                    b.HasIndex("TenantId")
+                        .HasDatabaseName("IX_StockTransferItem_TenantId");
 
                     b.HasIndex("UnitId");
 
@@ -2805,6 +2910,9 @@ namespace POS.Migrations.PostgreSQL.Migrations
                     b.HasKey("Id");
 
                     b.HasIndex("CreatedBy");
+
+                    b.HasIndex("TenantId")
+                        .HasDatabaseName("IX_TableSetting_TenantId");
 
                     b.ToTable("TableSettings");
                 });
@@ -3002,6 +3110,9 @@ namespace POS.Migrations.PostgreSQL.Migrations
 
                     b.HasIndex("FinancialYearId");
 
+                    b.HasIndex("TenantId", "TransactionDate")
+                        .HasDatabaseName("IX_Transaction_Tenant_Date");
+
                     b.ToTable("Transactions");
                 });
 
@@ -3064,6 +3175,9 @@ namespace POS.Migrations.PostgreSQL.Migrations
 
                     b.HasIndex("CreatedBy");
 
+                    b.HasIndex("TenantId")
+                        .HasDatabaseName("IX_Variant_TenantId");
+
                     b.ToTable("Variants");
                 });
 
@@ -3113,6 +3227,9 @@ namespace POS.Migrations.PostgreSQL.Migrations
                     b.HasKey("Id");
 
                     b.HasIndex("CreatedBy");
+
+                    b.HasIndex("TenantId")
+                        .HasDatabaseName("IX_VariantItem_TenantId");
 
                     b.HasIndex("VariantId");
 
@@ -3201,6 +3318,12 @@ namespace POS.Migrations.PostgreSQL.Migrations
 
                     b.HasIndex("LocationId");
 
+                    b.HasIndex("TenantId", "ExpenseCategoryId")
+                        .HasDatabaseName("IX_Expense_Tenant_Category");
+
+                    b.HasIndex("TenantId", "ExpenseDate")
+                        .HasDatabaseName("IX_Expense_Tenant_Date");
+
                     b.ToTable("Expenses");
                 });
 
@@ -3249,6 +3372,9 @@ namespace POS.Migrations.PostgreSQL.Migrations
                     b.HasKey("Id");
 
                     b.HasIndex("CreatedBy");
+
+                    b.HasIndex("TenantId")
+                        .HasDatabaseName("IX_ExpenseCategory_TenantId");
 
                     b.ToTable("ExpenseCategories");
                 });
@@ -3383,6 +3509,9 @@ namespace POS.Migrations.PostgreSQL.Migrations
 
                     b.HasIndex("InquiryStatusId");
 
+                    b.HasIndex("TenantId")
+                        .HasDatabaseName("IX_Inquiry_TenantId");
+
                     b.ToTable("Inquiries");
                 });
 
@@ -3444,6 +3573,9 @@ namespace POS.Migrations.PostgreSQL.Migrations
                     b.HasKey("Id");
 
                     b.HasIndex("CreatedBy");
+
+                    b.HasIndex("TenantId")
+                        .HasDatabaseName("IX_InquirySource_TenantId");
 
                     b.ToTable("InquirySources");
                 });
@@ -3785,6 +3917,19 @@ namespace POS.Migrations.PostgreSQL.Migrations
 
                     b.HasIndex("VariantItemId");
 
+                    b.HasIndex("TenantId", "Barcode")
+                        .HasDatabaseName("IX_Product_Tenant_Barcode");
+
+                    b.HasIndex("TenantId", "CategoryId")
+                        .HasDatabaseName("IX_Product_Tenant_Category");
+
+                    b.HasIndex("TenantId", "Code")
+                        .IsUnique()
+                        .HasDatabaseName("IX_Product_Tenant_Code");
+
+                    b.HasIndex("TenantId", "Name")
+                        .HasDatabaseName("IX_Product_Tenant_Name");
+
                     b.ToTable("Products");
                 });
 
@@ -3834,6 +3979,9 @@ namespace POS.Migrations.PostgreSQL.Migrations
                     b.HasIndex("CreatedBy");
 
                     b.HasIndex("TaxId");
+
+                    b.HasIndex("TenantId")
+                        .HasDatabaseName("IX_ProductTax_TenantId");
 
                     b.ToTable("ProductTaxes");
                 });
@@ -3940,6 +4088,16 @@ namespace POS.Migrations.PostgreSQL.Migrations
                     b.HasIndex("LocationId");
 
                     b.HasIndex("SupplierId");
+
+                    b.HasIndex("TenantId", "OrderNumber")
+                        .IsUnique()
+                        .HasDatabaseName("IX_PurchaseOrder_Tenant_Number");
+
+                    b.HasIndex("TenantId", "POCreatedDate")
+                        .HasDatabaseName("IX_PurchaseOrder_Tenant_Date");
+
+                    b.HasIndex("TenantId", "SupplierId")
+                        .HasDatabaseName("IX_PurchaseOrder_Tenant_Supplier");
 
                     b.ToTable("PurchaseOrders");
                 });
@@ -4094,6 +4252,9 @@ namespace POS.Migrations.PostgreSQL.Migrations
 
                     b.HasIndex("PurchaseOrderId");
 
+                    b.HasIndex("TenantId")
+                        .HasDatabaseName("IX_PurchaseOrderPayment_TenantId");
+
                     b.ToTable("PurchaseOrderPayments");
                 });
 
@@ -4186,6 +4347,9 @@ namespace POS.Migrations.PostgreSQL.Migrations
 
                     b.HasIndex("CreatedBy");
 
+                    b.HasIndex("TenantId")
+                        .HasDatabaseName("IX_Reminder_TenantId");
+
                     b.ToTable("Reminders");
                 });
 
@@ -4246,6 +4410,9 @@ namespace POS.Migrations.PostgreSQL.Migrations
 
                     b.HasIndex("ReminderId");
 
+                    b.HasIndex("TenantId")
+                        .HasDatabaseName("IX_ReminderNotification_TenantId");
+
                     b.ToTable("ReminderNotifications");
                 });
 
@@ -4292,7 +4459,7 @@ namespace POS.Migrations.PostgreSQL.Migrations
                     b.Property<bool>("IsSuperRole")
                         .HasColumnType("boolean");
 
-                    b.Property<Guid>("ModifiedBy")
+                    b.Property<Guid?>("ModifiedBy")
                         .HasColumnType("uuid");
 
                     b.Property<DateTime>("ModifiedDate")
@@ -4319,11 +4486,11 @@ namespace POS.Migrations.PostgreSQL.Migrations
 
                     b.HasIndex("ModifiedBy");
 
-                    b.HasIndex("NormalizedName")
+                    b.HasIndex("TenantId");
+
+                    b.HasIndex("NormalizedName", "TenantId")
                         .IsUnique()
                         .HasDatabaseName("RoleNameIndex");
-
-                    b.HasIndex("TenantId");
 
                     b.ToTable("Roles", (string)null);
                 });
@@ -4554,6 +4721,19 @@ namespace POS.Migrations.PostgreSQL.Migrations
 
                     b.HasIndex("LocationId");
 
+                    b.HasIndex("TenantId", "CustomerId")
+                        .HasDatabaseName("IX_SalesOrder_Tenant_Customer");
+
+                    b.HasIndex("TenantId", "OrderNumber")
+                        .IsUnique()
+                        .HasDatabaseName("IX_SalesOrder_Tenant_Number");
+
+                    b.HasIndex("TenantId", "SOCreatedDate")
+                        .HasDatabaseName("IX_SalesOrder_Tenant_Date");
+
+                    b.HasIndex("TenantId", "Status")
+                        .HasDatabaseName("IX_SalesOrder_Tenant_Status");
+
                     b.ToTable("SalesOrders");
                 });
 
@@ -4618,7 +4798,8 @@ namespace POS.Migrations.PostgreSQL.Migrations
 
                     b.HasIndex("ProductId");
 
-                    b.HasIndex("SalesOrderId");
+                    b.HasIndex("SalesOrderId")
+                        .HasDatabaseName("IX_SalesOrderItem_SalesOrder");
 
                     b.HasIndex("UnitId");
 
@@ -4717,6 +4898,9 @@ namespace POS.Migrations.PostgreSQL.Migrations
 
                     b.HasIndex("SalesOrderId");
 
+                    b.HasIndex("TenantId")
+                        .HasDatabaseName("IX_SalesOrderPayment_TenantId");
+
                     b.ToTable("SalesOrderPayments");
                 });
 
@@ -4778,6 +4962,9 @@ namespace POS.Migrations.PostgreSQL.Migrations
                     b.HasIndex("CustomerId");
 
                     b.HasIndex("SupplierId");
+
+                    b.HasIndex("TenantId")
+                        .HasDatabaseName("IX_SendEmail_TenantId");
 
                     b.ToTable("SendEmails");
                 });
@@ -4874,6 +5061,12 @@ namespace POS.Migrations.PostgreSQL.Migrations
 
                     b.HasIndex("ShippingAddressId");
 
+                    b.HasIndex("TenantId", "Email")
+                        .HasDatabaseName("IX_Supplier_Tenant_Email");
+
+                    b.HasIndex("TenantId", "MobileNo")
+                        .HasDatabaseName("IX_Supplier_Tenant_Mobile");
+
                     b.ToTable("Suppliers");
                 });
 
@@ -4966,6 +5159,9 @@ namespace POS.Migrations.PostgreSQL.Migrations
 
                     b.HasIndex("CreatedBy");
 
+                    b.HasIndex("TenantId")
+                        .HasDatabaseName("IX_Tax_TenantId");
+
                     b.ToTable("Taxes");
                 });
 
@@ -5027,6 +5223,9 @@ namespace POS.Migrations.PostgreSQL.Migrations
                     b.HasIndex("CreatedBy");
 
                     b.HasIndex("ParentId");
+
+                    b.HasIndex("TenantId", "Name")
+                        .HasDatabaseName("IX_Unit_Tenant_Name");
 
                     b.ToTable("UnitConversations");
                 });
@@ -5145,14 +5344,16 @@ namespace POS.Migrations.PostgreSQL.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("NormalizedEmail")
+                    b.HasIndex("NormalizedEmail", "TenantId")
+                        .IsUnique()
                         .HasDatabaseName("EmailIndex");
 
-                    b.HasIndex("NormalizedUserName")
+                    b.HasIndex("NormalizedUserName", "TenantId")
                         .IsUnique()
                         .HasDatabaseName("UserNameIndex");
 
-                    b.HasIndex("TenantId");
+                    b.HasIndex("TenantId", "PhoneNumber")
+                        .HasDatabaseName("IX_User_Tenant_Phone");
 
                     b.ToTable("Users", (string)null);
                 });
@@ -5181,7 +5382,8 @@ namespace POS.Migrations.PostgreSQL.Migrations
 
                     b.HasIndex("ActionId");
 
-                    b.HasIndex("UserId");
+                    b.HasIndex("UserId", "ClaimType")
+                        .HasDatabaseName("IX_UserClaim_User_Type");
 
                     b.ToTable("UserClaims", (string)null);
                 });
@@ -6600,8 +6802,7 @@ namespace POS.Migrations.PostgreSQL.Migrations
                     b.HasOne("POS.Data.User", "ModifiedByUser")
                         .WithMany()
                         .HasForeignKey("ModifiedBy")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
+                        .OnDelete(DeleteBehavior.Restrict);
 
                     b.HasOne("POS.Data.Entities.Tenant", "Tenant")
                         .WithMany()

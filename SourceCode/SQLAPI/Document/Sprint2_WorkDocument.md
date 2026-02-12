@@ -30,6 +30,15 @@ This document summarizes the changes implemented during Sprint 2 to support secu
 - **Code Audit**: Verified that `ApiKey` is only included if present and that the `appsettings.json` contains the correct `CloudApiUrl`.
 - **Security**: The download endpoint is protected by `[Authorize]` and strictly enforces tenant isolation by using the `TenantId` from the authenticated token.
 
+### 4. Bug Fix: Menu Duplication on Tenant Switch
+- **Issue**: Tenants were seeing duplicate menu items—one set from the default seed (Global) and one set specific to their Tenant.
+- **Root Cause**: `POSDbContext` allowed `MenuItem` queries to return items where `TenantId` was `NULL` (Global) OR matched the `CurrentTenantId`.
+- **Resolution**: Updated `POSDbContext.cs` to enforce **Strict Tenant Isolation**. Removed the `|| m.TenantId == null` clause from the `MenuItem` query filter.
+- **Verification**: Confirmed that when a SuperAdmin switches tenants:
+    - A new JWT is issued with the **Target Tenant ID**.
+    - The `POSDbContext` correctly filters for the target tenant's items only.
+    - The frontend displays the menu correctly (even without explicit role assignments in the target tenant) because it relies on the `IsVisible` property.
+
 ## Next Steps (Sprint 3)
 - Implementation of machine-specific encryption in the Electron app to protect the downloaded `ApiKey` and database.
 - Integration of the download flow into the Electron login experience.

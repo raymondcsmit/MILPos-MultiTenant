@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using POS.Common;
 using POS.Data;
 using POS.Data.Dto.Tenant;
 using POS.Data.Entities;
@@ -12,20 +13,20 @@ using System.Linq;
 using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
-using POS.Common;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace POS.Repository
 {
     public class TenantRegistrationService : ITenantRegistrationService
     {
         private readonly POSDbContext _context;
-        private readonly IPasswordHasher<User> _passwordHasher;
+        private readonly UserManager<User> _userManager;
         private readonly string _seedDataPath;
 
-        public TenantRegistrationService(POSDbContext context, IPasswordHasher<User> passwordHasher)
+        public TenantRegistrationService(POSDbContext context, UserManager<User> userManager)
         {
             _context = context;
-            _passwordHasher = passwordHasher;
+            _userManager = userManager;
             _seedDataPath = Path.Combine(AppContext.BaseDirectory, AppConstants.Seeding.SeedDataFolder);
             if (!Directory.Exists(_seedDataPath))
             {
@@ -73,17 +74,19 @@ namespace POS.Repository
             };
 
             _context.Tenants.Add(tenant);
-            await _context.SaveChangesAsync();
+            try
+            {
+                await _context.SaveChangesAsync();
+            }
+            catch (Exception ex)
+            { throw new Exception($"SeedRoles failed: {ex}"); }
 
             // 3. Create Admin User
             var adminUser = new User
             {
-                Id = Guid.NewGuid(),
                 TenantId = tenant.Id,
                 Email = dto.AdminEmail,
                 UserName = dto.AdminEmail,
-                NormalizedEmail = dto.AdminEmail.ToUpper(),
-                NormalizedUserName = dto.AdminEmail.ToUpper(),
                 FirstName = "Admin",
                 LastName = "User",
                 IsActive = true,
@@ -92,10 +95,14 @@ namespace POS.Repository
                 IsAllLocations = true
             };
 
-            adminUser.PasswordHash = _passwordHasher.HashPassword(adminUser, string.IsNullOrEmpty(dto.AdminPassword) ? AppConstants.Seeding.DefaultPassword : dto.AdminPassword);
-
-            _context.Users.Add(adminUser);
-            await _context.SaveChangesAsync();
+            var password = string.IsNullOrEmpty(dto.AdminPassword) ? AppConstants.Seeding.DefaultPassword : dto.AdminPassword;
+            var result = await _userManager.CreateAsync(adminUser, password);
+            
+            if (!result.Succeeded)
+            {
+                var errors = string.Join(", ", result.Errors.Select(e => e.Description));
+                throw new Exception($"Admin user creation failed: {errors}");
+            }
 
             // 4. Seed Data
             await SeedTenantDataAsync(tenant, adminUser);
@@ -141,6 +148,7 @@ namespace POS.Repository
             await SeedTenantTableAsync<EmailTemplate>("EmailTemplates.csv", tenant, adminUser, globalIdMap);
             await SeedTenantTableAsync<EmailSMTPSetting>("EmailSMTPSettings.csv", tenant, adminUser, globalIdMap);
             await SeedTenantTableAsync<Data.Action>("Actions.csv", tenant, adminUser, globalIdMap);
+            await SeedRoleClaimsAsync(roleMap, globalIdMap);
             await SeedTenantTableAsync<Page>("Pages.csv", tenant, adminUser, globalIdMap);
             await SeedTenantTableAsync<PageHelper>("Pagehelpers.csv", tenant, adminUser, globalIdMap);
             // Language is now Global (SharedBaseEntity) and seeded via SeedingService only.
@@ -373,7 +381,12 @@ namespace POS.Repository
             };
 
             _context.CompanyProfiles.Add(companyProfile);
-            await _context.SaveChangesAsync();
+            try
+            {
+                await _context.SaveChangesAsync();
+            }
+            catch (Exception ex)
+            { throw new Exception($"SeedRoles failed: {ex}"); }
         }
 
         private async Task<Dictionary<string, Guid>> SeedRolesAsync(Tenant tenant, User adminUser)
@@ -394,7 +407,9 @@ namespace POS.Repository
                     NormalizedName = oldRole.NormalizedName,
                     IsDeleted = false,
                     CreatedDate = DateTime.UtcNow,
-                    CreatedBy = adminUser.Id
+                    CreatedBy = adminUser.Id,
+                    ModifiedDate = DateTime.UtcNow,
+                    ModifiedBy = adminUser.Id
                 };
 
                 _context.Roles.Add(newRole);
@@ -412,22 +427,51 @@ namespace POS.Repository
 
             await _context.SaveChangesAsync();
 
+            return roleMap;
+        }
+
+        private async Task SeedRoleClaimsAsync(Dictionary<string, Guid> roleMap, Dictionary<string, Guid> globalIdMap)
+        {
             var claims = ReadCsv<RoleClaim>("RoleClaims.csv");
+            var newRoleIds = roleMap.Values.ToList();
+            var existingClaims = await _context.RoleClaims
+                .Where(rc => newRoleIds.Contains(rc.RoleId))
+                .ToListAsync();
+
             foreach (var claim in claims)
             {
                 if (roleMap.TryGetValue(claim.RoleId.ToString().ToUpper(), out var newRoleId))
                 {
-                    _context.RoleClaims.Add(new RoleClaim
+                    var oldActionId = claim.ActionId.ToString().ToUpper();
+                    if (globalIdMap.TryGetValue(oldActionId, out var newActionId))
                     {
-                        RoleId = newRoleId,
-                        ClaimType = claim.ClaimType,
-                        ClaimValue = claim.ClaimValue
-                    });
+                        var exists = existingClaims.Any(rc =>
+                            rc.RoleId == newRoleId &&
+                            rc.ClaimType == claim.ClaimType &&
+                            rc.ClaimValue == claim.ClaimValue &&
+                            rc.ActionId == newActionId);
+
+                        if (!exists)
+                        {
+                            var newClaim = new RoleClaim
+                            {
+                                RoleId = newRoleId,
+                                ClaimType = claim.ClaimType,
+                                ClaimValue = claim.ClaimValue,
+                                ActionId = newActionId
+                            };
+                            _context.RoleClaims.Add(newClaim);
+                            existingClaims.Add(newClaim);
+                        }
+                    }
                 }
             }
-            await _context.SaveChangesAsync();
-
-            return roleMap;
+            try
+            {
+                await _context.SaveChangesAsync();
+            }
+            catch (Exception ex)
+            { throw new Exception($"SeedRoleClaims failed: {ex}"); }
         }
 
         private async Task<Guid> EnsureMainLocationAsync(Tenant tenant, User adminUser)

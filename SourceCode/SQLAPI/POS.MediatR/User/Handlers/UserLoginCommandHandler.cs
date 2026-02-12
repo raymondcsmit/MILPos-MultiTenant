@@ -15,6 +15,7 @@ using POS.Common.Services;
 using System.IO;
 using AutoMapper;
 using System.Collections.Generic;
+using System;
 
 namespace POS.MediatR.Handlers
 {
@@ -117,8 +118,26 @@ namespace POS.MediatR.Handlers
                 var userRoles = await _userRoleRepository.FindBy(ur => ur.UserId == authUser.Id).ToListAsync();
                 var roleIds = userRoles.Select(ur => ur.RoleId).ToList();
 
-                var menuItems = await _menuItemRepository.AllIncluding(c => c.RoleMenuItems)
-                    .Where(c => c.IsActive)
+                var menuItemsQuery = _menuItemRepository.AllIncluding(c => c.RoleMenuItems)
+                    .Where(c => c.IsActive);
+
+                if (authUser.IsSuperAdmin)
+                {
+                    // For superadmin, filter by TargetTenantId if it exists to avoid duplicates
+                    // Or if menu items are tenant-specific, ensure we get the right ones
+                    // Assuming MenuItem has TenantId, we might want to filter by null (global) or specific tenant
+                    // Based on the user's issue, duplicates suggest we are getting both global and tenant specific or similar
+                    
+                    // If the User object has a TenantId, we should use it.
+                    // However, authUser is UserAuthDto, let's check the userInfo entity loaded earlier
+                    
+                    if (userInfo.TenantId != Guid.Empty)
+                    {
+                         menuItemsQuery = menuItemsQuery.Where(c => c.TenantId == userInfo.TenantId || c.TenantId == null);
+                    }
+                }
+
+                var menuItems = await menuItemsQuery
                     .OrderBy(c => c.Order)
                     .ToListAsync();
 

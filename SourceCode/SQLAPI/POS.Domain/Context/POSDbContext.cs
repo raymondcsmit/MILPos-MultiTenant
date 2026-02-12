@@ -148,6 +148,93 @@ namespace POS.Domain
                       .OnDelete(DeleteBehavior.Restrict);
             });
 
+            // Master Data Indexes
+            builder.Entity<Product>(b =>
+            {
+                b.HasIndex(p => new { p.TenantId, p.Name }).HasDatabaseName("IX_Product_Tenant_Name");
+                b.HasIndex(p => new { p.TenantId, p.Code }).IsUnique().HasDatabaseName("IX_Product_Tenant_Code");
+                b.HasIndex(p => new { p.TenantId, p.Barcode }).HasDatabaseName("IX_Product_Tenant_Barcode");
+                b.HasIndex(p => new { p.TenantId, p.CategoryId }).HasDatabaseName("IX_Product_Tenant_Category");
+            });
+
+            builder.Entity<ProductCategory>(b =>
+            {
+                b.HasIndex(c => new { c.TenantId, c.Name }).HasDatabaseName("IX_ProductCategory_Tenant_Name");
+            });
+
+            builder.Entity<Brand>(b =>
+            {
+                b.HasIndex(br => new { br.TenantId, br.Name }).HasDatabaseName("IX_Brand_Tenant_Name");
+            });
+
+            builder.Entity<UnitConversation>(b =>
+            {
+                b.HasIndex(u => new { u.TenantId, u.Name }).HasDatabaseName("IX_Unit_Tenant_Name");
+            });
+
+            builder.Entity<ProductStock>(b =>
+            {
+                b.HasIndex(ps => new { ps.TenantId, ps.ProductId, ps.LocationId }).IsUnique().HasDatabaseName("IX_ProductStock_Tenant_Product_Location");
+            });
+
+            // Sales & Purchase Indexes
+            builder.Entity<SalesOrder>(b =>
+            {
+                b.HasIndex(s => new { s.TenantId, s.OrderNumber }).IsUnique().HasDatabaseName("IX_SalesOrder_Tenant_Number");
+                b.HasIndex(s => new { s.TenantId, s.SOCreatedDate }).HasDatabaseName("IX_SalesOrder_Tenant_Date");
+                b.HasIndex(s => new { s.TenantId, s.CustomerId }).HasDatabaseName("IX_SalesOrder_Tenant_Customer");
+                b.HasIndex(s => new { s.TenantId, s.Status }).HasDatabaseName("IX_SalesOrder_Tenant_Status");
+            });
+
+            builder.Entity<PurchaseOrder>(b =>
+            {
+                b.HasIndex(p => new { p.TenantId, p.OrderNumber }).IsUnique().HasDatabaseName("IX_PurchaseOrder_Tenant_Number");
+                b.HasIndex(p => new { p.TenantId, p.POCreatedDate }).HasDatabaseName("IX_PurchaseOrder_Tenant_Date");
+                b.HasIndex(p => new { p.TenantId, p.SupplierId }).HasDatabaseName("IX_PurchaseOrder_Tenant_Supplier");
+            });
+
+            builder.Entity<SalesOrderItem>(b =>
+            {
+                b.HasIndex(si => si.SalesOrderId).HasDatabaseName("IX_SalesOrderItem_SalesOrder");
+            });
+
+            // CRM Indexes
+            builder.Entity<Customer>(b =>
+            {
+                b.HasIndex(c => new { c.TenantId, c.Email }).IsUnique().HasDatabaseName("IX_Customer_Tenant_Email");
+                b.HasIndex(c => new { c.TenantId, c.MobileNo }).IsUnique().HasDatabaseName("IX_Customer_Tenant_Mobile");
+                b.HasIndex(c => new { c.TenantId, c.CustomerName }).HasDatabaseName("IX_Customer_Tenant_Name");
+            });
+
+            builder.Entity<Supplier>(b =>
+            {
+                b.HasIndex(s => new { s.TenantId, s.Email }).HasDatabaseName("IX_Supplier_Tenant_Email");
+                b.HasIndex(s => new { s.TenantId, s.MobileNo }).HasDatabaseName("IX_Supplier_Tenant_Mobile");
+            });
+
+            // Financial Indexes
+            builder.Entity<Expense>(b =>
+            {
+                b.HasIndex(e => new { e.TenantId, e.ExpenseDate }).HasDatabaseName("IX_Expense_Tenant_Date");
+                b.HasIndex(e => new { e.TenantId, e.ExpenseCategoryId }).HasDatabaseName("IX_Expense_Tenant_Category");
+            });
+
+            builder.Entity<Transaction>(b =>
+            {
+                b.HasIndex(t => new { t.TenantId, t.TransactionDate }).HasDatabaseName("IX_Transaction_Tenant_Date");
+            });
+
+            // User Identity Indexes (Custom)
+            builder.Entity<UserClaim>(b =>
+            {
+                b.HasIndex(uc => new { uc.UserId, uc.ClaimType }).HasDatabaseName("IX_UserClaim_User_Type");
+            });
+            
+            builder.Entity<User>(b =>
+            {
+                b.HasIndex(u => new { u.TenantId, u.PhoneNumber }).HasDatabaseName("IX_User_Tenant_Phone");
+            });
+
             // Configure InventoryBatch to prevent cycles
             builder.Entity<InventoryBatch>(b =>
             {
@@ -199,6 +286,23 @@ namespace POS.Domain
 
             builder.Entity<User>(b =>
             {
+                // Remove default Identity indexes before adding tenant-aware ones
+                var userIndex = b.Metadata.GetIndexes().FirstOrDefault(i => i.Properties.Any(p => p.Name == "NormalizedUserName") && i.Properties.Count == 1);
+                if (userIndex != null) b.Metadata.RemoveIndex(userIndex);
+
+                var emailIndex = b.Metadata.GetIndexes().FirstOrDefault(i => i.Properties.Any(p => p.Name == "NormalizedEmail") && i.Properties.Count == 1);
+                if (emailIndex != null) b.Metadata.RemoveIndex(emailIndex);
+
+                // Redefine UserNameIndex to be tenant-aware
+                b.HasIndex(u => new { u.NormalizedUserName, u.TenantId })
+                    .IsUnique()
+                    .HasDatabaseName("UserNameIndex");
+
+                // Redefine EmailIndex to be tenant-aware
+                b.HasIndex(u => new { u.NormalizedEmail, u.TenantId })
+                    .IsUnique()
+                    .HasDatabaseName("EmailIndex");
+
                 // Configure User-Tenant relationship
                 b.HasOne(u => u.Tenant)
                     .WithMany()
@@ -251,6 +355,15 @@ namespace POS.Domain
 
             builder.Entity<Role>(b =>
             {
+                // Remove default Identity index before adding tenant-aware one
+                var roleIndex = b.Metadata.GetIndexes().FirstOrDefault(i => i.Properties.Any(p => p.Name == "NormalizedName") && i.Properties.Count == 1);
+                if (roleIndex != null) b.Metadata.RemoveIndex(roleIndex);
+
+                // Redefine RoleNameIndex to be tenant-aware
+                b.HasIndex(r => new { r.NormalizedName, r.TenantId })
+                    .IsUnique()
+                    .HasDatabaseName("RoleNameIndex");
+
                 // Configure Role-Tenant relationship
                 b.HasOne(r => r.Tenant)
                     .WithMany()
@@ -805,7 +918,7 @@ namespace POS.Domain
 
             // MenuItem Configuration for Hybrid Tenant/Global Filter
             builder.Entity<MenuItem>().HasQueryFilter(m =>
-                (m.TenantId == _tenantProvider.GetTenantId() || m.TenantId == null)
+                m.TenantId == _tenantProvider.GetTenantId()
                 && !m.IsDeleted);
 
 
@@ -1115,6 +1228,30 @@ namespace POS.Domain
             builder.Entity<UserToken>().ToTable("UserTokens");
             builder.DefalutMappingValue();
             builder.DefalutDeleteValueFilter();
+
+            // Automated Global Indexing for Multi-Tenancy
+            foreach (var entityType in builder.Model.GetEntityTypes())
+            {
+                // Check if entity inherits from BaseEntity (Tenant Data)
+                if (typeof(BaseEntity).IsAssignableFrom(entityType.ClrType))
+                {
+                    var tenantIdProperty = entityType.FindProperty("TenantId");
+                    if (tenantIdProperty != null)
+                    {
+                        // Add a non-unique index on TenantId if one doesn't exist starting with TenantId
+                        // We check existing indexes to avoid redundancy
+                        var existingIndex = entityType.GetIndexes()
+                            .Any(i => i.Properties.Count > 0 && i.Properties[0].Name == "TenantId");
+
+                        if (!existingIndex)
+                        {
+                            builder.Entity(entityType.ClrType)
+                                .HasIndex("TenantId")
+                                .HasDatabaseName($"IX_{entityType.ClrType.Name}_TenantId");
+                        }
+                    }
+                }
+            }
         }
 
         public Guid? CurrentTenantId => _tenantProvider?.GetTenantId();
