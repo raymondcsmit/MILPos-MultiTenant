@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using MediatR;
@@ -57,7 +57,6 @@ namespace POS.API.Controllers
         /// <returns></returns>
         [HttpGet]
         [Produces("application/json", "application/xml", Type = typeof(List<PageHelperDto>))]
-        [ClaimCheck("SETT_MANAGE_PAGE_HELPER")]
         public async Task<IActionResult> GetPageHelpers()
         {
             var getAllPageHelpers = new GetAllPageHelpersCommand();

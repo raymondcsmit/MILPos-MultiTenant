@@ -1,4 +1,4 @@
-﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore;
 using POS.Common.GenericRepository;
 using POS.Common.UnitOfWork;
 using POS.Data;
@@ -73,7 +73,7 @@ namespace POS.Repository
             if (!string.IsNullOrWhiteSpace(salesOrderResource.CustomerName))
             {
                 collectionBeforePaging = collectionBeforePaging
-                    .Where(a => a.Customer.CustomerName == salesOrderResource.CustomerName.GetUnescapestring());
+                    .Where(a => a.Customer.CustomerName.ToLower() == salesOrderResource.CustomerName.GetUnescapestring());
             }
 
             if (salesOrderResource.SOCreatedDate.HasValue)
@@ -85,9 +85,9 @@ namespace POS.Repository
 
             if (!string.IsNullOrWhiteSpace(salesOrderResource.OrderNumber))
             {
-                var orderNumber = salesOrderResource.OrderNumber.Trim();
+                var orderNumber = salesOrderResource.OrderNumber.Trim().ToLower();
                 collectionBeforePaging = collectionBeforePaging
-                    .Where(a => EF.Functions.Like(a.OrderNumber, $"%{orderNumber}%"));
+                    .Where(a => EF.Functions.Like(a.OrderNumber.ToLower(), $"%{orderNumber}%"));
             }
 
             if (salesOrderResource.PaymentStatus.HasValue)
@@ -131,9 +131,9 @@ namespace POS.Repository
 
             if (!string.IsNullOrWhiteSpace(salesOrderResource.OrderNumber))
             {
-                var orderNumber = salesOrderResource.OrderNumber.Trim();
+                var orderNumber = salesOrderResource.OrderNumber.Trim().ToLower();
                 collectionBeforePaging = collectionBeforePaging
-                    .Where(a => EF.Functions.Like(a.OrderNumber, $"%{orderNumber}%"));
+                    .Where(a => EF.Functions.Like(a.OrderNumber.ToLower(), $"%{orderNumber}%"));
             }
 
             if (salesOrderResource.CustomerId.HasValue)
@@ -163,7 +163,7 @@ namespace POS.Repository
             if (!string.IsNullOrWhiteSpace(salesOrderResource.CustomerName))
             {
                 collectionBeforePaging = collectionBeforePaging
-                    .Where(a => a.Customer.CustomerName == salesOrderResource.CustomerName.GetUnescapestring());
+                    .Where(a => a.Customer.CustomerName.ToLower() == salesOrderResource.CustomerName.GetUnescapestring());
             }
 
             if (salesOrderResource.SOCreatedDate.HasValue)
@@ -247,7 +247,7 @@ namespace POS.Repository
             if (!string.IsNullOrWhiteSpace(salesOrderResource.CustomerName))
             {
                 collectionBeforePaging = collectionBeforePaging
-                    .Where(a => a.Customer.CustomerName == salesOrderResource.CustomerName.GetUnescapestring());
+                    .Where(a => a.Customer.CustomerName.ToLower() == salesOrderResource.CustomerName.GetUnescapestring());
             }
 
             if (salesOrderResource.SOCreatedDate.HasValue)
@@ -259,9 +259,9 @@ namespace POS.Repository
 
             if (!string.IsNullOrWhiteSpace(salesOrderResource.OrderNumber))
             {
-                var orderNumber = salesOrderResource.OrderNumber.Trim();
+                var orderNumber = salesOrderResource.OrderNumber.Trim().ToLower();
                 collectionBeforePaging = collectionBeforePaging
-                    .Where(a => EF.Functions.Like(a.OrderNumber, $"%{orderNumber}%"));
+                    .Where(a => EF.Functions.Like(a.OrderNumber.ToLower(), $"%{orderNumber}%"));
             }
 
             if (salesOrderResource.PaymentStatus.HasValue)
@@ -339,7 +339,7 @@ namespace POS.Repository
             if (!string.IsNullOrWhiteSpace(salesOrderResource.CustomerName))
             {
                 collectionBeforePaging = collectionBeforePaging
-                    .Where(a => a.SalesOrderItem.SalesOrder.Customer.CustomerName == salesOrderResource.CustomerName.GetUnescapestring());
+                    .Where(a => a.SalesOrderItem.SalesOrder.Customer.CustomerName.ToLower() == salesOrderResource.CustomerName.GetUnescapestring());
             }
 
             if (salesOrderResource.SOCreatedDate.HasValue)
@@ -352,9 +352,9 @@ namespace POS.Repository
 
             if (!string.IsNullOrWhiteSpace(salesOrderResource.OrderNumber))
             {
-                var orderNumber = salesOrderResource.OrderNumber.Trim();
+                var orderNumber = salesOrderResource.OrderNumber.Trim().ToLower();
                 collectionBeforePaging = collectionBeforePaging
-                    .Where(a => EF.Functions.Like(a.SalesOrderItem.SalesOrder.OrderNumber, $"%{orderNumber}%"));
+                    .Where(a => EF.Functions.Like(a.SalesOrderItem.SalesOrder.OrderNumber.ToLower(), $"%{orderNumber}%"));
             }
 
             var result = await collectionBeforePaging
@@ -384,15 +384,15 @@ namespace POS.Repository
 
             if (!string.IsNullOrWhiteSpace(pendingSalesOrderResource.OrderNumber))
             {
-                var orderNumber = pendingSalesOrderResource.OrderNumber.Trim();
+                var orderNumber = pendingSalesOrderResource.OrderNumber.Trim().ToLower();
                 collectionBeforePaging = collectionBeforePaging
-                     .Where(a => a.OrderNumber.Contains(orderNumber));
+                     .Where(a => EF.Functions.Like(a.OrderNumber.ToLower(), $"%{orderNumber}%"));
             }
             if (!string.IsNullOrWhiteSpace(pendingSalesOrderResource.CustomerName))
             {
-                var orderNumber = pendingSalesOrderResource.CustomerName.Trim();
+                var customerName = pendingSalesOrderResource.CustomerName.Trim().ToLower();
                 collectionBeforePaging = collectionBeforePaging
-                    .Where(a => a.Customer.CustomerName.Contains(pendingSalesOrderResource.CustomerName));
+                    .Where(a => EF.Functions.Like(a.Customer.CustomerName.ToLower(), $"%{customerName}%"));
             }
 
             if (pendingSalesOrderResource.PaymentStatus.HasValue)

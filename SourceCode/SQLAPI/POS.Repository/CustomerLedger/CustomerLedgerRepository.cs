@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Linq;
 using System.Net;
 using System.Text.RegularExpressions;
@@ -47,7 +47,7 @@ namespace POS.Repository
                 var ecapestring = Regex.Unescape(encodingName);
                 encodingName = encodingName.Replace(@"\", @"\\").Replace("%", @"\%").Replace("_", @"\_").Replace("[", @"\[").Replace(" ", "%");
                 collectionBeforePaging = collectionBeforePaging
-                    .Where(a => EF.Functions.Like(a.Reference, $"{encodingName}%"));
+                    .Where(a => EF.Functions.Like(a.Reference.ToLower(), $"{encodingName}%"));
             }
             var customerLedgerList = new CustomerLedgerList();
             return await customerLedgerList

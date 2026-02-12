@@ -1,4 +1,4 @@
-﻿using AutoMapper;
+using AutoMapper;
 using POS.Data.Dto;
 using POS.MediatR.CommandAndQuery;
 using POS.Repository;
@@ -28,8 +28,9 @@ namespace POS.MediatR.Handlers
 
         public async Task<List<CityDto>> Handle(GetCitiesByContryIdQuery request, CancellationToken cancellationToken)
         {
+            var cityName = request.CityName?.Trim().ToLower() ?? "";
             return await _cityRepository.All
-                .Where(c => c.CountryId == request.CountryId || EF.Functions.Like(c.CityName, $"{request.CityName}%"))
+                .Where(c => c.CountryId == request.CountryId && EF.Functions.Like(c.CityName.ToLower(), $"{cityName}%"))
                 .Take(10)
                 .ProjectTo<CityDto>(_mapper.ConfigurationProvider)
                 .ToListAsync();

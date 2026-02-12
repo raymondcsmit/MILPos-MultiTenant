@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 using POS.Common.GenericRepository;
 using POS.Common.UnitOfWork;
@@ -23,18 +23,16 @@ public class PayrollRepository(IUnitOfWork<POSDbContext> uow,
         _propertyMappingService.GetPropertyMapping<PayrollDto, Payroll>());
 
         if (!string.IsNullOrWhiteSpace(payrollResource.BranchName))
-
-
         {
-            var branchName = payrollResource.BranchName.Trim();
+            var branchName = payrollResource.BranchName.Trim().ToLower();
             collectionBeforePaging = collectionBeforePaging
-                .Where(a => EF.Functions.Like(a.Location.Name, $"%{branchName}%"));
+                .Where(a => EF.Functions.Like(a.Location.Name.ToLower(), $"%{branchName}%"));
         }
         if (!string.IsNullOrWhiteSpace(payrollResource.EmployeeName))
         {
-            var employeeName = payrollResource.EmployeeName.Trim();
+            var employeeName = payrollResource.EmployeeName.Trim().ToLower();
             collectionBeforePaging = collectionBeforePaging
-                .Where(a => EF.Functions.Like(a.Employee.FirstName, $"%{employeeName}%"));
+                .Where(a => EF.Functions.Like(a.Employee.FirstName.ToLower(), $"%{employeeName}%"));
         }
         if (payrollResource.EmployeeId.HasValue)
         {

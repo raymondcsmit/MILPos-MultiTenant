@@ -1,4 +1,4 @@
-﻿using AutoMapper;
+using AutoMapper;
 using Microsoft.EntityFrameworkCore;
 using POS.Common.GenericRepository;
 using POS.Common.UnitOfWork;
@@ -43,7 +43,7 @@ namespace POS.Repository
                 var ecapestring = Regex.Unescape(encodingName);
                 encodingName = encodingName.Replace(@"\", @"\\").Replace("%", @"\%").Replace("_", @"\_").Replace("[", @"\[").Replace(" ", "%");
                 collectionBeforePaging = collectionBeforePaging
-                    .Where(a => EF.Functions.Like(a.CityName, $"{encodingName}%"));
+                    .Where(a => EF.Functions.Like(a.CityName.ToLower(), $"{encodingName}%"));
             }
 
             if (!string.IsNullOrWhiteSpace(cityResource.CountryName))

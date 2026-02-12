@@ -1,4 +1,4 @@
-﻿using AutoMapper;
+using AutoMapper;
 using Microsoft.EntityFrameworkCore;
 using POS.Common.GenericRepository;
 using POS.Common.UnitOfWork;
@@ -53,14 +53,15 @@ namespace POS.Repository
                 var ecapestring = Regex.Unescape(encodingName);
                 encodingName = encodingName.Replace(@"\", @"\\").Replace("%", @"\%").Replace("_", @"\_").Replace("[", @"\[").Replace(" ", "%");
                 collectionBeforePaging = collectionBeforePaging
-                    .Where(a => EF.Functions.Like(a.Name, $"{encodingName}%") || EF.Functions.Like(a.Barcode, $"{encodingName}%"));
+                    .Where(a => EF.Functions.Like(a.Name.ToLower(), $"{encodingName}%") || EF.Functions.Like(a.Barcode.ToLower(), $"{encodingName}%"));
             }
 
             if (!string.IsNullOrWhiteSpace(productResource.Barcode))
             {
                 // trim & ignore casing
+                var barcode = productResource.Barcode.Trim().ToLowerInvariant();
                 collectionBeforePaging = collectionBeforePaging
-                   .Where(a => a.Barcode == productResource.Barcode);
+                   .Where(a => a.Barcode.ToLower() == barcode);
             }
 
             if (productResource.UnitId.HasValue)

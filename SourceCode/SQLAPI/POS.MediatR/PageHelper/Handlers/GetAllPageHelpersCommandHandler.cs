@@ -1,4 +1,4 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -24,8 +24,9 @@ namespace POS.MediatR.PageHelper.Handlers
             {
                 Id = c.Id,
                 Code = c.Code,
-                Name = c.Name
-            }).ToListAsync();
+                Name = c.Name,
+                Description = c.Description
+            }).ToListAsync(cancellationToken);
 
             return entities;
         }

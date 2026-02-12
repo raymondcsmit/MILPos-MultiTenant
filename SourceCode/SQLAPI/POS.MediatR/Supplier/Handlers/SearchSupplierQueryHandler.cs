@@ -1,4 +1,4 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -21,7 +21,8 @@ namespace POS.MediatR.Handlers
         }
         public async Task<List<SupplierDto>> Handle(SearchSupplierQuery request, CancellationToken cancellationToken)
         {
-            var suppliers = await _supplierRepository.All.Where(a => EF.Functions.Like(a.SupplierName, $"{request.SearchQuery}%"))
+            var searchQuery = request.SearchQuery.Trim().ToLower();
+            var suppliers = await _supplierRepository.All.Where(a => EF.Functions.Like(a.SupplierName.ToLower(), $"{searchQuery}%"))
                 .Take(request.PageSize)
                 .Select(c => new SupplierDto
                 {

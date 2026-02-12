@@ -1,4 +1,4 @@
-﻿using Amazon.Runtime.Internal.Util;
+using Amazon.Runtime.Internal.Util;
 using AutoMapper;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
@@ -68,7 +68,7 @@ namespace POS.Repository
                 var referenceWhereClause = expenseResource.Reference
                     .Trim().ToLowerInvariant();
                 collectionBeforePaging = collectionBeforePaging
-                    .Where(a => EF.Functions.Like(a.Reference, $"{referenceWhereClause}%"));
+                    .Where(a => EF.Functions.Like(a.Reference.ToLower(), $"{referenceWhereClause}%"));
             }
 
             if (expenseResource.FromDate.HasValue)
@@ -88,7 +88,7 @@ namespace POS.Repository
                 var descriptionWhereClause = expenseResource.Description
                     .Trim().ToLowerInvariant();
                 collectionBeforePaging = collectionBeforePaging
-                    .Where(a => EF.Functions.Like(a.Description, $"{descriptionWhereClause}%"));
+                    .Where(a => EF.Functions.Like(a.Description.ToLower(), $"{descriptionWhereClause}%"));
             }
 
             if (expenseResource.ExpenseCategoryId.HasValue)
@@ -120,7 +120,7 @@ namespace POS.Repository
                 var referenceWhereClause = expenseResource.Reference
                     .Trim().ToLowerInvariant();
                 collectionBeforePaging = collectionBeforePaging
-                    .Where(a => EF.Functions.Like(a.Reference, $"{referenceWhereClause}%"));
+                    .Where(a => EF.Functions.Like(a.Reference.ToLower(), $"{referenceWhereClause}%"));
             }
 
             if (expenseResource.FromDate.HasValue)
@@ -140,7 +140,7 @@ namespace POS.Repository
                 var descriptionWhereClause = expenseResource.Description
                     .Trim().ToLowerInvariant();
                 collectionBeforePaging = collectionBeforePaging
-                    .Where(a => EF.Functions.Like(a.Description, $"{descriptionWhereClause}%"));
+                    .Where(a => EF.Functions.Like(a.Description.ToLower(), $"{descriptionWhereClause}%"));
             }
 
             if (expenseResource.ExpenseCategoryId.HasValue)

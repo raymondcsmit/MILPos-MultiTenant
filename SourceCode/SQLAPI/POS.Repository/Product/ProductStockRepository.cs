@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Linq;
 using System.Net;
 using System.Text.RegularExpressions;
@@ -103,7 +103,7 @@ namespace POS.Repository
                 var ecapestring = Regex.Unescape(encodingName);
                 encodingName = encodingName.Replace(@"\", @"\\").Replace("%", @"\%").Replace("_", @"\_").Replace("[", @"\[").Replace(" ", "%");
                 collectionBeforePaging = collectionBeforePaging
-                    .Where(a => EF.Functions.Like(a.Product.Name, $"{encodingName}%"));
+                    .Where(a => EF.Functions.Like(a.Product.Name.ToLower(), $"{encodingName}%"));
             }
 
             var stockAlerts = new ProductStockAlertList();
@@ -158,7 +158,7 @@ namespace POS.Repository
                 var ecapestring = Regex.Unescape(encodingName);
                 encodingName = encodingName.Replace(@"\", @"\\").Replace("%", @"\%").Replace("_", @"\_").Replace("[", @"\[").Replace(" ", "%");
                 collectionBeforePaging = collectionBeforePaging
-                    .Where(a => EF.Functions.Like(a.Product.Name, $"{encodingName}%"));
+                    .Where(a => EF.Functions.Like(a.Product.Name.ToLower(), $"{encodingName}%"));
             }
 
             var productStockList = new ProductStockList();

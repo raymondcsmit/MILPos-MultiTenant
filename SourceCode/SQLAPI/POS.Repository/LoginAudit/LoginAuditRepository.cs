@@ -1,4 +1,4 @@
-﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using System;
 using System.Linq;
@@ -36,8 +36,9 @@ namespace POS.Repository
 
             if (!string.IsNullOrWhiteSpace(loginAuditResrouce.UserName))
             {
+                var userName = loginAuditResrouce.UserName.Trim().ToLower();
                 collectionBeforePaging = collectionBeforePaging
-                    .Where(c => EF.Functions.Like(c.UserName, $"%{loginAuditResrouce.UserName}%"));
+                    .Where(c => EF.Functions.Like(c.UserName.ToLower(), $"%{userName}%"));
             }
 
             var loginAudits = new LoginAuditList();

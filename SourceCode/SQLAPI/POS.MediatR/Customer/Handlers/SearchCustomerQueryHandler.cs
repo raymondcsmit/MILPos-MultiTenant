@@ -1,4 +1,4 @@
-﻿using POS.Data.Dto;
+using POS.Data.Dto;
 using POS.MediatR.CommandAndQuery;
 using POS.Repository;
 using MediatR;
@@ -22,7 +22,8 @@ namespace POS.MediatR.Handlers
             var customers = _customerRepository.All;
             if (!string.IsNullOrWhiteSpace(request.SearchQuery))
             {
-                customers = customers.Where(c => EF.Functions.Like(c.CustomerName, $"{request.SearchQuery}%"));
+                var searchQuery = request.SearchQuery.Trim().ToLower();
+                customers = customers.Where(c => EF.Functions.Like(c.CustomerName.ToLower(), $"{searchQuery}%"));
             }
 
             if (request.IsPOS)

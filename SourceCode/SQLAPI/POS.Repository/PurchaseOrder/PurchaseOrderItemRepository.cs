@@ -1,4 +1,4 @@
-﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore;
 using POS.Common.GenericRepository;
 using POS.Common.UnitOfWork;
 using POS.Data;
@@ -66,9 +66,9 @@ namespace POS.Repository
 
             if (!string.IsNullOrWhiteSpace(purchaseOrderResource.OrderNumber))
             {
-                var orderNumber = purchaseOrderResource.OrderNumber.Trim();
+                var orderNumber = purchaseOrderResource.OrderNumber.Trim().ToLower();
                 collectionBeforePaging = collectionBeforePaging
-                    .Where(a => EF.Functions.Like(a.PurchaseOrder.OrderNumber, $"%{orderNumber}%"));
+                    .Where(a => EF.Functions.Like(a.PurchaseOrder.OrderNumber.ToLower(), $"%{orderNumber}%"));
             }
 
             if (purchaseOrderResource.LocationId.HasValue)

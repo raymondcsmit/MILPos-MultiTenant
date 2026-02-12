@@ -1,4 +1,4 @@
-﻿using MediatR;
+using MediatR;
 using Microsoft.EntityFrameworkCore;
 using POS.Data.Dto;
 using POS.Data.Dto.Acconting;
@@ -25,8 +25,8 @@ namespace POS.MediatR.Accouting
             var employees = _userRepository.All;
             if (!string.IsNullOrWhiteSpace(request.SearchQuery))
             {
-                request.SearchQuery = request.SearchQuery.Trim();
-                employees = employees.Where(c => EF.Functions.Like(c.FirstName, $"{request.SearchQuery}%"));
+                request.SearchQuery = request.SearchQuery.Trim().ToLower();
+                employees = employees.Where(c => EF.Functions.Like(c.FirstName.ToLower(), $"{request.SearchQuery}%"));
             }
              var emp= await employees
                 .OrderBy(c => c.FirstName)

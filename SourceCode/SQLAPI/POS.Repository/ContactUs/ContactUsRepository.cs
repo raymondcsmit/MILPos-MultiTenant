@@ -1,4 +1,4 @@
-﻿using AutoMapper;
+using AutoMapper;
 using POS.Common.GenericRepository;
 using POS.Common.UnitOfWork;
 using POS.Data;
@@ -37,7 +37,7 @@ namespace POS.Repository
                 var genreForWhereClause = contactUsResource.Name
                     .Trim().ToLowerInvariant();
                 collectionBeforePaging = collectionBeforePaging
-                    .Where(a => EF.Functions.Like(a.Name, $"{genreForWhereClause}%"));
+                    .Where(a => EF.Functions.Like(a.Name.ToLower(), $"{genreForWhereClause}%"));
             }
             if (!string.IsNullOrEmpty(contactUsResource.Email))
             {
@@ -45,7 +45,7 @@ namespace POS.Repository
                 var genreForWhereClause = contactUsResource.Email
                     .Trim().ToLowerInvariant();
                 collectionBeforePaging = collectionBeforePaging
-                    .Where(a => EF.Functions.Like(a.Email, $"{genreForWhereClause}%"));
+                    .Where(a => EF.Functions.Like(a.Email.ToLower(), $"{genreForWhereClause}%"));
             }
             if (!string.IsNullOrEmpty(contactUsResource.Phone))
             {
@@ -53,7 +53,7 @@ namespace POS.Repository
                 var searchQueryForWhereClause = contactUsResource.Phone
                     .Trim().ToLowerInvariant();
                 collectionBeforePaging = collectionBeforePaging
-                    .Where(a => a.Phone != null && EF.Functions.Like(a.Phone, $"{searchQueryForWhereClause}%"));
+                    .Where(a => a.Phone != null && EF.Functions.Like(a.Phone.ToLower(), $"{searchQueryForWhereClause}%"));
             }
         
 

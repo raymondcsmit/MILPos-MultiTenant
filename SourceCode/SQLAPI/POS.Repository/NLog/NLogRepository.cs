@@ -1,4 +1,4 @@
-﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore;
 using System.Linq;
 using System.Threading.Tasks;
 using POS.Common.GenericRepository;
@@ -29,8 +29,9 @@ namespace POS.Repository
 
             if (!string.IsNullOrWhiteSpace(nLogResource.Message))
             {
+                var message = nLogResource.Message.Trim().ToLower();
                 collectionBeforePaging = collectionBeforePaging
-                    .Where(c => EF.Functions.Like(c.Message, $"%{nLogResource.Message.Trim()}%"));
+                    .Where(c => EF.Functions.Like(c.Message.ToLower(), $"%{message}%"));
             }
 
             if (!string.IsNullOrWhiteSpace(nLogResource.Level))

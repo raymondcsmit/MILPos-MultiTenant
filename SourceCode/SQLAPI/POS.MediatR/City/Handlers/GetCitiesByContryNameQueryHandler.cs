@@ -1,4 +1,4 @@
-﻿using AutoMapper;
+using AutoMapper;
 using POS.Data.Dto;
 using POS.Helper;
 using POS.MediatR.CommandAndQuery;
@@ -53,9 +53,10 @@ namespace POS.MediatR.Handlers
             }
             else
             {
+                var cityName = request.CityName.Trim().ToLower();
                 cities = await _cityRepository.All
                         .OrderBy(c => c.CityName)
-                        .Where(c => c.CountryId == countryId && EF.Functions.Like(c.CityName, $"{request.CityName}%"))
+                        .Where(c => c.CountryId == countryId && EF.Functions.Like(c.CityName.ToLower(), $"{cityName}%"))
                         .Take(100)
                         .ProjectTo<CityDto>(_mapper.ConfigurationProvider)
                         .ToListAsync();

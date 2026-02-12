@@ -1,4 +1,4 @@
-﻿using AutoMapper;
+using AutoMapper;
 using POS.Common.GenericRepository;
 using POS.Common.UnitOfWork;
 using POS.Data;
@@ -59,7 +59,7 @@ namespace POS.Repository
                 var ecapestring = Regex.Unescape(encodingName);
                 encodingName = encodingName.Replace(@"\", @"\\").Replace("%", @"\%").Replace("_", @"\_").Replace("[", @"\[").Replace(" ", "%");
                 collectionBeforePaging = collectionBeforePaging
-                    .Where(a => EF.Functions.Like(a.SupplierName, $"{encodingName}%"));
+                    .Where(a => EF.Functions.Like(a.SupplierName.ToLower(), $"{encodingName}%"));
             }
 
             if (!string.IsNullOrEmpty(supplierResource.MobileNo))
@@ -68,8 +68,8 @@ namespace POS.Repository
                 var searchQueryForWhereClause = supplierResource.MobileNo
                     .Trim().ToLowerInvariant();
                 collectionBeforePaging = collectionBeforePaging
-                    .Where(a => (a.MobileNo != null && EF.Functions.Like(a.MobileNo, $"%{searchQueryForWhereClause}%")) ||
-                    (a.PhoneNo != null && EF.Functions.Like(a.PhoneNo, $"%{searchQueryForWhereClause}%")));
+                    .Where(a => (a.MobileNo != null && EF.Functions.Like(a.MobileNo.ToLower(), $"%{searchQueryForWhereClause}%")) ||
+                    (a.PhoneNo != null && EF.Functions.Like(a.PhoneNo.ToLower(), $"%{searchQueryForWhereClause}%")));
             }
             if (!string.IsNullOrEmpty(supplierResource.Email))
             {
@@ -77,7 +77,7 @@ namespace POS.Repository
                 var searchQueryForWhereClause = supplierResource.Email
                     .Trim().ToLowerInvariant();
                 collectionBeforePaging = collectionBeforePaging
-                    .Where(a => EF.Functions.Like(a.Email, $"{searchQueryForWhereClause}%"));
+                    .Where(a => EF.Functions.Like(a.Email.ToLower(), $"{searchQueryForWhereClause}%"));
             }
             if (!string.IsNullOrEmpty(supplierResource.Website))
             {
@@ -90,7 +90,7 @@ namespace POS.Repository
                 var ecapestring = Regex.Unescape(encodingName);
                 encodingName = encodingName.Replace(@"\", @"\\").Replace("%", @"\%").Replace("_", @"\_").Replace("[", @"\[").Replace(" ", "%");
                 collectionBeforePaging = collectionBeforePaging
-                    .Where(a => EF.Functions.Like(a.Website, $"%{encodingName}%"));
+                    .Where(a => EF.Functions.Like(a.Website.ToLower(), $"%{encodingName}%"));
             }
             if (!string.IsNullOrEmpty(supplierResource.SearchQuery))
             {
@@ -98,11 +98,9 @@ namespace POS.Repository
               .Trim().ToLowerInvariant();
                 collectionBeforePaging = collectionBeforePaging
                     .Where(a =>
-                    EF.Functions.Like(a.SupplierName, $"%{searchQueryForWhereClause}%")
-                    || EF.Functions.Like(a.MobileNo, $"{searchQueryForWhereClause}%")
-                    || (a.PhoneNo != null && EF.Functions.Like(a.PhoneNo, $"{searchQueryForWhereClause}%"))
-                    || EF.Functions.Like(a.PhoneNo, $"{searchQueryForWhereClause}%"
-                    )
+                    EF.Functions.Like(a.SupplierName.ToLower(), $"%{searchQueryForWhereClause}%")
+                    || (a.MobileNo != null && EF.Functions.Like(a.MobileNo.ToLower(), $"%{searchQueryForWhereClause}%"))
+                    || (a.PhoneNo != null && EF.Functions.Like(a.PhoneNo.ToLower(), $"%{searchQueryForWhereClause}%"))
                     );
             }
 
@@ -140,7 +138,7 @@ namespace POS.Repository
                 var ecapestring = Regex.Unescape(encodingName);
                 encodingName = encodingName.Replace(@"\", @"\\").Replace("%", @"\%").Replace("_", @"\_").Replace("[", @"\[").Replace(" ", "%");
                 collectionBeforePaging = collectionBeforePaging
-                    .Where(a => EF.Functions.Like(a.Supplier.SupplierName, $"{encodingName}%"));
+                    .Where(a => EF.Functions.Like(a.Supplier.SupplierName.ToLower(), $"{encodingName}%"));
             }
 
             var groupedCollection = collectionBeforePaging.GroupBy(c => c.SupplierId);

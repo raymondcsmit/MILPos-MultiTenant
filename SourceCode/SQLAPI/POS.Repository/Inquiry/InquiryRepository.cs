@@ -1,4 +1,4 @@
-﻿using AutoMapper;
+using AutoMapper;
 using POS.Common.GenericRepository;
 using POS.Common.UnitOfWork;
 using POS.Data;
@@ -44,7 +44,7 @@ namespace POS.Repository
                 var ecapestring = Regex.Unescape(encodingName);
                 encodingName = encodingName.Replace(@"\", @"\\").Replace("%", @"\%").Replace("_", @"\_").Replace("[", @"\[").Replace(" ", "%");
                 collectionBeforePaging = collectionBeforePaging
-                    .Where(a => EF.Functions.Like(a.CompanyName, $"{encodingName}%"));
+                    .Where(a => EF.Functions.Like(a.CompanyName.ToLower(), $"{encodingName}%"));
             }
             if (!string.IsNullOrEmpty(inquiryResource.ContactPerson))
             {
@@ -52,7 +52,7 @@ namespace POS.Repository
                 var genreForWhereClause = inquiryResource.ContactPerson
                     .Trim().ToLowerInvariant();
                 collectionBeforePaging = collectionBeforePaging
-                    .Where(a => EF.Functions.Like(a.ContactPerson, $"{genreForWhereClause}%"));
+                    .Where(a => EF.Functions.Like(a.ContactPerson.ToLower(), $"{genreForWhereClause}%"));
             }
             if (!string.IsNullOrEmpty(inquiryResource.PhoneNo))
             {
@@ -60,7 +60,7 @@ namespace POS.Repository
                 var searchQueryForWhereClause = inquiryResource.PhoneNo
                     .Trim().ToLowerInvariant();
                 collectionBeforePaging = collectionBeforePaging
-                    .Where(a => a.Phone != null && EF.Functions.Like(a.Phone, $"{searchQueryForWhereClause}%"));
+                    .Where(a => a.Phone != null && EF.Functions.Like(a.Phone.ToLower(), $"{searchQueryForWhereClause}%"));
             }
             if (!string.IsNullOrEmpty(inquiryResource.MobileNo))
             {
@@ -68,7 +68,7 @@ namespace POS.Repository
                 var searchQueryForWhereClause = inquiryResource.MobileNo
                     .Trim().ToLowerInvariant();
                 collectionBeforePaging = collectionBeforePaging
-                    .Where(a => a.MobileNo != null && EF.Functions.Like(a.MobileNo, $"{searchQueryForWhereClause}%"));
+                    .Where(a => a.MobileNo != null && EF.Functions.Like(a.MobileNo.ToLower(), $"{searchQueryForWhereClause}%"));
             }
             if (!string.IsNullOrEmpty(inquiryResource.Email))
             {
@@ -76,7 +76,7 @@ namespace POS.Repository
                 var searchQueryForWhereClause = inquiryResource.Email
                     .Trim().ToLowerInvariant();
                 collectionBeforePaging = collectionBeforePaging
-                    .Where(a => a.Email != null && EF.Functions.Like(a.Email, $"{searchQueryForWhereClause}%"));
+                    .Where(a => a.Email != null && EF.Functions.Like(a.Email.ToLower(), $"{searchQueryForWhereClause}%"));
             }
             if (!string.IsNullOrEmpty(inquiryResource.CityName))
             {
@@ -84,7 +84,7 @@ namespace POS.Repository
                 var searchQueryForWhereClause = inquiryResource.CityName
                     .Trim().ToLowerInvariant();
                 collectionBeforePaging = collectionBeforePaging
-                    .Where(a => a.CityName != null && EF.Functions.Like(a.CityName, $"{searchQueryForWhereClause}%"));
+                    .Where(a => a.CityName != null && EF.Functions.Like(a.CityName.ToLower(), $"{searchQueryForWhereClause}%"));
             }
             if (!string.IsNullOrEmpty(inquiryResource.CountryName))
             {
@@ -92,7 +92,7 @@ namespace POS.Repository
                 var searchQueryForWhereClause = inquiryResource.CountryName
                     .Trim().ToLowerInvariant();
                 collectionBeforePaging = collectionBeforePaging
-                    .Where(a => a.CountryName != null && EF.Functions.Like(a.CountryName, $"{searchQueryForWhereClause}%"));
+                    .Where(a => a.CountryName != null && EF.Functions.Like(a.CountryName.ToLower(), $"{searchQueryForWhereClause}%"));
             }
             if (inquiryResource.InquirySourceId.HasValue)
             {
@@ -116,11 +116,11 @@ namespace POS.Repository
                 var searchQueryForWhereClause = inquiryResource.SearchQuery
                     .Trim().ToLowerInvariant();
                 collectionBeforePaging = collectionBeforePaging
-                    .Where(a => (a.Email != null && EF.Functions.Like(a.Email, $"{searchQueryForWhereClause}%"))
-                    || EF.Functions.Like(a.CompanyName, $"%{searchQueryForWhereClause}%")
-                    || (a.MobileNo != null && EF.Functions.Like(a.MobileNo, $"{searchQueryForWhereClause}%"))
-                    || (a.Phone != null && EF.Functions.Like(a.Phone, $"{searchQueryForWhereClause}%"))
-                    || EF.Functions.Like(a.ContactPerson, $"{searchQueryForWhereClause}%")
+                    .Where(a => (a.Email != null && EF.Functions.Like(a.Email.ToLower(), $"{searchQueryForWhereClause}%"))
+                    || EF.Functions.Like(a.CompanyName.ToLower(), $"%{searchQueryForWhereClause}%")
+                    || (a.MobileNo != null && EF.Functions.Like(a.MobileNo.ToLower(), $"{searchQueryForWhereClause}%"))
+                    || (a.Phone != null && EF.Functions.Like(a.Phone.ToLower(), $"{searchQueryForWhereClause}%"))
+                    || EF.Functions.Like(a.ContactPerson.ToLower(), $"{searchQueryForWhereClause}%")
                     );
             }
 

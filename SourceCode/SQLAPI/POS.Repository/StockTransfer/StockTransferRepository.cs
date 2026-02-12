@@ -1,4 +1,4 @@
-﻿using System.Linq;
+using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using POS.Common.GenericRepository;
@@ -39,8 +39,9 @@ namespace POS.Repository
             }
             if (!string.IsNullOrWhiteSpace(stockTranferResource.ReferenceNo))
             {
+                var referenceNo = stockTranferResource.ReferenceNo.Trim().ToLower();
                 collectionBeforePaging = collectionBeforePaging
-                    .Where(c => EF.Functions.Like(c.ReferenceNo, $"%{stockTranferResource.ReferenceNo}%"));
+                    .Where(c => EF.Functions.Like(c.ReferenceNo.ToLower(), $"%{referenceNo}%"));
             }
 
             var loginAudits = new StockTransferList();

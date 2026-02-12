@@ -1,4 +1,4 @@
-﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore;
 using POS.Common.GenericRepository;
 using POS.Common.UnitOfWork;
 using POS.Data.Dto;
@@ -114,15 +114,15 @@ IPropertyMappingService _propertyMappingService) : GenericRepository<Transaction
         }
         if (!string.IsNullOrWhiteSpace(transactionResource.TransactionNumber))
         {
-            var transactionNumber = transactionResource.TransactionNumber.Trim();
+            var transactionNumber = transactionResource.TransactionNumber.Trim().ToLower();
             collectionBeforePaging = collectionBeforePaging
-                .Where(a => EF.Functions.Like(a.TransactionNumber, $"%{transactionNumber}%"));
+                .Where(a => EF.Functions.Like(a.TransactionNumber.ToLower(), $"%{transactionNumber}%"));
         }
         if (!string.IsNullOrWhiteSpace(transactionResource.ReferenceNumber))
         {
-            var referenceNumber = transactionResource.ReferenceNumber.Trim();
+            var referenceNumber = transactionResource.ReferenceNumber.Trim().ToLower();
             collectionBeforePaging = collectionBeforePaging
-                .Where(a => EF.Functions.Like(a.TransactionNumber, $"%{referenceNumber}%"));
+                    .Where(a => EF.Functions.Like(a.ReferenceNumber.ToLower(), $"%{referenceNumber}%"));
         }
         if (transactionResource.PaymentStatus.HasValue)
         {

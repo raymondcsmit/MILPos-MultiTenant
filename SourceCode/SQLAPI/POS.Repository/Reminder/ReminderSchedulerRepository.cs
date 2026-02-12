@@ -1,4 +1,4 @@
-﻿using POS.Common.GenericRepository;
+using POS.Common.GenericRepository;
 using POS.Common.UnitOfWork;
 using POS.Data;
 using POS.Data.Dto;
@@ -76,14 +76,16 @@ namespace POS.Repository
 
             if (!string.IsNullOrWhiteSpace(reminderResource.Subject))
             {
+                var subject = reminderResource.Subject.Trim().ToLower();
                 collectionBeforePaging = collectionBeforePaging
-                    .Where(c => EF.Functions.Like(c.Subject, $"%{reminderResource.Subject}%"));
+                    .Where(c => EF.Functions.Like(c.Subject.ToLower(), $"%{subject}%"));
             }
 
             if (!string.IsNullOrWhiteSpace(reminderResource.Message))
             {
+                var message = reminderResource.Message.Trim().ToLower();
                 collectionBeforePaging = collectionBeforePaging
-                    .Where(c => EF.Functions.Like(c.Message, $"%{reminderResource.Message}%"));
+                    .Where(c => EF.Functions.Like(c.Message.ToLower(), $"%{message}%"));
             }
 
             return await PagedList<ReminderScheduler>.Create(

@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -46,18 +46,21 @@ namespace POS.Repository
 
             if (!string.IsNullOrWhiteSpace(emailLogResource.Subject))
             {
+                var subject = emailLogResource.Subject.Trim().ToLower();
                 collectionBeforePaging = collectionBeforePaging
-                    .Where(c => EF.Functions.Like(c.Subject, $"%{emailLogResource.Subject}%"));
+                    .Where(c => EF.Functions.Like(c.Subject.ToLower(), $"%{subject}%"));
             }
             if (!string.IsNullOrWhiteSpace(emailLogResource.SenderEmail))
             {
+                var senderEmail = emailLogResource.SenderEmail.Trim().ToLower();
                 collectionBeforePaging = collectionBeforePaging
-                    .Where(c => EF.Functions.Like(c.SenderEmail, $"%{emailLogResource.SenderEmail}%"));
+                    .Where(c => EF.Functions.Like(c.SenderEmail.ToLower(), $"%{senderEmail}%"));
             }
             if (!string.IsNullOrWhiteSpace(emailLogResource.RecipientEmail))
             {
+                var recipientEmail = emailLogResource.RecipientEmail.Trim().ToLower();
                 collectionBeforePaging = collectionBeforePaging
-                    .Where(c => EF.Functions.Like(c.RecipientEmail, $"%{emailLogResource.RecipientEmail}%"));
+                    .Where(c => EF.Functions.Like(c.RecipientEmail.ToLower(), $"%{recipientEmail}%"));
             }
 
             var loginAudits = new EmailLogList();

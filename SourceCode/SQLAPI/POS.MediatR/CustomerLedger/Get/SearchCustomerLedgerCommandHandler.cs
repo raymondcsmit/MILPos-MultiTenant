@@ -1,4 +1,4 @@
-﻿using Amazon.Runtime.Internal.Util;
+using Amazon.Runtime.Internal.Util;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
@@ -26,8 +26,8 @@ namespace POS.MediatR
 
                 if (!string.IsNullOrWhiteSpace(request.SearchQuery))
                 {
-                    string search = request.SearchQuery.Trim();
-                    customersQuery = customersQuery.Where(c => EF.Functions.Like(c.CustomerName, $"{search}%"));
+                    string search = request.SearchQuery.Trim().ToLower();
+                    customersQuery = customersQuery.Where(c => EF.Functions.Like(c.CustomerName.ToLower(), $"{search}%"));
                 }
 
                 var result = await customersQuery

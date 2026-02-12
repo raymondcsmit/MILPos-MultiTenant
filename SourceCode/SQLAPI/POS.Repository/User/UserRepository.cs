@@ -1,4 +1,4 @@
-﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using POS.Common.GenericRepository;
 using POS.Common.UnitOfWork;
@@ -59,26 +59,30 @@ public class UserRepository : GenericRepository<User, POSDbContext>,
            _propertyMappingService.GetPropertyMapping<UserDto, User>());
         if (!string.IsNullOrWhiteSpace(userResource.email))
         {
+            var email = userResource.email.Trim().ToLower();
             collectionBeforePaging = collectionBeforePaging
-                .Where(c => EF.Functions.Like(c.Email, $"%{userResource.email}%"));
+                .Where(c => EF.Functions.Like(c.Email.ToLower(), $"%{email}%"));
         }
 
         if (!string.IsNullOrWhiteSpace(userResource.FirstName))
         {
+            var firstName = userResource.FirstName.Trim().ToLower();
             collectionBeforePaging = collectionBeforePaging
-                .Where(c => EF.Functions.Like(c.FirstName, $"%{userResource.FirstName}%"));
+                .Where(c => EF.Functions.Like(c.FirstName.ToLower(), $"%{firstName}%"));
         }
 
         if (!string.IsNullOrWhiteSpace(userResource.LastName))
         {
+            var lastName = userResource.LastName.Trim().ToLower();
             collectionBeforePaging = collectionBeforePaging
-                .Where(c => EF.Functions.Like(c.LastName, $"%{userResource.LastName}%"));
+                .Where(c => EF.Functions.Like(c.LastName.ToLower(), $"%{lastName}%"));
         }
 
         if (!string.IsNullOrWhiteSpace(userResource.PhoneNumber))
         {
+            var phoneNumber = userResource.PhoneNumber.Trim().ToLower();
             collectionBeforePaging = collectionBeforePaging
-                .Where(c => EF.Functions.Like(c.PhoneNumber, $"%{userResource.PhoneNumber}%"));
+                .Where(c => EF.Functions.Like(c.PhoneNumber.ToLower(), $"%{phoneNumber}%"));
         }
 
         var loginAudits = new UserList();
