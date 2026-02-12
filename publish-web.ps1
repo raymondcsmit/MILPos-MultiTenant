@@ -62,7 +62,7 @@ if (-not (Test-Path $targetDir)) { New-Item -ItemType Directory -Force -Path $ta
 $clientAppBrowser = ".\SourceCode\SQLAPI\POS.API\ClientApp\browser\*"
 
 if (Test-Path $clientAppBrowser) {
-    Copy-Item -Recurse $clientAppBrowser $targetDir
+    Copy-Item -Recurse $clientAppBrowser $targetDir -Force
 } else {
     Write-Host "ClientApp browser output not found at $clientAppBrowser" -ForegroundColor Yellow
     exit
