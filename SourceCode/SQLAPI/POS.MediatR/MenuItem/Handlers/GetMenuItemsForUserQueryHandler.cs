@@ -1,6 +1,7 @@
 using AutoMapper;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
+using POS.Data;
 using POS.Data.Dto;
 using POS.Helper;
 using POS.MediatR.MenuItem.Queries;
@@ -34,10 +35,27 @@ namespace POS.MediatR.MenuItem.Handlers
             var roleIds = userRoles.Select(ur => ur.RoleId).ToList();
 
             // var menuItems = await _menuItemRepository.GetMenuItemsByRolesAsync(roleIds);
-            var menuItems = await _menuItemRepository.AllIncluding(c => c.RoleMenuItems)
+            var allMenuItems = await _menuItemRepository.AllIncluding(c => c.RoleMenuItems)
                 .Where(c => c.IsActive)
-                .OrderBy(c => c.Order)
+                 .OrderBy(c => c.Order)
                 .ToListAsync();
+
+            // Deduplicate menu items locally
+            var menuItems = allMenuItems
+                .GroupBy(m => m.Id)
+                .Select(g =>
+                {
+                    var item = g.First();
+                    if (item.RoleMenuItems != null)
+                    {
+                        item.RoleMenuItems = g.SelectMany(x => x.RoleMenuItems ?? Enumerable.Empty<RoleMenuItem>())
+                                              .GroupBy(rm => rm.Id)
+                                              .Select(grp => grp.First())
+                                              .ToList();
+                    }
+                    return item;
+                })
+                .ToList();
 
             var dtos = _mapper.Map<List<MenuItemDto>>(menuItems);
 
