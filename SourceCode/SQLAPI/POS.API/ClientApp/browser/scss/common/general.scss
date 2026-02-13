@@ -114,8 +114,8 @@ dl {
 
 section {
   &.content {
-    margin: 70px 15px 0 276px;
-    min-height: calc(100vh - 76px);
+    margin: 100px 15px 0 276px;
+    min-height: calc(100vh - 101px);
     @include var.transition(0.5s);
 
     .content-block {
@@ -191,17 +191,16 @@ table {
 }
 
 .mat-mdc-table {
+  background: transparent !important;
 
   /* stripe even data rows, skip detail rows */
-  .odd-row {
-    background-color: var(--background-color);
-    /* light gray */
+  tr.mat-mdc-row:nth-child(odd) {
+    background-color: rgba(255, 255, 255, 0.05) !important;
   }
 
   /* stripe odd data rows, skip detail rows */
-  .even-row {
-    background-color: var(--surface-color) !important;
-    /* white */
+  tr.mat-mdc-row:nth-child(even) {
+    background-color: transparent !important;
   }
 }
 
@@ -329,12 +328,13 @@ tr.bg-warning1 td {
 }
 
 .table-pos>thead>tr>th {
-  background-color: var(--primary-700) !important;
+  background-color: rgba(var(--primary-700-rgb), 0.8) !important; // Semi-transparent header
+  backdrop-filter: blur(5px);
   color: #fff !important;
 }
 
 .table-pos>tbody>tr>td {
-  background-color: var(--surface-color) !important;
+  background-color: transparent !important;
   color: var(--text-color) !important;
 }
 

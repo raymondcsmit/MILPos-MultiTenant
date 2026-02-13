@@ -485,69 +485,73 @@ namespace POS.API.Helpers
                  Console.WriteLine($"Table: {tableName}, FullPath: {fullTableName}, HasIdentity: {hasIdentity}");
 
                  // Wrap saving in a transaction to speed up SQLite bulk inserts significantly
-                 using (var transaction = await _context.Database.BeginTransactionAsync())
+                 var strategy = _context.Database.CreateExecutionStrategy();
+                 await strategy.ExecuteAsync(async () =>
                  {
-                     try
+                     using (var transaction = await _context.Database.BeginTransactionAsync())
                      {
-                        if (hasIdentity)
-                        {
-                            Console.WriteLine($"Executing: SET IDENTITY_INSERT {fullTableName} ON");
-                            await _context.Database.ExecuteSqlRawAsync($"SET IDENTITY_INSERT {fullTableName} ON");
-                        }
-
-                        var dbSet = _context.Set<T>();
-                        
-                        // Optimize: AddRange is better than Add in loop, but for massive datasets, 
-                        // we should consider smaller batches if memory is an issue.
-                        // For now, assuming CSVs are < 10k rows, AddRange is fine.
-                        // Disable AutoDetectChanges for massive performance gain during AddRange
-                        _context.ChangeTracker.AutoDetectChangesEnabled = false;
-                        
-                        await dbSet.AddRangeAsync(entities);
-                        await _context.SaveChangesAsync();
-                        
-                        _context.ChangeTracker.AutoDetectChangesEnabled = true;
-
-                        if (hasIdentity)
-                        {
-                            await _context.Database.ExecuteSqlRawAsync($"SET IDENTITY_INSERT {fullTableName} OFF");
-                        }
-
-                    if (hasPostgresIdentity)
-                        {
-                            // Reset sequence for PostgreSQL to prevent PK violations on future inserts
-                            // This assumes standard naming convention for sequences: "TableName_Id_seq" or equivalent lookup
-                            // pg_get_serial_sequence handles quoted names correctly
-                             await _context.Database.ExecuteSqlRawAsync(@$"
-                                SELECT setval(
-                                    pg_get_serial_sequence('""{tableName}""', 'Id'), 
-                                    COALESCE((SELECT MAX(""Id"") + 1 FROM ""{tableName}""), 1), 
-                                    false
-                                );");
-                        }
-                        
-                        await transaction.CommitAsync();
-                     }
-                     catch (Exception ex) 
-                     {
-                         await transaction.RollbackAsync();
-                         
-                         var innerMessage = ex.InnerException?.Message ?? "No inner exception";
-                         Console.WriteLine($"Error batch saving {typeof(T).Name}: {ex.Message}");
-                         if (ex.InnerException != null) Console.WriteLine($"Inner Exception: {innerMessage}");
-
-                         if (hasIdentity)
+                         try
                          {
-                             try { await _context.Database.ExecuteSqlRawAsync($"SET IDENTITY_INSERT {fullTableName} OFF"); } catch { }
+                            if (hasIdentity)
+                            {
+                                Console.WriteLine($"Executing: SET IDENTITY_INSERT {fullTableName} ON");
+                                await _context.Database.ExecuteSqlRawAsync($"SET IDENTITY_INSERT {fullTableName} ON");
+                            }
+
+                            var dbSet = _context.Set<T>();
+                            
+                            // Optimize: AddRange is better than Add in loop, but for massive datasets, 
+                            // we should consider smaller batches if memory is an issue.
+                            // For now, assuming CSVs are < 10k rows, AddRange is fine.
+                            // Disable AutoDetectChanges for massive performance gain during AddRange
+                            _context.ChangeTracker.AutoDetectChangesEnabled = false;
+                            
+                            await dbSet.AddRangeAsync(entities);
+                            await _context.SaveChangesAsync();
+                            
+                            _context.ChangeTracker.AutoDetectChangesEnabled = true;
+
+                            if (hasIdentity)
+                            {
+                                await _context.Database.ExecuteSqlRawAsync($"SET IDENTITY_INSERT {fullTableName} OFF");
+                            }
+
+                            if (hasPostgresIdentity)
+                            {
+                                // Reset sequence for PostgreSQL to prevent PK violations on future inserts
+                                // This assumes standard naming convention for sequences: "TableName_Id_seq" or equivalent lookup
+                                // pg_get_serial_sequence handles quoted names correctly
+                                 await _context.Database.ExecuteSqlRawAsync(@$"
+                                    SELECT setval(
+                                        pg_get_serial_sequence('""{tableName}""', 'Id'), 
+                                        COALESCE((SELECT MAX(""Id"") + 1 FROM ""{tableName}""), 1), 
+                                        false
+                                    );");
+                            }
+                            
+                            await transaction.CommitAsync();
+                         }
+                         catch (Exception ex) 
+                         {
+                             await transaction.RollbackAsync();
+                             
+                             var innerMessage = ex.InnerException?.Message ?? "No inner exception";
+                             Console.WriteLine($"Error batch saving {typeof(T).Name}: {ex.Message}");
+                             if (ex.InnerException != null) Console.WriteLine($"Inner Exception: {innerMessage}");
+
+                             if (hasIdentity)
+                             {
+                                 try { await _context.Database.ExecuteSqlRawAsync($"SET IDENTITY_INSERT {fullTableName} OFF"); } catch { }
+                             }
+                         }
+                         finally
+                         {
+                             // ALWAYS clear tracker after each table to prevent pollution/leaks
+                             _context.ChangeTracker.Clear();
+                             _context.ChangeTracker.AutoDetectChangesEnabled = true; // Ensure it's back on
                          }
                      }
-                     finally
-                     {
-                         // ALWAYS clear tracker after each table to prevent pollution/leaks
-                         _context.ChangeTracker.Clear();
-                         _context.ChangeTracker.AutoDetectChangesEnabled = true; // Ensure it's back on
-                     }
-                 }
+                 });
             }
         }
 

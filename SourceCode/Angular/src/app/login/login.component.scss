@@ -1,3 +1,4 @@
+@use "../../../public/scss/theme/glassmorphism" as glass;
   .login-container {
     width: 100%;
     min-height: 100vh;
@@ -19,7 +20,7 @@
     }
   }
 
-@use "../../../../public/scss/theme/glassmorphism" as glass;
+
 
   .login-form {
     width: 380px;

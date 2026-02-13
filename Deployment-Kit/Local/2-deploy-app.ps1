@@ -3,12 +3,12 @@
 # Combines local build improvements with remote deployment capabilities
 
 # --- Configuration ---
-$ServerIP = "208.110.72.211"
-$ServerPort = 8888 # CHANGED to 8888 to bypass port conflicts
+$ServerIP = "208.110.72.211" # CHANGE THIS IP if deploying to a new server
+$ServerPort = 8888           # CHANGED to 8888 to bypass port conflicts
 $Username = "administrator"
-$Password = "My@UNAZPOS10" # WARNING: Storing passwords in plain text is not secure.
+$Password = "My@UNAZPOS10"   # WARNING: Storing passwords in plain text is not secure.
 $RemotePath = "C:\inetpub\wwwroot\pos-app" # Adjust this to your actual IIS folder
-$AppPoolName = "POS-Pool" # CHANGE THIS to your actual IIS Application Pool name
+$AppPoolName = "POS-Pool"    # CHANGE THIS to your actual IIS Application Pool name
 $publishDir = ".\Publish\Web"
 $apiProject = ".\SourceCode\SQLAPI\POS.API\POS.API.csproj"
 $angularDir = ".\SourceCode\Angular"
@@ -27,7 +27,7 @@ try {
         $trusted = (Get-Item WSMan:\localhost\Client\TrustedHosts).Value
         if ($trusted -notlike "*$ServerIP*") {
              Write-Host "WARNING: Server IP $ServerIP is not in TrustedHosts." -ForegroundColor Yellow
-             Write-Host "Please run '.\setup-winrm.ps1' as Administrator first." -ForegroundColor Yellow
+             Write-Host "Please run 'Set-Item WSMan:\localhost\Client\TrustedHosts -Value \"$ServerIP\" -Concatenate -Force' as Administrator first." -ForegroundColor Yellow
         }
     }
 } catch {}

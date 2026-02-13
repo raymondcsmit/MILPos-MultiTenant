@@ -1,4 +1,4 @@
-﻿using POS.Data;
+using POS.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using System;
@@ -24,40 +24,28 @@ namespace POS.Common.UnitOfWork
         }
         public int Save()
         {
-            using (var transaction = _context.Database.BeginTransaction())
+            try
             {
-                try
-                {
-                    SetModifiedInformation();
-                    var retValu = _context.SaveChanges();
-                    transaction.Commit();
-                    return retValu;
-                }
-                catch (Exception e)
-                {
-                    transaction.Rollback();
-                    _logger.LogError(e, e.Message);
-                    return 0;
-                }
+                SetModifiedInformation();
+                return _context.SaveChanges();
+            }
+            catch (Exception e)
+            {
+                _logger.LogError(e, e.Message);
+                return 0;
             }
         }
         public async Task<int> SaveAsync()
         {
-            using (var transaction = _context.Database.BeginTransaction())
+            try
             {
-                try
-                {
-                    SetModifiedInformation();
-                    var val = await _context.SaveChangesAsync();
-                    transaction.Commit();
-                    return val;
-                }
-                catch (Exception e)
-                {
-                    transaction.Rollback();
-                    _logger.LogError(e, e.Message);
-                    return 0;
-                }
+                SetModifiedInformation();
+                return await _context.SaveChangesAsync();
+            }
+            catch (Exception e)
+            {
+                _logger.LogError(e, e.Message);
+                return 0;
             }
         }
         public TContext Context => _context;
