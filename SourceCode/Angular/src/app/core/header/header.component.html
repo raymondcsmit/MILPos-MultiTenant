@@ -2,8 +2,7 @@
   <div class="container-fluid">
     @if(!isMobile ){
     @if(!isPosPage ){
-    <div class="navbar-header d-flex d-none d-lg-block" #navbarHeader>
-      <a class="bars" onClick="return false;" (click)="mobileMenuSidebarOpen($event,'overlay-open')"></a>
+    <div class="navbar-header d-flex" #navbarHeader>
       <a class="navbar-brand" routerLink="/">
         @if(logoImage){
         <img [src]="logoImage" alt="Logo" class="logo-img" />
@@ -11,9 +10,10 @@
         <img src="images/logo.png" alt="Lofo" class="logo-img">
         }
       </a>
-      <!-- mobile menu bars -->
-      <a onClick="return false;" class="navbar-toggle collapsed" (click)="isNavbarCollapsed = !isNavbarCollapsed"
-        aria-expanded="false"></a>
+      
+      <button mat-icon-button (click)="callSidemenuCollapse()">
+         <mat-icon [ngClass]="{'rotated': isOpenSidebar}" class="header-icon"> {{isOpenSidebar ? 'menu_close' : 'menu_open'}}</mat-icon>
+      </button>
     </div>
     }
     }
