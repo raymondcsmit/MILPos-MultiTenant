@@ -5497,7 +5497,7 @@ namespace POS.Migrations.PostgreSQL.Migrations
                     b.HasOne("POS.Data.User", "CreatedByUser")
                         .WithMany()
                         .HasForeignKey("CreatedBy")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.Navigation("CreatedByUser");
@@ -5508,7 +5508,7 @@ namespace POS.Migrations.PostgreSQL.Migrations
                     b.HasOne("POS.Data.User", "CreatedByUser")
                         .WithMany()
                         .HasForeignKey("CreatedBy")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.Navigation("CreatedByUser");
@@ -5566,7 +5566,7 @@ namespace POS.Migrations.PostgreSQL.Migrations
                     b.HasOne("POS.Data.User", "CreatedByUser")
                         .WithMany()
                         .HasForeignKey("CreatedBy")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.HasOne("POS.Data.Product", "Product")
@@ -5635,7 +5635,7 @@ namespace POS.Migrations.PostgreSQL.Migrations
                     b.HasOne("POS.Data.User", "CreatedByUser")
                         .WithMany()
                         .HasForeignKey("CreatedBy")
-                        .OnDelete(DeleteBehavior.NoAction)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.HasOne("POS.Data.Entities.Accounts.LedgerAccount", "CreditLedgerAccount")
@@ -5680,7 +5680,7 @@ namespace POS.Migrations.PostgreSQL.Migrations
                     b.HasOne("POS.Data.User", "CreatedByUser")
                         .WithMany()
                         .HasForeignKey("CreatedBy")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.Navigation("CreatedByUser");
@@ -5691,7 +5691,7 @@ namespace POS.Migrations.PostgreSQL.Migrations
                     b.HasOne("POS.Data.User", "CreatedByUser")
                         .WithMany()
                         .HasForeignKey("CreatedBy")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.HasOne("POS.Data.Entities.Accounts.LedgerAccount", "ParentAccount")
@@ -5714,7 +5714,7 @@ namespace POS.Migrations.PostgreSQL.Migrations
                     b.HasOne("POS.Data.User", "CreatedByUser")
                         .WithMany()
                         .HasForeignKey("CreatedBy")
-                        .OnDelete(DeleteBehavior.NoAction)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.HasOne("POS.Data.Entities.Accounts.LedgerAccount", "LoanAccount")
@@ -5743,7 +5743,7 @@ namespace POS.Migrations.PostgreSQL.Migrations
                     b.HasOne("POS.Data.User", "CreatedByUser")
                         .WithMany()
                         .HasForeignKey("CreatedBy")
-                        .OnDelete(DeleteBehavior.NoAction)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.HasOne("POS.Data.Entities.Accounts.LoanDetail", "LoanDetail")
@@ -5768,7 +5768,7 @@ namespace POS.Migrations.PostgreSQL.Migrations
                     b.HasOne("POS.Data.User", "CreatedByUser")
                         .WithMany()
                         .HasForeignKey("CreatedBy")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.HasOne("POS.Data.Entities.Transaction", "Transaction")
@@ -5795,7 +5795,7 @@ namespace POS.Migrations.PostgreSQL.Migrations
                     b.HasOne("POS.Data.User", "CreatedByUser")
                         .WithMany()
                         .HasForeignKey("CreatedBy")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.HasOne("POS.Data.Product", "InventoryItem")
@@ -5822,7 +5822,7 @@ namespace POS.Migrations.PostgreSQL.Migrations
                     b.HasOne("POS.Data.User", "CreatedByUser")
                         .WithMany()
                         .HasForeignKey("CreatedBy")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.HasOne("POS.Data.Entities.Transaction", "Transaction")
@@ -5888,7 +5888,7 @@ namespace POS.Migrations.PostgreSQL.Migrations
                     b.HasOne("POS.Data.User", "CreatedByUser")
                         .WithMany()
                         .HasForeignKey("CreatedBy")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.Navigation("CreatedByUser");
@@ -5899,7 +5899,7 @@ namespace POS.Migrations.PostgreSQL.Migrations
                     b.HasOne("POS.Data.User", "CreatedByUser")
                         .WithMany()
                         .HasForeignKey("CreatedBy")
-                        .OnDelete(DeleteBehavior.NoAction)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.HasOne("POS.Data.Customer", "Customer")
@@ -5987,7 +5987,7 @@ namespace POS.Migrations.PostgreSQL.Migrations
                     b.HasOne("POS.Data.User", "CreatedByUser")
                         .WithMany()
                         .HasForeignKey("CreatedBy")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.HasOne("POS.Data.SalesOrder", "SalesOrder")
@@ -6118,7 +6118,7 @@ namespace POS.Migrations.PostgreSQL.Migrations
                     b.HasOne("POS.Data.User", "CreatedByUser")
                         .WithMany()
                         .HasForeignKey("CreatedBy")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.Navigation("CreatedByUser");
@@ -6146,7 +6146,7 @@ namespace POS.Migrations.PostgreSQL.Migrations
                     b.HasOne("POS.Data.User", "CreatedByUser")
                         .WithMany()
                         .HasForeignKey("CreatedBy")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.HasOne("POS.Data.User", "Employee")
@@ -6192,7 +6192,7 @@ namespace POS.Migrations.PostgreSQL.Migrations
                     b.HasOne("POS.Data.User", "CreatedByUser")
                         .WithMany()
                         .HasForeignKey("CreatedBy")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.HasOne("POS.Data.Entities.Location", "Location")
@@ -6219,13 +6219,13 @@ namespace POS.Migrations.PostgreSQL.Migrations
                     b.HasOne("POS.Data.User", "CreatedByUser")
                         .WithMany()
                         .HasForeignKey("CreatedBy")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.HasOne("POS.Data.User", "User")
                         .WithMany()
                         .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.Navigation("CreatedByUser");
@@ -6265,7 +6265,7 @@ namespace POS.Migrations.PostgreSQL.Migrations
                     b.HasOne("POS.Data.User", "CreatedByUser")
                         .WithMany()
                         .HasForeignKey("CreatedBy")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.HasOne("POS.Data.Product", "Product")
@@ -6298,7 +6298,7 @@ namespace POS.Migrations.PostgreSQL.Migrations
                     b.HasOne("POS.Data.User", "CreatedByUser")
                         .WithMany()
                         .HasForeignKey("CreatedBy")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.Navigation("CreatedByUser");
@@ -6315,7 +6315,7 @@ namespace POS.Migrations.PostgreSQL.Migrations
                     b.HasOne("POS.Data.User", "CreatedByUser")
                         .WithMany()
                         .HasForeignKey("CreatedBy")
-                        .OnDelete(DeleteBehavior.NoAction)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.HasOne("POS.Data.Entities.Accounts.FinancialYear", "FinancialYear")
@@ -6355,7 +6355,7 @@ namespace POS.Migrations.PostgreSQL.Migrations
                     b.HasOne("POS.Data.User", "CreatedByUser")
                         .WithMany()
                         .HasForeignKey("CreatedBy")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.Navigation("CreatedByUser");
@@ -6453,7 +6453,7 @@ namespace POS.Migrations.PostgreSQL.Migrations
                     b.HasOne("POS.Data.User", "CreatedByUser")
                         .WithMany()
                         .HasForeignKey("CreatedBy")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.HasOne("POS.Data.InquirySource", "InquirySource")
@@ -6640,7 +6640,7 @@ namespace POS.Migrations.PostgreSQL.Migrations
                     b.HasOne("POS.Data.User", "CreatedByUser")
                         .WithMany()
                         .HasForeignKey("CreatedBy")
-                        .OnDelete(DeleteBehavior.NoAction)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.HasOne("POS.Data.Entities.Location", "Location")
@@ -6754,7 +6754,7 @@ namespace POS.Migrations.PostgreSQL.Migrations
                     b.HasOne("POS.Data.User", "CreatedByUser")
                         .WithMany()
                         .HasForeignKey("CreatedBy")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.HasOne("POS.Data.Reminder", "Reminder")
@@ -6962,7 +6962,7 @@ namespace POS.Migrations.PostgreSQL.Migrations
                     b.HasOne("POS.Data.User", "CreatedByUser")
                         .WithMany()
                         .HasForeignKey("CreatedBy")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.HasOne("POS.Data.Customer", "Customer")

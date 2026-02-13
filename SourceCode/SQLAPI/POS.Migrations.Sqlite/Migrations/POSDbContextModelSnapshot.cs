@@ -64,9 +64,6 @@ namespace POS.Migrations.Sqlite.Migrations
                     b.Property<long>("SyncVersion")
                         .HasColumnType("INTEGER");
 
-                    b.Property<Guid>("TenantId")
-                        .HasColumnType("TEXT");
-
                     b.HasKey("Id");
 
                     b.HasIndex("CreatedBy");
@@ -124,6 +121,9 @@ namespace POS.Migrations.Sqlite.Migrations
 
                     b.HasIndex("CreatedBy");
 
+                    b.HasIndex("TenantId", "Name")
+                        .HasDatabaseName("IX_Brand_Tenant_Name");
+
                     b.ToTable("Brands");
                 });
 
@@ -168,9 +168,6 @@ namespace POS.Migrations.Sqlite.Migrations
 
                     b.Property<long>("SyncVersion")
                         .HasColumnType("INTEGER");
-
-                    b.Property<Guid>("TenantId")
-                        .HasColumnType("TEXT");
 
                     b.HasKey("Id");
 
@@ -254,6 +251,9 @@ namespace POS.Migrations.Sqlite.Migrations
 
                     b.HasIndex("CreatedBy");
 
+                    b.HasIndex("TenantId")
+                        .HasDatabaseName("IX_CompanyProfile_TenantId");
+
                     b.ToTable("CompanyProfiles");
                 });
 
@@ -315,6 +315,9 @@ namespace POS.Migrations.Sqlite.Migrations
 
                     b.HasIndex("CreatedBy");
 
+                    b.HasIndex("TenantId")
+                        .HasDatabaseName("IX_ContactRequest_TenantId");
+
                     b.ToTable("ContactRequests");
                 });
 
@@ -357,9 +360,6 @@ namespace POS.Migrations.Sqlite.Migrations
                     b.Property<long>("SyncVersion")
                         .HasColumnType("INTEGER");
 
-                    b.Property<Guid>("TenantId")
-                        .HasColumnType("TEXT");
-
                     b.HasKey("Id");
 
                     b.HasIndex("CreatedBy");
@@ -373,6 +373,30 @@ namespace POS.Migrations.Sqlite.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("TEXT");
 
+                    b.Property<Guid>("CreatedBy")
+                        .HasColumnType("TEXT");
+
+                    b.Property<DateTime>("CreatedDate")
+                        .HasColumnType("TEXT");
+
+                    b.Property<Guid?>("DeletedBy")
+                        .HasColumnType("TEXT");
+
+                    b.Property<DateTime?>("DeletedDate")
+                        .HasColumnType("TEXT");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<DateTime?>("LastSyncedAt")
+                        .HasColumnType("TEXT");
+
+                    b.Property<Guid>("ModifiedBy")
+                        .HasColumnType("TEXT");
+
+                    b.Property<DateTime>("ModifiedDate")
+                        .HasColumnType("TEXT");
+
                     b.Property<string>("Name")
                         .HasMaxLength(100)
                         .HasColumnType("TEXT");
@@ -381,7 +405,12 @@ namespace POS.Migrations.Sqlite.Migrations
                         .HasMaxLength(10)
                         .HasColumnType("TEXT");
 
+                    b.Property<long>("SyncVersion")
+                        .HasColumnType("INTEGER");
+
                     b.HasKey("Id");
+
+                    b.HasIndex("CreatedBy");
 
                     b.ToTable("Currencies");
                 });
@@ -479,6 +508,17 @@ namespace POS.Migrations.Sqlite.Migrations
 
                     b.HasIndex("ShippingAddressId");
 
+                    b.HasIndex("TenantId", "CustomerName")
+                        .HasDatabaseName("IX_Customer_Tenant_Name");
+
+                    b.HasIndex("TenantId", "Email")
+                        .IsUnique()
+                        .HasDatabaseName("IX_Customer_Tenant_Email");
+
+                    b.HasIndex("TenantId", "MobileNo")
+                        .IsUnique()
+                        .HasDatabaseName("IX_Customer_Tenant_Mobile");
+
                     b.ToTable("Customers");
                 });
 
@@ -536,6 +576,9 @@ namespace POS.Migrations.Sqlite.Migrations
                     b.HasKey("Id");
 
                     b.HasIndex("CreatedBy");
+
+                    b.HasIndex("TenantId")
+                        .HasDatabaseName("IX_DailyProductPrice_TenantId");
 
                     b.HasIndex("ProductId", "PriceDate", "TenantId")
                         .IsUnique()
@@ -691,6 +734,9 @@ namespace POS.Migrations.Sqlite.Migrations
 
                     b.HasIndex("CreatedBy");
 
+                    b.HasIndex("TenantId")
+                        .HasDatabaseName("IX_EmailSMTPSetting_TenantId");
+
                     b.ToTable("EmailSMTPSettings");
                 });
 
@@ -742,6 +788,9 @@ namespace POS.Migrations.Sqlite.Migrations
                     b.HasKey("Id");
 
                     b.HasIndex("CreatedBy");
+
+                    b.HasIndex("TenantId")
+                        .HasDatabaseName("IX_EmailTemplate_TenantId");
 
                     b.ToTable("EmailTemplates");
                 });
@@ -826,6 +875,9 @@ namespace POS.Migrations.Sqlite.Migrations
 
                     b.HasIndex("FinancialYearId");
 
+                    b.HasIndex("TenantId")
+                        .HasDatabaseName("IX_AccountingEntry_TenantId");
+
                     b.HasIndex("TransactionId");
 
                     b.ToTable("AccountingEntries");
@@ -885,6 +937,9 @@ namespace POS.Migrations.Sqlite.Migrations
                     b.HasKey("Id");
 
                     b.HasIndex("CreatedBy");
+
+                    b.HasIndex("TenantId")
+                        .HasDatabaseName("IX_FinancialYear_TenantId");
 
                     b.ToTable("FinancialYears");
                 });
@@ -964,6 +1019,9 @@ namespace POS.Migrations.Sqlite.Migrations
 
                     b.HasIndex("ParentAccountId");
 
+                    b.HasIndex("TenantId")
+                        .HasDatabaseName("IX_LedgerAccount_TenantId");
+
                     b.ToTable("LedgerAccounts");
                 });
 
@@ -1037,6 +1095,9 @@ namespace POS.Migrations.Sqlite.Migrations
 
                     b.HasIndex("LoanAccountInterestExpenseId");
 
+                    b.HasIndex("TenantId")
+                        .HasDatabaseName("IX_LoanDetail_TenantId");
+
                     b.ToTable("LoanDetails");
                 });
 
@@ -1097,6 +1158,9 @@ namespace POS.Migrations.Sqlite.Migrations
 
                     b.HasIndex("LoanDetailId");
 
+                    b.HasIndex("TenantId")
+                        .HasDatabaseName("IX_LoanRepayment_TenantId");
+
                     b.ToTable("LoanRepayments");
                 });
 
@@ -1112,7 +1176,28 @@ namespace POS.Migrations.Sqlite.Migrations
                     b.Property<Guid>("BranchId")
                         .HasColumnType("TEXT");
 
-                    b.Property<DateTime>("CreatedAt")
+                    b.Property<Guid>("CreatedBy")
+                        .HasColumnType("TEXT");
+
+                    b.Property<DateTime>("CreatedDate")
+                        .HasColumnType("TEXT");
+
+                    b.Property<Guid?>("DeletedBy")
+                        .HasColumnType("TEXT");
+
+                    b.Property<DateTime?>("DeletedDate")
+                        .HasColumnType("TEXT");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<DateTime?>("LastSyncedAt")
+                        .HasColumnType("TEXT");
+
+                    b.Property<Guid>("ModifiedBy")
+                        .HasColumnType("TEXT");
+
+                    b.Property<DateTime>("ModifiedDate")
                         .HasColumnType("TEXT");
 
                     b.Property<string>("Narration")
@@ -1132,12 +1217,23 @@ namespace POS.Migrations.Sqlite.Migrations
                     b.Property<int>("Status")
                         .HasColumnType("INTEGER");
 
+                    b.Property<long>("SyncVersion")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<Guid>("TenantId")
+                        .HasColumnType("TEXT");
+
                     b.Property<Guid>("TransactionId")
                         .HasColumnType("TEXT");
 
                     b.HasKey("Id");
 
                     b.HasIndex("BranchId");
+
+                    b.HasIndex("CreatedBy");
+
+                    b.HasIndex("TenantId")
+                        .HasDatabaseName("IX_PaymentEntry_TenantId");
 
                     b.HasIndex("TransactionId");
 
@@ -1159,10 +1255,31 @@ namespace POS.Migrations.Sqlite.Migrations
                     b.Property<Guid>("BranchId")
                         .HasColumnType("TEXT");
 
-                    b.Property<DateTime>("CreatedAt")
+                    b.Property<Guid>("CreatedBy")
+                        .HasColumnType("TEXT");
+
+                    b.Property<DateTime>("CreatedDate")
+                        .HasColumnType("TEXT");
+
+                    b.Property<Guid?>("DeletedBy")
+                        .HasColumnType("TEXT");
+
+                    b.Property<DateTime?>("DeletedDate")
                         .HasColumnType("TEXT");
 
                     b.Property<Guid>("InventoryItemId")
+                        .HasColumnType("TEXT");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<DateTime?>("LastSyncedAt")
+                        .HasColumnType("TEXT");
+
+                    b.Property<Guid>("ModifiedBy")
+                        .HasColumnType("TEXT");
+
+                    b.Property<DateTime>("ModifiedDate")
                         .HasColumnType("TEXT");
 
                     b.Property<decimal>("Quantity")
@@ -1176,6 +1293,12 @@ namespace POS.Migrations.Sqlite.Migrations
                         .HasMaxLength(50)
                         .HasColumnType("TEXT");
 
+                    b.Property<long>("SyncVersion")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<Guid>("TenantId")
+                        .HasColumnType("TEXT");
+
                     b.Property<decimal>("TotalValue")
                         .HasColumnType("decimal(18,2)");
 
@@ -1186,7 +1309,12 @@ namespace POS.Migrations.Sqlite.Migrations
 
                     b.HasIndex("BranchId");
 
+                    b.HasIndex("CreatedBy");
+
                     b.HasIndex("InventoryItemId");
+
+                    b.HasIndex("TenantId")
+                        .HasDatabaseName("IX_StockAdjustment_TenantId");
 
                     b.ToTable("StockAdjustments");
                 });
@@ -1254,6 +1382,9 @@ namespace POS.Migrations.Sqlite.Migrations
                     b.HasIndex("BranchId");
 
                     b.HasIndex("CreatedBy");
+
+                    b.HasIndex("TenantId")
+                        .HasDatabaseName("IX_TaxEntry_TenantId");
 
                     b.HasIndex("TransactionId");
 
@@ -1352,13 +1483,45 @@ namespace POS.Migrations.Sqlite.Migrations
                     b.Property<string>("CountryName")
                         .HasColumnType("TEXT");
 
+                    b.Property<Guid>("CreatedBy")
+                        .HasColumnType("TEXT");
+
+                    b.Property<DateTime>("CreatedDate")
+                        .HasColumnType("TEXT");
+
+                    b.Property<Guid?>("DeletedBy")
+                        .HasColumnType("TEXT");
+
+                    b.Property<DateTime?>("DeletedDate")
+                        .HasColumnType("TEXT");
+
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("INTEGER");
+
+                    b.Property<DateTime?>("LastSyncedAt")
+                        .HasColumnType("TEXT");
 
                     b.Property<string>("MobileNo")
                         .HasColumnType("TEXT");
 
+                    b.Property<Guid>("ModifiedBy")
+                        .HasColumnType("TEXT");
+
+                    b.Property<DateTime>("ModifiedDate")
+                        .HasColumnType("TEXT");
+
+                    b.Property<long>("SyncVersion")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<Guid>("TenantId")
+                        .HasColumnType("TEXT");
+
                     b.HasKey("Id");
+
+                    b.HasIndex("CreatedBy");
+
+                    b.HasIndex("TenantId")
+                        .HasDatabaseName("IX_ContactAddress_TenantId");
 
                     b.ToTable("ContactAddresses");
                 });
@@ -1437,6 +1600,9 @@ namespace POS.Migrations.Sqlite.Migrations
 
                     b.HasIndex("LocationId");
 
+                    b.HasIndex("TenantId")
+                        .HasDatabaseName("IX_CustomerLedger_TenantId");
+
                     b.ToTable("CustomerLedgers");
                 });
 
@@ -1458,7 +1624,25 @@ namespace POS.Migrations.Sqlite.Migrations
                     b.Property<decimal>("DamagedQuantity")
                         .HasColumnType("decimal(18,2)");
 
+                    b.Property<Guid?>("DeletedBy")
+                        .HasColumnType("TEXT");
+
+                    b.Property<DateTime?>("DeletedDate")
+                        .HasColumnType("TEXT");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<DateTime?>("LastSyncedAt")
+                        .HasColumnType("TEXT");
+
                     b.Property<Guid>("LocationId")
+                        .HasColumnType("TEXT");
+
+                    b.Property<Guid>("ModifiedBy")
+                        .HasColumnType("TEXT");
+
+                    b.Property<DateTime>("ModifiedDate")
                         .HasColumnType("TEXT");
 
                     b.Property<Guid>("ProductId")
@@ -1470,6 +1654,12 @@ namespace POS.Migrations.Sqlite.Migrations
                     b.Property<Guid>("ReportedId")
                         .HasColumnType("TEXT");
 
+                    b.Property<long>("SyncVersion")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<Guid>("TenantId")
+                        .HasColumnType("TEXT");
+
                     b.HasKey("Id");
 
                     b.HasIndex("CreatedBy");
@@ -1479,6 +1669,9 @@ namespace POS.Migrations.Sqlite.Migrations
                     b.HasIndex("ProductId");
 
                     b.HasIndex("ReportedId");
+
+                    b.HasIndex("TenantId")
+                        .HasDatabaseName("IX_DamagedStock_TenantId");
 
                     b.ToTable("DamagedStocks");
                 });
@@ -1535,6 +1728,9 @@ namespace POS.Migrations.Sqlite.Migrations
                     b.HasIndex("ExpenseId");
 
                     b.HasIndex("TaxId");
+
+                    b.HasIndex("TenantId")
+                        .HasDatabaseName("IX_ExpenseTax_TenantId");
 
                     b.ToTable("ExpenseTaxes");
                 });
@@ -1610,6 +1806,9 @@ namespace POS.Migrations.Sqlite.Migrations
 
                     b.HasIndex("SalesOrderId");
 
+                    b.HasIndex("TenantId")
+                        .HasDatabaseName("IX_FBRSubmissionLog_TenantId");
+
                     b.ToTable("FBRSubmissionLogs");
                 });
 
@@ -1678,6 +1877,9 @@ namespace POS.Migrations.Sqlite.Migrations
 
                     b.HasIndex("InquiryId");
 
+                    b.HasIndex("TenantId")
+                        .HasDatabaseName("IX_InquiryActivity_TenantId");
+
                     b.ToTable("InquiryActivities");
                 });
 
@@ -1732,6 +1934,9 @@ namespace POS.Migrations.Sqlite.Migrations
 
                     b.HasIndex("InquiryId");
 
+                    b.HasIndex("TenantId")
+                        .HasDatabaseName("IX_InquiryAttachment_TenantId");
+
                     b.ToTable("InquiryAttachments");
                 });
 
@@ -1783,6 +1988,9 @@ namespace POS.Migrations.Sqlite.Migrations
 
                     b.HasIndex("InquiryId");
 
+                    b.HasIndex("TenantId")
+                        .HasDatabaseName("IX_InquiryNote_TenantId");
+
                     b.ToTable("InquiryNotes");
                 });
 
@@ -1829,6 +2037,9 @@ namespace POS.Migrations.Sqlite.Migrations
                     b.HasKey("Id");
 
                     b.HasIndex("CreatedBy");
+
+                    b.HasIndex("TenantId")
+                        .HasDatabaseName("IX_InquiryStatus_TenantId");
 
                     b.ToTable("InquiryStatuses");
                 });
@@ -1904,6 +2115,9 @@ namespace POS.Migrations.Sqlite.Migrations
 
                     b.HasIndex("ProductId");
 
+                    b.HasIndex("TenantId")
+                        .HasDatabaseName("IX_InventoryBatch_TenantId");
+
                     b.ToTable("InventoryBatches");
                 });
 
@@ -1957,9 +2171,6 @@ namespace POS.Migrations.Sqlite.Migrations
 
                     b.Property<long>("SyncVersion")
                         .HasColumnType("INTEGER");
-
-                    b.Property<Guid>("TenantId")
-                        .HasColumnType("TEXT");
 
                     b.HasKey("Id");
 
@@ -2053,6 +2264,9 @@ namespace POS.Migrations.Sqlite.Migrations
 
                     b.HasIndex("CreatedBy");
 
+                    b.HasIndex("TenantId")
+                        .HasDatabaseName("IX_Location_TenantId");
+
                     b.ToTable("Locations");
                 });
 
@@ -2098,9 +2312,6 @@ namespace POS.Migrations.Sqlite.Migrations
                     b.Property<long>("SyncVersion")
                         .HasColumnType("INTEGER");
 
-                    b.Property<Guid>("TenantId")
-                        .HasColumnType("TEXT");
-
                     b.HasKey("Id");
 
                     b.HasIndex("CreatedBy");
@@ -2135,6 +2346,18 @@ namespace POS.Migrations.Sqlite.Migrations
                     b.Property<decimal>("Commission")
                         .HasColumnType("decimal(18,2)");
 
+                    b.Property<Guid>("CreatedBy")
+                        .HasColumnType("TEXT");
+
+                    b.Property<DateTime>("CreatedDate")
+                        .HasColumnType("TEXT");
+
+                    b.Property<Guid?>("DeletedBy")
+                        .HasColumnType("TEXT");
+
+                    b.Property<DateTime?>("DeletedDate")
+                        .HasColumnType("TEXT");
+
                     b.Property<Guid>("EmployeeId")
                         .HasColumnType("TEXT");
 
@@ -2147,8 +2370,20 @@ namespace POS.Migrations.Sqlite.Migrations
                     b.Property<decimal>("FoodBill")
                         .HasColumnType("decimal(18,2)");
 
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<DateTime?>("LastSyncedAt")
+                        .HasColumnType("TEXT");
+
                     b.Property<decimal>("MobileBill")
                         .HasColumnType("decimal(18,2)");
+
+                    b.Property<Guid>("ModifiedBy")
+                        .HasColumnType("TEXT");
+
+                    b.Property<DateTime>("ModifiedDate")
+                        .HasColumnType("TEXT");
 
                     b.Property<string>("Note")
                         .HasColumnType("TEXT");
@@ -2165,6 +2400,12 @@ namespace POS.Migrations.Sqlite.Migrations
                     b.Property<int>("SalaryMonth")
                         .HasColumnType("INTEGER");
 
+                    b.Property<long>("SyncVersion")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<Guid>("TenantId")
+                        .HasColumnType("TEXT");
+
                     b.Property<decimal>("TotalSalary")
                         .HasColumnType("decimal(18,2)");
 
@@ -2175,9 +2416,14 @@ namespace POS.Migrations.Sqlite.Migrations
 
                     b.HasIndex("BranchId");
 
+                    b.HasIndex("CreatedBy");
+
                     b.HasIndex("EmployeeId");
 
                     b.HasIndex("FinancialYearId");
+
+                    b.HasIndex("TenantId")
+                        .HasDatabaseName("IX_Payroll_TenantId");
 
                     b.ToTable("Payrolls");
                 });
@@ -2237,6 +2483,9 @@ namespace POS.Migrations.Sqlite.Migrations
 
                     b.HasIndex("ParentId");
 
+                    b.HasIndex("TenantId", "Name")
+                        .HasDatabaseName("IX_ProductCategory_Tenant_Name");
+
                     b.ToTable("ProductCategories");
                 });
 
@@ -2246,10 +2495,31 @@ namespace POS.Migrations.Sqlite.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("TEXT");
 
+                    b.Property<Guid>("CreatedBy")
+                        .HasColumnType("TEXT");
+
+                    b.Property<DateTime>("CreatedDate")
+                        .HasColumnType("TEXT");
+
                     b.Property<decimal>("CurrentStock")
                         .HasColumnType("decimal(18,2)");
 
+                    b.Property<Guid?>("DeletedBy")
+                        .HasColumnType("TEXT");
+
+                    b.Property<DateTime?>("DeletedDate")
+                        .HasColumnType("TEXT");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<DateTime?>("LastSyncedAt")
+                        .HasColumnType("TEXT");
+
                     b.Property<Guid>("LocationId")
+                        .HasColumnType("TEXT");
+
+                    b.Property<Guid>("ModifiedBy")
                         .HasColumnType("TEXT");
 
                     b.Property<DateTime>("ModifiedDate")
@@ -2261,11 +2531,23 @@ namespace POS.Migrations.Sqlite.Migrations
                     b.Property<decimal>("PurchasePrice")
                         .HasColumnType("decimal(18,2)");
 
+                    b.Property<long>("SyncVersion")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<Guid>("TenantId")
+                        .HasColumnType("TEXT");
+
                     b.HasKey("Id");
+
+                    b.HasIndex("CreatedBy");
 
                     b.HasIndex("LocationId");
 
                     b.HasIndex("ProductId");
+
+                    b.HasIndex("TenantId", "ProductId", "LocationId")
+                        .IsUnique()
+                        .HasDatabaseName("IX_ProductStock_Tenant_Product_Location");
 
                     b.ToTable("ProductStocks");
                 });
@@ -2279,7 +2561,16 @@ namespace POS.Migrations.Sqlite.Migrations
                     b.Property<int?>("Application")
                         .HasColumnType("INTEGER");
 
+                    b.Property<Guid>("CreatedBy")
+                        .HasColumnType("TEXT");
+
                     b.Property<DateTime>("CreatedDate")
+                        .HasColumnType("TEXT");
+
+                    b.Property<Guid?>("DeletedBy")
+                        .HasColumnType("TEXT");
+
+                    b.Property<DateTime?>("DeletedDate")
                         .HasColumnType("TEXT");
 
                     b.Property<DateTime>("Duration")
@@ -2291,13 +2582,25 @@ namespace POS.Migrations.Sqlite.Migrations
                     b.Property<bool>("IsActive")
                         .HasColumnType("INTEGER");
 
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("INTEGER");
+
                     b.Property<bool>("IsEmailNotification")
                         .HasColumnType("INTEGER");
 
                     b.Property<bool>("IsRead")
                         .HasColumnType("INTEGER");
 
+                    b.Property<DateTime?>("LastSyncedAt")
+                        .HasColumnType("TEXT");
+
                     b.Property<string>("Message")
+                        .HasColumnType("TEXT");
+
+                    b.Property<Guid>("ModifiedBy")
+                        .HasColumnType("TEXT");
+
+                    b.Property<DateTime>("ModifiedDate")
                         .HasColumnType("TEXT");
 
                     b.Property<Guid?>("ReferenceId")
@@ -2306,10 +2609,21 @@ namespace POS.Migrations.Sqlite.Migrations
                     b.Property<string>("Subject")
                         .HasColumnType("TEXT");
 
+                    b.Property<long>("SyncVersion")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<Guid>("TenantId")
+                        .HasColumnType("TEXT");
+
                     b.Property<Guid>("UserId")
                         .HasColumnType("TEXT");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("CreatedBy");
+
+                    b.HasIndex("TenantId")
+                        .HasDatabaseName("IX_ReminderScheduler_TenantId");
 
                     b.HasIndex("UserId");
 
@@ -2384,6 +2698,9 @@ namespace POS.Migrations.Sqlite.Migrations
 
                     b.HasIndex("FromLocationId");
 
+                    b.HasIndex("TenantId")
+                        .HasDatabaseName("IX_StockTransfer_TenantId");
+
                     b.HasIndex("ToLocationId");
 
                     b.ToTable("StockTransfers");
@@ -2453,6 +2770,9 @@ namespace POS.Migrations.Sqlite.Migrations
                     b.HasIndex("ProductId");
 
                     b.HasIndex("StockTransferId");
+
+                    b.HasIndex("TenantId")
+                        .HasDatabaseName("IX_StockTransferItem_TenantId");
 
                     b.HasIndex("UnitId");
 
@@ -2540,6 +2860,30 @@ namespace POS.Migrations.Sqlite.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("TEXT");
 
+                    b.Property<Guid>("CreatedBy")
+                        .HasColumnType("TEXT");
+
+                    b.Property<DateTime>("CreatedDate")
+                        .HasColumnType("TEXT");
+
+                    b.Property<Guid?>("DeletedBy")
+                        .HasColumnType("TEXT");
+
+                    b.Property<DateTime?>("DeletedDate")
+                        .HasColumnType("TEXT");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<DateTime?>("LastSyncedAt")
+                        .HasColumnType("TEXT");
+
+                    b.Property<Guid>("ModifiedBy")
+                        .HasColumnType("TEXT");
+
+                    b.Property<DateTime>("ModifiedDate")
+                        .HasColumnType("TEXT");
+
                     b.Property<string>("ScreenName")
                         .IsRequired()
                         .HasColumnType("TEXT");
@@ -2547,10 +2891,21 @@ namespace POS.Migrations.Sqlite.Migrations
                     b.Property<string>("SettingsJson")
                         .HasColumnType("TEXT");
 
+                    b.Property<long>("SyncVersion")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<Guid>("TenantId")
+                        .HasColumnType("TEXT");
+
                     b.Property<Guid>("UserId")
                         .HasColumnType("TEXT");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("CreatedBy");
+
+                    b.HasIndex("TenantId")
+                        .HasDatabaseName("IX_TableSetting_TenantId");
 
                     b.ToTable("TableSettings");
                 });
@@ -2563,6 +2918,18 @@ namespace POS.Migrations.Sqlite.Migrations
 
                     b.Property<string>("Address")
                         .HasMaxLength(1000)
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("ApiKey")
+                        .HasColumnType("TEXT");
+
+                    b.Property<DateTime?>("ApiKeyCreatedDate")
+                        .HasColumnType("TEXT");
+
+                    b.Property<bool>("ApiKeyEnabled")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<DateTime?>("ApiKeyLastUsedDate")
                         .HasColumnType("TEXT");
 
                     b.Property<string>("BusinessType")
@@ -2589,6 +2956,9 @@ namespace POS.Migrations.Sqlite.Migrations
 
                     b.Property<bool>("IsActive")
                         .HasColumnType("INTEGER");
+
+                    b.Property<string>("LicenseType")
+                        .HasColumnType("TEXT");
 
                     b.Property<string>("LogoUrl")
                         .HasColumnType("TEXT");
@@ -2618,6 +2988,9 @@ namespace POS.Migrations.Sqlite.Migrations
 
                     b.Property<string>("TimeZone")
                         .HasMaxLength(100)
+                        .HasColumnType("TEXT");
+
+                    b.Property<DateTime?>("TrialExpiryDate")
                         .HasColumnType("TEXT");
 
                     b.HasKey("Id");
@@ -2730,6 +3103,9 @@ namespace POS.Migrations.Sqlite.Migrations
 
                     b.HasIndex("FinancialYearId");
 
+                    b.HasIndex("TenantId", "TransactionDate")
+                        .HasDatabaseName("IX_Transaction_Tenant_Date");
+
                     b.ToTable("Transactions");
                 });
 
@@ -2792,6 +3168,9 @@ namespace POS.Migrations.Sqlite.Migrations
 
                     b.HasIndex("CreatedBy");
 
+                    b.HasIndex("TenantId")
+                        .HasDatabaseName("IX_Variant_TenantId");
+
                     b.ToTable("Variants");
                 });
 
@@ -2841,6 +3220,9 @@ namespace POS.Migrations.Sqlite.Migrations
                     b.HasKey("Id");
 
                     b.HasIndex("CreatedBy");
+
+                    b.HasIndex("TenantId")
+                        .HasDatabaseName("IX_VariantItem_TenantId");
 
                     b.HasIndex("VariantId");
 
@@ -2929,6 +3311,12 @@ namespace POS.Migrations.Sqlite.Migrations
 
                     b.HasIndex("LocationId");
 
+                    b.HasIndex("TenantId", "ExpenseCategoryId")
+                        .HasDatabaseName("IX_Expense_Tenant_Category");
+
+                    b.HasIndex("TenantId", "ExpenseDate")
+                        .HasDatabaseName("IX_Expense_Tenant_Date");
+
                     b.ToTable("Expenses");
                 });
 
@@ -2977,6 +3365,9 @@ namespace POS.Migrations.Sqlite.Migrations
                     b.HasKey("Id");
 
                     b.HasIndex("CreatedBy");
+
+                    b.HasIndex("TenantId")
+                        .HasDatabaseName("IX_ExpenseCategory_TenantId");
 
                     b.ToTable("ExpenseCategories");
                 });
@@ -3111,6 +3502,9 @@ namespace POS.Migrations.Sqlite.Migrations
 
                     b.HasIndex("InquiryStatusId");
 
+                    b.HasIndex("TenantId")
+                        .HasDatabaseName("IX_Inquiry_TenantId");
+
                     b.ToTable("Inquiries");
                 });
 
@@ -3173,6 +3567,9 @@ namespace POS.Migrations.Sqlite.Migrations
 
                     b.HasIndex("CreatedBy");
 
+                    b.HasIndex("TenantId")
+                        .HasDatabaseName("IX_InquirySource_TenantId");
+
                     b.ToTable("InquirySources");
                 });
 
@@ -3209,6 +3606,93 @@ namespace POS.Migrations.Sqlite.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("LoginAudits");
+                });
+
+            modelBuilder.Entity("POS.Data.MenuItem", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("TEXT");
+
+                    b.Property<Guid>("CreatedBy")
+                        .HasColumnType("TEXT");
+
+                    b.Property<DateTime>("CreatedDate")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("CssClass")
+                        .HasColumnType("TEXT");
+
+                    b.Property<Guid?>("DeletedBy")
+                        .HasColumnType("TEXT");
+
+                    b.Property<DateTime?>("DeletedDate")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Icon")
+                        .HasColumnType("TEXT");
+
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<bool>("IsVisible")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<DateTime?>("LastSyncedAt")
+                        .HasColumnType("TEXT");
+
+                    b.Property<Guid>("ModifiedBy")
+                        .HasColumnType("TEXT");
+
+                    b.Property<DateTime>("ModifiedDate")
+                        .HasColumnType("TEXT");
+
+                    b.Property<int>("Order")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<Guid?>("ParentId")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Path")
+                        .HasColumnType("TEXT");
+
+                    b.Property<long>("SyncVersion")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<Guid?>("TenantId")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Title")
+                        .HasColumnType("TEXT");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CreatedBy");
+
+                    b.HasIndex("ParentId");
+
+                    b.ToTable("MenuItems");
+                });
+
+            modelBuilder.Entity("POS.Data.MenuItemAction", b =>
+                {
+                    b.Property<Guid>("MenuItemId")
+                        .HasColumnType("TEXT");
+
+                    b.Property<Guid>("ActionId")
+                        .HasColumnType("TEXT");
+
+                    b.Property<int>("Operation")
+                        .HasColumnType("INTEGER");
+
+                    b.HasKey("MenuItemId", "ActionId");
+
+                    b.HasIndex("ActionId");
+
+                    b.ToTable("MenuItemActions");
                 });
 
             modelBuilder.Entity("POS.Data.NLog", b =>
@@ -3293,9 +3777,6 @@ namespace POS.Migrations.Sqlite.Migrations
 
                     b.Property<long>("SyncVersion")
                         .HasColumnType("INTEGER");
-
-                    b.Property<Guid>("TenantId")
-                        .HasColumnType("TEXT");
 
                     b.HasKey("Id");
 
@@ -3429,6 +3910,19 @@ namespace POS.Migrations.Sqlite.Migrations
 
                     b.HasIndex("VariantItemId");
 
+                    b.HasIndex("TenantId", "Barcode")
+                        .HasDatabaseName("IX_Product_Tenant_Barcode");
+
+                    b.HasIndex("TenantId", "CategoryId")
+                        .HasDatabaseName("IX_Product_Tenant_Category");
+
+                    b.HasIndex("TenantId", "Code")
+                        .IsUnique()
+                        .HasDatabaseName("IX_Product_Tenant_Code");
+
+                    b.HasIndex("TenantId", "Name")
+                        .HasDatabaseName("IX_Product_Tenant_Name");
+
                     b.ToTable("Products");
                 });
 
@@ -3478,6 +3972,9 @@ namespace POS.Migrations.Sqlite.Migrations
                     b.HasIndex("CreatedBy");
 
                     b.HasIndex("TaxId");
+
+                    b.HasIndex("TenantId")
+                        .HasDatabaseName("IX_ProductTax_TenantId");
 
                     b.ToTable("ProductTaxes");
                 });
@@ -3584,6 +4081,16 @@ namespace POS.Migrations.Sqlite.Migrations
                     b.HasIndex("LocationId");
 
                     b.HasIndex("SupplierId");
+
+                    b.HasIndex("TenantId", "OrderNumber")
+                        .IsUnique()
+                        .HasDatabaseName("IX_PurchaseOrder_Tenant_Number");
+
+                    b.HasIndex("TenantId", "POCreatedDate")
+                        .HasDatabaseName("IX_PurchaseOrder_Tenant_Date");
+
+                    b.HasIndex("TenantId", "SupplierId")
+                        .HasDatabaseName("IX_PurchaseOrder_Tenant_Supplier");
 
                     b.ToTable("PurchaseOrders");
                 });
@@ -3738,6 +4245,9 @@ namespace POS.Migrations.Sqlite.Migrations
 
                     b.HasIndex("PurchaseOrderId");
 
+                    b.HasIndex("TenantId")
+                        .HasDatabaseName("IX_PurchaseOrderPayment_TenantId");
+
                     b.ToTable("PurchaseOrderPayments");
                 });
 
@@ -3830,6 +4340,9 @@ namespace POS.Migrations.Sqlite.Migrations
 
                     b.HasIndex("CreatedBy");
 
+                    b.HasIndex("TenantId")
+                        .HasDatabaseName("IX_Reminder_TenantId");
+
                     b.ToTable("Reminders");
                 });
 
@@ -3837,6 +4350,18 @@ namespace POS.Migrations.Sqlite.Migrations
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
+                        .HasColumnType("TEXT");
+
+                    b.Property<Guid>("CreatedBy")
+                        .HasColumnType("TEXT");
+
+                    b.Property<DateTime>("CreatedDate")
+                        .HasColumnType("TEXT");
+
+                    b.Property<Guid?>("DeletedBy")
+                        .HasColumnType("TEXT");
+
+                    b.Property<DateTime?>("DeletedDate")
                         .HasColumnType("TEXT");
 
                     b.Property<string>("Description")
@@ -3851,15 +4376,35 @@ namespace POS.Migrations.Sqlite.Migrations
                     b.Property<bool>("IsEmailNotification")
                         .HasColumnType("INTEGER");
 
+                    b.Property<DateTime?>("LastSyncedAt")
+                        .HasColumnType("TEXT");
+
+                    b.Property<Guid>("ModifiedBy")
+                        .HasColumnType("TEXT");
+
+                    b.Property<DateTime>("ModifiedDate")
+                        .HasColumnType("TEXT");
+
                     b.Property<Guid>("ReminderId")
                         .HasColumnType("TEXT");
 
                     b.Property<string>("Subject")
                         .HasColumnType("TEXT");
 
+                    b.Property<long>("SyncVersion")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<Guid>("TenantId")
+                        .HasColumnType("TEXT");
+
                     b.HasKey("Id");
 
+                    b.HasIndex("CreatedBy");
+
                     b.HasIndex("ReminderId");
+
+                    b.HasIndex("TenantId")
+                        .HasDatabaseName("IX_ReminderNotification_TenantId");
 
                     b.ToTable("ReminderNotifications");
                 });
@@ -3907,7 +4452,7 @@ namespace POS.Migrations.Sqlite.Migrations
                     b.Property<bool>("IsSuperRole")
                         .HasColumnType("INTEGER");
 
-                    b.Property<Guid>("ModifiedBy")
+                    b.Property<Guid?>("ModifiedBy")
                         .HasColumnType("TEXT");
 
                     b.Property<DateTime>("ModifiedDate")
@@ -3934,11 +4479,11 @@ namespace POS.Migrations.Sqlite.Migrations
 
                     b.HasIndex("ModifiedBy");
 
-                    b.HasIndex("NormalizedName")
+                    b.HasIndex("TenantId");
+
+                    b.HasIndex("NormalizedName", "TenantId")
                         .IsUnique()
                         .HasDatabaseName("RoleNameIndex");
-
-                    b.HasIndex("TenantId");
 
                     b.ToTable("Roles", (string)null);
                 });
@@ -3968,6 +4513,47 @@ namespace POS.Migrations.Sqlite.Migrations
                     b.HasIndex("RoleId");
 
                     b.ToTable("RoleClaims", (string)null);
+                });
+
+            modelBuilder.Entity("POS.Data.RoleMenuItem", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("TEXT");
+
+                    b.Property<Guid>("AssignedBy")
+                        .HasColumnType("TEXT");
+
+                    b.Property<DateTime>("AssignedDate")
+                        .HasColumnType("TEXT");
+
+                    b.Property<bool>("CanCreate")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<bool>("CanDelete")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<bool>("CanEdit")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<bool>("CanView")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<Guid>("MenuItemId")
+                        .HasColumnType("TEXT");
+
+                    b.Property<Guid>("RoleId")
+                        .HasColumnType("TEXT");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("AssignedBy");
+
+                    b.HasIndex("MenuItemId");
+
+                    b.HasIndex("RoleId");
+
+                    b.ToTable("RoleMenuItems");
                 });
 
             modelBuilder.Entity("POS.Data.SalesOrder", b =>
@@ -4126,6 +4712,19 @@ namespace POS.Migrations.Sqlite.Migrations
 
                     b.HasIndex("LocationId");
 
+                    b.HasIndex("TenantId", "CustomerId")
+                        .HasDatabaseName("IX_SalesOrder_Tenant_Customer");
+
+                    b.HasIndex("TenantId", "OrderNumber")
+                        .IsUnique()
+                        .HasDatabaseName("IX_SalesOrder_Tenant_Number");
+
+                    b.HasIndex("TenantId", "SOCreatedDate")
+                        .HasDatabaseName("IX_SalesOrder_Tenant_Date");
+
+                    b.HasIndex("TenantId", "Status")
+                        .HasDatabaseName("IX_SalesOrder_Tenant_Status");
+
                     b.ToTable("SalesOrders");
                 });
 
@@ -4190,7 +4789,8 @@ namespace POS.Migrations.Sqlite.Migrations
 
                     b.HasIndex("ProductId");
 
-                    b.HasIndex("SalesOrderId");
+                    b.HasIndex("SalesOrderId")
+                        .HasDatabaseName("IX_SalesOrderItem_SalesOrder");
 
                     b.HasIndex("UnitId");
 
@@ -4289,6 +4889,9 @@ namespace POS.Migrations.Sqlite.Migrations
 
                     b.HasIndex("SalesOrderId");
 
+                    b.HasIndex("TenantId")
+                        .HasDatabaseName("IX_SalesOrderPayment_TenantId");
+
                     b.ToTable("SalesOrderPayments");
                 });
 
@@ -4350,6 +4953,9 @@ namespace POS.Migrations.Sqlite.Migrations
                     b.HasIndex("CustomerId");
 
                     b.HasIndex("SupplierId");
+
+                    b.HasIndex("TenantId")
+                        .HasDatabaseName("IX_SendEmail_TenantId");
 
                     b.ToTable("SendEmails");
                 });
@@ -4446,6 +5052,12 @@ namespace POS.Migrations.Sqlite.Migrations
 
                     b.HasIndex("ShippingAddressId");
 
+                    b.HasIndex("TenantId", "Email")
+                        .HasDatabaseName("IX_Supplier_Tenant_Email");
+
+                    b.HasIndex("TenantId", "MobileNo")
+                        .HasDatabaseName("IX_Supplier_Tenant_Mobile");
+
                     b.ToTable("Suppliers");
                 });
 
@@ -4538,6 +5150,9 @@ namespace POS.Migrations.Sqlite.Migrations
 
                     b.HasIndex("CreatedBy");
 
+                    b.HasIndex("TenantId")
+                        .HasDatabaseName("IX_Tax_TenantId");
+
                     b.ToTable("Taxes");
                 });
 
@@ -4599,6 +5214,9 @@ namespace POS.Migrations.Sqlite.Migrations
                     b.HasIndex("CreatedBy");
 
                     b.HasIndex("ParentId");
+
+                    b.HasIndex("TenantId", "Name")
+                        .HasDatabaseName("IX_Unit_Tenant_Name");
 
                     b.ToTable("UnitConversations");
                 });
@@ -4717,14 +5335,16 @@ namespace POS.Migrations.Sqlite.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("NormalizedEmail")
+                    b.HasIndex("NormalizedEmail", "TenantId")
+                        .IsUnique()
                         .HasDatabaseName("EmailIndex");
 
-                    b.HasIndex("NormalizedUserName")
+                    b.HasIndex("NormalizedUserName", "TenantId")
                         .IsUnique()
                         .HasDatabaseName("UserNameIndex");
 
-                    b.HasIndex("TenantId");
+                    b.HasIndex("TenantId", "PhoneNumber")
+                        .HasDatabaseName("IX_User_Tenant_Phone");
 
                     b.ToTable("Users", (string)null);
                 });
@@ -4751,7 +5371,8 @@ namespace POS.Migrations.Sqlite.Migrations
 
                     b.HasIndex("ActionId");
 
-                    b.HasIndex("UserId");
+                    b.HasIndex("UserId", "ClaimType")
+                        .HasDatabaseName("IX_UserClaim_User_Type");
 
                     b.ToTable("UserClaims", (string)null);
                 });
@@ -4865,7 +5486,7 @@ namespace POS.Migrations.Sqlite.Migrations
                     b.HasOne("POS.Data.User", "CreatedByUser")
                         .WithMany()
                         .HasForeignKey("CreatedBy")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.Navigation("CreatedByUser");
@@ -4876,13 +5497,24 @@ namespace POS.Migrations.Sqlite.Migrations
                     b.HasOne("POS.Data.User", "CreatedByUser")
                         .WithMany()
                         .HasForeignKey("CreatedBy")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.Navigation("CreatedByUser");
                 });
 
             modelBuilder.Entity("POS.Data.Country", b =>
+                {
+                    b.HasOne("POS.Data.User", "CreatedByUser")
+                        .WithMany()
+                        .HasForeignKey("CreatedBy")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("CreatedByUser");
+                });
+
+            modelBuilder.Entity("POS.Data.Currency", b =>
                 {
                     b.HasOne("POS.Data.User", "CreatedByUser")
                         .WithMany()
@@ -4923,7 +5555,7 @@ namespace POS.Migrations.Sqlite.Migrations
                     b.HasOne("POS.Data.User", "CreatedByUser")
                         .WithMany()
                         .HasForeignKey("CreatedBy")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.HasOne("POS.Data.Product", "Product")
@@ -4992,7 +5624,7 @@ namespace POS.Migrations.Sqlite.Migrations
                     b.HasOne("POS.Data.User", "CreatedByUser")
                         .WithMany()
                         .HasForeignKey("CreatedBy")
-                        .OnDelete(DeleteBehavior.NoAction)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.HasOne("POS.Data.Entities.Accounts.LedgerAccount", "CreditLedgerAccount")
@@ -5037,7 +5669,7 @@ namespace POS.Migrations.Sqlite.Migrations
                     b.HasOne("POS.Data.User", "CreatedByUser")
                         .WithMany()
                         .HasForeignKey("CreatedBy")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.Navigation("CreatedByUser");
@@ -5048,7 +5680,7 @@ namespace POS.Migrations.Sqlite.Migrations
                     b.HasOne("POS.Data.User", "CreatedByUser")
                         .WithMany()
                         .HasForeignKey("CreatedBy")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.HasOne("POS.Data.Entities.Accounts.LedgerAccount", "ParentAccount")
@@ -5071,7 +5703,7 @@ namespace POS.Migrations.Sqlite.Migrations
                     b.HasOne("POS.Data.User", "CreatedByUser")
                         .WithMany()
                         .HasForeignKey("CreatedBy")
-                        .OnDelete(DeleteBehavior.NoAction)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.HasOne("POS.Data.Entities.Accounts.LedgerAccount", "LoanAccount")
@@ -5100,7 +5732,7 @@ namespace POS.Migrations.Sqlite.Migrations
                     b.HasOne("POS.Data.User", "CreatedByUser")
                         .WithMany()
                         .HasForeignKey("CreatedBy")
-                        .OnDelete(DeleteBehavior.NoAction)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.HasOne("POS.Data.Entities.Accounts.LoanDetail", "LoanDetail")
@@ -5122,6 +5754,12 @@ namespace POS.Migrations.Sqlite.Migrations
                         .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
 
+                    b.HasOne("POS.Data.User", "CreatedByUser")
+                        .WithMany()
+                        .HasForeignKey("CreatedBy")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
                     b.HasOne("POS.Data.Entities.Transaction", "Transaction")
                         .WithMany("PaymentEntries")
                         .HasForeignKey("TransactionId")
@@ -5129,6 +5767,8 @@ namespace POS.Migrations.Sqlite.Migrations
                         .IsRequired();
 
                     b.Navigation("Branch");
+
+                    b.Navigation("CreatedByUser");
 
                     b.Navigation("Transaction");
                 });
@@ -5141,6 +5781,12 @@ namespace POS.Migrations.Sqlite.Migrations
                         .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
 
+                    b.HasOne("POS.Data.User", "CreatedByUser")
+                        .WithMany()
+                        .HasForeignKey("CreatedBy")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
                     b.HasOne("POS.Data.Product", "InventoryItem")
                         .WithMany()
                         .HasForeignKey("InventoryItemId")
@@ -5148,6 +5794,8 @@ namespace POS.Migrations.Sqlite.Migrations
                         .IsRequired();
 
                     b.Navigation("Branch");
+
+                    b.Navigation("CreatedByUser");
 
                     b.Navigation("InventoryItem");
                 });
@@ -5163,7 +5811,7 @@ namespace POS.Migrations.Sqlite.Migrations
                     b.HasOne("POS.Data.User", "CreatedByUser")
                         .WithMany()
                         .HasForeignKey("CreatedBy")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.HasOne("POS.Data.Entities.Transaction", "Transaction")
@@ -5224,12 +5872,23 @@ namespace POS.Migrations.Sqlite.Migrations
                     b.Navigation("TransactionItem");
                 });
 
+            modelBuilder.Entity("POS.Data.Entities.ContactAddress", b =>
+                {
+                    b.HasOne("POS.Data.User", "CreatedByUser")
+                        .WithMany()
+                        .HasForeignKey("CreatedBy")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("CreatedByUser");
+                });
+
             modelBuilder.Entity("POS.Data.Entities.CustomerLedger", b =>
                 {
                     b.HasOne("POS.Data.User", "CreatedByUser")
                         .WithMany()
                         .HasForeignKey("CreatedBy")
-                        .OnDelete(DeleteBehavior.NoAction)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.HasOne("POS.Data.Customer", "Customer")
@@ -5317,7 +5976,7 @@ namespace POS.Migrations.Sqlite.Migrations
                     b.HasOne("POS.Data.User", "CreatedByUser")
                         .WithMany()
                         .HasForeignKey("CreatedBy")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.HasOne("POS.Data.SalesOrder", "SalesOrder")
@@ -5448,7 +6107,7 @@ namespace POS.Migrations.Sqlite.Migrations
                     b.HasOne("POS.Data.User", "CreatedByUser")
                         .WithMany()
                         .HasForeignKey("CreatedBy")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.Navigation("CreatedByUser");
@@ -5473,6 +6132,12 @@ namespace POS.Migrations.Sqlite.Migrations
                         .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
 
+                    b.HasOne("POS.Data.User", "CreatedByUser")
+                        .WithMany()
+                        .HasForeignKey("CreatedBy")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
                     b.HasOne("POS.Data.User", "Employee")
                         .WithMany()
                         .HasForeignKey("EmployeeId")
@@ -5484,6 +6149,8 @@ namespace POS.Migrations.Sqlite.Migrations
                         .HasForeignKey("FinancialYearId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+
+                    b.Navigation("CreatedByUser");
 
                     b.Navigation("Employee");
 
@@ -5511,6 +6178,12 @@ namespace POS.Migrations.Sqlite.Migrations
 
             modelBuilder.Entity("POS.Data.Entities.ProductStock", b =>
                 {
+                    b.HasOne("POS.Data.User", "CreatedByUser")
+                        .WithMany()
+                        .HasForeignKey("CreatedBy")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
                     b.HasOne("POS.Data.Entities.Location", "Location")
                         .WithMany()
                         .HasForeignKey("LocationId")
@@ -5523,6 +6196,8 @@ namespace POS.Migrations.Sqlite.Migrations
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
+                    b.Navigation("CreatedByUser");
+
                     b.Navigation("Location");
 
                     b.Navigation("Product");
@@ -5530,11 +6205,19 @@ namespace POS.Migrations.Sqlite.Migrations
 
             modelBuilder.Entity("POS.Data.Entities.ReminderScheduler", b =>
                 {
+                    b.HasOne("POS.Data.User", "CreatedByUser")
+                        .WithMany()
+                        .HasForeignKey("CreatedBy")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
                     b.HasOne("POS.Data.User", "User")
                         .WithMany()
                         .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
+
+                    b.Navigation("CreatedByUser");
 
                     b.Navigation("User");
                 });
@@ -5571,7 +6254,7 @@ namespace POS.Migrations.Sqlite.Migrations
                     b.HasOne("POS.Data.User", "CreatedByUser")
                         .WithMany()
                         .HasForeignKey("CreatedBy")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.HasOne("POS.Data.Product", "Product")
@@ -5599,6 +6282,17 @@ namespace POS.Migrations.Sqlite.Migrations
                     b.Navigation("Unit");
                 });
 
+            modelBuilder.Entity("POS.Data.Entities.TableSetting", b =>
+                {
+                    b.HasOne("POS.Data.User", "CreatedByUser")
+                        .WithMany()
+                        .HasForeignKey("CreatedBy")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("CreatedByUser");
+                });
+
             modelBuilder.Entity("POS.Data.Entities.Transaction", b =>
                 {
                     b.HasOne("POS.Data.Entities.Location", "Branch")
@@ -5610,7 +6304,7 @@ namespace POS.Migrations.Sqlite.Migrations
                     b.HasOne("POS.Data.User", "CreatedByUser")
                         .WithMany()
                         .HasForeignKey("CreatedBy")
-                        .OnDelete(DeleteBehavior.NoAction)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.HasOne("POS.Data.Entities.Accounts.FinancialYear", "FinancialYear")
@@ -5650,7 +6344,7 @@ namespace POS.Migrations.Sqlite.Migrations
                     b.HasOne("POS.Data.User", "CreatedByUser")
                         .WithMany()
                         .HasForeignKey("CreatedBy")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.Navigation("CreatedByUser");
@@ -5748,7 +6442,7 @@ namespace POS.Migrations.Sqlite.Migrations
                     b.HasOne("POS.Data.User", "CreatedByUser")
                         .WithMany()
                         .HasForeignKey("CreatedBy")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.HasOne("POS.Data.InquirySource", "InquirySource")
@@ -5802,6 +6496,43 @@ namespace POS.Migrations.Sqlite.Migrations
                         .IsRequired();
 
                     b.Navigation("CreatedByUser");
+                });
+
+            modelBuilder.Entity("POS.Data.MenuItem", b =>
+                {
+                    b.HasOne("POS.Data.User", "CreatedByUser")
+                        .WithMany()
+                        .HasForeignKey("CreatedBy")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("POS.Data.MenuItem", "Parent")
+                        .WithMany("Children")
+                        .HasForeignKey("ParentId")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.Navigation("CreatedByUser");
+
+                    b.Navigation("Parent");
+                });
+
+            modelBuilder.Entity("POS.Data.MenuItemAction", b =>
+                {
+                    b.HasOne("POS.Data.Action", "Action")
+                        .WithMany()
+                        .HasForeignKey("ActionId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("POS.Data.MenuItem", "MenuItem")
+                        .WithMany("MenuItemActions")
+                        .HasForeignKey("MenuItemId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Action");
+
+                    b.Navigation("MenuItem");
                 });
 
             modelBuilder.Entity("POS.Data.Page", b =>
@@ -5898,7 +6629,7 @@ namespace POS.Migrations.Sqlite.Migrations
                     b.HasOne("POS.Data.User", "CreatedByUser")
                         .WithMany()
                         .HasForeignKey("CreatedBy")
-                        .OnDelete(DeleteBehavior.NoAction)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.HasOne("POS.Data.Entities.Location", "Location")
@@ -6009,11 +6740,19 @@ namespace POS.Migrations.Sqlite.Migrations
 
             modelBuilder.Entity("POS.Data.ReminderNotification", b =>
                 {
+                    b.HasOne("POS.Data.User", "CreatedByUser")
+                        .WithMany()
+                        .HasForeignKey("CreatedBy")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
                     b.HasOne("POS.Data.Reminder", "Reminder")
                         .WithMany("ReminderNotifications")
                         .HasForeignKey("ReminderId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+
+                    b.Navigation("CreatedByUser");
 
                     b.Navigation("Reminder");
                 });
@@ -6052,8 +6791,7 @@ namespace POS.Migrations.Sqlite.Migrations
                     b.HasOne("POS.Data.User", "ModifiedByUser")
                         .WithMany()
                         .HasForeignKey("ModifiedBy")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
+                        .OnDelete(DeleteBehavior.Restrict);
 
                     b.HasOne("POS.Data.Entities.Tenant", "Tenant")
                         .WithMany()
@@ -6085,6 +6823,33 @@ namespace POS.Migrations.Sqlite.Migrations
                         .IsRequired();
 
                     b.Navigation("Action");
+
+                    b.Navigation("Role");
+                });
+
+            modelBuilder.Entity("POS.Data.RoleMenuItem", b =>
+                {
+                    b.HasOne("POS.Data.User", "AssignedByUser")
+                        .WithMany()
+                        .HasForeignKey("AssignedBy")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("POS.Data.MenuItem", "MenuItem")
+                        .WithMany("RoleMenuItems")
+                        .HasForeignKey("MenuItemId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("POS.Data.Role", "Role")
+                        .WithMany()
+                        .HasForeignKey("RoleId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("AssignedByUser");
+
+                    b.Navigation("MenuItem");
 
                     b.Navigation("Role");
                 });
@@ -6186,7 +6951,7 @@ namespace POS.Migrations.Sqlite.Migrations
                     b.HasOne("POS.Data.User", "CreatedByUser")
                         .WithMany()
                         .HasForeignKey("CreatedBy")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.HasOne("POS.Data.Customer", "Customer")
@@ -6409,6 +7174,15 @@ namespace POS.Migrations.Sqlite.Migrations
                     b.Navigation("InquiryNotes");
 
                     b.Navigation("InquiryProducts");
+                });
+
+            modelBuilder.Entity("POS.Data.MenuItem", b =>
+                {
+                    b.Navigation("Children");
+
+                    b.Navigation("MenuItemActions");
+
+                    b.Navigation("RoleMenuItems");
                 });
 
             modelBuilder.Entity("POS.Data.Page", b =>
