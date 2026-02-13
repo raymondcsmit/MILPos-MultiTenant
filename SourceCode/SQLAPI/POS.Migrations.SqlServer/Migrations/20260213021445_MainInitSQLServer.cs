@@ -12,38 +12,6 @@ namespace POS.Migrations.SqlServer.Migrations
         protected override void Up(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.CreateTable(
-                name: "ContactAddresses",
-                columns: table => new
-                {
-                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    ContactPerson = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    MobileNo = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    Address = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    CountryName = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    CityName = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    CountryId = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
-                    CityId = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
-                    IsDeleted = table.Column<bool>(type: "bit", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_ContactAddresses", x => x.Id);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "Currencies",
-                columns: table => new
-                {
-                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    Name = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: true),
-                    Symbol = table.Column<string>(type: "nvarchar(10)", maxLength: 10, nullable: true)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_Currencies", x => x.Id);
-                });
-
-            migrationBuilder.CreateTable(
                 name: "EmailLogs",
                 columns: table => new
                 {
@@ -138,20 +106,6 @@ namespace POS.Migrations.SqlServer.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "TableSettings",
-                columns: table => new
-                {
-                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    ScreenName = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    UserId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    SettingsJson = table.Column<string>(type: "nvarchar(max)", nullable: true)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_TableSettings", x => x.Id);
-                });
-
-            migrationBuilder.CreateTable(
                 name: "Tenants",
                 columns: table => new
                 {
@@ -171,7 +125,13 @@ namespace POS.Migrations.SqlServer.Migrations
                     LogoUrl = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     TimeZone = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: true),
                     Currency = table.Column<string>(type: "nvarchar(10)", maxLength: 10, nullable: true),
-                    BusinessType = table.Column<string>(type: "nvarchar(max)", nullable: true)
+                    BusinessType = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    LicenseType = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    TrialExpiryDate = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    ApiKey = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    ApiKeyCreatedDate = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    ApiKeyLastUsedDate = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    ApiKeyEnabled = table.Column<bool>(type: "bit", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -228,7 +188,7 @@ namespace POS.Migrations.SqlServer.Migrations
                     PasswordHash = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     SecurityStamp = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     ConcurrencyStamp = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    PhoneNumber = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    PhoneNumber = table.Column<string>(type: "nvarchar(450)", nullable: true),
                     PhoneNumberConfirmed = table.Column<bool>(type: "bit", nullable: false),
                     TwoFactorEnabled = table.Column<bool>(type: "bit", nullable: false),
                     LockoutEnd = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: true),
@@ -310,7 +270,41 @@ namespace POS.Migrations.SqlServer.Migrations
                         column: x => x.CreatedBy,
                         principalTable: "Users",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
+                        onDelete: ReferentialAction.Restrict);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "ContactAddresses",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    ContactPerson = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    MobileNo = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Address = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    CountryName = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    CityName = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    CountryId = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
+                    CityId = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
+                    TenantId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    CreatedDate = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    CreatedBy = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    ModifiedDate = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    ModifiedBy = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    DeletedDate = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    DeletedBy = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
+                    SyncVersion = table.Column<long>(type: "bigint", nullable: false),
+                    LastSyncedAt = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    IsDeleted = table.Column<bool>(type: "bit", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_ContactAddresses", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_ContactAddresses_Users_CreatedBy",
+                        column: x => x.CreatedBy,
+                        principalTable: "Users",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
                 });
 
             migrationBuilder.CreateTable(
@@ -341,7 +335,7 @@ namespace POS.Migrations.SqlServer.Migrations
                         column: x => x.CreatedBy,
                         principalTable: "Users",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
+                        onDelete: ReferentialAction.Restrict);
                 });
 
             migrationBuilder.CreateTable(
@@ -350,7 +344,6 @@ namespace POS.Migrations.SqlServer.Migrations
                 {
                     Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     CountryName = table.Column<string>(type: "nvarchar(200)", maxLength: 200, nullable: true),
-                    TenantId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     CreatedDate = table.Column<DateTime>(type: "datetime2", nullable: false),
                     CreatedBy = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     ModifiedDate = table.Column<DateTime>(type: "datetime2", nullable: false, defaultValueSql: "CURRENT_TIMESTAMP"),
@@ -373,24 +366,12 @@ namespace POS.Migrations.SqlServer.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "Customers",
+                name: "Currencies",
                 columns: table => new
                 {
                     Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    CustomerName = table.Column<string>(type: "nvarchar(250)", maxLength: 250, nullable: true),
-                    ContactPerson = table.Column<string>(type: "nvarchar(200)", maxLength: 200, nullable: true),
-                    Email = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: true),
-                    Fax = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: true),
-                    MobileNo = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: true),
-                    PhoneNo = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: true),
-                    Website = table.Column<string>(type: "nvarchar(500)", maxLength: 500, nullable: true),
-                    Description = table.Column<string>(type: "nvarchar(2000)", maxLength: 2000, nullable: true),
-                    Url = table.Column<string>(type: "nvarchar(500)", maxLength: 500, nullable: true),
-                    BillingAddressId = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
-                    ShippingAddressId = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
-                    IsWalkIn = table.Column<bool>(type: "bit", nullable: false),
-                    TaxNumber = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: true),
-                    TenantId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    Name = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: true),
+                    Symbol = table.Column<string>(type: "nvarchar(10)", maxLength: 10, nullable: true),
                     CreatedDate = table.Column<DateTime>(type: "datetime2", nullable: false),
                     CreatedBy = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     ModifiedDate = table.Column<DateTime>(type: "datetime2", nullable: false),
@@ -403,25 +384,13 @@ namespace POS.Migrations.SqlServer.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Customers", x => x.Id);
+                    table.PrimaryKey("PK_Currencies", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_Customers_ContactAddresses_BillingAddressId",
-                        column: x => x.BillingAddressId,
-                        principalTable: "ContactAddresses",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
-                    table.ForeignKey(
-                        name: "FK_Customers_ContactAddresses_ShippingAddressId",
-                        column: x => x.ShippingAddressId,
-                        principalTable: "ContactAddresses",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
-                    table.ForeignKey(
-                        name: "FK_Customers_Users_CreatedBy",
+                        name: "FK_Currencies_Users_CreatedBy",
                         column: x => x.CreatedBy,
                         principalTable: "Users",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
+                        onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(
@@ -546,7 +515,7 @@ namespace POS.Migrations.SqlServer.Migrations
                         column: x => x.CreatedBy,
                         principalTable: "Users",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
+                        onDelete: ReferentialAction.Restrict);
                 });
 
             migrationBuilder.CreateTable(
@@ -615,7 +584,6 @@ namespace POS.Migrations.SqlServer.Migrations
                     ImageUrl = table.Column<string>(type: "nvarchar(500)", maxLength: 500, nullable: true),
                     Isrtl = table.Column<bool>(type: "bit", nullable: false),
                     Order = table.Column<int>(type: "int", nullable: false),
-                    TenantId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     CreatedDate = table.Column<DateTime>(type: "datetime2", nullable: false),
                     CreatedBy = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     ModifiedDate = table.Column<DateTime>(type: "datetime2", nullable: false),
@@ -675,7 +643,7 @@ namespace POS.Migrations.SqlServer.Migrations
                         column: x => x.CreatedBy,
                         principalTable: "Users",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
+                        onDelete: ReferentialAction.Restrict);
                 });
 
             migrationBuilder.CreateTable(
@@ -713,6 +681,47 @@ namespace POS.Migrations.SqlServer.Migrations
                         column: x => x.CreatedBy,
                         principalTable: "Users",
                         principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "MenuItems",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    Title = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Path = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Icon = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    CssClass = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Order = table.Column<int>(type: "int", nullable: false),
+                    ParentId = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
+                    IsActive = table.Column<bool>(type: "bit", nullable: false),
+                    IsVisible = table.Column<bool>(type: "bit", nullable: false),
+                    TenantId = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
+                    CreatedDate = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    CreatedBy = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    ModifiedDate = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    ModifiedBy = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    DeletedDate = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    DeletedBy = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
+                    SyncVersion = table.Column<long>(type: "bigint", nullable: false),
+                    LastSyncedAt = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    IsDeleted = table.Column<bool>(type: "bit", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_MenuItems", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_MenuItems_MenuItems_ParentId",
+                        column: x => x.ParentId,
+                        principalTable: "MenuItems",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
+                        name: "FK_MenuItems_Users_CreatedBy",
+                        column: x => x.CreatedBy,
+                        principalTable: "Users",
+                        principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                 });
 
@@ -724,7 +733,6 @@ namespace POS.Migrations.SqlServer.Migrations
                     Code = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     Name = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     Description = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    TenantId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     CreatedDate = table.Column<DateTime>(type: "datetime2", nullable: false),
                     CreatedBy = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     ModifiedDate = table.Column<DateTime>(type: "datetime2", nullable: false),
@@ -753,7 +761,6 @@ namespace POS.Migrations.SqlServer.Migrations
                     Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     Name = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     Order = table.Column<int>(type: "int", nullable: false),
-                    TenantId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     CreatedDate = table.Column<DateTime>(type: "datetime2", nullable: false),
                     CreatedBy = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     ModifiedDate = table.Column<DateTime>(type: "datetime2", nullable: false, defaultValueSql: "CURRENT_TIMESTAMP"),
@@ -853,24 +860,39 @@ namespace POS.Migrations.SqlServer.Migrations
                     Duration = table.Column<DateTime>(type: "datetime2", nullable: false),
                     IsActive = table.Column<bool>(type: "bit", nullable: false),
                     Frequency = table.Column<int>(type: "int", nullable: true),
-                    CreatedDate = table.Column<DateTime>(type: "datetime2", nullable: false),
                     UserId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     IsRead = table.Column<bool>(type: "bit", nullable: false),
                     IsEmailNotification = table.Column<bool>(type: "bit", nullable: false),
                     Subject = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     Message = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     ReferenceId = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
-                    Application = table.Column<int>(type: "int", nullable: true)
+                    Application = table.Column<int>(type: "int", nullable: true),
+                    TenantId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    CreatedDate = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    CreatedBy = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    ModifiedDate = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    ModifiedBy = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    DeletedDate = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    DeletedBy = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
+                    SyncVersion = table.Column<long>(type: "bigint", nullable: false),
+                    LastSyncedAt = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    IsDeleted = table.Column<bool>(type: "bit", nullable: false)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_ReminderSchedulers", x => x.Id);
                     table.ForeignKey(
+                        name: "FK_ReminderSchedulers_Users_CreatedBy",
+                        column: x => x.CreatedBy,
+                        principalTable: "Users",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
                         name: "FK_ReminderSchedulers_Users_UserId",
                         column: x => x.UserId,
                         principalTable: "Users",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
+                        onDelete: ReferentialAction.Restrict);
                 });
 
             migrationBuilder.CreateTable(
@@ -883,7 +905,7 @@ namespace POS.Migrations.SqlServer.Migrations
                     CreatedDate = table.Column<DateTime>(type: "datetime2", nullable: false),
                     CreatedBy = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
                     ModifiedDate = table.Column<DateTime>(type: "datetime2", nullable: false, defaultValueSql: "CURRENT_TIMESTAMP"),
-                    ModifiedBy = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    ModifiedBy = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
                     DeletedDate = table.Column<DateTime>(type: "datetime2", nullable: true),
                     DeletedBy = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
                     IsSuperRole = table.Column<bool>(type: "bit", nullable: false),
@@ -915,6 +937,36 @@ namespace POS.Migrations.SqlServer.Migrations
                     table.ForeignKey(
                         name: "FK_Roles_Users_ModifiedBy",
                         column: x => x.ModifiedBy,
+                        principalTable: "Users",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "TableSettings",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    ScreenName = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    UserId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    SettingsJson = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    TenantId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    CreatedDate = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    CreatedBy = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    ModifiedDate = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    ModifiedBy = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    DeletedDate = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    DeletedBy = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
+                    SyncVersion = table.Column<long>(type: "bigint", nullable: false),
+                    LastSyncedAt = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    IsDeleted = table.Column<bool>(type: "bit", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_TableSettings", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_TableSettings_Users_CreatedBy",
+                        column: x => x.CreatedBy,
                         principalTable: "Users",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Restrict);
@@ -1053,7 +1105,59 @@ namespace POS.Migrations.SqlServer.Migrations
                         column: x => x.CreatedBy,
                         principalTable: "Users",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
+                        onDelete: ReferentialAction.Restrict);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Customers",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    CustomerName = table.Column<string>(type: "nvarchar(250)", maxLength: 250, nullable: true),
+                    ContactPerson = table.Column<string>(type: "nvarchar(200)", maxLength: 200, nullable: true),
+                    Email = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: true),
+                    Fax = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: true),
+                    MobileNo = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: true),
+                    PhoneNo = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: true),
+                    Website = table.Column<string>(type: "nvarchar(500)", maxLength: 500, nullable: true),
+                    Description = table.Column<string>(type: "nvarchar(2000)", maxLength: 2000, nullable: true),
+                    Url = table.Column<string>(type: "nvarchar(500)", maxLength: 500, nullable: true),
+                    BillingAddressId = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
+                    ShippingAddressId = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
+                    IsWalkIn = table.Column<bool>(type: "bit", nullable: false),
+                    TaxNumber = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: true),
+                    TenantId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    CreatedDate = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    CreatedBy = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    ModifiedDate = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    ModifiedBy = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    DeletedDate = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    DeletedBy = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
+                    SyncVersion = table.Column<long>(type: "bigint", nullable: false),
+                    LastSyncedAt = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    IsDeleted = table.Column<bool>(type: "bit", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Customers", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_Customers_ContactAddresses_BillingAddressId",
+                        column: x => x.BillingAddressId,
+                        principalTable: "ContactAddresses",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
+                        name: "FK_Customers_ContactAddresses_ShippingAddressId",
+                        column: x => x.ShippingAddressId,
+                        principalTable: "ContactAddresses",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
+                        name: "FK_Customers_Users_CreatedBy",
+                        column: x => x.CreatedBy,
+                        principalTable: "Users",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
                 });
 
             migrationBuilder.CreateTable(
@@ -1063,7 +1167,6 @@ namespace POS.Migrations.SqlServer.Migrations
                     Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     CityName = table.Column<string>(type: "nvarchar(200)", maxLength: 200, nullable: true),
                     CountryId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    TenantId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     CreatedDate = table.Column<DateTime>(type: "datetime2", nullable: false),
                     CreatedBy = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     ModifiedDate = table.Column<DateTime>(type: "datetime2", nullable: false, defaultValueSql: "CURRENT_TIMESTAMP"),
@@ -1089,54 +1192,6 @@ namespace POS.Migrations.SqlServer.Migrations
                         principalTable: "Users",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Restrict);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "CustomerLedgers",
-                columns: table => new
-                {
-                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    Date = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    CustomerId = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
-                    AccountName = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    LocationId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    Description = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    Amount = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
-                    Reference = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    Balance = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
-                    Overdue = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
-                    Note = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    TenantId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    CreatedDate = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    CreatedBy = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    ModifiedDate = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    ModifiedBy = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    DeletedDate = table.Column<DateTime>(type: "datetime2", nullable: true),
-                    DeletedBy = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
-                    SyncVersion = table.Column<long>(type: "bigint", nullable: false),
-                    LastSyncedAt = table.Column<DateTime>(type: "datetime2", nullable: true),
-                    IsDeleted = table.Column<bool>(type: "bit", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_CustomerLedgers", x => x.Id);
-                    table.ForeignKey(
-                        name: "FK_CustomerLedgers_Customers_CustomerId",
-                        column: x => x.CustomerId,
-                        principalTable: "Customers",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
-                    table.ForeignKey(
-                        name: "FK_CustomerLedgers_Locations_LocationId",
-                        column: x => x.LocationId,
-                        principalTable: "Locations",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
-                    table.ForeignKey(
-                        name: "FK_CustomerLedgers_Users_CreatedBy",
-                        column: x => x.CreatedBy,
-                        principalTable: "Users",
-                        principalColumn: "Id");
                 });
 
             migrationBuilder.CreateTable(
@@ -1243,7 +1298,8 @@ namespace POS.Migrations.SqlServer.Migrations
                         name: "FK_LoanDetails_Users_CreatedBy",
                         column: x => x.CreatedBy,
                         principalTable: "Users",
-                        principalColumn: "Id");
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
                 });
 
             migrationBuilder.CreateTable(
@@ -1269,7 +1325,17 @@ namespace POS.Migrations.SqlServer.Migrations
                     SalaryDate = table.Column<DateOnly>(type: "date", nullable: false),
                     Note = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     Attachment = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    FinancialYearId = table.Column<Guid>(type: "uniqueidentifier", nullable: false)
+                    FinancialYearId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    TenantId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    CreatedDate = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    CreatedBy = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    ModifiedDate = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    ModifiedBy = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    DeletedDate = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    DeletedBy = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
+                    SyncVersion = table.Column<long>(type: "bigint", nullable: false),
+                    LastSyncedAt = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    IsDeleted = table.Column<bool>(type: "bit", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -1286,83 +1352,14 @@ namespace POS.Migrations.SqlServer.Migrations
                         principalTable: "Locations",
                         principalColumn: "Id");
                     table.ForeignKey(
-                        name: "FK_Payrolls_Users_EmployeeId",
-                        column: x => x.EmployeeId,
+                        name: "FK_Payrolls_Users_CreatedBy",
+                        column: x => x.CreatedBy,
                         principalTable: "Users",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Restrict);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "SalesOrders",
-                columns: table => new
-                {
-                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    OrderNumber = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: true),
-                    Note = table.Column<string>(type: "nvarchar(2000)", maxLength: 2000, nullable: true),
-                    SaleReturnNote = table.Column<string>(type: "nvarchar(2000)", maxLength: 2000, nullable: true),
-                    TermAndCondition = table.Column<string>(type: "nvarchar(4000)", maxLength: 4000, nullable: true),
-                    IsSalesOrderRequest = table.Column<bool>(type: "bit", nullable: false),
-                    SOCreatedDate = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    Status = table.Column<int>(type: "int", nullable: false),
-                    DeliveryDate = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    DeliveryStatus = table.Column<int>(type: "int", nullable: false),
-                    CustomerId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    TotalAmount = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
-                    TotalTax = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
-                    TotalDiscount = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
-                    FlatDiscount = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
-                    TotalPaidAmount = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
-                    TotalRoundOff = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
-                    TotalRefundAmount = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
-                    PaymentStatus = table.Column<int>(type: "int", nullable: false),
-                    LocationId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    BuyerNTN = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    BuyerCNIC = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    BuyerName = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    BuyerPhoneNumber = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    BuyerAddress = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    SaleType = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    FBRStatus = table.Column<int>(type: "int", nullable: false),
-                    FBRInvoiceNumber = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    FBRUSIN = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    FBRSubmittedAt = table.Column<DateTime>(type: "datetime2", nullable: true),
-                    FBRAcknowledgedAt = table.Column<DateTime>(type: "datetime2", nullable: true),
-                    FBRQRCodeData = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    FBRQRCodeImagePath = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    FBRRetryCount = table.Column<int>(type: "int", nullable: false),
-                    FBRNextRetryAt = table.Column<DateTime>(type: "datetime2", nullable: true),
-                    FBRErrorMessage = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    FBRResponseJson = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    TenantId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    CreatedDate = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    CreatedBy = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    ModifiedDate = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    ModifiedBy = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    DeletedDate = table.Column<DateTime>(type: "datetime2", nullable: true),
-                    DeletedBy = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
-                    SyncVersion = table.Column<long>(type: "bigint", nullable: false),
-                    LastSyncedAt = table.Column<DateTime>(type: "datetime2", nullable: true),
-                    IsDeleted = table.Column<bool>(type: "bit", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_SalesOrders", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_SalesOrders_Customers_CustomerId",
-                        column: x => x.CustomerId,
-                        principalTable: "Customers",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
-                    table.ForeignKey(
-                        name: "FK_SalesOrders_Locations_LocationId",
-                        column: x => x.LocationId,
-                        principalTable: "Locations",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
-                    table.ForeignKey(
-                        name: "FK_SalesOrders_Users_CreatedBy",
-                        column: x => x.CreatedBy,
+                        name: "FK_Payrolls_Users_EmployeeId",
+                        column: x => x.EmployeeId,
                         principalTable: "Users",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Restrict);
@@ -1468,7 +1465,8 @@ namespace POS.Migrations.SqlServer.Migrations
                         name: "FK_Transactions_Users_CreatedBy",
                         column: x => x.CreatedBy,
                         principalTable: "Users",
-                        principalColumn: "Id");
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
                 });
 
             migrationBuilder.CreateTable(
@@ -1504,7 +1502,6 @@ namespace POS.Migrations.SqlServer.Migrations
                     Order = table.Column<int>(type: "int", nullable: false),
                     PageId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     Code = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    TenantId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     CreatedDate = table.Column<DateTime>(type: "datetime2", nullable: false),
                     CreatedBy = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     ModifiedDate = table.Column<DateTime>(type: "datetime2", nullable: false, defaultValueSql: "CURRENT_TIMESTAMP"),
@@ -1603,8 +1600,17 @@ namespace POS.Migrations.SqlServer.Migrations
                     Subject = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     Description = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     FetchDateTime = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    IsDeleted = table.Column<bool>(type: "bit", nullable: false),
-                    IsEmailNotification = table.Column<bool>(type: "bit", nullable: false)
+                    IsEmailNotification = table.Column<bool>(type: "bit", nullable: false),
+                    TenantId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    CreatedDate = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    CreatedBy = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    ModifiedDate = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    ModifiedBy = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    DeletedDate = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    DeletedBy = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
+                    SyncVersion = table.Column<long>(type: "bigint", nullable: false),
+                    LastSyncedAt = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    IsDeleted = table.Column<bool>(type: "bit", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -1615,6 +1621,12 @@ namespace POS.Migrations.SqlServer.Migrations
                         principalTable: "Reminders",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_ReminderNotifications_Users_CreatedBy",
+                        column: x => x.CreatedBy,
+                        principalTable: "Users",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
                 });
 
             migrationBuilder.CreateTable(
@@ -1638,6 +1650,43 @@ namespace POS.Migrations.SqlServer.Migrations
                         column: x => x.UserId,
                         principalTable: "Users",
                         principalColumn: "Id");
+                });
+
+            migrationBuilder.CreateTable(
+                name: "RoleMenuItems",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    RoleId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    MenuItemId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    CanView = table.Column<bool>(type: "bit", nullable: false),
+                    CanCreate = table.Column<bool>(type: "bit", nullable: false),
+                    CanEdit = table.Column<bool>(type: "bit", nullable: false),
+                    CanDelete = table.Column<bool>(type: "bit", nullable: false),
+                    AssignedDate = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    AssignedBy = table.Column<Guid>(type: "uniqueidentifier", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_RoleMenuItems", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_RoleMenuItems_MenuItems_MenuItemId",
+                        column: x => x.MenuItemId,
+                        principalTable: "MenuItems",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_RoleMenuItems_Roles_RoleId",
+                        column: x => x.RoleId,
+                        principalTable: "Roles",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_RoleMenuItems_Users_AssignedBy",
+                        column: x => x.AssignedBy,
+                        principalTable: "Users",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
                 });
 
             migrationBuilder.CreateTable(
@@ -1695,6 +1744,130 @@ namespace POS.Migrations.SqlServer.Migrations
                         name: "FK_VariantItems_Variants_VariantId",
                         column: x => x.VariantId,
                         principalTable: "Variants",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "CustomerLedgers",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    Date = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    CustomerId = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
+                    AccountName = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    LocationId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    Description = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Amount = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
+                    Reference = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Balance = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
+                    Overdue = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
+                    Note = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    TenantId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    CreatedDate = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    CreatedBy = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    ModifiedDate = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    ModifiedBy = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    DeletedDate = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    DeletedBy = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
+                    SyncVersion = table.Column<long>(type: "bigint", nullable: false),
+                    LastSyncedAt = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    IsDeleted = table.Column<bool>(type: "bit", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_CustomerLedgers", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_CustomerLedgers_Customers_CustomerId",
+                        column: x => x.CustomerId,
+                        principalTable: "Customers",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
+                        name: "FK_CustomerLedgers_Locations_LocationId",
+                        column: x => x.LocationId,
+                        principalTable: "Locations",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_CustomerLedgers_Users_CreatedBy",
+                        column: x => x.CreatedBy,
+                        principalTable: "Users",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "SalesOrders",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    OrderNumber = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: true),
+                    Note = table.Column<string>(type: "nvarchar(2000)", maxLength: 2000, nullable: true),
+                    SaleReturnNote = table.Column<string>(type: "nvarchar(2000)", maxLength: 2000, nullable: true),
+                    TermAndCondition = table.Column<string>(type: "nvarchar(4000)", maxLength: 4000, nullable: true),
+                    IsSalesOrderRequest = table.Column<bool>(type: "bit", nullable: false),
+                    SOCreatedDate = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    Status = table.Column<int>(type: "int", nullable: false),
+                    DeliveryDate = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    DeliveryStatus = table.Column<int>(type: "int", nullable: false),
+                    CustomerId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    TotalAmount = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
+                    TotalTax = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
+                    TotalDiscount = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
+                    FlatDiscount = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
+                    TotalPaidAmount = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
+                    TotalRoundOff = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
+                    TotalRefundAmount = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
+                    PaymentStatus = table.Column<int>(type: "int", nullable: false),
+                    LocationId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    BuyerNTN = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    BuyerCNIC = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    BuyerName = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    BuyerPhoneNumber = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    BuyerAddress = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    SaleType = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    FBRStatus = table.Column<int>(type: "int", nullable: false),
+                    FBRInvoiceNumber = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    FBRUSIN = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    FBRSubmittedAt = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    FBRAcknowledgedAt = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    FBRQRCodeData = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    FBRQRCodeImagePath = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    FBRRetryCount = table.Column<int>(type: "int", nullable: false),
+                    FBRNextRetryAt = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    FBRErrorMessage = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    FBRResponseJson = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    TenantId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    CreatedDate = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    CreatedBy = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    ModifiedDate = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    ModifiedBy = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    DeletedDate = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    DeletedBy = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
+                    SyncVersion = table.Column<long>(type: "bigint", nullable: false),
+                    LastSyncedAt = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    IsDeleted = table.Column<bool>(type: "bit", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_SalesOrders", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_SalesOrders_Customers_CustomerId",
+                        column: x => x.CustomerId,
+                        principalTable: "Customers",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
+                        name: "FK_SalesOrders_Locations_LocationId",
+                        column: x => x.LocationId,
+                        principalTable: "Locations",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
+                        name: "FK_SalesOrders_Users_CreatedBy",
+                        column: x => x.CreatedBy,
+                        principalTable: "Users",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Restrict);
                 });
@@ -1764,7 +1937,7 @@ namespace POS.Migrations.SqlServer.Migrations
                         column: x => x.CreatedBy,
                         principalTable: "Users",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
+                        onDelete: ReferentialAction.Restrict);
                 });
 
             migrationBuilder.CreateTable(
@@ -1870,88 +2043,6 @@ namespace POS.Migrations.SqlServer.Migrations
                         name: "FK_LoanRepayments_Users_CreatedBy",
                         column: x => x.CreatedBy,
                         principalTable: "Users",
-                        principalColumn: "Id");
-                });
-
-            migrationBuilder.CreateTable(
-                name: "FBRSubmissionLogs",
-                columns: table => new
-                {
-                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    SalesOrderId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    AttemptedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    Status = table.Column<int>(type: "int", nullable: false),
-                    RequestPayload = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    ResponsePayload = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    HttpStatusCode = table.Column<int>(type: "int", nullable: false),
-                    ErrorMessage = table.Column<string>(type: "nvarchar(1000)", maxLength: 1000, nullable: true),
-                    ResponseTime = table.Column<TimeSpan>(type: "time", nullable: false),
-                    SubmittedBy = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: true),
-                    TenantId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    CreatedDate = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    CreatedBy = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    ModifiedDate = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    ModifiedBy = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    DeletedDate = table.Column<DateTime>(type: "datetime2", nullable: true),
-                    DeletedBy = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
-                    SyncVersion = table.Column<long>(type: "bigint", nullable: false),
-                    LastSyncedAt = table.Column<DateTime>(type: "datetime2", nullable: true),
-                    IsDeleted = table.Column<bool>(type: "bit", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_FBRSubmissionLogs", x => x.Id);
-                    table.ForeignKey(
-                        name: "FK_FBRSubmissionLogs_SalesOrders_SalesOrderId",
-                        column: x => x.SalesOrderId,
-                        principalTable: "SalesOrders",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
-                    table.ForeignKey(
-                        name: "FK_FBRSubmissionLogs_Users_CreatedBy",
-                        column: x => x.CreatedBy,
-                        principalTable: "Users",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "SalesOrderPayments",
-                columns: table => new
-                {
-                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    SalesOrderId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    PaymentDate = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    ReferenceNumber = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: true),
-                    Amount = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
-                    PaymentMethod = table.Column<int>(type: "int", nullable: false),
-                    Note = table.Column<string>(type: "nvarchar(1000)", maxLength: 1000, nullable: true),
-                    AttachmentUrl = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    PaymentType = table.Column<int>(type: "int", nullable: false),
-                    TenantId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    CreatedDate = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    CreatedBy = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    ModifiedDate = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    ModifiedBy = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    DeletedDate = table.Column<DateTime>(type: "datetime2", nullable: true),
-                    DeletedBy = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
-                    SyncVersion = table.Column<long>(type: "bigint", nullable: false),
-                    LastSyncedAt = table.Column<DateTime>(type: "datetime2", nullable: true),
-                    IsDeleted = table.Column<bool>(type: "bit", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_SalesOrderPayments", x => x.Id);
-                    table.ForeignKey(
-                        name: "FK_SalesOrderPayments_SalesOrders_SalesOrderId",
-                        column: x => x.SalesOrderId,
-                        principalTable: "SalesOrders",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
-                    table.ForeignKey(
-                        name: "FK_SalesOrderPayments_Users_CreatedBy",
-                        column: x => x.CreatedBy,
-                        principalTable: "Users",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Restrict);
                 });
@@ -2018,7 +2109,8 @@ namespace POS.Migrations.SqlServer.Migrations
                         name: "FK_AccountingEntries_Users_CreatedBy",
                         column: x => x.CreatedBy,
                         principalTable: "Users",
-                        principalColumn: "Id");
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
                 });
 
             migrationBuilder.CreateTable(
@@ -2034,7 +2126,16 @@ namespace POS.Migrations.SqlServer.Migrations
                     ReferenceNumber = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: true),
                     Narration = table.Column<string>(type: "nvarchar(500)", maxLength: 500, nullable: true),
                     Status = table.Column<int>(type: "int", nullable: false),
-                    CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false)
+                    TenantId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    CreatedDate = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    CreatedBy = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    ModifiedDate = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    ModifiedBy = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    DeletedDate = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    DeletedBy = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
+                    SyncVersion = table.Column<long>(type: "bigint", nullable: false),
+                    LastSyncedAt = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    IsDeleted = table.Column<bool>(type: "bit", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -2048,6 +2149,12 @@ namespace POS.Migrations.SqlServer.Migrations
                         name: "FK_PaymentEntries_Transactions_TransactionId",
                         column: x => x.TransactionId,
                         principalTable: "Transactions",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
+                        name: "FK_PaymentEntries_Users_CreatedBy",
+                        column: x => x.CreatedBy,
+                        principalTable: "Users",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Restrict);
                 });
@@ -2094,6 +2201,31 @@ namespace POS.Migrations.SqlServer.Migrations
                         column: x => x.CreatedBy,
                         principalTable: "Users",
                         principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "MenuItemActions",
+                columns: table => new
+                {
+                    MenuItemId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    ActionId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    Operation = table.Column<int>(type: "int", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_MenuItemActions", x => new { x.MenuItemId, x.ActionId });
+                    table.ForeignKey(
+                        name: "FK_MenuItemActions_Actions_ActionId",
+                        column: x => x.ActionId,
+                        principalTable: "Actions",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_MenuItemActions_MenuItems_MenuItemId",
+                        column: x => x.MenuItemId,
+                        principalTable: "MenuItems",
+                        principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                 });
 
@@ -2133,7 +2265,7 @@ namespace POS.Migrations.SqlServer.Migrations
                         .Annotation("SqlServer:Identity", "1, 1"),
                     ActionId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     UserId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    ClaimType = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    ClaimType = table.Column<string>(type: "nvarchar(450)", nullable: true),
                     ClaimValue = table.Column<string>(type: "nvarchar(max)", nullable: true)
                 },
                 constraints: table =>
@@ -2232,6 +2364,89 @@ namespace POS.Migrations.SqlServer.Migrations
                         column: x => x.VariantId,
                         principalTable: "Variants",
                         principalColumn: "Id");
+                });
+
+            migrationBuilder.CreateTable(
+                name: "FBRSubmissionLogs",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    SalesOrderId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    AttemptedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    Status = table.Column<int>(type: "int", nullable: false),
+                    RequestPayload = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    ResponsePayload = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    HttpStatusCode = table.Column<int>(type: "int", nullable: false),
+                    ErrorMessage = table.Column<string>(type: "nvarchar(1000)", maxLength: 1000, nullable: true),
+                    ResponseTime = table.Column<TimeSpan>(type: "time", nullable: false),
+                    SubmittedBy = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: true),
+                    TenantId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    CreatedDate = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    CreatedBy = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    ModifiedDate = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    ModifiedBy = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    DeletedDate = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    DeletedBy = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
+                    SyncVersion = table.Column<long>(type: "bigint", nullable: false),
+                    LastSyncedAt = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    IsDeleted = table.Column<bool>(type: "bit", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_FBRSubmissionLogs", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_FBRSubmissionLogs_SalesOrders_SalesOrderId",
+                        column: x => x.SalesOrderId,
+                        principalTable: "SalesOrders",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_FBRSubmissionLogs_Users_CreatedBy",
+                        column: x => x.CreatedBy,
+                        principalTable: "Users",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "SalesOrderPayments",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    SalesOrderId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    PaymentDate = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    ReferenceNumber = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: true),
+                    Amount = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
+                    PaymentMethod = table.Column<int>(type: "int", nullable: false),
+                    Note = table.Column<string>(type: "nvarchar(1000)", maxLength: 1000, nullable: true),
+                    AttachmentUrl = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    PaymentType = table.Column<int>(type: "int", nullable: false),
+                    TenantId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    CreatedDate = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    CreatedBy = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    ModifiedDate = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    ModifiedBy = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    DeletedDate = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    DeletedBy = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
+                    SyncVersion = table.Column<long>(type: "bigint", nullable: false),
+                    LastSyncedAt = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    IsDeleted = table.Column<bool>(type: "bit", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_SalesOrderPayments", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_SalesOrderPayments_SalesOrders_SalesOrderId",
+                        column: x => x.SalesOrderId,
+                        principalTable: "SalesOrders",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_SalesOrderPayments_Users_CreatedBy",
+                        column: x => x.CreatedBy,
+                        principalTable: "Users",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
                 });
 
             migrationBuilder.CreateTable(
@@ -2402,6 +2617,44 @@ namespace POS.Migrations.SqlServer.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "DailyProductPrices",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    ProductId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    PriceDate = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    SalesPrice = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
+                    Mrp = table.Column<decimal>(type: "decimal(18,2)", nullable: true),
+                    IsActive = table.Column<bool>(type: "bit", nullable: false),
+                    TenantId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    CreatedDate = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    CreatedBy = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    ModifiedDate = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    ModifiedBy = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    DeletedDate = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    DeletedBy = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
+                    SyncVersion = table.Column<long>(type: "bigint", nullable: false),
+                    LastSyncedAt = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    IsDeleted = table.Column<bool>(type: "bit", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_DailyProductPrices", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_DailyProductPrices_Products_ProductId",
+                        column: x => x.ProductId,
+                        principalTable: "Products",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
+                        name: "FK_DailyProductPrices_Users_CreatedBy",
+                        column: x => x.CreatedBy,
+                        principalTable: "Users",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "DamagedStocks",
                 columns: table => new
                 {
@@ -2411,9 +2664,17 @@ namespace POS.Migrations.SqlServer.Migrations
                     Reason = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     ReportedId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     DamagedDate = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    LocationId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    TenantId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     CreatedDate = table.Column<DateTime>(type: "datetime2", nullable: false),
                     CreatedBy = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    LocationId = table.Column<Guid>(type: "uniqueidentifier", nullable: false)
+                    ModifiedDate = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    ModifiedBy = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    DeletedDate = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    DeletedBy = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
+                    SyncVersion = table.Column<long>(type: "bigint", nullable: false),
+                    LastSyncedAt = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    IsDeleted = table.Column<bool>(type: "bit", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -2525,7 +2786,16 @@ namespace POS.Migrations.SqlServer.Migrations
                     PurchasePrice = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
                     LocationId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     ProductId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    ModifiedDate = table.Column<DateTime>(type: "datetime2", nullable: false)
+                    ModifiedDate = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    TenantId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    CreatedDate = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    CreatedBy = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    ModifiedBy = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    DeletedDate = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    DeletedBy = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
+                    SyncVersion = table.Column<long>(type: "bigint", nullable: false),
+                    LastSyncedAt = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    IsDeleted = table.Column<bool>(type: "bit", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -2540,6 +2810,12 @@ namespace POS.Migrations.SqlServer.Migrations
                         name: "FK_ProductStocks_Products_ProductId",
                         column: x => x.ProductId,
                         principalTable: "Products",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
+                        name: "FK_ProductStocks_Users_CreatedBy",
+                        column: x => x.CreatedBy,
+                        principalTable: "Users",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Restrict);
                 });
@@ -2645,7 +2921,16 @@ namespace POS.Migrations.SqlServer.Migrations
                     Reason = table.Column<string>(type: "nvarchar(500)", maxLength: 500, nullable: true),
                     Reference = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: true),
                     AdjustmentDate = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false)
+                    TenantId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    CreatedDate = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    CreatedBy = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    ModifiedDate = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    ModifiedBy = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    DeletedDate = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    DeletedBy = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
+                    SyncVersion = table.Column<long>(type: "bigint", nullable: false),
+                    LastSyncedAt = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    IsDeleted = table.Column<bool>(type: "bit", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -2659,6 +2944,12 @@ namespace POS.Migrations.SqlServer.Migrations
                         name: "FK_StockAdjustments_Products_InventoryItemId",
                         column: x => x.InventoryItemId,
                         principalTable: "Products",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
+                        name: "FK_StockAdjustments_Users_CreatedBy",
+                        column: x => x.CreatedBy,
+                        principalTable: "Users",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Restrict);
                 });
@@ -2711,7 +3002,7 @@ namespace POS.Migrations.SqlServer.Migrations
                         column: x => x.CreatedBy,
                         principalTable: "Users",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
+                        onDelete: ReferentialAction.Restrict);
                 });
 
             migrationBuilder.CreateTable(
@@ -2807,7 +3098,8 @@ namespace POS.Migrations.SqlServer.Migrations
                         name: "FK_PurchaseOrders_Users_CreatedBy",
                         column: x => x.CreatedBy,
                         principalTable: "Users",
-                        principalColumn: "Id");
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
                 });
 
             migrationBuilder.CreateTable(
@@ -2849,7 +3141,7 @@ namespace POS.Migrations.SqlServer.Migrations
                         column: x => x.CreatedBy,
                         principalTable: "Users",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
+                        onDelete: ReferentialAction.Restrict);
                 });
 
             migrationBuilder.CreateTable(
@@ -3041,6 +3333,11 @@ namespace POS.Migrations.SqlServer.Migrations
                 column: "TransactionId");
 
             migrationBuilder.CreateIndex(
+                name: "IX_AccountingEntry_TenantId",
+                table: "AccountingEntries",
+                column: "TenantId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_Actions_CreatedBy",
                 table: "Actions",
                 column: "CreatedBy");
@@ -3049,6 +3346,11 @@ namespace POS.Migrations.SqlServer.Migrations
                 name: "IX_Actions_PageId",
                 table: "Actions",
                 column: "PageId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Brand_Tenant_Name",
+                table: "Brands",
+                columns: new[] { "TenantId", "Name" });
 
             migrationBuilder.CreateIndex(
                 name: "IX_Brands_CreatedBy",
@@ -3066,9 +3368,29 @@ namespace POS.Migrations.SqlServer.Migrations
                 column: "CreatedBy");
 
             migrationBuilder.CreateIndex(
+                name: "IX_CompanyProfile_TenantId",
+                table: "CompanyProfiles",
+                column: "TenantId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_CompanyProfiles_CreatedBy",
                 table: "CompanyProfiles",
                 column: "CreatedBy");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_ContactAddress_TenantId",
+                table: "ContactAddresses",
+                column: "TenantId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_ContactAddresses_CreatedBy",
+                table: "ContactAddresses",
+                column: "CreatedBy");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_ContactRequest_TenantId",
+                table: "ContactRequests",
+                column: "TenantId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_ContactRequests_CreatedBy",
@@ -3079,6 +3401,16 @@ namespace POS.Migrations.SqlServer.Migrations
                 name: "IX_Countries_CreatedBy",
                 table: "Countries",
                 column: "CreatedBy");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Currencies_CreatedBy",
+                table: "Currencies",
+                column: "CreatedBy");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_CustomerLedger_TenantId",
+                table: "CustomerLedgers",
+                column: "TenantId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_CustomerLedgers_CreatedBy",
@@ -3096,6 +3428,25 @@ namespace POS.Migrations.SqlServer.Migrations
                 column: "LocationId");
 
             migrationBuilder.CreateIndex(
+                name: "IX_Customer_Tenant_Email",
+                table: "Customers",
+                columns: new[] { "TenantId", "Email" },
+                unique: true,
+                filter: "[Email] IS NOT NULL");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Customer_Tenant_Mobile",
+                table: "Customers",
+                columns: new[] { "TenantId", "MobileNo" },
+                unique: true,
+                filter: "[MobileNo] IS NOT NULL");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Customer_Tenant_Name",
+                table: "Customers",
+                columns: new[] { "TenantId", "CustomerName" });
+
+            migrationBuilder.CreateIndex(
                 name: "IX_Customers_BillingAddressId",
                 table: "Customers",
                 column: "BillingAddressId");
@@ -3111,9 +3462,30 @@ namespace POS.Migrations.SqlServer.Migrations
                 column: "ShippingAddressId");
 
             migrationBuilder.CreateIndex(
+                name: "IX_DailyProductPrice_Product_Date_Tenant",
+                table: "DailyProductPrices",
+                columns: new[] { "ProductId", "PriceDate", "TenantId" },
+                unique: true);
+
+            migrationBuilder.CreateIndex(
+                name: "IX_DailyProductPrice_TenantId",
+                table: "DailyProductPrices",
+                column: "TenantId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_DailyProductPrices_CreatedBy",
+                table: "DailyProductPrices",
+                column: "CreatedBy");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_DailyReminders_ReminderId",
                 table: "DailyReminders",
                 column: "ReminderId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_DamagedStock_TenantId",
+                table: "DamagedStocks",
+                column: "TenantId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_DamagedStocks_CreatedBy",
@@ -3141,9 +3513,19 @@ namespace POS.Migrations.SqlServer.Migrations
                 column: "EmailLogId");
 
             migrationBuilder.CreateIndex(
+                name: "IX_EmailSMTPSetting_TenantId",
+                table: "EmailSMTPSettings",
+                column: "TenantId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_EmailSMTPSettings_CreatedBy",
                 table: "EmailSMTPSettings",
                 column: "CreatedBy");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_EmailTemplate_TenantId",
+                table: "EmailTemplates",
+                column: "TenantId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_EmailTemplates_CreatedBy",
@@ -3154,6 +3536,21 @@ namespace POS.Migrations.SqlServer.Migrations
                 name: "IX_ExpenseCategories_CreatedBy",
                 table: "ExpenseCategories",
                 column: "CreatedBy");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_ExpenseCategory_TenantId",
+                table: "ExpenseCategories",
+                column: "TenantId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Expense_Tenant_Category",
+                table: "Expenses",
+                columns: new[] { "TenantId", "ExpenseCategoryId" });
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Expense_Tenant_Date",
+                table: "Expenses",
+                columns: new[] { "TenantId", "ExpenseDate" });
 
             migrationBuilder.CreateIndex(
                 name: "IX_Expenses_CreatedBy",
@@ -3176,6 +3573,11 @@ namespace POS.Migrations.SqlServer.Migrations
                 column: "LocationId");
 
             migrationBuilder.CreateIndex(
+                name: "IX_ExpenseTax_TenantId",
+                table: "ExpenseTaxes",
+                column: "TenantId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_ExpenseTaxes_CreatedBy",
                 table: "ExpenseTaxes",
                 column: "CreatedBy");
@@ -3191,6 +3593,11 @@ namespace POS.Migrations.SqlServer.Migrations
                 column: "TaxId");
 
             migrationBuilder.CreateIndex(
+                name: "IX_FBRSubmissionLog_TenantId",
+                table: "FBRSubmissionLogs",
+                column: "TenantId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_FBRSubmissionLogs_CreatedBy",
                 table: "FBRSubmissionLogs",
                 column: "CreatedBy");
@@ -3199,6 +3606,11 @@ namespace POS.Migrations.SqlServer.Migrations
                 name: "IX_FBRSubmissionLogs_SalesOrderId",
                 table: "FBRSubmissionLogs",
                 column: "SalesOrderId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_FinancialYear_TenantId",
+                table: "FinancialYears",
+                column: "TenantId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_FinancialYears_CreatedBy",
@@ -3241,6 +3653,11 @@ namespace POS.Migrations.SqlServer.Migrations
                 column: "InquiryStatusId");
 
             migrationBuilder.CreateIndex(
+                name: "IX_Inquiry_TenantId",
+                table: "Inquiries",
+                column: "TenantId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_InquiryActivities_AssignTo",
                 table: "InquiryActivities",
                 column: "AssignTo");
@@ -3256,6 +3673,16 @@ namespace POS.Migrations.SqlServer.Migrations
                 column: "InquiryId");
 
             migrationBuilder.CreateIndex(
+                name: "IX_InquiryActivity_TenantId",
+                table: "InquiryActivities",
+                column: "TenantId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_InquiryAttachment_TenantId",
+                table: "InquiryAttachments",
+                column: "TenantId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_InquiryAttachments_CreatedBy",
                 table: "InquiryAttachments",
                 column: "CreatedBy");
@@ -3264,6 +3691,11 @@ namespace POS.Migrations.SqlServer.Migrations
                 name: "IX_InquiryAttachments_InquiryId",
                 table: "InquiryAttachments",
                 column: "InquiryId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_InquiryNote_TenantId",
+                table: "InquiryNotes",
+                column: "TenantId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_InquiryNotes_CreatedBy",
@@ -3281,14 +3713,29 @@ namespace POS.Migrations.SqlServer.Migrations
                 column: "InquiryId");
 
             migrationBuilder.CreateIndex(
+                name: "IX_InquirySource_TenantId",
+                table: "InquirySources",
+                column: "TenantId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_InquirySources_CreatedBy",
                 table: "InquirySources",
                 column: "CreatedBy");
 
             migrationBuilder.CreateIndex(
+                name: "IX_InquiryStatus_TenantId",
+                table: "InquiryStatuses",
+                column: "TenantId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_InquiryStatuses_CreatedBy",
                 table: "InquiryStatuses",
                 column: "CreatedBy");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_InventoryBatch_TenantId",
+                table: "InventoryBatches",
+                column: "TenantId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_InventoryBatches_CreatedBy",
@@ -3311,6 +3758,11 @@ namespace POS.Migrations.SqlServer.Migrations
                 column: "CreatedBy");
 
             migrationBuilder.CreateIndex(
+                name: "IX_LedgerAccount_TenantId",
+                table: "LedgerAccounts",
+                column: "TenantId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_LedgerAccounts_CreatedBy",
                 table: "LedgerAccounts",
                 column: "CreatedBy");
@@ -3319,6 +3771,11 @@ namespace POS.Migrations.SqlServer.Migrations
                 name: "IX_LedgerAccounts_ParentAccountId",
                 table: "LedgerAccounts",
                 column: "ParentAccountId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_LoanDetail_TenantId",
+                table: "LoanDetails",
+                column: "TenantId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_LoanDetails_BranchId",
@@ -3341,6 +3798,11 @@ namespace POS.Migrations.SqlServer.Migrations
                 column: "LoanAccountInterestExpenseId");
 
             migrationBuilder.CreateIndex(
+                name: "IX_LoanRepayment_TenantId",
+                table: "LoanRepayments",
+                column: "TenantId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_LoanRepayments_CreatedBy",
                 table: "LoanRepayments",
                 column: "CreatedBy");
@@ -3351,9 +3813,29 @@ namespace POS.Migrations.SqlServer.Migrations
                 column: "LoanDetailId");
 
             migrationBuilder.CreateIndex(
+                name: "IX_Location_TenantId",
+                table: "Locations",
+                column: "TenantId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_Locations_CreatedBy",
                 table: "Locations",
                 column: "CreatedBy");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_MenuItemActions_ActionId",
+                table: "MenuItemActions",
+                column: "ActionId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_MenuItems_CreatedBy",
+                table: "MenuItems",
+                column: "CreatedBy");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_MenuItems_ParentId",
+                table: "MenuItems",
+                column: "ParentId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Pagehelpers_CreatedBy",
@@ -3371,14 +3853,34 @@ namespace POS.Migrations.SqlServer.Migrations
                 column: "BranchId");
 
             migrationBuilder.CreateIndex(
+                name: "IX_PaymentEntries_CreatedBy",
+                table: "PaymentEntries",
+                column: "CreatedBy");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_PaymentEntries_TransactionId",
                 table: "PaymentEntries",
                 column: "TransactionId");
 
             migrationBuilder.CreateIndex(
+                name: "IX_PaymentEntry_TenantId",
+                table: "PaymentEntries",
+                column: "TenantId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Payroll_TenantId",
+                table: "Payrolls",
+                column: "TenantId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_Payrolls_BranchId",
                 table: "Payrolls",
                 column: "BranchId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Payrolls_CreatedBy",
+                table: "Payrolls",
+                column: "CreatedBy");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Payrolls_EmployeeId",
@@ -3399,6 +3901,33 @@ namespace POS.Migrations.SqlServer.Migrations
                 name: "IX_ProductCategories_ParentId",
                 table: "ProductCategories",
                 column: "ParentId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_ProductCategory_Tenant_Name",
+                table: "ProductCategories",
+                columns: new[] { "TenantId", "Name" });
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Product_Tenant_Barcode",
+                table: "Products",
+                columns: new[] { "TenantId", "Barcode" });
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Product_Tenant_Category",
+                table: "Products",
+                columns: new[] { "TenantId", "CategoryId" });
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Product_Tenant_Code",
+                table: "Products",
+                columns: new[] { "TenantId", "Code" },
+                unique: true,
+                filter: "[Code] IS NOT NULL");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Product_Tenant_Name",
+                table: "Products",
+                columns: new[] { "TenantId", "Name" });
 
             migrationBuilder.CreateIndex(
                 name: "IX_Products_BrandId",
@@ -3436,6 +3965,17 @@ namespace POS.Migrations.SqlServer.Migrations
                 column: "VariantItemId");
 
             migrationBuilder.CreateIndex(
+                name: "IX_ProductStock_Tenant_Product_Location",
+                table: "ProductStocks",
+                columns: new[] { "TenantId", "ProductId", "LocationId" },
+                unique: true);
+
+            migrationBuilder.CreateIndex(
+                name: "IX_ProductStocks_CreatedBy",
+                table: "ProductStocks",
+                column: "CreatedBy");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_ProductStocks_LocationId",
                 table: "ProductStocks",
                 column: "LocationId");
@@ -3444,6 +3984,11 @@ namespace POS.Migrations.SqlServer.Migrations
                 name: "IX_ProductStocks_ProductId",
                 table: "ProductStocks",
                 column: "ProductId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_ProductTax_TenantId",
+                table: "ProductTaxes",
+                column: "TenantId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_ProductTaxes_CreatedBy",
@@ -3481,6 +4026,11 @@ namespace POS.Migrations.SqlServer.Migrations
                 column: "TaxId");
 
             migrationBuilder.CreateIndex(
+                name: "IX_PurchaseOrderPayment_TenantId",
+                table: "PurchaseOrderPayments",
+                column: "TenantId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_PurchaseOrderPayments_CreatedBy",
                 table: "PurchaseOrderPayments",
                 column: "CreatedBy");
@@ -3489,6 +4039,23 @@ namespace POS.Migrations.SqlServer.Migrations
                 name: "IX_PurchaseOrderPayments_PurchaseOrderId",
                 table: "PurchaseOrderPayments",
                 column: "PurchaseOrderId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_PurchaseOrder_Tenant_Date",
+                table: "PurchaseOrders",
+                columns: new[] { "TenantId", "POCreatedDate" });
+
+            migrationBuilder.CreateIndex(
+                name: "IX_PurchaseOrder_Tenant_Number",
+                table: "PurchaseOrders",
+                columns: new[] { "TenantId", "OrderNumber" },
+                unique: true,
+                filter: "[OrderNumber] IS NOT NULL");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_PurchaseOrder_Tenant_Supplier",
+                table: "PurchaseOrders",
+                columns: new[] { "TenantId", "SupplierId" });
 
             migrationBuilder.CreateIndex(
                 name: "IX_PurchaseOrders_CreatedBy",
@@ -3511,13 +4078,38 @@ namespace POS.Migrations.SqlServer.Migrations
                 column: "ReminderId");
 
             migrationBuilder.CreateIndex(
+                name: "IX_ReminderNotification_TenantId",
+                table: "ReminderNotifications",
+                column: "TenantId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_ReminderNotifications_CreatedBy",
+                table: "ReminderNotifications",
+                column: "CreatedBy");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_ReminderNotifications_ReminderId",
                 table: "ReminderNotifications",
                 column: "ReminderId");
 
             migrationBuilder.CreateIndex(
+                name: "IX_Reminder_TenantId",
+                table: "Reminders",
+                column: "TenantId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_Reminders_CreatedBy",
                 table: "Reminders",
+                column: "CreatedBy");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_ReminderScheduler_TenantId",
+                table: "ReminderSchedulers",
+                column: "TenantId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_ReminderSchedulers_CreatedBy",
+                table: "ReminderSchedulers",
                 column: "CreatedBy");
 
             migrationBuilder.CreateIndex(
@@ -3538,6 +4130,21 @@ namespace POS.Migrations.SqlServer.Migrations
             migrationBuilder.CreateIndex(
                 name: "IX_RoleClaims_RoleId",
                 table: "RoleClaims",
+                column: "RoleId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_RoleMenuItems_AssignedBy",
+                table: "RoleMenuItems",
+                column: "AssignedBy");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_RoleMenuItems_MenuItemId",
+                table: "RoleMenuItems",
+                column: "MenuItemId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_RoleMenuItems_RoleId",
+                table: "RoleMenuItems",
                 column: "RoleId");
 
             migrationBuilder.CreateIndex(
@@ -3563,19 +4170,19 @@ namespace POS.Migrations.SqlServer.Migrations
             migrationBuilder.CreateIndex(
                 name: "RoleNameIndex",
                 table: "Roles",
-                column: "NormalizedName",
+                columns: new[] { "NormalizedName", "TenantId" },
                 unique: true,
                 filter: "[NormalizedName] IS NOT NULL");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_SalesOrderItem_SalesOrder",
+                table: "SalesOrderItems",
+                column: "SalesOrderId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_SalesOrderItems_ProductId",
                 table: "SalesOrderItems",
                 column: "ProductId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_SalesOrderItems_SalesOrderId",
-                table: "SalesOrderItems",
-                column: "SalesOrderId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_SalesOrderItems_UnitId",
@@ -3593,6 +4200,11 @@ namespace POS.Migrations.SqlServer.Migrations
                 column: "TaxId");
 
             migrationBuilder.CreateIndex(
+                name: "IX_SalesOrderPayment_TenantId",
+                table: "SalesOrderPayments",
+                column: "TenantId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_SalesOrderPayments_CreatedBy",
                 table: "SalesOrderPayments",
                 column: "CreatedBy");
@@ -3601,6 +4213,28 @@ namespace POS.Migrations.SqlServer.Migrations
                 name: "IX_SalesOrderPayments_SalesOrderId",
                 table: "SalesOrderPayments",
                 column: "SalesOrderId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_SalesOrder_Tenant_Customer",
+                table: "SalesOrders",
+                columns: new[] { "TenantId", "CustomerId" });
+
+            migrationBuilder.CreateIndex(
+                name: "IX_SalesOrder_Tenant_Date",
+                table: "SalesOrders",
+                columns: new[] { "TenantId", "SOCreatedDate" });
+
+            migrationBuilder.CreateIndex(
+                name: "IX_SalesOrder_Tenant_Number",
+                table: "SalesOrders",
+                columns: new[] { "TenantId", "OrderNumber" },
+                unique: true,
+                filter: "[OrderNumber] IS NOT NULL");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_SalesOrder_Tenant_Status",
+                table: "SalesOrders",
+                columns: new[] { "TenantId", "Status" });
 
             migrationBuilder.CreateIndex(
                 name: "IX_SalesOrders_CreatedBy",
@@ -3618,6 +4252,11 @@ namespace POS.Migrations.SqlServer.Migrations
                 column: "LocationId");
 
             migrationBuilder.CreateIndex(
+                name: "IX_SendEmail_TenantId",
+                table: "SendEmails",
+                column: "TenantId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_SendEmails_CreatedBy",
                 table: "SendEmails",
                 column: "CreatedBy");
@@ -3633,14 +4272,29 @@ namespace POS.Migrations.SqlServer.Migrations
                 column: "SupplierId");
 
             migrationBuilder.CreateIndex(
+                name: "IX_StockAdjustment_TenantId",
+                table: "StockAdjustments",
+                column: "TenantId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_StockAdjustments_BranchId",
                 table: "StockAdjustments",
                 column: "BranchId");
 
             migrationBuilder.CreateIndex(
+                name: "IX_StockAdjustments_CreatedBy",
+                table: "StockAdjustments",
+                column: "CreatedBy");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_StockAdjustments_InventoryItemId",
                 table: "StockAdjustments",
                 column: "InventoryItemId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_StockTransferItem_TenantId",
+                table: "StockTransferItems",
+                column: "TenantId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_StockTransferItems_CreatedBy",
@@ -3661,6 +4315,11 @@ namespace POS.Migrations.SqlServer.Migrations
                 name: "IX_StockTransferItems_UnitId",
                 table: "StockTransferItems",
                 column: "UnitId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_StockTransfer_TenantId",
+                table: "StockTransfers",
+                column: "TenantId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_StockTransfers_CreatedBy",
@@ -3688,6 +4347,16 @@ namespace POS.Migrations.SqlServer.Migrations
                 column: "CountryId");
 
             migrationBuilder.CreateIndex(
+                name: "IX_Supplier_Tenant_Email",
+                table: "Suppliers",
+                columns: new[] { "TenantId", "Email" });
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Supplier_Tenant_Mobile",
+                table: "Suppliers",
+                columns: new[] { "TenantId", "MobileNo" });
+
+            migrationBuilder.CreateIndex(
                 name: "IX_Suppliers_BillingAddressId",
                 table: "Suppliers",
                 column: "BillingAddressId");
@@ -3713,6 +4382,16 @@ namespace POS.Migrations.SqlServer.Migrations
                 column: "EntityType");
 
             migrationBuilder.CreateIndex(
+                name: "IX_TableSetting_TenantId",
+                table: "TableSettings",
+                column: "TenantId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_TableSettings_CreatedBy",
+                table: "TableSettings",
+                column: "CreatedBy");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_TaxEntries_BranchId",
                 table: "TaxEntries",
                 column: "BranchId");
@@ -3726,6 +4405,16 @@ namespace POS.Migrations.SqlServer.Migrations
                 name: "IX_TaxEntries_TransactionId",
                 table: "TaxEntries",
                 column: "TransactionId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_TaxEntry_TenantId",
+                table: "TaxEntries",
+                column: "TenantId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Tax_TenantId",
+                table: "Taxes",
+                column: "TenantId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Taxes_CreatedBy",
@@ -3759,6 +4448,11 @@ namespace POS.Migrations.SqlServer.Migrations
                 column: "TaxId");
 
             migrationBuilder.CreateIndex(
+                name: "IX_Transaction_Tenant_Date",
+                table: "Transactions",
+                columns: new[] { "TenantId", "TransactionDate" });
+
+            migrationBuilder.CreateIndex(
                 name: "IX_Transactions_BranchId",
                 table: "Transactions",
                 column: "BranchId");
@@ -3774,6 +4468,11 @@ namespace POS.Migrations.SqlServer.Migrations
                 column: "FinancialYearId");
 
             migrationBuilder.CreateIndex(
+                name: "IX_Unit_Tenant_Name",
+                table: "UnitConversations",
+                columns: new[] { "TenantId", "Name" });
+
+            migrationBuilder.CreateIndex(
                 name: "IX_UnitConversations_CreatedBy",
                 table: "UnitConversations",
                 column: "CreatedBy");
@@ -3784,14 +4483,14 @@ namespace POS.Migrations.SqlServer.Migrations
                 column: "ParentId");
 
             migrationBuilder.CreateIndex(
+                name: "IX_UserClaim_User_Type",
+                table: "UserClaims",
+                columns: new[] { "UserId", "ClaimType" });
+
+            migrationBuilder.CreateIndex(
                 name: "IX_UserClaims_ActionId",
                 table: "UserClaims",
                 column: "ActionId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_UserClaims_UserId",
-                table: "UserClaims",
-                column: "UserId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_UserLocations_LocationId",
@@ -3811,19 +4510,26 @@ namespace POS.Migrations.SqlServer.Migrations
             migrationBuilder.CreateIndex(
                 name: "EmailIndex",
                 table: "Users",
-                column: "NormalizedEmail");
+                columns: new[] { "NormalizedEmail", "TenantId" },
+                unique: true,
+                filter: "[NormalizedEmail] IS NOT NULL");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Users_TenantId",
+                name: "IX_User_Tenant_Phone",
                 table: "Users",
-                column: "TenantId");
+                columns: new[] { "TenantId", "PhoneNumber" });
 
             migrationBuilder.CreateIndex(
                 name: "UserNameIndex",
                 table: "Users",
-                column: "NormalizedUserName",
+                columns: new[] { "NormalizedUserName", "TenantId" },
                 unique: true,
                 filter: "[NormalizedUserName] IS NOT NULL");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_VariantItem_TenantId",
+                table: "VariantItems",
+                column: "TenantId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_VariantItems_CreatedBy",
@@ -3834,6 +4540,11 @@ namespace POS.Migrations.SqlServer.Migrations
                 name: "IX_VariantItems_VariantId",
                 table: "VariantItems",
                 column: "VariantId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Variant_TenantId",
+                table: "Variants",
+                column: "TenantId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Variants_CreatedBy",
@@ -3858,6 +4569,9 @@ namespace POS.Migrations.SqlServer.Migrations
 
             migrationBuilder.DropTable(
                 name: "CustomerLedgers");
+
+            migrationBuilder.DropTable(
+                name: "DailyProductPrices");
 
             migrationBuilder.DropTable(
                 name: "DailyReminders");
@@ -3908,6 +4622,9 @@ namespace POS.Migrations.SqlServer.Migrations
                 name: "LoginAudits");
 
             migrationBuilder.DropTable(
+                name: "MenuItemActions");
+
+            migrationBuilder.DropTable(
                 name: "NLog");
 
             migrationBuilder.DropTable(
@@ -3945,6 +4662,9 @@ namespace POS.Migrations.SqlServer.Migrations
 
             migrationBuilder.DropTable(
                 name: "RoleClaims");
+
+            migrationBuilder.DropTable(
+                name: "RoleMenuItems");
 
             migrationBuilder.DropTable(
                 name: "SalesOrderItemTaxes");
@@ -4008,6 +4728,9 @@ namespace POS.Migrations.SqlServer.Migrations
 
             migrationBuilder.DropTable(
                 name: "Reminders");
+
+            migrationBuilder.DropTable(
+                name: "MenuItems");
 
             migrationBuilder.DropTable(
                 name: "SalesOrderItems");

@@ -93,15 +93,31 @@ try {
         try { Stop-WebAppPool -Name $name -ErrorAction SilentlyContinue } catch {}
     }
 
-    Write-Host "   - Copying files (This may take a while)..." -ForegroundColor Yellow
+    # --- Optimization: Zip, Upload, Unzip ---
+    Write-Host "   - Compressing artifacts locally (Optimization)..." -ForegroundColor Yellow
+    $zipFile = "$PWD\publish.zip"
+    if (Test-Path $zipFile) { Remove-Item $zipFile }
+    Compress-Archive -Path "$publishDir\*" -DestinationPath $zipFile -Force
+
+    Write-Host "   - Uploading compressed bundle..." -ForegroundColor Yellow
     # Ensure remote directory exists
     Invoke-Command -Session $session -ArgumentList $RemotePath -ScriptBlock { 
         param($path) 
         if (-not (Test-Path $path)) { New-Item -ItemType Directory -Force -Path $path }
     }
 
-    # Copy Files
-    Copy-Item -Path "$publishDir\*" -Destination $RemotePath -ToSession $session -Recurse -Force
+    # Upload Zip
+    Copy-Item -Path $zipFile -Destination "$RemotePath\publish.zip" -ToSession $session -Force
+
+    Write-Host "   - Extracting files on remote server..." -ForegroundColor Yellow
+    Invoke-Command -Session $session -ArgumentList $RemotePath -ScriptBlock { 
+        param($path)
+        Expand-Archive -Path "$path\publish.zip" -DestinationPath $path -Force
+        Remove-Item "$path\publish.zip"
+    }
+    
+    # Cleanup local zip
+    if (Test-Path $zipFile) { Remove-Item $zipFile }
 
     # Restart IIS
     Invoke-Command -Session $session -ArgumentList $AppPoolName -ScriptBlock { 

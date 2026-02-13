@@ -12,8 +12,8 @@ using POS.Domain;
 namespace POS.Migrations.SqlServer.Migrations
 {
     [DbContext(typeof(POSDbContext))]
-    [Migration("20260210101107_AddDynamicMenuSystem")]
-    partial class AddDynamicMenuSystem
+    [Migration("20260213021445_MainInitSQLServer")]
+    partial class MainInitSQLServer
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -72,9 +72,6 @@ namespace POS.Migrations.SqlServer.Migrations
                     b.Property<long>("SyncVersion")
                         .HasColumnType("bigint");
 
-                    b.Property<Guid>("TenantId")
-                        .HasColumnType("uniqueidentifier");
-
                     b.HasKey("Id");
 
                     b.HasIndex("CreatedBy");
@@ -132,6 +129,9 @@ namespace POS.Migrations.SqlServer.Migrations
 
                     b.HasIndex("CreatedBy");
 
+                    b.HasIndex("TenantId", "Name")
+                        .HasDatabaseName("IX_Brand_Tenant_Name");
+
                     b.ToTable("Brands");
                 });
 
@@ -176,9 +176,6 @@ namespace POS.Migrations.SqlServer.Migrations
 
                     b.Property<long>("SyncVersion")
                         .HasColumnType("bigint");
-
-                    b.Property<Guid>("TenantId")
-                        .HasColumnType("uniqueidentifier");
 
                     b.HasKey("Id");
 
@@ -262,6 +259,9 @@ namespace POS.Migrations.SqlServer.Migrations
 
                     b.HasIndex("CreatedBy");
 
+                    b.HasIndex("TenantId")
+                        .HasDatabaseName("IX_CompanyProfile_TenantId");
+
                     b.ToTable("CompanyProfiles");
                 });
 
@@ -323,6 +323,9 @@ namespace POS.Migrations.SqlServer.Migrations
 
                     b.HasIndex("CreatedBy");
 
+                    b.HasIndex("TenantId")
+                        .HasDatabaseName("IX_ContactRequest_TenantId");
+
                     b.ToTable("ContactRequests");
                 });
 
@@ -365,9 +368,6 @@ namespace POS.Migrations.SqlServer.Migrations
                     b.Property<long>("SyncVersion")
                         .HasColumnType("bigint");
 
-                    b.Property<Guid>("TenantId")
-                        .HasColumnType("uniqueidentifier");
-
                     b.HasKey("Id");
 
                     b.HasIndex("CreatedBy");
@@ -381,6 +381,30 @@ namespace POS.Migrations.SqlServer.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
+                    b.Property<Guid>("CreatedBy")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime>("CreatedDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<Guid?>("DeletedBy")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime?>("DeletedDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("bit");
+
+                    b.Property<DateTime?>("LastSyncedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<Guid>("ModifiedBy")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime>("ModifiedDate")
+                        .HasColumnType("datetime2");
+
                     b.Property<string>("Name")
                         .HasMaxLength(100)
                         .HasColumnType("nvarchar(100)");
@@ -389,7 +413,12 @@ namespace POS.Migrations.SqlServer.Migrations
                         .HasMaxLength(10)
                         .HasColumnType("nvarchar(10)");
 
+                    b.Property<long>("SyncVersion")
+                        .HasColumnType("bigint");
+
                     b.HasKey("Id");
+
+                    b.HasIndex("CreatedBy");
 
                     b.ToTable("Currencies");
                 });
@@ -487,6 +516,19 @@ namespace POS.Migrations.SqlServer.Migrations
 
                     b.HasIndex("ShippingAddressId");
 
+                    b.HasIndex("TenantId", "CustomerName")
+                        .HasDatabaseName("IX_Customer_Tenant_Name");
+
+                    b.HasIndex("TenantId", "Email")
+                        .IsUnique()
+                        .HasDatabaseName("IX_Customer_Tenant_Email")
+                        .HasFilter("[Email] IS NOT NULL");
+
+                    b.HasIndex("TenantId", "MobileNo")
+                        .IsUnique()
+                        .HasDatabaseName("IX_Customer_Tenant_Mobile")
+                        .HasFilter("[MobileNo] IS NOT NULL");
+
                     b.ToTable("Customers");
                 });
 
@@ -544,6 +586,9 @@ namespace POS.Migrations.SqlServer.Migrations
                     b.HasKey("Id");
 
                     b.HasIndex("CreatedBy");
+
+                    b.HasIndex("TenantId")
+                        .HasDatabaseName("IX_DailyProductPrice_TenantId");
 
                     b.HasIndex("ProductId", "PriceDate", "TenantId")
                         .IsUnique()
@@ -699,6 +744,9 @@ namespace POS.Migrations.SqlServer.Migrations
 
                     b.HasIndex("CreatedBy");
 
+                    b.HasIndex("TenantId")
+                        .HasDatabaseName("IX_EmailSMTPSetting_TenantId");
+
                     b.ToTable("EmailSMTPSettings");
                 });
 
@@ -750,6 +798,9 @@ namespace POS.Migrations.SqlServer.Migrations
                     b.HasKey("Id");
 
                     b.HasIndex("CreatedBy");
+
+                    b.HasIndex("TenantId")
+                        .HasDatabaseName("IX_EmailTemplate_TenantId");
 
                     b.ToTable("EmailTemplates");
                 });
@@ -834,6 +885,9 @@ namespace POS.Migrations.SqlServer.Migrations
 
                     b.HasIndex("FinancialYearId");
 
+                    b.HasIndex("TenantId")
+                        .HasDatabaseName("IX_AccountingEntry_TenantId");
+
                     b.HasIndex("TransactionId");
 
                     b.ToTable("AccountingEntries");
@@ -893,6 +947,9 @@ namespace POS.Migrations.SqlServer.Migrations
                     b.HasKey("Id");
 
                     b.HasIndex("CreatedBy");
+
+                    b.HasIndex("TenantId")
+                        .HasDatabaseName("IX_FinancialYear_TenantId");
 
                     b.ToTable("FinancialYears");
                 });
@@ -972,6 +1029,9 @@ namespace POS.Migrations.SqlServer.Migrations
 
                     b.HasIndex("ParentAccountId");
 
+                    b.HasIndex("TenantId")
+                        .HasDatabaseName("IX_LedgerAccount_TenantId");
+
                     b.ToTable("LedgerAccounts");
                 });
 
@@ -1045,6 +1105,9 @@ namespace POS.Migrations.SqlServer.Migrations
 
                     b.HasIndex("LoanAccountInterestExpenseId");
 
+                    b.HasIndex("TenantId")
+                        .HasDatabaseName("IX_LoanDetail_TenantId");
+
                     b.ToTable("LoanDetails");
                 });
 
@@ -1105,6 +1168,9 @@ namespace POS.Migrations.SqlServer.Migrations
 
                     b.HasIndex("LoanDetailId");
 
+                    b.HasIndex("TenantId")
+                        .HasDatabaseName("IX_LoanRepayment_TenantId");
+
                     b.ToTable("LoanRepayments");
                 });
 
@@ -1120,7 +1186,28 @@ namespace POS.Migrations.SqlServer.Migrations
                     b.Property<Guid>("BranchId")
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<DateTime>("CreatedAt")
+                    b.Property<Guid>("CreatedBy")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime>("CreatedDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<Guid?>("DeletedBy")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime?>("DeletedDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("bit");
+
+                    b.Property<DateTime?>("LastSyncedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<Guid>("ModifiedBy")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime>("ModifiedDate")
                         .HasColumnType("datetime2");
 
                     b.Property<string>("Narration")
@@ -1140,12 +1227,23 @@ namespace POS.Migrations.SqlServer.Migrations
                     b.Property<int>("Status")
                         .HasColumnType("int");
 
+                    b.Property<long>("SyncVersion")
+                        .HasColumnType("bigint");
+
+                    b.Property<Guid>("TenantId")
+                        .HasColumnType("uniqueidentifier");
+
                     b.Property<Guid>("TransactionId")
                         .HasColumnType("uniqueidentifier");
 
                     b.HasKey("Id");
 
                     b.HasIndex("BranchId");
+
+                    b.HasIndex("CreatedBy");
+
+                    b.HasIndex("TenantId")
+                        .HasDatabaseName("IX_PaymentEntry_TenantId");
 
                     b.HasIndex("TransactionId");
 
@@ -1167,11 +1265,32 @@ namespace POS.Migrations.SqlServer.Migrations
                     b.Property<Guid>("BranchId")
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<DateTime>("CreatedAt")
+                    b.Property<Guid>("CreatedBy")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime>("CreatedDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<Guid?>("DeletedBy")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime?>("DeletedDate")
                         .HasColumnType("datetime2");
 
                     b.Property<Guid>("InventoryItemId")
                         .HasColumnType("uniqueidentifier");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("bit");
+
+                    b.Property<DateTime?>("LastSyncedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<Guid>("ModifiedBy")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime>("ModifiedDate")
+                        .HasColumnType("datetime2");
 
                     b.Property<decimal>("Quantity")
                         .HasColumnType("decimal(18,2)");
@@ -1184,6 +1303,12 @@ namespace POS.Migrations.SqlServer.Migrations
                         .HasMaxLength(50)
                         .HasColumnType("nvarchar(50)");
 
+                    b.Property<long>("SyncVersion")
+                        .HasColumnType("bigint");
+
+                    b.Property<Guid>("TenantId")
+                        .HasColumnType("uniqueidentifier");
+
                     b.Property<decimal>("TotalValue")
                         .HasColumnType("decimal(18,2)");
 
@@ -1194,7 +1319,12 @@ namespace POS.Migrations.SqlServer.Migrations
 
                     b.HasIndex("BranchId");
 
+                    b.HasIndex("CreatedBy");
+
                     b.HasIndex("InventoryItemId");
+
+                    b.HasIndex("TenantId")
+                        .HasDatabaseName("IX_StockAdjustment_TenantId");
 
                     b.ToTable("StockAdjustments");
                 });
@@ -1262,6 +1392,9 @@ namespace POS.Migrations.SqlServer.Migrations
                     b.HasIndex("BranchId");
 
                     b.HasIndex("CreatedBy");
+
+                    b.HasIndex("TenantId")
+                        .HasDatabaseName("IX_TaxEntry_TenantId");
 
                     b.HasIndex("TransactionId");
 
@@ -1360,13 +1493,45 @@ namespace POS.Migrations.SqlServer.Migrations
                     b.Property<string>("CountryName")
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<Guid>("CreatedBy")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime>("CreatedDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<Guid?>("DeletedBy")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime?>("DeletedDate")
+                        .HasColumnType("datetime2");
+
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("bit");
+
+                    b.Property<DateTime?>("LastSyncedAt")
+                        .HasColumnType("datetime2");
 
                     b.Property<string>("MobileNo")
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<Guid>("ModifiedBy")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime>("ModifiedDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<long>("SyncVersion")
+                        .HasColumnType("bigint");
+
+                    b.Property<Guid>("TenantId")
+                        .HasColumnType("uniqueidentifier");
+
                     b.HasKey("Id");
+
+                    b.HasIndex("CreatedBy");
+
+                    b.HasIndex("TenantId")
+                        .HasDatabaseName("IX_ContactAddress_TenantId");
 
                     b.ToTable("ContactAddresses");
                 });
@@ -1445,6 +1610,9 @@ namespace POS.Migrations.SqlServer.Migrations
 
                     b.HasIndex("LocationId");
 
+                    b.HasIndex("TenantId")
+                        .HasDatabaseName("IX_CustomerLedger_TenantId");
+
                     b.ToTable("CustomerLedgers");
                 });
 
@@ -1466,8 +1634,26 @@ namespace POS.Migrations.SqlServer.Migrations
                     b.Property<decimal>("DamagedQuantity")
                         .HasColumnType("decimal(18,2)");
 
+                    b.Property<Guid?>("DeletedBy")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime?>("DeletedDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("bit");
+
+                    b.Property<DateTime?>("LastSyncedAt")
+                        .HasColumnType("datetime2");
+
                     b.Property<Guid>("LocationId")
                         .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid>("ModifiedBy")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime>("ModifiedDate")
+                        .HasColumnType("datetime2");
 
                     b.Property<Guid>("ProductId")
                         .HasColumnType("uniqueidentifier");
@@ -1476,6 +1662,12 @@ namespace POS.Migrations.SqlServer.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<Guid>("ReportedId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<long>("SyncVersion")
+                        .HasColumnType("bigint");
+
+                    b.Property<Guid>("TenantId")
                         .HasColumnType("uniqueidentifier");
 
                     b.HasKey("Id");
@@ -1487,6 +1679,9 @@ namespace POS.Migrations.SqlServer.Migrations
                     b.HasIndex("ProductId");
 
                     b.HasIndex("ReportedId");
+
+                    b.HasIndex("TenantId")
+                        .HasDatabaseName("IX_DamagedStock_TenantId");
 
                     b.ToTable("DamagedStocks");
                 });
@@ -1543,6 +1738,9 @@ namespace POS.Migrations.SqlServer.Migrations
                     b.HasIndex("ExpenseId");
 
                     b.HasIndex("TaxId");
+
+                    b.HasIndex("TenantId")
+                        .HasDatabaseName("IX_ExpenseTax_TenantId");
 
                     b.ToTable("ExpenseTaxes");
                 });
@@ -1618,6 +1816,9 @@ namespace POS.Migrations.SqlServer.Migrations
 
                     b.HasIndex("SalesOrderId");
 
+                    b.HasIndex("TenantId")
+                        .HasDatabaseName("IX_FBRSubmissionLog_TenantId");
+
                     b.ToTable("FBRSubmissionLogs");
                 });
 
@@ -1686,6 +1887,9 @@ namespace POS.Migrations.SqlServer.Migrations
 
                     b.HasIndex("InquiryId");
 
+                    b.HasIndex("TenantId")
+                        .HasDatabaseName("IX_InquiryActivity_TenantId");
+
                     b.ToTable("InquiryActivities");
                 });
 
@@ -1740,6 +1944,9 @@ namespace POS.Migrations.SqlServer.Migrations
 
                     b.HasIndex("InquiryId");
 
+                    b.HasIndex("TenantId")
+                        .HasDatabaseName("IX_InquiryAttachment_TenantId");
+
                     b.ToTable("InquiryAttachments");
                 });
 
@@ -1791,6 +1998,9 @@ namespace POS.Migrations.SqlServer.Migrations
 
                     b.HasIndex("InquiryId");
 
+                    b.HasIndex("TenantId")
+                        .HasDatabaseName("IX_InquiryNote_TenantId");
+
                     b.ToTable("InquiryNotes");
                 });
 
@@ -1837,6 +2047,9 @@ namespace POS.Migrations.SqlServer.Migrations
                     b.HasKey("Id");
 
                     b.HasIndex("CreatedBy");
+
+                    b.HasIndex("TenantId")
+                        .HasDatabaseName("IX_InquiryStatus_TenantId");
 
                     b.ToTable("InquiryStatuses");
                 });
@@ -1912,6 +2125,9 @@ namespace POS.Migrations.SqlServer.Migrations
 
                     b.HasIndex("ProductId");
 
+                    b.HasIndex("TenantId")
+                        .HasDatabaseName("IX_InventoryBatch_TenantId");
+
                     b.ToTable("InventoryBatches");
                 });
 
@@ -1965,9 +2181,6 @@ namespace POS.Migrations.SqlServer.Migrations
 
                     b.Property<long>("SyncVersion")
                         .HasColumnType("bigint");
-
-                    b.Property<Guid>("TenantId")
-                        .HasColumnType("uniqueidentifier");
 
                     b.HasKey("Id");
 
@@ -2061,6 +2274,9 @@ namespace POS.Migrations.SqlServer.Migrations
 
                     b.HasIndex("CreatedBy");
 
+                    b.HasIndex("TenantId")
+                        .HasDatabaseName("IX_Location_TenantId");
+
                     b.ToTable("Locations");
                 });
 
@@ -2106,9 +2322,6 @@ namespace POS.Migrations.SqlServer.Migrations
                     b.Property<long>("SyncVersion")
                         .HasColumnType("bigint");
 
-                    b.Property<Guid>("TenantId")
-                        .HasColumnType("uniqueidentifier");
-
                     b.HasKey("Id");
 
                     b.HasIndex("CreatedBy");
@@ -2143,6 +2356,18 @@ namespace POS.Migrations.SqlServer.Migrations
                     b.Property<decimal>("Commission")
                         .HasColumnType("decimal(18,2)");
 
+                    b.Property<Guid>("CreatedBy")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime>("CreatedDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<Guid?>("DeletedBy")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime?>("DeletedDate")
+                        .HasColumnType("datetime2");
+
                     b.Property<Guid>("EmployeeId")
                         .HasColumnType("uniqueidentifier");
 
@@ -2155,8 +2380,20 @@ namespace POS.Migrations.SqlServer.Migrations
                     b.Property<decimal>("FoodBill")
                         .HasColumnType("decimal(18,2)");
 
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("bit");
+
+                    b.Property<DateTime?>("LastSyncedAt")
+                        .HasColumnType("datetime2");
+
                     b.Property<decimal>("MobileBill")
                         .HasColumnType("decimal(18,2)");
+
+                    b.Property<Guid>("ModifiedBy")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime>("ModifiedDate")
+                        .HasColumnType("datetime2");
 
                     b.Property<string>("Note")
                         .HasColumnType("nvarchar(max)");
@@ -2173,6 +2410,12 @@ namespace POS.Migrations.SqlServer.Migrations
                     b.Property<int>("SalaryMonth")
                         .HasColumnType("int");
 
+                    b.Property<long>("SyncVersion")
+                        .HasColumnType("bigint");
+
+                    b.Property<Guid>("TenantId")
+                        .HasColumnType("uniqueidentifier");
+
                     b.Property<decimal>("TotalSalary")
                         .HasColumnType("decimal(18,2)");
 
@@ -2183,9 +2426,14 @@ namespace POS.Migrations.SqlServer.Migrations
 
                     b.HasIndex("BranchId");
 
+                    b.HasIndex("CreatedBy");
+
                     b.HasIndex("EmployeeId");
 
                     b.HasIndex("FinancialYearId");
+
+                    b.HasIndex("TenantId")
+                        .HasDatabaseName("IX_Payroll_TenantId");
 
                     b.ToTable("Payrolls");
                 });
@@ -2245,6 +2493,9 @@ namespace POS.Migrations.SqlServer.Migrations
 
                     b.HasIndex("ParentId");
 
+                    b.HasIndex("TenantId", "Name")
+                        .HasDatabaseName("IX_ProductCategory_Tenant_Name");
+
                     b.ToTable("ProductCategories");
                 });
 
@@ -2254,10 +2505,31 @@ namespace POS.Migrations.SqlServer.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
+                    b.Property<Guid>("CreatedBy")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime>("CreatedDate")
+                        .HasColumnType("datetime2");
+
                     b.Property<decimal>("CurrentStock")
                         .HasColumnType("decimal(18,2)");
 
+                    b.Property<Guid?>("DeletedBy")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime?>("DeletedDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("bit");
+
+                    b.Property<DateTime?>("LastSyncedAt")
+                        .HasColumnType("datetime2");
+
                     b.Property<Guid>("LocationId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid>("ModifiedBy")
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<DateTime>("ModifiedDate")
@@ -2269,11 +2541,23 @@ namespace POS.Migrations.SqlServer.Migrations
                     b.Property<decimal>("PurchasePrice")
                         .HasColumnType("decimal(18,2)");
 
+                    b.Property<long>("SyncVersion")
+                        .HasColumnType("bigint");
+
+                    b.Property<Guid>("TenantId")
+                        .HasColumnType("uniqueidentifier");
+
                     b.HasKey("Id");
+
+                    b.HasIndex("CreatedBy");
 
                     b.HasIndex("LocationId");
 
                     b.HasIndex("ProductId");
+
+                    b.HasIndex("TenantId", "ProductId", "LocationId")
+                        .IsUnique()
+                        .HasDatabaseName("IX_ProductStock_Tenant_Product_Location");
 
                     b.ToTable("ProductStocks");
                 });
@@ -2287,7 +2571,16 @@ namespace POS.Migrations.SqlServer.Migrations
                     b.Property<int?>("Application")
                         .HasColumnType("int");
 
+                    b.Property<Guid>("CreatedBy")
+                        .HasColumnType("uniqueidentifier");
+
                     b.Property<DateTime>("CreatedDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<Guid?>("DeletedBy")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime?>("DeletedDate")
                         .HasColumnType("datetime2");
 
                     b.Property<DateTime>("Duration")
@@ -2299,14 +2592,26 @@ namespace POS.Migrations.SqlServer.Migrations
                     b.Property<bool>("IsActive")
                         .HasColumnType("bit");
 
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("bit");
+
                     b.Property<bool>("IsEmailNotification")
                         .HasColumnType("bit");
 
                     b.Property<bool>("IsRead")
                         .HasColumnType("bit");
 
+                    b.Property<DateTime?>("LastSyncedAt")
+                        .HasColumnType("datetime2");
+
                     b.Property<string>("Message")
                         .HasColumnType("nvarchar(max)");
+
+                    b.Property<Guid>("ModifiedBy")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime>("ModifiedDate")
+                        .HasColumnType("datetime2");
 
                     b.Property<Guid?>("ReferenceId")
                         .HasColumnType("uniqueidentifier");
@@ -2314,10 +2619,21 @@ namespace POS.Migrations.SqlServer.Migrations
                     b.Property<string>("Subject")
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<long>("SyncVersion")
+                        .HasColumnType("bigint");
+
+                    b.Property<Guid>("TenantId")
+                        .HasColumnType("uniqueidentifier");
+
                     b.Property<Guid>("UserId")
                         .HasColumnType("uniqueidentifier");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("CreatedBy");
+
+                    b.HasIndex("TenantId")
+                        .HasDatabaseName("IX_ReminderScheduler_TenantId");
 
                     b.HasIndex("UserId");
 
@@ -2392,6 +2708,9 @@ namespace POS.Migrations.SqlServer.Migrations
 
                     b.HasIndex("FromLocationId");
 
+                    b.HasIndex("TenantId")
+                        .HasDatabaseName("IX_StockTransfer_TenantId");
+
                     b.HasIndex("ToLocationId");
 
                     b.ToTable("StockTransfers");
@@ -2461,6 +2780,9 @@ namespace POS.Migrations.SqlServer.Migrations
                     b.HasIndex("ProductId");
 
                     b.HasIndex("StockTransferId");
+
+                    b.HasIndex("TenantId")
+                        .HasDatabaseName("IX_StockTransferItem_TenantId");
 
                     b.HasIndex("UnitId");
 
@@ -2550,6 +2872,30 @@ namespace POS.Migrations.SqlServer.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
+                    b.Property<Guid>("CreatedBy")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime>("CreatedDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<Guid?>("DeletedBy")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime?>("DeletedDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("bit");
+
+                    b.Property<DateTime?>("LastSyncedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<Guid>("ModifiedBy")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime>("ModifiedDate")
+                        .HasColumnType("datetime2");
+
                     b.Property<string>("ScreenName")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
@@ -2557,10 +2903,21 @@ namespace POS.Migrations.SqlServer.Migrations
                     b.Property<string>("SettingsJson")
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<long>("SyncVersion")
+                        .HasColumnType("bigint");
+
+                    b.Property<Guid>("TenantId")
+                        .HasColumnType("uniqueidentifier");
+
                     b.Property<Guid>("UserId")
                         .HasColumnType("uniqueidentifier");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("CreatedBy");
+
+                    b.HasIndex("TenantId")
+                        .HasDatabaseName("IX_TableSetting_TenantId");
 
                     b.ToTable("TableSettings");
                 });
@@ -2574,6 +2931,18 @@ namespace POS.Migrations.SqlServer.Migrations
                     b.Property<string>("Address")
                         .HasMaxLength(1000)
                         .HasColumnType("nvarchar(1000)");
+
+                    b.Property<string>("ApiKey")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime?>("ApiKeyCreatedDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<bool>("ApiKeyEnabled")
+                        .HasColumnType("bit");
+
+                    b.Property<DateTime?>("ApiKeyLastUsedDate")
+                        .HasColumnType("datetime2");
 
                     b.Property<string>("BusinessType")
                         .HasColumnType("nvarchar(max)");
@@ -2746,6 +3115,9 @@ namespace POS.Migrations.SqlServer.Migrations
 
                     b.HasIndex("FinancialYearId");
 
+                    b.HasIndex("TenantId", "TransactionDate")
+                        .HasDatabaseName("IX_Transaction_Tenant_Date");
+
                     b.ToTable("Transactions");
                 });
 
@@ -2808,6 +3180,9 @@ namespace POS.Migrations.SqlServer.Migrations
 
                     b.HasIndex("CreatedBy");
 
+                    b.HasIndex("TenantId")
+                        .HasDatabaseName("IX_Variant_TenantId");
+
                     b.ToTable("Variants");
                 });
 
@@ -2857,6 +3232,9 @@ namespace POS.Migrations.SqlServer.Migrations
                     b.HasKey("Id");
 
                     b.HasIndex("CreatedBy");
+
+                    b.HasIndex("TenantId")
+                        .HasDatabaseName("IX_VariantItem_TenantId");
 
                     b.HasIndex("VariantId");
 
@@ -2945,6 +3323,12 @@ namespace POS.Migrations.SqlServer.Migrations
 
                     b.HasIndex("LocationId");
 
+                    b.HasIndex("TenantId", "ExpenseCategoryId")
+                        .HasDatabaseName("IX_Expense_Tenant_Category");
+
+                    b.HasIndex("TenantId", "ExpenseDate")
+                        .HasDatabaseName("IX_Expense_Tenant_Date");
+
                     b.ToTable("Expenses");
                 });
 
@@ -2993,6 +3377,9 @@ namespace POS.Migrations.SqlServer.Migrations
                     b.HasKey("Id");
 
                     b.HasIndex("CreatedBy");
+
+                    b.HasIndex("TenantId")
+                        .HasDatabaseName("IX_ExpenseCategory_TenantId");
 
                     b.ToTable("ExpenseCategories");
                 });
@@ -3127,6 +3514,9 @@ namespace POS.Migrations.SqlServer.Migrations
 
                     b.HasIndex("InquiryStatusId");
 
+                    b.HasIndex("TenantId")
+                        .HasDatabaseName("IX_Inquiry_TenantId");
+
                     b.ToTable("Inquiries");
                 });
 
@@ -3188,6 +3578,9 @@ namespace POS.Migrations.SqlServer.Migrations
                     b.HasKey("Id");
 
                     b.HasIndex("CreatedBy");
+
+                    b.HasIndex("TenantId")
+                        .HasDatabaseName("IX_InquirySource_TenantId");
 
                     b.ToTable("InquirySources");
                 });
@@ -3281,7 +3674,7 @@ namespace POS.Migrations.SqlServer.Migrations
                     b.Property<long>("SyncVersion")
                         .HasColumnType("bigint");
 
-                    b.Property<Guid>("TenantId")
+                    b.Property<Guid?>("TenantId")
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<string>("Title")
@@ -3396,9 +3789,6 @@ namespace POS.Migrations.SqlServer.Migrations
 
                     b.Property<long>("SyncVersion")
                         .HasColumnType("bigint");
-
-                    b.Property<Guid>("TenantId")
-                        .HasColumnType("uniqueidentifier");
 
                     b.HasKey("Id");
 
@@ -3532,6 +3922,20 @@ namespace POS.Migrations.SqlServer.Migrations
 
                     b.HasIndex("VariantItemId");
 
+                    b.HasIndex("TenantId", "Barcode")
+                        .HasDatabaseName("IX_Product_Tenant_Barcode");
+
+                    b.HasIndex("TenantId", "CategoryId")
+                        .HasDatabaseName("IX_Product_Tenant_Category");
+
+                    b.HasIndex("TenantId", "Code")
+                        .IsUnique()
+                        .HasDatabaseName("IX_Product_Tenant_Code")
+                        .HasFilter("[Code] IS NOT NULL");
+
+                    b.HasIndex("TenantId", "Name")
+                        .HasDatabaseName("IX_Product_Tenant_Name");
+
                     b.ToTable("Products");
                 });
 
@@ -3581,6 +3985,9 @@ namespace POS.Migrations.SqlServer.Migrations
                     b.HasIndex("CreatedBy");
 
                     b.HasIndex("TaxId");
+
+                    b.HasIndex("TenantId")
+                        .HasDatabaseName("IX_ProductTax_TenantId");
 
                     b.ToTable("ProductTaxes");
                 });
@@ -3687,6 +4094,17 @@ namespace POS.Migrations.SqlServer.Migrations
                     b.HasIndex("LocationId");
 
                     b.HasIndex("SupplierId");
+
+                    b.HasIndex("TenantId", "OrderNumber")
+                        .IsUnique()
+                        .HasDatabaseName("IX_PurchaseOrder_Tenant_Number")
+                        .HasFilter("[OrderNumber] IS NOT NULL");
+
+                    b.HasIndex("TenantId", "POCreatedDate")
+                        .HasDatabaseName("IX_PurchaseOrder_Tenant_Date");
+
+                    b.HasIndex("TenantId", "SupplierId")
+                        .HasDatabaseName("IX_PurchaseOrder_Tenant_Supplier");
 
                     b.ToTable("PurchaseOrders");
                 });
@@ -3841,6 +4259,9 @@ namespace POS.Migrations.SqlServer.Migrations
 
                     b.HasIndex("PurchaseOrderId");
 
+                    b.HasIndex("TenantId")
+                        .HasDatabaseName("IX_PurchaseOrderPayment_TenantId");
+
                     b.ToTable("PurchaseOrderPayments");
                 });
 
@@ -3933,6 +4354,9 @@ namespace POS.Migrations.SqlServer.Migrations
 
                     b.HasIndex("CreatedBy");
 
+                    b.HasIndex("TenantId")
+                        .HasDatabaseName("IX_Reminder_TenantId");
+
                     b.ToTable("Reminders");
                 });
 
@@ -3941,6 +4365,18 @@ namespace POS.Migrations.SqlServer.Migrations
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid>("CreatedBy")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime>("CreatedDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<Guid?>("DeletedBy")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime?>("DeletedDate")
+                        .HasColumnType("datetime2");
 
                     b.Property<string>("Description")
                         .HasColumnType("nvarchar(max)");
@@ -3954,15 +4390,35 @@ namespace POS.Migrations.SqlServer.Migrations
                     b.Property<bool>("IsEmailNotification")
                         .HasColumnType("bit");
 
+                    b.Property<DateTime?>("LastSyncedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<Guid>("ModifiedBy")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime>("ModifiedDate")
+                        .HasColumnType("datetime2");
+
                     b.Property<Guid>("ReminderId")
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<string>("Subject")
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<long>("SyncVersion")
+                        .HasColumnType("bigint");
+
+                    b.Property<Guid>("TenantId")
+                        .HasColumnType("uniqueidentifier");
+
                     b.HasKey("Id");
 
+                    b.HasIndex("CreatedBy");
+
                     b.HasIndex("ReminderId");
+
+                    b.HasIndex("TenantId")
+                        .HasDatabaseName("IX_ReminderNotification_TenantId");
 
                     b.ToTable("ReminderNotifications");
                 });
@@ -4010,7 +4466,7 @@ namespace POS.Migrations.SqlServer.Migrations
                     b.Property<bool>("IsSuperRole")
                         .HasColumnType("bit");
 
-                    b.Property<Guid>("ModifiedBy")
+                    b.Property<Guid?>("ModifiedBy")
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<DateTime>("ModifiedDate")
@@ -4037,12 +4493,12 @@ namespace POS.Migrations.SqlServer.Migrations
 
                     b.HasIndex("ModifiedBy");
 
-                    b.HasIndex("NormalizedName")
+                    b.HasIndex("TenantId");
+
+                    b.HasIndex("NormalizedName", "TenantId")
                         .IsUnique()
                         .HasDatabaseName("RoleNameIndex")
                         .HasFilter("[NormalizedName] IS NOT NULL");
-
-                    b.HasIndex("TenantId");
 
                     b.ToTable("Roles", (string)null);
                 });
@@ -4273,6 +4729,20 @@ namespace POS.Migrations.SqlServer.Migrations
 
                     b.HasIndex("LocationId");
 
+                    b.HasIndex("TenantId", "CustomerId")
+                        .HasDatabaseName("IX_SalesOrder_Tenant_Customer");
+
+                    b.HasIndex("TenantId", "OrderNumber")
+                        .IsUnique()
+                        .HasDatabaseName("IX_SalesOrder_Tenant_Number")
+                        .HasFilter("[OrderNumber] IS NOT NULL");
+
+                    b.HasIndex("TenantId", "SOCreatedDate")
+                        .HasDatabaseName("IX_SalesOrder_Tenant_Date");
+
+                    b.HasIndex("TenantId", "Status")
+                        .HasDatabaseName("IX_SalesOrder_Tenant_Status");
+
                     b.ToTable("SalesOrders");
                 });
 
@@ -4337,7 +4807,8 @@ namespace POS.Migrations.SqlServer.Migrations
 
                     b.HasIndex("ProductId");
 
-                    b.HasIndex("SalesOrderId");
+                    b.HasIndex("SalesOrderId")
+                        .HasDatabaseName("IX_SalesOrderItem_SalesOrder");
 
                     b.HasIndex("UnitId");
 
@@ -4436,6 +4907,9 @@ namespace POS.Migrations.SqlServer.Migrations
 
                     b.HasIndex("SalesOrderId");
 
+                    b.HasIndex("TenantId")
+                        .HasDatabaseName("IX_SalesOrderPayment_TenantId");
+
                     b.ToTable("SalesOrderPayments");
                 });
 
@@ -4497,6 +4971,9 @@ namespace POS.Migrations.SqlServer.Migrations
                     b.HasIndex("CustomerId");
 
                     b.HasIndex("SupplierId");
+
+                    b.HasIndex("TenantId")
+                        .HasDatabaseName("IX_SendEmail_TenantId");
 
                     b.ToTable("SendEmails");
                 });
@@ -4593,6 +5070,12 @@ namespace POS.Migrations.SqlServer.Migrations
 
                     b.HasIndex("ShippingAddressId");
 
+                    b.HasIndex("TenantId", "Email")
+                        .HasDatabaseName("IX_Supplier_Tenant_Email");
+
+                    b.HasIndex("TenantId", "MobileNo")
+                        .HasDatabaseName("IX_Supplier_Tenant_Mobile");
+
                     b.ToTable("Suppliers");
                 });
 
@@ -4685,6 +5168,9 @@ namespace POS.Migrations.SqlServer.Migrations
 
                     b.HasIndex("CreatedBy");
 
+                    b.HasIndex("TenantId")
+                        .HasDatabaseName("IX_Tax_TenantId");
+
                     b.ToTable("Taxes");
                 });
 
@@ -4746,6 +5232,9 @@ namespace POS.Migrations.SqlServer.Migrations
                     b.HasIndex("CreatedBy");
 
                     b.HasIndex("ParentId");
+
+                    b.HasIndex("TenantId", "Name")
+                        .HasDatabaseName("IX_Unit_Tenant_Name");
 
                     b.ToTable("UnitConversations");
                 });
@@ -4832,7 +5321,7 @@ namespace POS.Migrations.SqlServer.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("PhoneNumber")
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("nvarchar(450)");
 
                     b.Property<bool>("PhoneNumberConfirmed")
                         .HasColumnType("bit");
@@ -4864,15 +5353,18 @@ namespace POS.Migrations.SqlServer.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("NormalizedEmail")
-                        .HasDatabaseName("EmailIndex");
+                    b.HasIndex("NormalizedEmail", "TenantId")
+                        .IsUnique()
+                        .HasDatabaseName("EmailIndex")
+                        .HasFilter("[NormalizedEmail] IS NOT NULL");
 
-                    b.HasIndex("NormalizedUserName")
+                    b.HasIndex("NormalizedUserName", "TenantId")
                         .IsUnique()
                         .HasDatabaseName("UserNameIndex")
                         .HasFilter("[NormalizedUserName] IS NOT NULL");
 
-                    b.HasIndex("TenantId");
+                    b.HasIndex("TenantId", "PhoneNumber")
+                        .HasDatabaseName("IX_User_Tenant_Phone");
 
                     b.ToTable("Users", (string)null);
                 });
@@ -4889,7 +5381,7 @@ namespace POS.Migrations.SqlServer.Migrations
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<string>("ClaimType")
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("nvarchar(450)");
 
                     b.Property<string>("ClaimValue")
                         .HasColumnType("nvarchar(max)");
@@ -4901,7 +5393,8 @@ namespace POS.Migrations.SqlServer.Migrations
 
                     b.HasIndex("ActionId");
 
-                    b.HasIndex("UserId");
+                    b.HasIndex("UserId", "ClaimType")
+                        .HasDatabaseName("IX_UserClaim_User_Type");
 
                     b.ToTable("UserClaims", (string)null);
                 });
@@ -5015,7 +5508,7 @@ namespace POS.Migrations.SqlServer.Migrations
                     b.HasOne("POS.Data.User", "CreatedByUser")
                         .WithMany()
                         .HasForeignKey("CreatedBy")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.Navigation("CreatedByUser");
@@ -5026,13 +5519,24 @@ namespace POS.Migrations.SqlServer.Migrations
                     b.HasOne("POS.Data.User", "CreatedByUser")
                         .WithMany()
                         .HasForeignKey("CreatedBy")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.Navigation("CreatedByUser");
                 });
 
             modelBuilder.Entity("POS.Data.Country", b =>
+                {
+                    b.HasOne("POS.Data.User", "CreatedByUser")
+                        .WithMany()
+                        .HasForeignKey("CreatedBy")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("CreatedByUser");
+                });
+
+            modelBuilder.Entity("POS.Data.Currency", b =>
                 {
                     b.HasOne("POS.Data.User", "CreatedByUser")
                         .WithMany()
@@ -5073,7 +5577,7 @@ namespace POS.Migrations.SqlServer.Migrations
                     b.HasOne("POS.Data.User", "CreatedByUser")
                         .WithMany()
                         .HasForeignKey("CreatedBy")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.HasOne("POS.Data.Product", "Product")
@@ -5142,7 +5646,7 @@ namespace POS.Migrations.SqlServer.Migrations
                     b.HasOne("POS.Data.User", "CreatedByUser")
                         .WithMany()
                         .HasForeignKey("CreatedBy")
-                        .OnDelete(DeleteBehavior.NoAction)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.HasOne("POS.Data.Entities.Accounts.LedgerAccount", "CreditLedgerAccount")
@@ -5187,7 +5691,7 @@ namespace POS.Migrations.SqlServer.Migrations
                     b.HasOne("POS.Data.User", "CreatedByUser")
                         .WithMany()
                         .HasForeignKey("CreatedBy")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.Navigation("CreatedByUser");
@@ -5198,7 +5702,7 @@ namespace POS.Migrations.SqlServer.Migrations
                     b.HasOne("POS.Data.User", "CreatedByUser")
                         .WithMany()
                         .HasForeignKey("CreatedBy")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.HasOne("POS.Data.Entities.Accounts.LedgerAccount", "ParentAccount")
@@ -5221,7 +5725,7 @@ namespace POS.Migrations.SqlServer.Migrations
                     b.HasOne("POS.Data.User", "CreatedByUser")
                         .WithMany()
                         .HasForeignKey("CreatedBy")
-                        .OnDelete(DeleteBehavior.NoAction)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.HasOne("POS.Data.Entities.Accounts.LedgerAccount", "LoanAccount")
@@ -5250,7 +5754,7 @@ namespace POS.Migrations.SqlServer.Migrations
                     b.HasOne("POS.Data.User", "CreatedByUser")
                         .WithMany()
                         .HasForeignKey("CreatedBy")
-                        .OnDelete(DeleteBehavior.NoAction)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.HasOne("POS.Data.Entities.Accounts.LoanDetail", "LoanDetail")
@@ -5272,6 +5776,12 @@ namespace POS.Migrations.SqlServer.Migrations
                         .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
 
+                    b.HasOne("POS.Data.User", "CreatedByUser")
+                        .WithMany()
+                        .HasForeignKey("CreatedBy")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
                     b.HasOne("POS.Data.Entities.Transaction", "Transaction")
                         .WithMany("PaymentEntries")
                         .HasForeignKey("TransactionId")
@@ -5279,6 +5789,8 @@ namespace POS.Migrations.SqlServer.Migrations
                         .IsRequired();
 
                     b.Navigation("Branch");
+
+                    b.Navigation("CreatedByUser");
 
                     b.Navigation("Transaction");
                 });
@@ -5291,6 +5803,12 @@ namespace POS.Migrations.SqlServer.Migrations
                         .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
 
+                    b.HasOne("POS.Data.User", "CreatedByUser")
+                        .WithMany()
+                        .HasForeignKey("CreatedBy")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
                     b.HasOne("POS.Data.Product", "InventoryItem")
                         .WithMany()
                         .HasForeignKey("InventoryItemId")
@@ -5298,6 +5816,8 @@ namespace POS.Migrations.SqlServer.Migrations
                         .IsRequired();
 
                     b.Navigation("Branch");
+
+                    b.Navigation("CreatedByUser");
 
                     b.Navigation("InventoryItem");
                 });
@@ -5313,7 +5833,7 @@ namespace POS.Migrations.SqlServer.Migrations
                     b.HasOne("POS.Data.User", "CreatedByUser")
                         .WithMany()
                         .HasForeignKey("CreatedBy")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.HasOne("POS.Data.Entities.Transaction", "Transaction")
@@ -5374,12 +5894,23 @@ namespace POS.Migrations.SqlServer.Migrations
                     b.Navigation("TransactionItem");
                 });
 
+            modelBuilder.Entity("POS.Data.Entities.ContactAddress", b =>
+                {
+                    b.HasOne("POS.Data.User", "CreatedByUser")
+                        .WithMany()
+                        .HasForeignKey("CreatedBy")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("CreatedByUser");
+                });
+
             modelBuilder.Entity("POS.Data.Entities.CustomerLedger", b =>
                 {
                     b.HasOne("POS.Data.User", "CreatedByUser")
                         .WithMany()
                         .HasForeignKey("CreatedBy")
-                        .OnDelete(DeleteBehavior.NoAction)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.HasOne("POS.Data.Customer", "Customer")
@@ -5467,7 +5998,7 @@ namespace POS.Migrations.SqlServer.Migrations
                     b.HasOne("POS.Data.User", "CreatedByUser")
                         .WithMany()
                         .HasForeignKey("CreatedBy")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.HasOne("POS.Data.SalesOrder", "SalesOrder")
@@ -5598,7 +6129,7 @@ namespace POS.Migrations.SqlServer.Migrations
                     b.HasOne("POS.Data.User", "CreatedByUser")
                         .WithMany()
                         .HasForeignKey("CreatedBy")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.Navigation("CreatedByUser");
@@ -5623,6 +6154,12 @@ namespace POS.Migrations.SqlServer.Migrations
                         .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
 
+                    b.HasOne("POS.Data.User", "CreatedByUser")
+                        .WithMany()
+                        .HasForeignKey("CreatedBy")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
                     b.HasOne("POS.Data.User", "Employee")
                         .WithMany()
                         .HasForeignKey("EmployeeId")
@@ -5634,6 +6171,8 @@ namespace POS.Migrations.SqlServer.Migrations
                         .HasForeignKey("FinancialYearId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+
+                    b.Navigation("CreatedByUser");
 
                     b.Navigation("Employee");
 
@@ -5661,6 +6200,12 @@ namespace POS.Migrations.SqlServer.Migrations
 
             modelBuilder.Entity("POS.Data.Entities.ProductStock", b =>
                 {
+                    b.HasOne("POS.Data.User", "CreatedByUser")
+                        .WithMany()
+                        .HasForeignKey("CreatedBy")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
                     b.HasOne("POS.Data.Entities.Location", "Location")
                         .WithMany()
                         .HasForeignKey("LocationId")
@@ -5673,6 +6218,8 @@ namespace POS.Migrations.SqlServer.Migrations
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
+                    b.Navigation("CreatedByUser");
+
                     b.Navigation("Location");
 
                     b.Navigation("Product");
@@ -5680,11 +6227,19 @@ namespace POS.Migrations.SqlServer.Migrations
 
             modelBuilder.Entity("POS.Data.Entities.ReminderScheduler", b =>
                 {
+                    b.HasOne("POS.Data.User", "CreatedByUser")
+                        .WithMany()
+                        .HasForeignKey("CreatedBy")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
                     b.HasOne("POS.Data.User", "User")
                         .WithMany()
                         .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
+
+                    b.Navigation("CreatedByUser");
 
                     b.Navigation("User");
                 });
@@ -5721,7 +6276,7 @@ namespace POS.Migrations.SqlServer.Migrations
                     b.HasOne("POS.Data.User", "CreatedByUser")
                         .WithMany()
                         .HasForeignKey("CreatedBy")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.HasOne("POS.Data.Product", "Product")
@@ -5749,6 +6304,17 @@ namespace POS.Migrations.SqlServer.Migrations
                     b.Navigation("Unit");
                 });
 
+            modelBuilder.Entity("POS.Data.Entities.TableSetting", b =>
+                {
+                    b.HasOne("POS.Data.User", "CreatedByUser")
+                        .WithMany()
+                        .HasForeignKey("CreatedBy")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("CreatedByUser");
+                });
+
             modelBuilder.Entity("POS.Data.Entities.Transaction", b =>
                 {
                     b.HasOne("POS.Data.Entities.Location", "Branch")
@@ -5760,7 +6326,7 @@ namespace POS.Migrations.SqlServer.Migrations
                     b.HasOne("POS.Data.User", "CreatedByUser")
                         .WithMany()
                         .HasForeignKey("CreatedBy")
-                        .OnDelete(DeleteBehavior.NoAction)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.HasOne("POS.Data.Entities.Accounts.FinancialYear", "FinancialYear")
@@ -5800,7 +6366,7 @@ namespace POS.Migrations.SqlServer.Migrations
                     b.HasOne("POS.Data.User", "CreatedByUser")
                         .WithMany()
                         .HasForeignKey("CreatedBy")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.Navigation("CreatedByUser");
@@ -5898,7 +6464,7 @@ namespace POS.Migrations.SqlServer.Migrations
                     b.HasOne("POS.Data.User", "CreatedByUser")
                         .WithMany()
                         .HasForeignKey("CreatedBy")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.HasOne("POS.Data.InquirySource", "InquirySource")
@@ -6085,7 +6651,7 @@ namespace POS.Migrations.SqlServer.Migrations
                     b.HasOne("POS.Data.User", "CreatedByUser")
                         .WithMany()
                         .HasForeignKey("CreatedBy")
-                        .OnDelete(DeleteBehavior.NoAction)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.HasOne("POS.Data.Entities.Location", "Location")
@@ -6196,11 +6762,19 @@ namespace POS.Migrations.SqlServer.Migrations
 
             modelBuilder.Entity("POS.Data.ReminderNotification", b =>
                 {
+                    b.HasOne("POS.Data.User", "CreatedByUser")
+                        .WithMany()
+                        .HasForeignKey("CreatedBy")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
                     b.HasOne("POS.Data.Reminder", "Reminder")
                         .WithMany("ReminderNotifications")
                         .HasForeignKey("ReminderId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+
+                    b.Navigation("CreatedByUser");
 
                     b.Navigation("Reminder");
                 });
@@ -6239,8 +6813,7 @@ namespace POS.Migrations.SqlServer.Migrations
                     b.HasOne("POS.Data.User", "ModifiedByUser")
                         .WithMany()
                         .HasForeignKey("ModifiedBy")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
+                        .OnDelete(DeleteBehavior.Restrict);
 
                     b.HasOne("POS.Data.Entities.Tenant", "Tenant")
                         .WithMany()
@@ -6400,7 +6973,7 @@ namespace POS.Migrations.SqlServer.Migrations
                     b.HasOne("POS.Data.User", "CreatedByUser")
                         .WithMany()
                         .HasForeignKey("CreatedBy")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.HasOne("POS.Data.Customer", "Customer")

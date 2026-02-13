@@ -64,6 +64,12 @@ SqlServer
 dotnet ef database update --project POS.Domain --startup-project POS.API
 dotnet run --project POS.API/POS.API.csproj
 
+SQLServer
+dotnet ef migrations add MainInitSQLServer -p POS.Migrations.SqlServer/POS.Migrations.SqlServer.csproj -s POS.API/POS.API.csproj -o Migrations -- --DatabaseProvider=SQLServer 
+
+dotnet ef database update MainInitSQLServer -c POSDbContext -p POS.Migrations.SqlServer/POS.Migrations.SqlServer.csproj --startup-project POS.API/POS.API.csproj -- --DatabaseProvider=SQLServer
+
+
 PostgreSQL
 dotnet ef migrations add MainInitPostgreSQL -p POS.Migrations.PostgreSQL/POS.Migrations.PostgreSQL.csproj -s POS.API/POS.API.csproj -o Migrations -- --DatabaseProvider=PostgreSql 
 

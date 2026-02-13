@@ -40,46 +40,51 @@ namespace POS.MediatR.Tenant.Handlers
                 var optionsBuilder = new DbContextOptionsBuilder<POSDbContext>();
                 optionsBuilder.UseSqlite($"Data Source={dbFilePath}");
 
-                using var destinationContext = new POSDbContext(optionsBuilder.Options, new ExportTenantProvider(request.TenantId));
-                await destinationContext.Database.EnsureCreatedAsync(cancellationToken);
-
-                // 2. Pre-fetch User and Role IDs for filtering dependent entities
-                var userIds = await _sourceContext.Users
-                    .IgnoreQueryFilters()
-                    .Where(u => u.TenantId == request.TenantId)
-                    .Select(u => u.Id)
-                    .ToListAsync(cancellationToken);
-
-                var roleIds = await _sourceContext.Roles
-                    .IgnoreQueryFilters()
-                    .Where(r => r.TenantId == request.TenantId)
-                    .Select(r => r.Id)
-                    .ToListAsync(cancellationToken);
-
-                // Fetch Tenant ApiKey if not provided in request
-                if (string.IsNullOrEmpty(request.ApiKey))
+                using (var destinationContext = new POSDbContext(optionsBuilder.Options, new ExportTenantProvider(request.TenantId)))
                 {
-                    var tenant = await _sourceContext.Tenants.IgnoreQueryFilters().FirstOrDefaultAsync(t => t.Id == request.TenantId, cancellationToken);
-                    request.ApiKey = tenant?.ApiKey;
+                    await destinationContext.Database.EnsureCreatedAsync(cancellationToken);
+
+                    // 2. Pre-fetch User and Role IDs for filtering dependent entities
+                    var userIds = await _sourceContext.Users
+                        .IgnoreQueryFilters()
+                        .Where(u => u.TenantId == request.TenantId)
+                        .Select(u => u.Id)
+                        .ToListAsync(cancellationToken);
+
+                    var roleIds = await _sourceContext.Roles
+                        .IgnoreQueryFilters()
+                        .Where(r => r.TenantId == request.TenantId)
+                        .Select(r => r.Id)
+                        .ToListAsync(cancellationToken);
+
+                    // Fetch Tenant ApiKey if not provided in request
+                    if (string.IsNullOrEmpty(request.ApiKey))
+                    {
+                        var tenant = await _sourceContext.Tenants.IgnoreQueryFilters().FirstOrDefaultAsync(t => t.Id == request.TenantId, cancellationToken);
+                        request.ApiKey = tenant?.ApiKey;
+                    }
+
+                    // 3. Iterate and Copy Data
+                    var dbSetProperties = typeof(POSDbContext).GetProperties()
+                        .Where(p => p.PropertyType.IsGenericType && 
+                                    p.PropertyType.GetGenericTypeDefinition() == typeof(DbSet<>));
+
+                    foreach (var property in dbSetProperties)
+                    {
+                        var entityType = property.PropertyType.GetGenericArguments()[0];
+                        if (IsExcludedEntity(entityType)) continue;
+
+                        var method = this.GetType().GetMethod(nameof(CopyEntity), BindingFlags.NonPublic | BindingFlags.Instance);
+                        var genericMethod = method.MakeGenericMethod(entityType);
+                        await (Task)genericMethod.Invoke(this, new object[] { _sourceContext, destinationContext, request.TenantId, userIds, roleIds, cancellationToken });
+                    }
+                    
+                    // 4. Generate SyncMetadata
+                    await GenerateSyncMetadata(destinationContext, dbSetProperties, exportTime, cancellationToken);
                 }
 
-                // 3. Iterate and Copy Data
-                var dbSetProperties = typeof(POSDbContext).GetProperties()
-                    .Where(p => p.PropertyType.IsGenericType && 
-                                p.PropertyType.GetGenericTypeDefinition() == typeof(DbSet<>));
-
-                foreach (var property in dbSetProperties)
-                {
-                    var entityType = property.PropertyType.GetGenericArguments()[0];
-                    if (IsExcludedEntity(entityType)) continue;
-
-                    var method = this.GetType().GetMethod(nameof(CopyEntity), BindingFlags.NonPublic | BindingFlags.Instance);
-                    var genericMethod = method.MakeGenericMethod(entityType);
-                    await (Task)genericMethod.Invoke(this, new object[] { _sourceContext, destinationContext, request.TenantId, userIds, roleIds, cancellationToken });
-                }
-                
-                // 4. Generate SyncMetadata
-                await GenerateSyncMetadata(destinationContext, dbSetProperties, exportTime, cancellationToken);
+                // Force release of file locks
+                Microsoft.Data.Sqlite.SqliteConnection.ClearAllPools();
                 
                 // 5. Generate appsettings.json
                 var appSettings = new

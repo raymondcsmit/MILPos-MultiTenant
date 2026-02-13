@@ -601,6 +601,19 @@ namespace POS.Domain
                     .OnDelete(DeleteBehavior.Restrict);
             });
 
+            builder.Entity<ReminderScheduler>(b =>
+            {
+                b.HasOne(e => e.User)
+                    .WithMany()
+                    .HasForeignKey(rs => rs.UserId)
+                    .OnDelete(DeleteBehavior.Restrict);
+
+                b.HasOne(e => e.CreatedByUser)
+                    .WithMany()
+                    .HasForeignKey(rs => rs.CreatedBy)
+                    .OnDelete(DeleteBehavior.Restrict);
+            });
+
             builder.Entity<Expense>(b =>
             {
                 b.HasOne(e => e.ExpenseBy)
@@ -1235,6 +1248,20 @@ namespace POS.Domain
                 // Check if entity inherits from BaseEntity (Tenant Data)
                 if (typeof(BaseEntity).IsAssignableFrom(entityType.ClrType))
                 {
+                    // Configure CreatedBy relationship to Restrict to avoid cycles
+                    try
+                    {
+                        builder.Entity(entityType.ClrType)
+                            .HasOne("CreatedByUser")
+                            .WithMany()
+                            .HasForeignKey("CreatedBy")
+                            .OnDelete(DeleteBehavior.Restrict);
+                    }
+                    catch (InvalidOperationException)
+                    {
+                        // Ignore if navigation property doesn't exist or is already configured (e.g. User entity itself)
+                    }
+
                     var tenantIdProperty = entityType.FindProperty("TenantId");
                     if (tenantIdProperty != null)
                     {
