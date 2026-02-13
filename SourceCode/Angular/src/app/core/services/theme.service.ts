@@ -1,6 +1,6 @@
 import { Injectable, signal, effect } from '@angular/core';
 
-export type WebsiteTheme = 'default' | 'theme-ocean' | 'theme-dark' | 'theme-crimson' | 'theme-sunset' | 'theme-forest' | 'theme-berry' | 'theme-royal' | 'theme-slate' | 'theme-sky';
+export type WebsiteTheme = string; 
 
 @Injectable({
   providedIn: 'root'
@@ -35,12 +35,9 @@ export class ThemeService {
   }
 
   private applyTheme(theme: WebsiteTheme) {
-    // Remove all known theme classes
-    document.body.classList.remove(
-      'theme-ocean', 'theme-dark', 'theme-crimson',
-      'theme-sunset', 'theme-forest', 'theme-berry',
-      'theme-royal', 'theme-slate', 'theme-sky'
-    );
+    // Remove all classes that start with 'theme-'
+    const userThemeClasses = Array.from(document.body.classList).filter(c => c.startsWith('theme-'));
+    userThemeClasses.forEach(c => document.body.classList.remove(c));
     
     // Add the new theme class (if not default)
     if (theme !== 'default') {

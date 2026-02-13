@@ -1,0 +1,115 @@
+// Shared Background for all Glass Themes
+// Fix: Color must be at the END of the shorthand syntax for valid CSS
+$glass-body-bg: radial-gradient(circle at 0% 0%, #1a1f2c 0%, #07090e 100%), radial-gradient(circle at 100% 100%, #1e2432 0%, #080b10 100%) #0a0c15;
+
+@mixin glass-theme($bg-color, $glass-bg, $border-color, $primary, $text-color: #ffffff) {
+    --background-color: #{$glass-body-bg}; // Sets the complex gradient
+    --glass-bg: #{$glass-bg};
+    --glass-border: #{$border-color};
+    --primary-color: #{$primary}; 
+    --text-color: #{$text-color};
+    --card-bg: transparent;
+    --sidenav-bg: transparent;
+    
+    // Override material vars
+    --mdc-filled-button-container-color: #{$primary};
+}
+
+// 1. NAVY · GREY FOUNDATION
+.theme-n1 { @include glass-theme(#0a0c15, rgba(10,25,45,0.55), rgba(140,180,230,0.3), #4F657F); }
+.theme-n2 { @include glass-theme(#0a0c15, rgba(30,25,45,0.55), rgba(210,170,180,0.35), #6D5B6E); }
+.theme-n3 { @include glass-theme(#0a0c15, rgba(8,40,50,0.6), rgba(100,200,200,0.3), #3E6A70); }
+.theme-n4 { @include glass-theme(#0a0c15, rgba(35,20,35,0.6), rgba(200,120,140,0.4), #684E5A); }
+.theme-n5 { @include glass-theme(#0a0c15, rgba(30,40,30,0.6), rgba(170,180,110,0.3), #5A6952); }
+.theme-n6 { @include glass-theme(#0a0c15, rgba(20,25,45,0.6), rgba(230,200,120,0.45), #7A7156); }
+.theme-n7 { @include glass-theme(#0a0c15, rgba(30,25,50,0.6), rgba(190,170,230,0.4), #63597E); }
+.theme-n8 { @include glass-theme(#0a0c15, rgba(40,30,45,0.6), rgba(255,150,140,0.35), #975D62); }
+.theme-n9 { @include glass-theme(#0a0c15, rgba(20,35,60,0.6), rgba(120,160,210,0.4), #466282); }
+.theme-n10 { @include glass-theme(#0a0c15, rgba(10,25,35,0.65), rgba(70,180,140,0.35), #2C5E4A); }
+.theme-n11 { @include glass-theme(#0a0c15, rgba(30,30,40,0.6), rgba(180,150,130,0.4), #695D54); }
+.theme-n12 { @include glass-theme(#0a0c15, rgba(30,25,45,0.6), rgba(230,160,180,0.4), #865F70); }
+.theme-n13 { @include glass-theme(#0a0c15, rgba(25,25,45,0.65), rgba(230,190,80,0.45), #8A793D); }
+.theme-n14 { @include glass-theme(#0a0c15, rgba(45,30,35,0.6), rgba(210,130,100,0.4), #925E53); }
+.theme-n15 { @include glass-theme(#0a0c15, rgba(8,30,55,0.65), rgba(0,220,240,0.5), #007C92); }
+
+// 2. BRIGHT · NEON GLASS
+.theme-b1 { @include glass-theme(#0a0c15, rgba(45,15,45,0.5), #ff44aa, #FF1493); }
+.theme-b2 { @include glass-theme(#0a0c15, rgba(30,50,20,0.5), #ccff00, #CCFF00); }
+.theme-b3 { @include glass-theme(#0a0c15, rgba(55,25,35,0.5), #ff8800, #FF5500); }
+.theme-b4 { @include glass-theme(#0a0c15, rgba(25,20,50,0.5), #00ffff, #00FFFF); }
+.theme-b5 { @include glass-theme(#0a0c15, rgba(35,15,55,0.55), #aa00ff, #AA00FF); }
+.theme-b6 { @include glass-theme(#0a0c15, rgba(50,15,25,0.55), #ff3300, #FF3300); }
+.theme-b7 { @include glass-theme(#0a0c15, rgba(40,25,55,0.5), #ffdd00, #FFDD00); }
+.theme-b8 { @include glass-theme(#0a0c15, rgba(25,55,55,0.5), #00ffaa, #00FFAA); }
+.theme-b9 { @include glass-theme(#0a0c15, rgba(55,20,45,0.55), #ff44cc, #FF44CC); }
+.theme-b10 { @include glass-theme(#0a0c15, rgba(20,50,65,0.5), #0ff0f0, #0FF0F0); }
+.theme-b11 { @include glass-theme(#0a0c15, rgba(55,15,40,0.55), #ff69b4, #FF69B4); }
+.theme-b12 { @include glass-theme(#0a0c15, rgba(15,45,60,0.55), #00ffcc, #00FFCC); }
+.theme-b13 { @include glass-theme(#0a0c15, rgba(50,10,20,0.6), #ff0040, #FF0040); }
+.theme-b14 { @include glass-theme(#0a0c15, rgba(35,45,15,0.55), #aaff00, #AAFF00); }
+.theme-b15 { @include glass-theme(#0a0c15, rgba(25,10,50,0.6), #cc44ff, #CC44FF); }
+
+// 3. PROFESSIONAL · ELEVATED
+.theme-p1 { @include glass-theme(#0a0c15, rgba(20,35,35,0.5), #b48b7d, #5F7A6B); }
+.theme-p2 { @include glass-theme(#0a0c15, rgba(10,35,50,0.55), #ff8c6a, #2D6A8F); }
+.theme-p3 { @include glass-theme(#0a0c15, rgba(40,25,40,0.55), #e6b450, #5E3C5C); }
+.theme-p4 { @include glass-theme(#0a0c15, rgba(30,45,55,0.55), #c06e4e, #4F6D7A); }
+.theme-p5 { @include glass-theme(#0a0c15, rgba(30,45,30,0.55), #e0cba0, #5C735E); }
+.theme-p6 { @include glass-theme(#0a0c15, rgba(20,30,55,0.55), #ffbe98, #3F5C8A); }
+.theme-p7 { @include glass-theme(#0a0c15, rgba(25,30,40,0.6), #b9d48b, #4B5563); }
+.theme-p8 { @include glass-theme(#0a0c15, rgba(45,25,35,0.6), #f5cfc2, #613A4A); }
+.theme-p9 { @include glass-theme(#0a0c15, rgba(10,45,50,0.6), #d9b650, #1E6468); }
+.theme-p10 { @include glass-theme(#0a0c15, rgba(30,25,55,0.6), #c5c0d9, #4F4C7A); }
+.theme-p11 { @include glass-theme(#0a0c15, rgba(40,30,25,0.6), #e6c9af, #6F4E3A); }
+.theme-p12 { @include glass-theme(#0a0c15, rgba(30,35,50,0.6), #fbbf24, #4A5266); }
+.theme-p13 { @include glass-theme(#0a0c15, rgba(20,45,45,0.6), #dbe7e4, #2F5E5E); }
+.theme-p14 { @include glass-theme(#0a0c15, rgba(45,25,40,0.6), #dbbec3, #693B4C); }
+.theme-p15 { @include glass-theme(#0a0c15, rgba(10,35,50,0.6), #b9e6d9, #1E4A5F); }
+.theme-n2 { @include glass-theme(#0a0c15, rgba(30,25,45,0.55), rgba(210,170,180,0.35), #6D5B6E); }
+.theme-n3 { @include glass-theme(#0a0c15, rgba(8,40,50,0.6), rgba(100,200,200,0.3), #3E6A70); }
+.theme-n4 { @include glass-theme(#0a0c15, rgba(35,20,35,0.6), rgba(200,120,140,0.4), #684E5A); }
+.theme-n5 { @include glass-theme(#0a0c15, rgba(30,40,30,0.6), rgba(170,180,110,0.3), #5A6952); }
+.theme-n6 { @include glass-theme(#0a0c15, rgba(20,25,45,0.6), rgba(230,200,120,0.45), #7A7156); }
+.theme-n7 { @include glass-theme(#0a0c15, rgba(30,25,50,0.6), rgba(190,170,230,0.4), #63597E); }
+.theme-n8 { @include glass-theme(#0a0c15, rgba(40,30,45,0.6), rgba(255,150,140,0.35), #975D62); }
+.theme-n9 { @include glass-theme(#0a0c15, rgba(20,35,60,0.6), rgba(120,160,210,0.4), #466282); }
+.theme-n10 { @include glass-theme(#0a0c15, rgba(10,25,35,0.65), rgba(70,180,140,0.35), #2C5E4A); }
+.theme-n11 { @include glass-theme(#0a0c15, rgba(30,30,40,0.6), rgba(180,150,130,0.4), #695D54); }
+.theme-n12 { @include glass-theme(#0a0c15, rgba(30,25,45,0.6), rgba(230,160,180,0.4), #865F70); }
+.theme-n13 { @include glass-theme(#0a0c15, rgba(25,25,45,0.65), rgba(230,190,80,0.45), #8A793D); }
+.theme-n14 { @include glass-theme(#0a0c15, rgba(45,30,35,0.6), rgba(210,130,100,0.4), #925E53); }
+.theme-n15 { @include glass-theme(#0a0c15, rgba(8,30,55,0.65), rgba(0,220,240,0.5), #007C92); }
+
+// 2. BRIGHT · NEON GLASS
+.theme-b1 { @include glass-theme(#0a0c15, rgba(45,15,45,0.5), #ff44aa, #FF1493); }
+.theme-b2 { @include glass-theme(#0a0c15, rgba(30,50,20,0.5), #ccff00, #CCFF00); }
+.theme-b3 { @include glass-theme(#0a0c15, rgba(55,25,35,0.5), #ff8800, #FF5500); }
+.theme-b4 { @include glass-theme(#0a0c15, rgba(25,20,50,0.5), #00ffff, #00FFFF); }
+.theme-b5 { @include glass-theme(#0a0c15, rgba(35,15,55,0.55), #aa00ff, #AA00FF); }
+.theme-b6 { @include glass-theme(#0a0c15, rgba(50,15,25,0.55), #ff3300, #FF3300); }
+.theme-b7 { @include glass-theme(#0a0c15, rgba(40,25,55,0.5), #ffdd00, #FFDD00); }
+.theme-b8 { @include glass-theme(#0a0c15, rgba(25,55,55,0.5), #00ffaa, #00FFAA); }
+.theme-b9 { @include glass-theme(#0a0c15, rgba(55,20,45,0.55), #ff44cc, #FF44CC); }
+.theme-b10 { @include glass-theme(#0a0c15, rgba(20,50,65,0.5), #0ff0f0, #0FF0F0); }
+.theme-b11 { @include glass-theme(#0a0c15, rgba(55,15,40,0.55), #ff69b4, #FF69B4); }
+.theme-b12 { @include glass-theme(#0a0c15, rgba(15,45,60,0.55), #00ffcc, #00FFCC); }
+.theme-b13 { @include glass-theme(#0a0c15, rgba(50,10,20,0.6), #ff0040, #FF0040); }
+.theme-b14 { @include glass-theme(#0a0c15, rgba(35,45,15,0.55), #aaff00, #AAFF00); }
+.theme-b15 { @include glass-theme(#0a0c15, rgba(25,10,50,0.6), #cc44ff, #CC44FF); }
+
+// 3. PROFESSIONAL · ELEVATED
+.theme-p1 { @include glass-theme(#0a0c15, rgba(20,35,35,0.5), #b48b7d, #5F7A6B); }
+.theme-p2 { @include glass-theme(#0a0c15, rgba(10,35,50,0.55), #ff8c6a, #2D6A8F); }
+.theme-p3 { @include glass-theme(#0a0c15, rgba(40,25,40,0.55), #e6b450, #5E3C5C); }
+.theme-p4 { @include glass-theme(#0a0c15, rgba(30,45,55,0.55), #c06e4e, #4F6D7A); }
+.theme-p5 { @include glass-theme(#0a0c15, rgba(30,45,30,0.55), #e0cba0, #5C735E); }
+.theme-p6 { @include glass-theme(#0a0c15, rgba(20,30,55,0.55), #ffbe98, #3F5C8A); }
+.theme-p7 { @include glass-theme(#0a0c15, rgba(25,30,40,0.6), #b9d48b, #4B5563); }
+.theme-p8 { @include glass-theme(#0a0c15, rgba(45,25,35,0.6), #f5cfc2, #613A4A); }
+.theme-p9 { @include glass-theme(#0a0c15, rgba(10,45,50,0.6), #d9b650, #1E6468); }
+.theme-p10 { @include glass-theme(#0a0c15, rgba(30,25,55,0.6), #c5c0d9, #4F4C7A); }
+.theme-p11 { @include glass-theme(#0a0c15, rgba(40,30,25,0.6), #e6c9af, #6F4E3A); }
+.theme-p12 { @include glass-theme(#0a0c15, rgba(30,35,50,0.6), #fbbf24, #4A5266); }
+.theme-p13 { @include glass-theme(#0a0c15, rgba(20,45,45,0.6), #dbe7e4, #2F5E5E); }
+.theme-p14 { @include glass-theme(#0a0c15, rgba(45,25,40,0.6), #dbbec3, #693B4C); }
+.theme-p15 { @include glass-theme(#0a0c15, rgba(10,35,50,0.6), #b9e6d9, #1E4A5F); }

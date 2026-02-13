@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Search Results - Glassmorphic Mockup</title>
+    <link rel="stylesheet" href="mockup-styles.css">
+</head>
+<body>
+    <div class="app-container">
+        <!-- Sidebar -->
+        <aside class="sidebar glass-panel">
+            <div class="brand">
+                <span class="material-icons">inventory_2</span>
+                POS System
+            </div>
+            <nav class="nav-links">
+                <a href="01_Dashboard.html" class="nav-item">
+                    <span class="material-icons">dashboard</span> Dashboard
+                </a>
+                <a href="02_UserProfile.html" class="nav-item">
+                    <span class="material-icons">person</span> Profile
+                </a>
+                <a href="03_DataEntry.html" class="nav-item">
+                    <span class="material-icons">add_box</span> Add Product
+                </a>
+                <a href="05_SearchResults.html" class="nav-item active">
+                    <span class="material-icons">search</span> Search
+                </a>
+                <a href="04_Settings.html" class="nav-item">
+                    <span class="material-icons">settings</span> Settings
+                </a>
+            </nav>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- Navbar -->
+            <header class="navbar glass-panel">
+                <h2 style="margin: 0; font-weight: 500;">Inventory Search</h2>
+                <div class="user-menu">
+                    <span class="avatar">JD</span>
+                    <span>John Doe</span>
+                    <span class="material-icons">expand_more</span>
+                </div>
+            </header>
+
+            <div class="content-scroll">
+                
+                <!-- Search & Filters -->
+                <div class="card glass-panel">
+                    <div style="display: flex; gap: 16px; margin-bottom: 20px;">
+                        <div style="flex: 1; position: relative;">
+                            <span class="material-icons" style="position: absolute; left: 16px; top: 14px; color: var(--text-secondary);">search</span>
+                            <input type="text" placeholder="Search products, SKUs, or barcodes..." style="padding-left: 48px; font-size: 16px;">
+                        </div>
+                        <button class="btn" style="padding: 0 32px;">Search</button>
+                    </div>
+
+                    <div style="display: flex; gap: 12px; align-items: center; flex-wrap: wrap;">
+                        <span style="color: var(--text-secondary); font-size: 14px; margin-right: 8px;">Filters:</span>
+                        
+                        <div style="display: flex; align-items: center; gap: 8px; background: rgba(255,255,255,0.1); padding: 6px 12px; border-radius: 20px; border: 1px solid rgba(255,255,255,0.1); font-size: 13px;">
+                            <span>Category: Electronics</span>
+                            <span class="material-icons" style="font-size: 16px; cursor: pointer; opacity: 0.7;">close</span>
+                        </div>
+
+                        <div style="display: flex; align-items: center; gap: 8px; background: rgba(255,255,255,0.1); padding: 6px 12px; border-radius: 20px; border: 1px solid rgba(255,255,255,0.1); font-size: 13px;">
+                            <span>Stock: In Stock</span>
+                            <span class="material-icons" style="font-size: 16px; cursor: pointer; opacity: 0.7;">close</span>
+                        </div>
+
+                        <div style="display: flex; align-items: center; gap: 8px; background: rgba(255,255,255,0.1); padding: 6px 12px; border-radius: 20px; border: 1px solid rgba(255,255,255,0.1); font-size: 13px;">
+                            <span>Price: $100 - $500</span>
+                            <span class="material-icons" style="font-size: 16px; cursor: pointer; opacity: 0.7;">close</span>
+                        </div>
+
+                        <button class="btn btn-secondary" style="padding: 6px 12px; border-radius: 20px; font-size: 13px;">+ Add Filter</button>
+                        <button class="btn btn-secondary" style="padding: 6px 12px; border-radius: 20px; font-size: 13px; margin-left: auto;">
+                            <span class="material-icons" style="font-size: 16px; margin-right: 4px;">sort</span> Sort By
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Results -->
+                <div class="card glass-panel" style="padding: 0;">
+                    <div class="table-container">
+                        <table style="border-spacing: 0;">
+                            <thead>
+                                <tr style="background: rgba(255,255,255,0.05);">
+                                    <th style="padding: 20px;">Product Name</th>
+                                    <th>SKU</th>
+                                    <th>Category</th>
+                                    <th>Price</th>
+                                    <th>Stock</th>
+                                    <th>Status</th>
+                                    <th style="text-align: right; padding-right: 24px;">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <!-- Result Item 1 -->
+                                <tr class="glass-row" style="border-bottom: 1px solid rgba(255,255,255,0.05);">
+                                    <td style="padding: 20px;">
+                                        <div style="display: flex; align-items: center; gap: 12px;">
+                                            <div style="width: 40px; height: 40px; background: rgba(255,255,255,0.1); border-radius: 8px; display: flex; align-items: center; justify-content: center;">
+                                                <span class="material-icons" style="font-size: 20px;">headphones</span>
+                                            </div>
+                                            <div>
+                                                <div style="font-weight: 500;">Sony WH-1000XM5</div>
+                                                <div style="font-size: 12px; color: var(--text-secondary);">Wireless Noise Canceling</div>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td>SNY-XM5-BLK</td>
+                                    <td>Electronics</td>
+                                    <td>$349.99</td>
+                                    <td>45</td>
+                                    <td><span class="badge badge-success">Active</span></td>
+                                    <td style="text-align: right; padding-right: 24px;">
+                                        <button class="btn btn-secondary" style="padding: 6px; border-radius: 6px; margin-right: 4px;">
+                                            <span class="material-icons" style="font-size: 18px;">edit</span>
+                                        </button>
+                                        <button class="btn btn-secondary" style="padding: 6px; border-radius: 6px; color: var(--warn);">
+                                            <span class="material-icons" style="font-size: 18px;">delete</span>
+                                        </button>
+                                    </td>
+                                </tr>
+
+                                <!-- Result Item 2 -->
+                                <tr class="glass-row">
+                                    <td style="padding: 20px;">
+                                        <div style="display: flex; align-items: center; gap: 12px;">
+                                            <div style="width: 40px; height: 40px; background: rgba(255,255,255,0.1); border-radius: 8px; display: flex; align-items: center; justify-content: center;">
+                                                <span class="material-icons" style="font-size: 20px;">laptop</span>
+                                            </div>
+                                            <div>
+                                                <div style="font-weight: 500;">MacBook Pro 14"</div>
+                                                <div style="font-size: 12px; color: var(--text-secondary);">M3 Pro, 16GB RAM</div>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td>APP-MBP-14</td>
+                                    <td>Computers</td>
+                                    <td>$1999.00</td>
+                                    <td>12</td>
+                                    <td><span class="badge badge-success">Active</span></td>
+                                    <td style="text-align: right; padding-right: 24px;">
+                                        <button class="btn btn-secondary" style="padding: 6px; border-radius: 6px; margin-right: 4px;">
+                                            <span class="material-icons" style="font-size: 18px;">edit</span>
+                                        </button>
+                                        <button class="btn btn-secondary" style="padding: 6px; border-radius: 6px; color: var(--warn);">
+                                            <span class="material-icons" style="font-size: 18px;">delete</span>
+                                        </button>
+                                    </td>
+                                </tr>
+
+                                <!-- Result Item 3 -->
+                                <tr class="glass-row">
+                                    <td style="padding: 20px;">
+                                        <div style="display: flex; align-items: center; gap: 12px;">
+                                            <div style="width: 40px; height: 40px; background: rgba(255,255,255,0.1); border-radius: 8px; display: flex; align-items: center; justify-content: center;">
+                                                <span class="material-icons" style="font-size: 20px;">smartphone</span>
+                                            </div>
+                                            <div>
+                                                <div style="font-weight: 500;">Samsung Galaxy S24</div>
+                                                <div style="font-size: 12px; color: var(--text-secondary);">256GB, Phantom Black</div>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td>SAM-S24-BLK</td>
+                                    <td>Smartphones</td>
+                                    <td>$999.00</td>
+                                    <td>0</td>
+                                    <td><span class="badge badge-danger">Out of Stock</span></td>
+                                    <td style="text-align: right; padding-right: 24px;">
+                                        <button class="btn btn-secondary" style="padding: 6px; border-radius: 6px; margin-right: 4px;">
+                                            <span class="material-icons" style="font-size: 18px;">edit</span>
+                                        </button>
+                                        <button class="btn btn-secondary" style="padding: 6px; border-radius: 6px; color: var(--warn);">
+                                            <span class="material-icons" style="font-size: 18px;">delete</span>
+                                        </button>
+                                    </td>
+                                </tr>
+
+                                <!-- Result Item 4 -->
+                                <tr class="glass-row">
+                                    <td style="padding: 20px;">
+                                        <div style="display: flex; align-items: center; gap: 12px;">
+                                            <div style="width: 40px; height: 40px; background: rgba(255,255,255,0.1); border-radius: 8px; display: flex; align-items: center; justify-content: center;">
+                                                <span class="material-icons" style="font-size: 20px;">watch</span>
+                                            </div>
+                                            <div>
+                                                <div style="font-weight: 500;">Apple Watch Series 9</div>
+                                                <div style="font-size: 12px; color: var(--text-secondary);">45mm, Midnight</div>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td>APP-WATCH-9</td>
+                                    <td>Wearables</td>
+                                    <td>$429.00</td>
+                                    <td>28</td>
+                                    <td><span class="badge badge-success">Active</span></td>
+                                    <td style="text-align: right; padding-right: 24px;">
+                                        <button class="btn btn-secondary" style="padding: 6px; border-radius: 6px; margin-right: 4px;">
+                                            <span class="material-icons" style="font-size: 18px;">edit</span>
+                                        </button>
+                                        <button class="btn btn-secondary" style="padding: 6px; border-radius: 6px; color: var(--warn);">
+                                            <span class="material-icons" style="font-size: 18px;">delete</span>
+                                        </button>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    
+                    <!-- Pagination -->
+                    <div style="padding: 16px 24px; border-top: 1px solid rgba(255,255,255,0.1); display: flex; justify-content: space-between; align-items: center;">
+                        <span style="color: var(--text-secondary); font-size: 14px;">Showing 1-4 of 124 results</span>
+                        <div style="display: flex; gap: 8px;">
+                            <button class="btn btn-secondary" style="padding: 8px 12px;" disabled><span class="material-icons" style="font-size: 16px;">chevron_left</span></button>
+                            <button class="btn btn-secondary" style="padding: 8px 12px; background: rgba(255,255,255,0.2); color: white;">1</button>
+                            <button class="btn btn-secondary" style="padding: 8px 12px;">2</button>
+                            <button class="btn btn-secondary" style="padding: 8px 12px;">3</button>
+                            <button class="btn btn-secondary" style="padding: 8px 12px;">...</button>
+                            <button class="btn btn-secondary" style="padding: 8px 12px;">12</button>
+                            <button class="btn btn-secondary" style="padding: 8px 12px;"><span class="material-icons" style="font-size: 16px;">chevron_right</span></button>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </main>
+    </div>
+</body>
+</html>

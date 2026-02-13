@@ -3,6 +3,7 @@
 @use './theme-colors' as theme-colors;
 @use '../common/var-generator' as vars;
 @use '../common/standard-palettes' as palettes;
+@use './glass-themes'; // Import Glassmorphic Themes
 
 // --- 1. Define Palettes (Re-using existing ones) ---
 // We simply reuse what's imported from theme-colors
@@ -14,14 +15,18 @@
   @include vars.generate-theme-vars(palettes.$red-palette, 'warn');
   
   // Base Colors
-  --surface-color: #ffffff;
-  --background-color: #f4f6f8;
-  --text-color: rgba(0, 0, 0, 0.87);
-  --border-color: #e0e0e0;
+  --surface-color: #ffffff; // Keep solid fallback
+  --background-color: linear-gradient(135deg, #667eea 0%, #764ba2 100%); // Vibrant gradient
+  --text-color: #ffffff; // Updated to white for better contrast on dark gradient
+  --border-color: rgba(255, 255, 255, 0.2);
   
+  // Glass Variables
+  --glass-bg: rgba(255, 255, 255, 0.15);
+  --glass-border: rgba(255, 255, 255, 0.2);
+
   // Specific Overrides for components mapped to vars
-  --card-bg: #fff;
-  --sidenav-bg: #fff;
+  --card-bg: transparent;
+  --sidenav-bg: transparent;
 }
 
 // --- 3. Define Alternative Themes ---
@@ -32,11 +37,11 @@
     @include vars.generate-theme-vars(palettes.$purple-palette, 'secondary');
 
     --surface-color: #424242;
-    --background-color: #303030;
+    --background-color: #303030; // Consider a dark gradient here if desired
     --text-color: #ffffff;
     --border-color: #616161;
-    --card-bg: #424242;
-    --sidenav-bg: #424242;
+    --card-bg: transparent;
+    --sidenav-bg: transparent;
 }
 
 
@@ -47,9 +52,11 @@
     
     // Light base
     --surface-color: #ffffff;
-    --background-color: #e8f0f5;
+    --background-color: linear-gradient(135deg, #E3FDF5 0%, #FFE6FA 100%); // Light gradient
     --text-color: rgba(0, 0, 0, 0.87);
      --border-color: #b0bec5;
+     --card-bg: transparent;
+     --sidenav-bg: transparent;
 }
 
 
@@ -57,42 +64,63 @@
 .theme-crimson {
     @include vars.generate-theme-vars(palettes.$red-palette, 'primary');
     @include vars.generate-theme-vars(palettes.$amber-palette, 'secondary');
+    --background-color: linear-gradient(135deg, #ff9a9e 0%, #fecfef 99%, #fecfef 100%);
+    --card-bg: transparent;
+    --sidenav-bg: transparent;
 }
 
 // Sunset Theme
 .theme-sunset {
     @include vars.generate-theme-vars(palettes.$orange-palette, 'primary');
     @include vars.generate-theme-vars(palettes.$deep-orange-palette, 'secondary');
+    --background-color: linear-gradient(120deg, #f6d365 0%, #fda085 100%);
+    --card-bg: transparent;
+    --sidenav-bg: transparent;
 }
 
 // Forest Theme
 .theme-forest {
     @include vars.generate-theme-vars(palettes.$teal-palette, 'primary');
     @include vars.generate-theme-vars(palettes.$green-palette, 'secondary');
+    --background-color: linear-gradient(135deg, #d299c2 0%, #fef9d7 100%);
+    --card-bg: transparent;
+    --sidenav-bg: transparent;
 }
 
 // Berry Theme
 .theme-berry {
     @include vars.generate-theme-vars(palettes.$pink-palette, 'primary');
     @include vars.generate-theme-vars(palettes.$deep-purple-palette, 'secondary');
+    --background-color: linear-gradient(to top, #a18cd1 0%, #fbc2eb 100%);
+    --card-bg: transparent;
+    --sidenav-bg: transparent;
 }
 
 // Royal Theme
 .theme-royal {
     @include vars.generate-theme-vars(palettes.$deep-purple-palette, 'primary');
     @include vars.generate-theme-vars(palettes.$amber-palette, 'secondary');
+    --background-color: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    --card-bg: transparent;
+    --sidenav-bg: transparent;
 }
 
 // Slate Theme
 .theme-slate {
     @include vars.generate-theme-vars(palettes.$blue-grey-palette, 'primary');
     @include vars.generate-theme-vars(palettes.$light-blue-palette, 'secondary');
+    --background-color: linear-gradient(to top, #cfd9df 0%, #e2ebf0 100%);
+    --card-bg: transparent;
+    --sidenav-bg: transparent;
 }
 
 // Sky Theme
 .theme-sky {
     @include vars.generate-theme-vars(palettes.$light-blue-palette, 'primary');
     @include vars.generate-theme-vars(palettes.$cyan-palette, 'secondary');
+    --background-color: linear-gradient(120deg, #a1c4fd 0%, #c2e9fb 100%);
+    --card-bg: transparent;
+    --sidenav-bg: transparent;
 }
 
 // --- 4. Material Theme Configuration ---

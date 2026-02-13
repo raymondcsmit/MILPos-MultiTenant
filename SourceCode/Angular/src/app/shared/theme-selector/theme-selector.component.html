@@ -1,13 +1,18 @@
 <div class="theme-selector-container">
   <h5>{{ 'THEME_SELECTION' | translate }}</h5>
-  <div class="theme-grid">
-    <div *ngFor="let theme of themes" 
-         class="theme-btn" 
-         [class.active]="(themeService.currentTheme()) === theme.id"
-         (click)="setTheme(theme.id)">
-         
-      <div class="color-swatch" [style.background-color]="theme.color"></div>
-      <span class="small">{{ theme.name }}</span>
+  
+  <div *ngFor="let group of themeGroups">
+    <h6 class="mt-3 mb-2 text-muted" style="font-size: 0.85rem; font-weight: 600;">{{ group.name }}</h6>
+    <div class="theme-grid">
+        <div *ngFor="let theme of group.themes" 
+             class="theme-btn" 
+             [class.active]="(themeService.currentTheme()) === theme.id"
+             (click)="setTheme(theme.id)"
+             [title]="theme.name">
+             
+          <div class="color-swatch" [style.background-color]="theme.color"></div>
+          <span class="small" style="font-size: 10px; text-align: center; line-height: 1.1;">{{ theme.name }}</span>
+        </div>
     </div>
   </div>
 </div>
