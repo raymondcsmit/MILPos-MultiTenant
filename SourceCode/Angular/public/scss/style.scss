@@ -40,11 +40,12 @@ body {
   }
 }
 
-.navbar {
+.navbar, .navbar.active {
   @include glass.glass-panel($opacity: 0.25, $blur: 15px);
   margin: 10px;
   width: calc(100% - 20px);
   border-radius: 16px;
+  background-color: var(--glass-bg) !important; // Force glass bg overriding theme.scss
 }
 
 .card, .mat-mdc-card {
