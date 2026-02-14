@@ -549,9 +549,13 @@ function showCloudLogin() {
       webPreferences: {
         nodeIntegration: false,
         contextIsolation: true,
-        preload: path.join(__dirname, 'preload.js')
+        preload: path.join(__dirname, 'preload.js'),
+        devTools: true // Explicitly enable DevTools
       }
     });
+
+    // Open DevTools for debugging
+    win.webContents.openDevTools({ mode: 'detach' });
 
     win.loadFile(path.join(__dirname, 'login-cloud.html'));
     
