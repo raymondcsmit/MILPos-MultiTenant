@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pricing | NexusPOS</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+    <!-- Navigation -->
+    <nav class="glass-nav">
+        <div style="font-size:1.5rem; font-weight:bold;">NexusPOS</div>
+        <div>
+            <a href="index.html" class="glass-btn">Home</a>
+            <a href="pricing.html" class="glass-btn glass-btn-primary">Pricing</a>
+            <a href="store.html" class="glass-btn">Store Demo</a>
+        </div>
+    </nav>
+
+    <!-- Pricing Header -->
+    <div class="glass-panel" style="text-align:center;">
+        <h1>Choose Your Plan</h1>
+        <p>Transparent pricing for every stage of your business.</p>
+    </div>
+
+    <!-- Pricing Cards -->
+    <section class="pricing-table">
+        <!-- Free Trial -->
+        <div class="glass-card" style="width:300px; text-align:center; border:1px solid rgba(255,255,255,0.3);">
+            <h3>Starter</h3>
+            <h2 style="font-size:2.5rem; color:var(--accent-color);">$0</h2>
+            <p>14-Day Free Trial</p>
+            <ul style="text-align:left; list-style:none; padding:1rem; line-height:2rem;">
+                <li>✓ Single User</li>
+                <li>✓ Basic Inventory</li>
+                <li>✓ 100 Products</li>
+                <li>✓ Community Support</li>
+            </ul>
+            <button class="glass-btn glass-btn-primary" onclick="location.href='register-tenant.html'">Start Free Trial</button>
+        </div>
+
+        <!-- Pro Plan -->
+        <div class="glass-card" style="width:300px; text-align:center; transform:scale(1.05); border:2px solid var(--primary-color);">
+            <div class="badge" style="position: absolute; top: -10px; right: 20px;">MOST POPULAR</div>
+            <h3>Professional</h3>
+            <h2 style="font-size:2.5rem; color:var(--accent-color);">$49</h2>
+            <p>Per Month</p>
+            <ul style="text-align:left; list-style:none; padding:1rem; line-height:2rem;">
+                <li>✓ Unlimited Users</li>
+                <li>✓ Advanced Inventory</li>
+                <li>✓ <b>Unlimited</b> Products</li>
+                <li>✓ Public E-commerce Store</li>
+                <li>✓ Priority Email Support</li>
+            </ul>
+            <button class="glass-btn glass-btn-primary" onclick="location.href='payment.html'">Subscribe Now</button>
+        </div>
+
+        <!-- Enterprise -->
+        <div class="glass-card" style="width:300px; text-align:center;">
+            <h3>Enterprise</h3>
+            <h2 style="font-size:2.5rem; color:var(--accent-color);">Custom</h2>
+            <p>Contact Sales</p>
+            <ul style="text-align:left; list-style:none; padding:1rem; line-height:2rem;">
+                <li>✓ Multi-Location</li>
+                <li>✓ Dedicated Account Manager</li>
+                <li>✓ Custom Integrations</li>
+                <li>✓ SLA Guarantees</li>
+            </ul>
+            <button class="glass-btn" onclick="location.href='contact.html'">Contact Us</button>
+        </div>
+    </section>
+
+    <footer class="footer">
+        <p>© 2026 NexusPOS Solutions.</p>
+    </footer>
+
+</body>
+</html>

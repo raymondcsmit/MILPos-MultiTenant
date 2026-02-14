@@ -1,0 +1,56 @@
+@{
+    ViewData["Title"] = "Pricing";
+}
+
+<!-- Pricing Header -->
+<div class="glass-panel" style="text-align:center;">
+    <h1>Choose Your Plan</h1>
+    <p>Transparent pricing for every stage of your business.</p>
+</div>
+
+<!-- Pricing Cards -->
+<section class="pricing-table">
+    <!-- Free Trial -->
+    <div class="glass-card" style="width:300px; text-align:center; border:1px solid rgba(255,255,255,0.3);">
+        <h3>Starter</h3>
+        <h2 style="font-size:2.5rem; color:var(--accent-color);">$0</h2>
+        <p>14-Day Free Trial</p>
+        <ul style="text-align:left; list-style:none; padding:1rem; line-height:2rem;">
+            <li>✓ Single User</li>
+            <li>✓ Basic Inventory</li>
+            <li>✓ 100 Products</li>
+            <li>✓ Community Support</li>
+        </ul>
+        <a asp-action="Register" asp-route-plan="Starter" class="glass-btn glass-btn-primary">Start Free Trial</a>
+    </div>
+
+    <!-- Pro Plan -->
+    <div class="glass-card" style="width:300px; text-align:center; transform:scale(1.05); border:2px solid var(--primary-color);">
+        <div class="badge" style="position: absolute; top: -10px; right: 20px;">MOST POPULAR</div>
+        <h3>Professional</h3>
+        <h2 style="font-size:2.5rem; color:var(--accent-color);">$49</h2>
+        <p>Per Month</p>
+        <ul style="text-align:left; list-style:none; padding:1rem; line-height:2rem;">
+            <li>✓ Unlimited Users</li>
+            <li>✓ Advanced Inventory</li>
+            <li>✓ <b>Unlimited</b> Products</li>
+            <li>✓ Public E-commerce Store</li>
+            <li>✓ Priority Email Support</li>
+        </ul>
+        <a asp-action="Payment" asp-route-plan="Professional" class="glass-btn glass-btn-primary">Subscribe Now</a>
+    </div>
+
+    <!-- Enterprise -->
+    <div class="glass-card" style="width:300px; text-align:center;">
+        <h3>Enterprise</h3>
+        <h2 style="font-size:2.5rem; color:var(--accent-color);">Custom</h2>
+        <p>Contact Sales</p>
+        <ul style="text-align:left; list-style:none; padding:1rem; line-height:2rem;">
+            <li>✓ Multi-Location</li>
+            <li>✓ Dedicated Account Manager</li>
+            <li>✓ Custom Integrations</li>
+            <li>✓ SLA Guarantees</li>
+        </ul>
+        <a asp-controller="Home" asp-action="Contact" class="glass-btn">Contact Us</a>
+    </div>
+</section>

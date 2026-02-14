@@ -1,0 +1,73 @@
+@model POS.MediatR.Tenant.Commands.CreateTenantCommand
+@{
+    ViewData["Title"] = "Register Tenant";
+}
+
+<div class="glass-panel" style="max-width: 600px; margin: 2rem auto;">
+    <h1 style="text-align: center;">Register Your Business</h1>
+    <p style="text-align: center; margin-bottom: 2rem; color: #b2bec3;">Complete your registration to get started.</p>
+
+    <form asp-action="Subscribe" method="post">
+        @Html.AntiForgeryToken()
+        
+        <div asp-validation-summary="All" class="text-danger"></div>
+
+        <!-- Business Details -->
+        <h3 style="border-bottom: 1px solid var(--glass-border); padding-bottom: 0.5rem;">Business Information</h3>
+        
+        <label asp-for="Name">Business Name</label>
+        <input asp-for="Name" class="glass-input" placeholder="My Retail Store" required />
+        <span asp-validation-for="Name" class="text-danger"></span>
+
+        <label asp-for="Subdomain">Subdomain (Your URL)</label>
+        <div style="display: flex; align-items: center; margin-bottom: 1rem;">
+            <input asp-for="Subdomain" class="glass-input" placeholder="my-store" style="margin-bottom: 0; border-top-right-radius: 0; border-bottom-right-radius: 0;" required />
+            <div style="background: rgba(255,255,255,0.1); padding: 0.8rem; border: 1px solid var(--glass-border); border-left: none; border-top-right-radius: 8px; border-bottom-right-radius: 8px; color: #b2bec3;">.nexuspos.com</div>
+        </div>
+        <span asp-validation-for="Subdomain" class="text-danger"></span>
+
+        <label>Business Type (Optional)</label>
+        <select class="glass-input">
+            <option value="Retail" style="color: black;">Retail Store</option>
+            <option value="Pharmacy" style="color: black;">Pharmacy</option>
+            <option value="Restaurant" style="color: black;">Restaurant / Cafe</option>
+            <option value="Petrol" style="color: black;">Petrol Station</option>
+        </select>
+
+        <label asp-for="Address">Address</label>
+        <textarea asp-for="Address" class="glass-input" rows="2" placeholder="123 Main St, City, Country" required></textarea>
+        <span asp-validation-for="Address" class="text-danger"></span>
+
+        <!-- Contact / Admin Details -->
+        <h3 style="border-bottom: 1px solid var(--glass-border); padding-bottom: 0.5rem; margin-top: 2rem;">Admin Account</h3>
+        
+        <label>Contact Name</label>
+        <input type="text" class="glass-input" placeholder="John Doe" /> 
+
+        <label asp-for="AdminEmail">Email Address (Admin Login)</label>
+        <input asp-for="AdminEmail" type="email" class="glass-input" placeholder="admin@mystore.com" required />
+        <span asp-validation-for="AdminEmail" class="text-danger"></span>
+
+        <label asp-for="ContactPhone">Phone Number</label>
+        <input asp-for="ContactPhone" type="tel" class="glass-input" placeholder="+1 234 567 890" required />
+        <span asp-validation-for="ContactPhone" class="text-danger"></span>
+
+        <label asp-for="AdminPassword">Password</label>
+        <input asp-for="AdminPassword" type="password" class="glass-input" placeholder="••••••••" required />
+        <span asp-validation-for="AdminPassword" class="text-danger"></span>
+
+        <label>Confirm Password</label>
+        <input type="password" class="glass-input" placeholder="••••••••" required />
+
+        <div style="margin: 1.5rem 0;">
+            <label style="display: flex; align-items: center; gap: 10px; cursor: pointer;">
+                <input type="checkbox" required style="width: 20px; height: 20px;">
+                <span>I agree to the <a href="#" style="color: var(--accent-color);">Terms of Service</a> and <a href="#" style="color: var(--accent-color);">Privacy Policy</a>.</span>
+            </label>
+        </div>
+
+        <button type="submit" class="glass-btn glass-btn-primary" style="width: 100%; font-size: 1.2rem; padding: 1rem;">
+            Create Account
+        </button>
+    </form>
+</div>

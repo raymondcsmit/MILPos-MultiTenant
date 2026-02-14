@@ -225,12 +225,18 @@ namespace POS.API
             {
                 options.Providers.Add<GzipCompressionProvider>();
             });
-            services.AddControllers()
+            services.AddControllersWithViews()
                 .AddNewtonsoftJson(options =>
                 {
                     options.SerializerSettings.ReferenceLoopHandling = ReferenceLoopHandling.Ignore;
                     options.SerializerSettings.DateTimeZoneHandling = DateTimeZoneHandling.Utc;
                 });
+            services.AddSession(options =>
+            {
+                options.IdleTimeout = TimeSpan.FromMinutes(30);
+                options.Cookie.HttpOnly = true;
+                options.Cookie.IsEssential = true;
+            });
             services.AddSwaggerGen(c =>
             {
                 c.SwaggerDoc("v1", new OpenApiInfo
@@ -348,6 +354,7 @@ namespace POS.API
             {
                 app.UseMiddleware<POS.API.Middleware.TenantResolutionMiddleware>();
             }
+            app.UseSession();
             app.UseRouting();
             app.UseAuthorization();
             app.UseMiddleware<POS.API.Middleware.TrialEnforcementMiddleware>();
@@ -355,6 +362,9 @@ namespace POS.API
 
             app.UseEndpoints(endpoints =>
             {
+                endpoints.MapControllerRoute(
+                    name: "default",
+                    pattern: "{controller=Home}/{action=Index}/{id?}");
                 endpoints.MapControllers();
                 endpoints.MapHub<UserHub>("/userHub");
             });

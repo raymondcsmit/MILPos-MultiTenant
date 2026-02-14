@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Checkout | Demo Tenant</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+    <nav class="glass-nav">
+        <div style="font-size:1.5rem;">🛒 <b>Demo Shop</b></div>
+        <div>
+            <a href="store.html" class="glass-btn">Continue Shopping</a>
+        </div>
+    </nav>
+
+    <div class="glass-panel" style="max-width: 800px; margin: 2rem auto;">
+        <h1>Your Cart</h1>
+        <hr style="border-color:var(--glass-border); margin:1rem 0;">
+
+        <!-- Cart Items -->
+        <div style="margin-bottom: 2rem;">
+            <div style="display:flex; justify-content:space-between; align-items:center; padding:1rem; border-bottom:1px solid rgba(255,255,255,0.1);">
+                <div style="display:flex; align-items:center;">
+                    <div style="width:50px; height:50px; background:rgba(255,255,255,0.1); border-radius:4px; margin-right:1rem;"></div>
+                    <div>
+                        <h4 style="margin:0;">Wireless Headphones</h4>
+                        <small>Qty: 1</small>
+                    </div>
+                </div>
+                <span>$12.99</span>
+            </div>
+
+            <div style="display:flex; justify-content:space-between; align-items:center; padding:1rem; border-bottom:1px solid rgba(255,255,255,0.1);">
+                <div style="display:flex; align-items:center;">
+                    <div style="width:50px; height:50px; background:rgba(255,255,255,0.1); border-radius:4px; margin-right:1rem;"></div>
+                    <div>
+                        <h4 style="margin:0;">Mechanical Keyboard</h4>
+                        <small>Qty: 1</small>
+                    </div>
+                </div>
+                <span>$89.99</span>
+            </div>
+        </div>
+
+        <div style="text-align:right; margin-bottom:2rem; font-size:1.5rem;">
+            Total: <b>$102.98</b>
+        </div>
+
+        <!-- Checkout Form -->
+        <div class="glass-card">
+            <h3>Checkout Details</h3>
+            <p>This will submit a sales order request to the shop owner.</p>
+            <form onsubmit="alert('Order Request Sent Scucessfully!'); return false;">
+                <label>Name</label>
+                <input type="text" class="glass-input" placeholder="John Doe" required>
+                
+                <label>Email</label>
+                <input type="email" class="glass-input" placeholder="john@example.com" required>
+                
+                <label>Phone</label>
+                <input type="tel" class="glass-input" placeholder="+1 234 567 8900" required>
+                
+                <label>Address (Optional)</label>
+                <input type="text" class="glass-input" placeholder="123 Main St, City">
+
+                <button type="submit" class="glass-btn glass-btn-primary" style="width:100%; margin-top:1rem; font-size:1.1rem;">
+                    Submit Order Request
+                </button>
+            </form>
+        </div>
+    </div>
+
+</body>
+</html>

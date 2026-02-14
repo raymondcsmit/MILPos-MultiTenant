@@ -1,0 +1,15 @@
+@{
+    ViewData["Title"] = "Registration Successful";
+}
+
+<div class="glass-panel" style="text-align: center; margin-top: 4rem; max-width: 600px; margin-left: auto; margin-right: auto;">
+    <h1 style="color: var(--accent-color);">Welcome aboard! 🚀</h1>
+    <h2>Your store "@ViewBag.TenantName" is ready.</h2>
+    <p>
+        An email has been sent to <strong>@ViewBag.AdminEmail</strong> with your login credentials and further instructions.
+    </p>
+    
+    <div style="margin-top: 2rem;">
+        <a href="/app/login" class="glass-btn glass-btn-primary">Login to Dashboard</a>
+    </div>
+</div>

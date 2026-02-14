@@ -50,64 +50,74 @@ namespace POS.Repository
                 throw new Exception("Subdomain already exists.");
             }
 
-            // 2. Create Tenant
-            var tenant = new Tenant
+            var strategy = _context.Database.CreateExecutionStrategy();
+
+            return await strategy.ExecuteAsync(async () =>
             {
-                Id = Guid.NewGuid(),
-                Name = dto.Name,
-                Subdomain = dto.Subdomain,
-                ContactEmail = dto.AdminEmail,
-                ContactPhone = dto.Phone,
-                Address = dto.Address,
-                IsActive = true,
-                CreatedDate = DateTime.UtcNow,
-                SubscriptionPlan = AppConstants.TenantConfig.TrialPlan,
-                SubscriptionStartDate = DateTime.UtcNow,
-                SubscriptionEndDate = DateTime.UtcNow.AddDays(AppConstants.TenantConfig.TrialPeriodDays),
-                MaxUsers = AppConstants.TenantConfig.DefaultMaxUsers,
-                BusinessType = dto.BusinessType,
-                
-                // Auto-generate API key
-                ApiKey = GenerateSecureApiKey(),
-                ApiKeyCreatedDate = DateTime.UtcNow,
-                ApiKeyEnabled = true
-            };
+                using var transaction = await _context.Database.BeginTransactionAsync();
+                try
+                {
+                    // 2. Create Tenant
+                    var tenant = new Tenant
+                    {
+                        Id = Guid.NewGuid(),
+                        Name = dto.Name,
+                        Subdomain = dto.Subdomain,
+                        ContactEmail = dto.AdminEmail,
+                        ContactPhone = dto.Phone,
+                        Address = dto.Address,
+                        IsActive = true,
+                        CreatedDate = DateTime.UtcNow,
+                        SubscriptionPlan = AppConstants.TenantConfig.TrialPlan,
+                        SubscriptionStartDate = DateTime.UtcNow,
+                        SubscriptionEndDate = DateTime.UtcNow.AddDays(AppConstants.TenantConfig.TrialPeriodDays),
+                        MaxUsers = AppConstants.TenantConfig.DefaultMaxUsers,
+                        BusinessType = dto.BusinessType,
 
-            _context.Tenants.Add(tenant);
-            try
-            {
-                await _context.SaveChangesAsync();
-            }
-            catch (Exception ex)
-            { throw new Exception($"SeedRoles failed: {ex}"); }
+                        // Auto-generate API key
+                        ApiKey = GenerateSecureApiKey(),
+                        ApiKeyCreatedDate = DateTime.UtcNow,
+                        ApiKeyEnabled = true
+                    };
 
-            // 3. Create Admin User
-            var adminUser = new User
-            {
-                TenantId = tenant.Id,
-                Email = dto.AdminEmail,
-                UserName = dto.AdminEmail,
-                FirstName = "Admin",
-                LastName = "User",
-                IsActive = true,
-                CreatedDate = DateTime.UtcNow,
-                PhoneNumber = dto.Phone,
-                IsAllLocations = true
-            };
+                    _context.Tenants.Add(tenant);
+                    await _context.SaveChangesAsync();
 
-            var password = string.IsNullOrEmpty(dto.AdminPassword) ? AppConstants.Seeding.DefaultPassword : dto.AdminPassword;
-            var result = await _userManager.CreateAsync(adminUser, password);
-            
-            if (!result.Succeeded)
-            {
-                var errors = string.Join(", ", result.Errors.Select(e => e.Description));
-                throw new Exception($"Admin user creation failed: {errors}");
-            }
+                    // 3. Create Admin User
+                    var adminUser = new User
+                    {
+                        TenantId = tenant.Id,
+                        Email = dto.AdminEmail,
+                        UserName = dto.AdminEmail,
+                        FirstName = "Admin",
+                        LastName = "User",
+                        IsActive = true,
+                        CreatedDate = DateTime.UtcNow,
+                        PhoneNumber = dto.Phone,
+                        IsAllLocations = true
+                    };
 
-            // 4. Seed Data
-            await SeedTenantDataAsync(tenant, adminUser);
+                    var password = string.IsNullOrEmpty(dto.AdminPassword) ? AppConstants.Seeding.DefaultPassword : dto.AdminPassword;
+                    var result = await _userManager.CreateAsync(adminUser, password);
 
-            return tenant;
+                    if (!result.Succeeded)
+                    {
+                        var errors = string.Join(", ", result.Errors.Select(e => e.Description));
+                        throw new Exception($"Admin user creation failed: {errors}");
+                    }
+
+                    // 4. Seed Data
+                    await SeedTenantDataAsync(tenant, adminUser);
+
+                    await transaction.CommitAsync();
+                    return tenant;
+                }
+                catch (Exception)
+                {
+                    await transaction.RollbackAsync();
+                    throw;
+                }
+            });
         }
 
         private async Task SeedTenantDataAsync(Tenant tenant, User adminUser)
@@ -404,7 +414,7 @@ namespace POS.Repository
                     Id = newId,
                     TenantId = tenant.Id,
                     Name = oldRole.Name,
-                    NormalizedName = oldRole.NormalizedName,
+                    NormalizedName = !string.IsNullOrWhiteSpace(oldRole.NormalizedName) ? oldRole.NormalizedName : oldRole.Name.ToUpper(),
                     IsDeleted = false,
                     CreatedDate = DateTime.UtcNow,
                     CreatedBy = adminUser.Id,
@@ -434,6 +444,18 @@ namespace POS.Repository
         {
             var claims = ReadCsv<RoleClaim>("RoleClaims.csv");
             var newRoleIds = roleMap.Values.ToList();
+
+            // Fetch newly created Actions to support mapping by Code
+            var allNewIds = globalIdMap.Values.ToList();
+            var newActions = await _context.Set<POS.Data.Action>()
+                .Where(a => allNewIds.Contains(a.Id))
+                .ToListAsync();
+
+            var actionCodeMap = newActions
+                .Where(a => !string.IsNullOrEmpty(a.Code))
+                .GroupBy(a => a.Code) // Handle potential duplicates if any
+                .ToDictionary(g => g.Key, g => g.First().Id, StringComparer.OrdinalIgnoreCase);
+
             var existingClaims = await _context.RoleClaims
                 .Where(rc => newRoleIds.Contains(rc.RoleId))
                 .ToListAsync();
@@ -442,8 +464,21 @@ namespace POS.Repository
             {
                 if (roleMap.TryGetValue(claim.RoleId.ToString().ToUpper(), out var newRoleId))
                 {
+                    Guid newActionId = Guid.Empty;
                     var oldActionId = claim.ActionId.ToString().ToUpper();
-                    if (globalIdMap.TryGetValue(oldActionId, out var newActionId))
+
+                    // Try exact ID match first (for claims with valid IDs in CSV)
+                    if (globalIdMap.TryGetValue(oldActionId, out var mappedId))
+                    {
+                        newActionId = mappedId;
+                    }
+                    // Fallback to Code match (using ClaimType as Code)
+                    else if (actionCodeMap.TryGetValue(claim.ClaimType, out var codeMappedId))
+                    {
+                        newActionId = codeMappedId;
+                    }
+
+                    if (newActionId != Guid.Empty)
                     {
                         var exists = existingClaims.Any(rc =>
                             rc.RoleId == newRoleId &&

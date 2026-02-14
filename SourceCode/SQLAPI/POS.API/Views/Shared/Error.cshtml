@@ -1,0 +1,12 @@
+@{
+    ViewData["Title"] = "Error";
+}
+
+<div class="glass-panel" style="text-align: center; margin-top: 4rem;">
+    <h1 class="text-danger">Error.</h1>
+    <h2 class="text-danger">An error occurred while processing your request.</h2>
+    <p>
+        <strong>Request ID:</strong> <code>@System.Diagnostics.Activity.Current?.Id</code>
+    </p>
+    <a asp-controller="Home" asp-action="Index" class="glass-btn">Return Home</a>
+</div>

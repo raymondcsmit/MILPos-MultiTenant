@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>@ViewData["Title"] - NexusPOS</title>
+    <link rel="stylesheet" href="~/css/site.css" />
+    <style>
+        /* Interactive Elements */
+        a { text-decoration: none; color: inherit; }
+    </style>
+</head>
+<body>
+
+    <!-- Navigation -->
+    <nav class="glass-nav">
+        <div style="font-size:1.5rem; font-weight:bold;">
+            <a asp-controller="Home" asp-action="Index">NexusPOS</a>
+        </div>
+        <div>
+            <a asp-controller="Home" asp-action="Index" class="glass-btn">Home</a>
+            <a asp-controller="Pricing" asp-action="Index" class="glass-btn">Pricing</a>
+            <!-- Store Demo Link - linking to a demo tenant for now -->
+            <a href="/store/demo" class="glass-btn">Store Demo</a>
+            <a href="/app/login" class="glass-btn glass-btn-primary">Login</a>
+        </div>
+    </nav>
+
+    <div class="container-fluid">
+        <main role="main" class="pb-3">
+            @RenderBody()
+        </main>
+    </div>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <p>&copy; 2026 NexusPOS Solutions. All rights reserved.</p>
+        <div>
+            <a href="#" style="color:var(--text-color); margin:0 10px;">Privacy</a>
+            <a href="#" style="color:var(--text-color); margin:0 10px;">Terms</a>
+            <a asp-controller="Home" asp-action="Contact" style="color:var(--text-color); margin:0 10px;">Contact</a>
+        </div>
+    </footer>
+
+    @await RenderSectionAsync("Scripts", required: false)
+</body>
+</html>

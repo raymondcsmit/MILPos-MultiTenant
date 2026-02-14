@@ -1,0 +1,17 @@
+@{
+    ViewData["Title"] = "Order Received";
+    var tenantName = ViewContext.RouteData.Values["tenantName"];
+}
+
+<div class="glass-panel" style="text-align: center; margin-top: 4rem; max-width: 600px; margin-left: auto; margin-right: auto;">
+    <h1 style="color: var(--accent-color);">Order Request Sent! 📦</h1>
+    <p>
+        The store owner has been notified of your order request.
+        <br>
+        They will contact you shortly to confirm availability and payment.
+    </p>
+    
+    <div style="margin-top: 2rem;">
+        <a asp-action="Index" asp-route-tenantName="@tenantName" class="glass-btn glass-btn-primary">Return to Store</a>
+    </div>
+</div>

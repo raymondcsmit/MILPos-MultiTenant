@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Store | Demo Tenant</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+    <!-- Store Header with Tenant Context -->
+    <nav class="glass-nav">
+        <div style="font-size:1.5rem;">
+            🛒 <b>Demo Shop</b> 
+            <span style="font-size:0.8rem; opacity:0.7; margin-left:10px;">Powered by NexusPOS</span>
+        </div>
+        <div>
+            <a href="cart.html" class="glass-btn" style="position:relative;">
+                Cart 🛒 
+                <span class="badge" style="position:absolute; top:-5px; right:-5px;">2</span>
+            </a>
+        </div>
+    </nav>
+
+    <div class="glass-panel" style="display:flex; justify-content:space-between; align-items:center;">
+        <div>
+            <h1>Browse Products</h1>
+            <p>Select items to request a quote or order.</p>
+        </div>
+        <div>
+            <input type="text" class="glass-input" placeholder="Search products..." style="width:300px;">
+        </div>
+    </div>
+
+    <!-- Product Grid -->
+    <section class="glass-panel">
+        <div class="product-grid">
+            <!-- Product 1 -->
+            <div class="glass-card">
+                <div style="height:150px; background:rgba(0,0,0,0.2); border-radius:8px; margin-bottom:1rem; display:flex; align-items:center; justify-content:center;">
+                    📷 Image Placeholder
+                </div>
+                <h3>Wireless Headphones</h3>
+                <p style="color:#b2bec3; font-size:0.9rem;">High quality noise cancelling.</p>
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-top:1rem;">
+                    <span style="font-size:1.2rem; font-weight:bold;">$12.99</span>
+                    <button class="glass-btn glass-btn-primary" onclick="alert('Added to Cart!')">Add to Cart</button>
+                </div>
+            </div>
+
+            <!-- Product 2 -->
+            <div class="glass-card">
+                <div style="height:150px; background:rgba(0,0,0,0.2); border-radius:8px; margin-bottom:1rem; display:flex; align-items:center; justify-content:center;">
+                    📷 Image Placeholder
+                </div>
+                <h3>Mechanical Keyboard</h3>
+                <p style="color:#b2bec3; font-size:0.9rem;">RGB Backlit, Blue Switches.</p>
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-top:1rem;">
+                    <span style="font-size:1.2rem; font-weight:bold;">$89.99</span>
+                    <button class="glass-btn glass-btn-primary">Add to Cart</button>
+                </div>
+            </div>
+
+            <!-- Product 3 -->
+            <div class="glass-card">
+                <div style="height:150px; background:rgba(0,0,0,0.2); border-radius:8px; margin-bottom:1rem; display:flex; align-items:center; justify-content:center;">
+                    📷 Image Placeholder
+                </div>
+                <h3>Smart Watch</h3>
+                <p style="color:#b2bec3; font-size:0.9rem;">Fitness tracker & notification sync.</p>
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-top:1rem;">
+                    <span style="font-size:1.2rem; font-weight:bold;">$199.99</span>
+                    <button class="glass-btn glass-btn-primary">Add to Cart</button>
+                </div>
+            </div>
+
+             <!-- Product 4 -->
+             <div class="glass-card">
+                <div style="height:150px; background:rgba(0,0,0,0.2); border-radius:8px; margin-bottom:1rem; display:flex; align-items:center; justify-content:center;">
+                    📷 Image Placeholder
+                </div>
+                <h3>USB-C Hub</h3>
+                <p style="color:#b2bec3; font-size:0.9rem;">7-in-1 Adapter for Laptop.</p>
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-top:1rem;">
+                    <span style="font-size:1.2rem; font-weight:bold;">$45.00</span>
+                    <button class="glass-btn glass-btn-primary">Add to Cart</button>
+                </div>
+            </div>
+        </div>
+    </section>
+
+</body>
+</html>

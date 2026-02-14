@@ -1,0 +1,62 @@
+@{
+    ViewData["Title"] = "Future of Retail";
+}
+
+<style>
+    .hero {
+        position: relative;
+        padding: 80px 20px;
+        overflow: hidden;
+    }
+    .hero::before {
+        content: '';
+        position: absolute;
+        top: -50px; left: -50px;
+        width: 300px; height: 300px;
+        background: var(--primary-color);
+        filter: blur(100px);
+        opacity: 0.4;
+        z-index: -1;
+    }
+    .feature-icon { font-size: 2.5rem; margin-bottom: 1rem; color: var(--accent-color); }
+</style>
+
+<!-- Hero Section -->
+<header class="hero hero-section glass-panel">
+    <h1 style="font-size:3rem; margin-bottom:1rem;">Empower Your Retail Business</h1>
+    <p style="font-size:1.2rem; max-width:600px; margin:0 auto 2rem auto; color:#b2bec3;">
+        A complete Point of Sale solution with Inventory Management, CRM, and Analytics.
+        Built for modern businesses.
+    </p>
+    <div>
+        <a asp-controller="Pricing" asp-action="Index" class="glass-btn glass-btn-primary" style="font-size:1.2rem;">Get Started Free</a>
+        <a href="#features" class="glass-btn">Learn More</a>
+    </div>
+</header>
+
+<!-- Features Section -->
+<section id="features" class="grid-features">
+    <div class="glass-card">
+        <div class="feature-icon">📊</div>
+        <h3>Real-time Analytics</h3>
+        <p>Track your sales, profit margins, and inventory levels in real-time from anywhere in the world.</p>
+    </div>
+    <div class="glass-card">
+        <div class="feature-icon">🛍️</div>
+        <h3>Sync E-commerce</h3>
+        <p>Seamlessly integrate your physical store with your online presence. One inventory, multiple channels.</p>
+    </div>
+    <div class="glass-card">
+        <div class="feature-icon">🔒</div>
+        <h3>Secure & Cloud-Based</h3>
+        <p>Your data is encrypted and backed up daily. Access your dashboard from any device securely.</p>
+    </div>
+</section>
+
+<!-- CTA Section -->
+<section class="glass-panel" style="text-align:center; margin: 4rem 2rem;">
+    <h2>Ready to Scale?</h2>
+    <p>Join thousands of retailers growing with NexusPOS.</p>
+    <br>
+    <a asp-controller="Pricing" asp-action="Index" class="glass-btn glass-btn-primary">View Plans</a>
+</section>

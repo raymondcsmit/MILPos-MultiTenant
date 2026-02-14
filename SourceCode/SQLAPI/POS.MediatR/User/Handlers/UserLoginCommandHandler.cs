@@ -89,12 +89,7 @@ namespace POS.MediatR.Handlers
             
             if (result.Succeeded)
             {
-                var userInfo = await _userRepository
-                    .All
-                    .IgnoreQueryFilters()
-                    .Where(c => c.UserName == request.UserName || c.Email== request.UserName)
-                    .FirstOrDefaultAsync();
-                if (!userInfo.IsActive)
+                if (!user.IsActive)
                 {
                     await _loginAuditRepository.LoginAudit(loginAudit);
                     return ServiceResponse<UserAuthDto>.ReturnFailed(401, "UserName Or Password is InCorrect.");
@@ -102,7 +97,7 @@ namespace POS.MediatR.Handlers
 
                 loginAudit.Status = LoginStatus.Success.ToString();
                 await _loginAuditRepository.LoginAudit(loginAudit);
-                var authUser = await _userRepository.BuildUserAuthObject(userInfo);
+                var authUser = await _userRepository.BuildUserAuthObject(user);
                 var onlineUser = new SignlarUser
                 {
                     Email = authUser.Email,
@@ -137,11 +132,11 @@ namespace POS.MediatR.Handlers
                     // Based on the user's issue, duplicates suggest we are getting both global and tenant specific or similar
                     
                     // If the User object has a TenantId, we should use it.
-                    // However, authUser is UserAuthDto, let's check the userInfo entity loaded earlier
+                    // However, authUser is UserAuthDto, let's check the user entity loaded earlier
                     
-                    if (userInfo.TenantId != Guid.Empty)
+                    if (user.TenantId != Guid.Empty)
                     {
-                         menuItemsQuery = menuItemsQuery.Where(c => c.TenantId == userInfo.TenantId || c.TenantId == null);
+                         menuItemsQuery = menuItemsQuery.Where(c => c.TenantId == user.TenantId || c.TenantId == null);
                     }
                 }
 

@@ -12,17 +12,14 @@ namespace POS.API
     {
         internal static void Configure(IApplicationBuilder app)
         {
-            app.UseStaticFiles();
-            app.UseSpaStaticFiles();
-            app.UseSpa(spa =>
+            // Map the SPA to /app path
+            app.Map("/app", spaApp =>
             {
-                spa.Options.SourcePath = "ClientApp";
-            });
-
-            // here you can see we make sure it doesn't start with /api, if it does, it'll 404 within .NET if it can't be found
-            app.MapWhen(x => !x.Request.Path.Value.StartsWith("/api"), builder =>
-            {
-                builder.UseRouting();
+                spaApp.UseSpaStaticFiles();
+                spaApp.UseSpa(spa =>
+                {
+                    spa.Options.SourcePath = "ClientApp";
+                });
             });
         }
 
@@ -31,7 +28,8 @@ namespace POS.API
             var spaPath = ((IConfiguration)services.BuildServiceProvider().GetService(typeof(IConfiguration))).GetValue<string>("SpaRootPath");
             services.AddSpaStaticFiles(configuration =>
             {
-                configuration.RootPath = !string.IsNullOrEmpty(spaPath) ? spaPath : "wwwroot";
+                // Default to ClientApp to avoid conflict with MVC wwwroot
+                configuration.RootPath = !string.IsNullOrEmpty(spaPath) ? spaPath : "ClientApp";
             });
         }
     }
