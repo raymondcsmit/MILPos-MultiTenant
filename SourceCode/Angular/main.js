@@ -118,7 +118,7 @@ ipcMain.handle('clear-auth', async (event) => {
   }
 });
 
-const CLOUD_API_URL = 'http://62.171.140.251'; // Production Cloud API
+const CLOUD_API_URL = 'http://208.110.72.211'; // Production Cloud API
 
 ipcMain.handle('cloud-login', async (event, { email, password }) => {
   try {
@@ -126,7 +126,7 @@ ipcMain.handle('cloud-login', async (event, { email, password }) => {
     
     // 1. Authenticate with Cloud
     const response = await axios.post(`${CLOUD_API_URL}/api/authentication`, {
-      email,
+      userName: email,
       password
     });
 

@@ -23,7 +23,7 @@ if (-not (Test-Path WSMan:\localhost)) {
 }
 
 # 4. Set TrustedHosts
-$ServerIP = "62.171.140.251"
+$ServerIP = "208.110.72.211"
 Write-Host "4. Setting TrustedHosts for $ServerIP..."
 try {
     # Check if drive exists now

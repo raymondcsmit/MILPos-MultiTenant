@@ -3,7 +3,7 @@
 # PREREQUISITE: The Remote Server must have WinRM enabled (Run 'Enable-PSRemoting' on server)
 
 # --- Configuration ---
-$ServerIP = "62.171.140.251"
+$ServerIP = "208.110.72.211"
 $Username = "Administrator"
 $Password = "ZamaKhpalUNAZPOS" # WARNING: Storing passwords in plain text is not secure. Use with caution.
 $RemotePath = "C:\inetpub\wwwroot\pos-app" # Adjust this to your actual IIS folder
