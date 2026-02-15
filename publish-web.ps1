@@ -1,4 +1,7 @@
 # deploy-web-remote.ps1
+# Set Environment to Cloud for the build process
+$env:ASPNETCORE_ENVIRONMENT = "Cloud"
+
 # Automates Build and Deployment to a Remote Windows Server
 # Combines local build improvements with remote deployment capabilities
 
@@ -44,7 +47,7 @@ Write-Host "Building Angular Application..." -ForegroundColor Green
 Set-Location $angularDir
 npm install
 # Use Angular CLI directly with explicit configuration and project (From new script)
-npx ng build --configuration=production --project=pos
+npx ng build --configuration=production --project=pos --base-href /app/
 Set-Location ..\..
 
 # --- 3. Publish .NET API ---

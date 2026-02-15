@@ -27,12 +27,13 @@
         <span asp-validation-for="Subdomain" class="text-danger"></span>
 
         <label>Business Type (Optional)</label>
-        <select class="glass-input">
+        <select asp-for="BusinessType" class="glass-input">
             <option value="Retail" style="color: black;">Retail Store</option>
             <option value="Pharmacy" style="color: black;">Pharmacy</option>
             <option value="Restaurant" style="color: black;">Restaurant / Cafe</option>
             <option value="Petrol" style="color: black;">Petrol Station</option>
         </select>
+        <span asp-validation-for="BusinessType" class="text-danger"></span>
 
         <label asp-for="Address">Address</label>
         <textarea asp-for="Address" class="glass-input" rows="2" placeholder="123 Main St, City, Country" required></textarea>
@@ -41,8 +42,9 @@
         <!-- Contact / Admin Details -->
         <h3 style="border-bottom: 1px solid var(--glass-border); padding-bottom: 0.5rem; margin-top: 2rem;">Admin Account</h3>
         
-        <label>Contact Name</label>
-        <input type="text" class="glass-input" placeholder="John Doe" /> 
+        <label asp-for="ContactName">Contact Name</label>
+        <input asp-for="ContactName" class="glass-input" placeholder="John Doe" required /> 
+        <span asp-validation-for="ContactName" class="text-danger"></span>
 
         <label asp-for="AdminEmail">Email Address (Admin Login)</label>
         <input asp-for="AdminEmail" type="email" class="glass-input" placeholder="admin@mystore.com" required />
@@ -56,14 +58,16 @@
         <input asp-for="AdminPassword" type="password" class="glass-input" placeholder="••••••••" required />
         <span asp-validation-for="AdminPassword" class="text-danger"></span>
 
-        <label>Confirm Password</label>
-        <input type="password" class="glass-input" placeholder="••••••••" required />
+        <label asp-for="ConfirmPassword">Confirm Password</label>
+        <input asp-for="ConfirmPassword" type="password" class="glass-input" placeholder="••••••••" required />
+        <span asp-validation-for="ConfirmPassword" class="text-danger"></span>
 
         <div style="margin: 1.5rem 0;">
             <label style="display: flex; align-items: center; gap: 10px; cursor: pointer;">
-                <input type="checkbox" required style="width: 20px; height: 20px;">
+                <input asp-for="TermsAccepted" type="checkbox" required style="width: 20px; height: 20px;">
                 <span>I agree to the <a href="#" style="color: var(--accent-color);">Terms of Service</a> and <a href="#" style="color: var(--accent-color);">Privacy Policy</a>.</span>
             </label>
+            <span asp-validation-for="TermsAccepted" class="text-danger" style="display: block;"></span>
         </div>
 
         <button type="submit" class="glass-btn glass-btn-primary" style="width: 100%; font-size: 1.2rem; padding: 1rem;">

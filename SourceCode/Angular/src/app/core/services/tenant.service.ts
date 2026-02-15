@@ -32,6 +32,10 @@ export class TenantService {
     return this.httpClient.put<Tenant>(`Tenants/${id}/license`, { licenseType });
   }
 
+  updateAdmin(id: string, adminData: any): Observable<any> {
+    return this.httpClient.post(`Tenants/${id}/admin`, adminData);
+  }
+
   switchTenant(id: string): Observable<any> {
     return this.httpClient.post<any>(`Tenants/${id}/switch`, {});
   }

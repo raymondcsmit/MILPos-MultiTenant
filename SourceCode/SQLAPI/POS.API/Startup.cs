@@ -225,12 +225,29 @@ namespace POS.API
             {
                 options.Providers.Add<GzipCompressionProvider>();
             });
-            services.AddControllersWithViews()
-                .AddNewtonsoftJson(options =>
-                {
-                    options.SerializerSettings.ReferenceLoopHandling = ReferenceLoopHandling.Ignore;
-                    options.SerializerSettings.DateTimeZoneHandling = DateTimeZoneHandling.Utc;
-                });
+
+            // Conditionally register Controllers/Views based on deployment mode
+            if (deploymentSettings?.DeploymentMode == "Desktop")
+            {
+                // Desktop mode: Only API controllers, no Razor Views
+                services.AddControllers()
+                    .AddNewtonsoftJson(options =>
+                    {
+                        options.SerializerSettings.ReferenceLoopHandling = ReferenceLoopHandling.Ignore;
+                        options.SerializerSettings.DateTimeZoneHandling = DateTimeZoneHandling.Utc;
+                    });
+            }
+            else
+            {
+                // Cloud/Web mode: API controllers + Razor Views (MVC)
+                services.AddControllersWithViews()
+                    .AddNewtonsoftJson(options =>
+                    {
+                        options.SerializerSettings.ReferenceLoopHandling = ReferenceLoopHandling.Ignore;
+                        options.SerializerSettings.DateTimeZoneHandling = DateTimeZoneHandling.Utc;
+                    });
+            }
+
             services.AddSession(options =>
             {
                 options.IdleTimeout = TimeSpan.FromMinutes(30);
@@ -275,7 +292,7 @@ namespace POS.API
 
             //var jobService = sp.GetService<JobService>();
             //jobService.StartScheduler();
-            SpaStartup.ConfigureServices(services);
+            SpaStartup.ConfigureServices(services, Configuration);
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -362,9 +379,14 @@ namespace POS.API
 
             app.UseEndpoints(endpoints =>
             {
-                endpoints.MapControllerRoute(
-                    name: "default",
-                    pattern: "{controller=Home}/{action=Index}/{id?}");
+                // Only map MVC routes if NOT in Desktop mode
+                if (deploymentSettings?.DeploymentMode != "Desktop")
+                {
+                    endpoints.MapControllerRoute(
+                        name: "default",
+                        pattern: "{controller=Home}/{action=Index}/{id?}");
+                }
+                
                 endpoints.MapControllers();
                 endpoints.MapHub<UserHub>("/userHub");
             });

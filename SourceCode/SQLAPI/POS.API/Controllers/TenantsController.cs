@@ -168,6 +168,25 @@ namespace POS.API.Controllers
         }
 
         /// <summary>
+        /// Update Tenant Admin User (Reset Password / Create Admin)
+        /// </summary>
+        [HttpPost("{id}/admin")]
+        [Authorize(Policy = AppConstants.Policies.SuperAdmin)]
+        public async Task<IActionResult> UpdateTenantAdmin(Guid id, [FromBody] UpdateTenantAdminCommand command)
+        {
+            if (id != command.TenantId)
+            {
+                return BadRequest("Tenant Id mismatch");
+            }
+            var result = await _mediator.Send(command);
+            if (result.Success)
+            {
+                return Ok(result);
+            }
+            return BadRequest(new { message = string.Join(", ", result.Errors) });
+        }
+
+        /// <summary>
         /// Deactivate tenant (SuperAdmin only)
         /// </summary>
         [HttpDelete("{id}")]

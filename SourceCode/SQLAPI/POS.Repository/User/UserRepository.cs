@@ -124,6 +124,7 @@ public class UserRepository : GenericRepository<User, POSDbContext>,
         // Get all claims for this user
         var appClaimDtos = await this.GetUserAndRoleClaims(appUser);
         ret.Claims = appClaimDtos.Select(c => c).ToList();
+
         var claims = appClaimDtos.Select(c => new Claim(c, "true")).ToList(); // Convert to List<Claim>
         claims.Add(new Claim("licensekey", string.IsNullOrEmpty(companyProfile.LicenseKey) ? "" : HttpUtility.UrlEncode(companyProfile.LicenseKey.ToString())));
         claims.Add(new Claim("purchasecode", string.IsNullOrEmpty(companyProfile.PurchaseCode) ? "" : HttpUtility.UrlEncode(companyProfile.PurchaseCode.ToString())));

@@ -6,6 +6,7 @@ import { BaseComponent } from '../../base.component';
 import { MatDialog } from '@angular/material/dialog';
 import { CommonDialogService } from '@core/common-dialog/common-dialog.service';
 import { TenantAddUpdateComponent } from '../tenant-add-update/tenant-add-update';
+import { TenantAdminManageComponent } from '../tenant-admin-manage/tenant-admin-manage.component';
 import { TranslateModule } from '@ngx-translate/core';
 import { MatTableModule } from '@angular/material/table';
 import { MatIconModule } from '@angular/material/icon';
@@ -67,6 +68,14 @@ export class TenantListComponent extends BaseComponent implements OnInit {
       if (result) {
         this.loadTenants();
       }
+    });
+  }
+
+  manageAdmin(tenant: Tenant): void {
+    this.dialog.open(TenantAdminManageComponent, {
+      width: '600px',
+      direction: this.langDir,
+      data: Object.assign({}, tenant)
     });
   }
 

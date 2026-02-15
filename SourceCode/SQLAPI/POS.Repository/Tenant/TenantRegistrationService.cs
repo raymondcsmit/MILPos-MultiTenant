@@ -105,8 +105,9 @@ namespace POS.Repository
                         var errors = string.Join(", ", result.Errors.Select(e => e.Description));
                         throw new Exception($"Admin user creation failed: {errors}");
                     }
+                    
 
-                    // 4. Seed Data
+                    // 4. Seed Data (Roles and Admin assignment happen here)
                     await SeedTenantDataAsync(tenant, adminUser);
 
                     await transaction.CommitAsync();
@@ -401,7 +402,7 @@ namespace POS.Repository
 
         private async Task<Dictionary<string, Guid>> SeedRolesAsync(Tenant tenant, User adminUser)
         {
-            var roles = ReadCsv<Role>("Roles.csv");
+            var roles = _context.Roles.Count()>0? _context.Roles.ToList() : ReadCsv<Role>("Roles.csv");
             var roleMap = new Dictionary<string, Guid>(); 
 
             foreach (var oldRole in roles)
@@ -424,8 +425,8 @@ namespace POS.Repository
 
                 _context.Roles.Add(newRole);
 
-                if (newRole.Name.Equals(AppConstants.Roles.SuperAdmin, StringComparison.OrdinalIgnoreCase) ||
-                    newRole.Name.Equals(AppConstants.Roles.Admin, StringComparison.OrdinalIgnoreCase))
+                // Assign Admin role to the initial user
+                if (newRole.Name.Equals(AppConstants.Roles.Admin, StringComparison.OrdinalIgnoreCase))
                 {
                     _context.UserRoles.Add(new UserRole
                     {
@@ -442,6 +443,8 @@ namespace POS.Repository
 
         private async Task SeedRoleClaimsAsync(Dictionary<string, Guid> roleMap, Dictionary<string, Guid> globalIdMap)
         {
+            //var claims = await _context.RoleClaims.Where(x=>x.t)
+                
             var claims = ReadCsv<RoleClaim>("RoleClaims.csv");
             var newRoleIds = roleMap.Values.ToList();
 

@@ -12,24 +12,28 @@ namespace POS.API
     {
         internal static void Configure(IApplicationBuilder app)
         {
+            var config = app.ApplicationServices.GetService<IConfiguration>();
+            var spaPath = config.GetValue<string>("SpaRootPath");
+            var sourcePath = !string.IsNullOrEmpty(spaPath) ? spaPath : "ClientApp";
+
             // Map the SPA to /app path
             app.Map("/app", spaApp =>
             {
                 spaApp.UseSpaStaticFiles();
                 spaApp.UseSpa(spa =>
                 {
-                    spa.Options.SourcePath = "ClientApp";
+                    spa.Options.SourcePath = sourcePath;
                 });
             });
         }
 
-        internal static void ConfigureServices(IServiceCollection services)
+        internal static void ConfigureServices(IServiceCollection services, IConfiguration configuration)
         {
-            var spaPath = ((IConfiguration)services.BuildServiceProvider().GetService(typeof(IConfiguration))).GetValue<string>("SpaRootPath");
-            services.AddSpaStaticFiles(configuration =>
+            var spaPath = configuration.GetValue<string>("SpaRootPath");
+            services.AddSpaStaticFiles(config =>
             {
                 // Default to ClientApp to avoid conflict with MVC wwwroot
-                configuration.RootPath = !string.IsNullOrEmpty(spaPath) ? spaPath : "ClientApp";
+                config.RootPath = !string.IsNullOrEmpty(spaPath) ? spaPath : "ClientApp";
             });
         }
     }
