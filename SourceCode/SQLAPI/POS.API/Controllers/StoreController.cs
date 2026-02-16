@@ -18,6 +18,7 @@ using POS.Data;
 namespace POS.API.Controllers
 {
     [Route("store/{tenantName}")]
+    [Route("store")]
     public class StoreController : StoreBaseController
     {
         private readonly IMediator _mediator;
@@ -29,12 +30,20 @@ namespace POS.API.Controllers
 
         public async Task<IActionResult> Index([FromQuery] string searchQuery, [FromQuery] int skip = 0)
         {
+            var tenantName = RouteData.Values["tenantName"]?.ToString();
+            
             var productResource = new ProductResource 
             { 
                 PageSize = 20, 
                 Skip = skip,
-                Name = searchQuery // Assuming ProductResource has Name filter
+                Name = searchQuery,
+                IgnoreTenantFilter = string.IsNullOrEmpty(tenantName)
             };
+
+            if (string.IsNullOrEmpty(tenantName))
+            {
+                ViewBag.TenantName = "All Products";
+            }
 
             var command = new GetAllProductCommand
             {

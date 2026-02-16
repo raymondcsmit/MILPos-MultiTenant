@@ -19,7 +19,7 @@ namespace POS.API.Filters
             
             if (string.IsNullOrEmpty(tenantName))
             {
-                context.Result = new NotFoundResult();
+                await next();
                 return;
             }
 

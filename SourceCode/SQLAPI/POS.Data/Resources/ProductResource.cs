@@ -23,5 +23,6 @@ namespace POS.Data.Resources
         public Guid? ParentId { get; set; }
         public Guid? LocationId { get; set; }
         public bool IsBarcodeGenerated { get; set; }
+        public bool IgnoreTenantFilter { get; set; }
     }
 }

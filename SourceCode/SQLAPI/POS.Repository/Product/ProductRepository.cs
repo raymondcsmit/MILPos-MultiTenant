@@ -36,11 +36,17 @@ namespace POS.Repository
 
         public async Task<ProductList> GetProducts(ProductResource productResource)
         {
-            var collectionBeforePaging =
+            IQueryable<Product> collectionBeforePaging =
                 AllIncluding(c => c.Brand, cs => cs.ProductCategory, u => u.Unit)
                 .Include(c => c.ProductTaxes)
-                    .ThenInclude(c => c.Tax)
-                .ApplySort(productResource.OrderBy,
+                    .ThenInclude(c => c.Tax);
+
+            if (productResource.IgnoreTenantFilter)
+            {
+                collectionBeforePaging = collectionBeforePaging.IgnoreQueryFilters().Where(c => !c.IsDeleted);
+            }
+
+            collectionBeforePaging = collectionBeforePaging.ApplySort(productResource.OrderBy,
                 _propertyMappingService.GetPropertyMapping<ProductDto, Product>());
 
             if (!string.IsNullOrWhiteSpace(productResource.Name))
