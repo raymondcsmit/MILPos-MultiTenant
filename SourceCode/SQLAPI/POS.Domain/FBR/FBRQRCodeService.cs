@@ -1,4 +1,6 @@
 using Microsoft.Extensions.Logging;
+using Microsoft.AspNetCore.Hosting;
+using Microsoft.Extensions.Hosting;
 using QRCoder;
 using System;
 using System.IO;
@@ -13,12 +15,32 @@ namespace POS.Domain.FBR
     {
         private readonly ILogger<FBRQRCodeService> _logger;
         private readonly string _qrCodeDirectory;
+        private readonly string _baseUrlPath; // For constructing relative URLs
 
-        public FBRQRCodeService(ILogger<FBRQRCodeService> logger)
+        public FBRQRCodeService(ILogger<FBRQRCodeService> logger, IWebHostEnvironment environment)
         {
             _logger = logger;
-            // QR codes will be saved in wwwroot/qrcodes/
-            _qrCodeDirectory = Path.Combine("wwwroot", "qrcodes");
+            
+            if (environment.IsEnvironment("Desktop"))
+            {
+                // In Desktop mode, write to AppData to avoid permission issues
+                var appDataPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "milpos");
+                _qrCodeDirectory = Path.Combine(appDataPath, "qrcodes");
+                
+                // For desktop, we might need a different strategy for serving these files if they aren't in wwwroot
+                // But for now, let's ensure we can write them.
+                // If the frontend needs to display them, we might need to expose them via a controller or custom file provider.
+                // However, if the frontend is also running from resources, it might not have direct access to AppData.
+                // A common pattern is to serve them via an API endpoint that reads the file.
+                _baseUrlPath = "/qrcodes"; 
+            }
+            else
+            {
+                // In Web mode, use standard wwwroot
+                string webRootPath = environment.WebRootPath ?? Path.Combine(Directory.GetCurrentDirectory(), "wwwroot");
+                _qrCodeDirectory = Path.Combine(webRootPath, "qrcodes");
+                _baseUrlPath = "/qrcodes";
+            }
             
             // Ensure directory exists
             if (!Directory.Exists(_qrCodeDirectory))
@@ -52,8 +74,11 @@ namespace POS.Domain.FBR
                         
                         await File.WriteAllBytesAsync(filePath, qrCodeBytes);
                         
+                        await File.WriteAllBytesAsync(filePath, qrCodeBytes);
+                        
                         // Return relative path for web access
-                        var relativePath = $"/qrcodes/{fileName}";
+                        // Note: For desktop, this path might need to be intercepted or served via a specific endpoint
+                        var relativePath = $"{_baseUrlPath}/{fileName}";
                         
                         _logger.LogInformation("QR code saved to {Path}", relativePath);
                         
@@ -73,7 +98,7 @@ namespace POS.Domain.FBR
         /// </summary>
         public string GetQRCodeImagePath(Guid invoiceId)
         {
-            return $"/qrcodes/{invoiceId}.png";
+            return $"{_baseUrlPath}/{invoiceId}.png";
         }
 
         /// <summary>

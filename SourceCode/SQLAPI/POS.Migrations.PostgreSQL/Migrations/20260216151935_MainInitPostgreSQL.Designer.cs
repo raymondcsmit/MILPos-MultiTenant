@@ -12,7 +12,7 @@ using POS.Domain;
 namespace POS.Migrations.PostgreSQL.Migrations
 {
     [DbContext(typeof(POSDbContext))]
-    [Migration("20260213024511_MainInitPostgreSQL")]
+    [Migration("20260216151935_MainInitPostgreSQL")]
     partial class MainInitPostgreSQL
     {
         /// <inheritdoc />

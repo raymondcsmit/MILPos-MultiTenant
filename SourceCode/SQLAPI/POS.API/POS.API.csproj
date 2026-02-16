@@ -86,12 +86,16 @@
 		<Content Update="nlog.sqlite.config">
 			<CopyToOutputDirectory>Always</CopyToOutputDirectory>
 		</Content>
+		<Content Update="wwwroot\App_Data\Templates\POSDb.db">
+		  <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+		</Content>
 		<Content Update="wwwroot\CompanyLogo\logo.png">
 		  <CopyToOutputDirectory>Always</CopyToOutputDirectory>
 		</Content>
 	</ItemGroup>
 
 	<ItemGroup>
+		<Folder Include="wwwroot\App_Data\Templates\" />
 		<Folder Include="wwwroot\images\" />
 		<Folder Include="wwwroot\Languages\" />
 		<Folder Include="wwwroot\BrandImages\" />

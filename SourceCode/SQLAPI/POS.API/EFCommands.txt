@@ -79,11 +79,12 @@ dotnet ef database update MainInitSQLServer -c POSDbContext -p POS.Migrations.Sq
 
 
 PostgreSQL
+$env:DatabaseProvider="PostgreSQL"
 dotnet ef migrations add MainInitPostgreSQL -p POS.Migrations.PostgreSQL/POS.Migrations.PostgreSQL.csproj -s POS.API/POS.API.csproj -o Migrations -- --DatabaseProvider=PostgreSql 
 
 dotnet ef migrations add IndexPostgreSQL -p POS.Migrations.PostgreSQL/POS.Migrations.PostgreSQL.csproj -s POS.API/POS.API.csproj -o Migrations -- --DatabaseProvider=PostgreSql 
 dotnet ef database update IndexPostgreSQL -c POSDbContext -p POS.Migrations.PostgreSQL/POS.Migrations.PostgreSQL.csproj --startup-project POS.API/POS.API.csproj -- --DatabaseProvider=PostgreSql
 
 
-
+$env:DatabaseProvider="PostgreSQL"
 dotnet ef database update MainInitPostgreSQL -c POSDbContext -p POS.Migrations.PostgreSQL/POS.Migrations.PostgreSQL.csproj --startup-project POS.API/POS.API.csproj -- --DatabaseProvider=PostgreSql

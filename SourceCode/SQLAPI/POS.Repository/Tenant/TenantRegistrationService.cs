@@ -568,12 +568,17 @@ namespace POS.Repository
             string prefix = "";
             if (tenant.BusinessType == AppConstants.BusinessType.Pharmacy) prefix = AppConstants.Prefix.Pharmacy;
             else if (tenant.BusinessType == AppConstants.BusinessType.Petrol) prefix = AppConstants.Prefix.Petrol;
-            else prefix = AppConstants.Prefix.Retail; 
+            else 
+            {
+                 // For Retail (or others), do not filter by strict prefix "RT" since we don't have "RT" products in seed data.
+                 // Allow all products (Pharmacy + Petrol + General) to be seeded for Retail.
+                 prefix = ""; 
+            }
 
             foreach (var p in allProducts)
             {
                 if (string.IsNullOrEmpty(p.Code)) continue;
-                if (!p.Code.StartsWith(prefix, StringComparison.OrdinalIgnoreCase)) continue;
+                if (!string.IsNullOrEmpty(prefix) && !p.Code.StartsWith(prefix, StringComparison.OrdinalIgnoreCase)) continue;
 
                 var oldId = p.Id.ToString().ToUpper();
                 p.Id = Guid.NewGuid();
@@ -663,30 +668,36 @@ namespace POS.Repository
                         try
                         {
                             var value = values[j];
-                            if (string.IsNullOrWhiteSpace(value)) continue;
+                            if (value == null) continue; // Should not happen with new parser but good check
+
+                            // Trim whitespace for parsing efficiency, unless it's a string where spaces might matter?
+                            // For IDs, Dates, Enums, Numbers, trimming is safe and required.
+                            // For content strings, maybe not? Let's trim for now as CSVs often have accidental spaces.
+                            var trimValue = value.Trim();
+                            if (string.IsNullOrEmpty(trimValue)) continue;
 
                             var targetType = Nullable.GetUnderlyingType(prop.PropertyType) ?? prop.PropertyType;
                             object convertedValue = null;
 
                             if (targetType == typeof(Guid))
                             {
-                                if (Guid.TryParse(value, out var g)) convertedValue = g;
+                                if (Guid.TryParse(trimValue, out var g)) convertedValue = g;
                             }
                             else if (targetType == typeof(DateTime))
                             {
-                                if (DateTime.TryParse(value, out var d)) convertedValue = d;
+                                if (DateTime.TryParse(trimValue, out var d)) convertedValue = d;
                             }
                             else if (targetType == typeof(bool))
                             {
-                                convertedValue = (value == "1" || value.ToLower() == "true");
+                                convertedValue = (trimValue == "1" || trimValue.Equals("true", StringComparison.OrdinalIgnoreCase));
                             }
                             else if (targetType.IsEnum)
                             {
-                                convertedValue = Enum.Parse(targetType, value, true);
+                                convertedValue = Enum.Parse(targetType, trimValue, true);
                             }
                             else
                             {
-                                convertedValue = Convert.ChangeType(value, targetType);
+                                convertedValue = Convert.ChangeType(trimValue, targetType);
                             }
 
                             if (convertedValue != null)
@@ -711,22 +722,44 @@ namespace POS.Repository
             for (int i = 0; i < line.Length; i++)
             {
                 char c = line[i];
+
                 if (inQuotes)
                 {
                     if (c == '"')
                     {
-                        if (i + 1 < line.Length && line[i + 1] == '"') { current.Append('"'); i++; }
-                        else inQuotes = false;
+                        if (i + 1 < line.Length && line[i + 1] == '"') // Escaped quote
+                        {
+                            current.Append('"');
+                            i++;
+                        }
+                        else
+                        {
+                            inQuotes = false;
+                        }
                     }
-                    else current.Append(c);
+                    else
+                    {
+                        current.Append(c);
+                    }
                 }
                 else
                 {
-                    if (c == '"') inQuotes = true;
-                    else if (c == ',') { result.Add(current.ToString()); current.Clear(); }
-                    else current.Append(c);
+                    if (c == '"')
+                    {
+                        inQuotes = true;
+                    }
+                    else if (c == ',')
+                    {
+                        result.Add(current.ToString());
+                        current.Clear();
+                    }
+                    else
+                    {
+                        current.Append(c);
+                    }
                 }
             }
+
             result.Add(current.ToString());
             return result;
         }

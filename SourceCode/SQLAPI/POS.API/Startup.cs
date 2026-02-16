@@ -60,6 +60,7 @@ namespace POS.API
             services.AddValidatorsFromAssemblies(Enumerable.Repeat(assembly, 1));
 
             services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
+            services.AddDistributedMemoryCache();
             
             // Configure deployment settings
             services.Configure<DeploymentSettings>(Configuration);
@@ -102,6 +103,8 @@ namespace POS.API
 
             services.AddMemoryCache();
 
+            var isDevelopment = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT") == "Development";
+
             // Configure DbContext - Scoped lifetime
             services.AddDbContext<POSDbContext>((serviceProvider, options) =>
             {
@@ -109,8 +112,9 @@ namespace POS.API
                 if (provider == "Sqlite")
                 {
                     options.UseSqlite(Configuration.GetConnectionString("SqliteConnectionString"),
-                        b => b.MigrationsAssembly("POS.Migrations.Sqlite"))
-                    .EnableSensitiveDataLogging();
+                        b => b.MigrationsAssembly("POS.Migrations.Sqlite"));
+                    
+                    if (isDevelopment) options.EnableSensitiveDataLogging();
                 }
                 else if (provider == "PostgreSql")
                 {
@@ -120,14 +124,16 @@ namespace POS.API
                             b.MigrationsAssembly("POS.Migrations.PostgreSQL");
                             b.CommandTimeout(300);
                             b.EnableRetryOnFailure(5, TimeSpan.FromSeconds(10), null);
-                        })
-                    .EnableSensitiveDataLogging();
+                        });
+
+                    if (isDevelopment) options.EnableSensitiveDataLogging();
                 }
                 else
                 {
                     options.UseSqlServer(Configuration.GetConnectionString("DbConnectionString"),
-                        b => b.MigrationsAssembly("POS.Migrations.SqlServer"))
-                    .EnableSensitiveDataLogging();
+                        b => b.MigrationsAssembly("POS.Migrations.SqlServer"));
+
+                    if (isDevelopment) options.EnableSensitiveDataLogging();
                 }
 
                 options.UseQueryTrackingBehavior(QueryTrackingBehavior.NoTracking);
@@ -334,20 +340,24 @@ namespace POS.API
             });
             app.UseStaticFiles();
             
-            // Serve files from ProgramData/MILPOS/wwwroot to handle permission issues in Electron
-            var appDataPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData), "MILPOS", "wwwroot");
-            if (!Directory.Exists(appDataPath))
-            {
-                Directory.CreateDirectory(appDataPath);
-            }
-            app.UseStaticFiles(new StaticFileOptions
-            {
-                FileProvider = new PhysicalFileProvider(appDataPath),
-                RequestPath = "" 
-            });
-
-            // Get deployment settings
+            // Get deployment settings first
             var deploymentSettings = app.ApplicationServices.GetService<Microsoft.Extensions.Options.IOptions<DeploymentSettings>>()?.Value;
+
+            // Serve files from ProgramData/MILPOS/wwwroot ONLY in Desktop mode to handle permission issues in Electron
+            // This prevents HTTP 500.30 on IIS where AppData access is restricted
+            if (deploymentSettings?.DeploymentMode == "Desktop")
+            {
+                var appDataPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "milpos", "wwwroot");
+                if (!Directory.Exists(appDataPath))
+                {
+                    Directory.CreateDirectory(appDataPath);
+                }
+                app.UseStaticFiles(new StaticFileOptions
+                {
+                    FileProvider = new PhysicalFileProvider(appDataPath),
+                    RequestPath = "" 
+                });
+            }
             
             // Apply CORS based on deployment mode
             if (deploymentSettings?.IsCloud == true)
@@ -359,7 +369,10 @@ namespace POS.API
                 app.UseCors("DesktopCorsPolicy");
             }
             
-            app.UseHttpsRedirection();
+            if (deploymentSettings?.DeploymentMode != "Desktop")
+            {
+                app.UseHttpsRedirection();
+            }
             
 
             

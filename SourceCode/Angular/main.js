@@ -353,14 +353,15 @@ function startApi() {
         `--ConnectionStrings:SqliteConnectionString=${connectionString}`
       ], {
         cwd: path.dirname(apiPath),
-        env: env
+        env: env,
+        shell: false
       });
       
       appendLog(`Process spawned with PID: ${apiProcess.pid}`);
 
       apiProcess.stdout.on('data', (data) => {
         const output = data.toString();
-        // appendLog(`STDOUT: ${output}`); // Comment out to reduce noise if needed, or keep for debug
+        appendLog(`API [STDOUT]: ${output.trim()}`); 
         
         if (!win && (output.includes('Application is running on') || output.includes('Now listening on:'))) {
            appendLog('API Server reported ready.');
@@ -371,7 +372,7 @@ function startApi() {
       });
 
       apiProcess.stderr.on('data', (data) => {
-        appendLog(`STDERR: ${data}`);
+        appendLog(`API [STDERR]: ${data.toString().trim()}`);
       });
 
       apiProcess.on('error', (err) => {
@@ -382,8 +383,8 @@ function startApi() {
         if (splash) splash.close();
       });
 
-      apiProcess.on('exit', (code) => {
-        appendLog(`EXIT: Process exited with code ${code}`);
+      apiProcess.on('exit', (code, signal) => {
+        appendLog(`EXIT: Process exited with code ${code} and signal ${signal}`);
         // If it exits early, we should probably warn the user
         // But the timeout will handle the window opening if it hasn't already
       });

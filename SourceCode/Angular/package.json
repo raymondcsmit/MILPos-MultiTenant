@@ -1,6 +1,6 @@
 {
   "name": "milpos",
-  "version": "0.0.11",
+  "version": "0.0.19",
   "description": "A comprehensive, multi-tenant POS with Inventory Management System designed to streamline retail operations, integrating POS, inventory tracking, accounting, purchasing, and CRM.",
   "author": {
     "name": "Waqar Habib",
@@ -18,6 +18,7 @@
     "start": "ng serve",
     "electron": "electron . --dev",
     "electron:prod": "electron .",
+    "electron:debug": "concurrently \"npm start\" \"wait-on http://localhost:4200 && electron . --dev\"",
     "electron:build": "ng build --configuration=electron --base-href ./ && electron-builder",
     "build:api": "dotnet publish ../SQLAPI/POS.API/POS.API.csproj -c Release -r win-x64 --self-contained true",
     "electron:package": "npm run build:api && npm run electron:build",
@@ -146,6 +147,7 @@
     "@types/clone": "^2.1.4",
     "@types/jasmine": "~5.1.0",
     "baseline-browser-mapping": "^2.9.19",
+    "concurrently": "^9.2.1",
     "electron": "^40.0.0",
     "electron-builder": "^26.4.0",
     "jasmine-core": "~5.9.0",
@@ -156,6 +158,7 @@
     "karma-jasmine-html-reporter": "~2.1.0",
     "node-addon-api": "^8.5.0",
     "png-to-ico": "^3.0.1",
-    "typescript": "~5.9.2"
+    "typescript": "~5.9.2",
+    "wait-on": "^9.0.4"
   }
 }

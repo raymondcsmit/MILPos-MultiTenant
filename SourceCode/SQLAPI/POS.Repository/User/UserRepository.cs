@@ -115,8 +115,17 @@ public class UserRepository : GenericRepository<User, POSDbContext>,
         ret.IsAuthenticated = true;
         ret.ProfilePhoto = appUser.ProfilePhoto;
         ret.IsSuperAdmin = appUser.IsSuperAdmin;
-        ret.LicenseKey = string.IsNullOrEmpty(companyProfile.LicenseKey) ? "" : HttpUtility.UrlEncode(companyProfile.LicenseKey.ToString());
-        ret.PurchaseCode = string.IsNullOrEmpty(companyProfile.PurchaseCode) ? "" : HttpUtility.UrlEncode(companyProfile.PurchaseCode.ToString());
+        
+        if (companyProfile != null)
+        {
+            ret.LicenseKey = string.IsNullOrEmpty(companyProfile.LicenseKey) ? "" : HttpUtility.UrlEncode(companyProfile.LicenseKey.ToString());
+            ret.PurchaseCode = string.IsNullOrEmpty(companyProfile.PurchaseCode) ? "" : HttpUtility.UrlEncode(companyProfile.PurchaseCode.ToString());
+        }
+        else
+        {
+            ret.LicenseKey = "";
+            ret.PurchaseCode = "";
+        }
         // Get Tenant ApiKey
         var tenant = await Context.Set<Data.Entities.Tenant>().IgnoreQueryFilters().FirstOrDefaultAsync(t => t.Id == appUser.TenantId);
         ret.ApiKey = tenant?.ApiKey;
@@ -126,8 +135,18 @@ public class UserRepository : GenericRepository<User, POSDbContext>,
         ret.Claims = appClaimDtos.Select(c => c).ToList();
 
         var claims = appClaimDtos.Select(c => new Claim(c, "true")).ToList(); // Convert to List<Claim>
-        claims.Add(new Claim("licensekey", string.IsNullOrEmpty(companyProfile.LicenseKey) ? "" : HttpUtility.UrlEncode(companyProfile.LicenseKey.ToString())));
-        claims.Add(new Claim("purchasecode", string.IsNullOrEmpty(companyProfile.PurchaseCode) ? "" : HttpUtility.UrlEncode(companyProfile.PurchaseCode.ToString())));
+        
+        if (companyProfile != null)
+        {
+            claims.Add(new Claim("licensekey", string.IsNullOrEmpty(companyProfile.LicenseKey) ? "" : HttpUtility.UrlEncode(companyProfile.LicenseKey.ToString())));
+            claims.Add(new Claim("purchasecode", string.IsNullOrEmpty(companyProfile.PurchaseCode) ? "" : HttpUtility.UrlEncode(companyProfile.PurchaseCode.ToString())));
+        }
+        else
+        {
+            claims.Add(new Claim("licensekey", ""));
+            claims.Add(new Claim("purchasecode", ""));
+        }
+        
         claims.Add(new Claim("isSuperAdmin", appUser.IsSuperAdmin.ToString().ToLower()));
         if (!string.IsNullOrEmpty(ret.ApiKey))
         {

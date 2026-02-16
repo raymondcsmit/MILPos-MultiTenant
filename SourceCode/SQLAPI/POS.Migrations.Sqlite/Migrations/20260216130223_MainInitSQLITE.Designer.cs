@@ -11,8 +11,8 @@ using POS.Domain;
 namespace POS.Migrations.Sqlite.Migrations
 {
     [DbContext(typeof(POSDbContext))]
-    [Migration("20260213024351_MainInitSqlite")]
-    partial class MainInitSqlite
+    [Migration("20260216130223_MainInitSQLITE")]
+    partial class MainInitSQLITE
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -4469,7 +4469,8 @@ namespace POS.Migrations.Sqlite.Migrations
 
                     b.Property<string>("NormalizedName")
                         .HasMaxLength(256)
-                        .HasColumnType("TEXT");
+                        .HasColumnType("TEXT")
+                        .UseCollation("NOCASE");
 
                     b.Property<Guid>("TenantId")
                         .HasColumnType("TEXT");
@@ -5296,11 +5297,13 @@ namespace POS.Migrations.Sqlite.Migrations
 
                     b.Property<string>("NormalizedEmail")
                         .HasMaxLength(256)
-                        .HasColumnType("TEXT");
+                        .HasColumnType("TEXT")
+                        .UseCollation("NOCASE");
 
                     b.Property<string>("NormalizedUserName")
                         .HasMaxLength(256)
-                        .HasColumnType("TEXT");
+                        .HasColumnType("TEXT")
+                        .UseCollation("NOCASE");
 
                     b.Property<string>("PasswordHash")
                         .HasColumnType("TEXT");

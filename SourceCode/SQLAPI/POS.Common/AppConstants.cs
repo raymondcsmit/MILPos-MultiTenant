@@ -82,6 +82,9 @@ namespace POS.Common
              {
                     "Tenants",
                     "Users", 
+                    "Pages",
+                    "Pagehelpers",
+                    "Actions",
                     "Roles",
                     "UserRoles",
                     "RoleClaims",
@@ -146,9 +149,6 @@ namespace POS.Common
                     "HalfYearlyReminders",
                     "EmailTemplates",
                     "EmailSMTPSettings",
-                    "Actions",
-                    "Pages",
-                    "Pagehelpers",
                     "Languages"
              };
         }

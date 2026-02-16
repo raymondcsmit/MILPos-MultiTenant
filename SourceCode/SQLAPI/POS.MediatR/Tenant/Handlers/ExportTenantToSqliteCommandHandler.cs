@@ -12,20 +12,36 @@ using System.Linq;
 using System.Reflection;
 using System.Threading;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Hosting;
+using Microsoft.Extensions.Configuration;
 
 namespace POS.MediatR.Tenant.Handlers
 {
     public class ExportTenantToSqliteCommandHandler : IRequestHandler<ExportTenantToSqliteCommand, ServiceResponse<ExportTenantToSqliteCommandResult>>
     {
         private readonly POSDbContext _sourceContext;
+        private readonly POS.Common.Services.IFileStorageService _fileStorageService;
+        private readonly PathHelper _pathHelper;
+        private readonly IWebHostEnvironment _webHostEnvironment;
+        private readonly Microsoft.Extensions.Configuration.IConfiguration _configuration;
 
-        public ExportTenantToSqliteCommandHandler(POSDbContext sourceContext)
+        public ExportTenantToSqliteCommandHandler(
+            POSDbContext sourceContext, 
+            POS.Common.Services.IFileStorageService fileStorageService,
+            PathHelper pathHelper,
+            IWebHostEnvironment webHostEnvironment,
+            Microsoft.Extensions.Configuration.IConfiguration configuration)
         {
             _sourceContext = sourceContext;
+            _fileStorageService = fileStorageService;
+            _pathHelper = pathHelper;
+            _webHostEnvironment = webHostEnvironment;
+            _configuration = configuration;
         }
 
         public async Task<ServiceResponse<ExportTenantToSqliteCommandResult>> Handle(ExportTenantToSqliteCommand request, CancellationToken cancellationToken)
         {
+            // ... (existing code for tempFolder setup) ...
             var tempFolder = Path.Combine(Path.GetTempPath(), Guid.NewGuid().ToString());
             Directory.CreateDirectory(tempFolder);
 
@@ -36,13 +52,41 @@ namespace POS.MediatR.Tenant.Handlers
 
             try
             {
-                // 1. Setup Destination Context (SQLite)
+                // ... (rest of the logic) ...
+
+                // 1. Setup Destination Database
+                var templatePath = Path.Combine(_webHostEnvironment.WebRootPath, "App_Data", "Templates", "POSDb.db");
+                bool templateUsed = false;
+
+                if (File.Exists(templatePath))
+                {
+                    File.Copy(templatePath, dbFilePath, true);
+                    templateUsed = true;
+                }
+
+                // Setup Context
                 var optionsBuilder = new DbContextOptionsBuilder<POSDbContext>();
                 optionsBuilder.UseSqlite($"Data Source={dbFilePath}");
 
                 using (var destinationContext = new POSDbContext(optionsBuilder.Options, new ExportTenantProvider(request.TenantId)))
                 {
-                    await destinationContext.Database.EnsureCreatedAsync(cancellationToken);
+                    if (!templateUsed)
+                    {
+                        // Fallback: Create Schema at Runtime if template missing
+                        // Use EnsureCreatedAsync (safer than MigrateAsync in this context)
+                        await destinationContext.Database.EnsureCreatedAsync(cancellationToken);
+
+                        // Manually inject Migration History so client thinks it's migrated
+                        var historySql = @"
+                            CREATE TABLE IF NOT EXISTS ""__EFMigrationsHistory"" (
+                                ""MigrationId"" TEXT NOT NULL CONSTRAINT ""PK___EFMigrationsHistory"" PRIMARY KEY,
+                                ""ProductVersion"" TEXT NOT NULL
+                            );
+                            INSERT INTO ""__EFMigrationsHistory"" (""MigrationId"", ""ProductVersion"")
+                            VALUES ('20260213024351_MainInitSqlite', '10.0.2');
+                        ";
+                        await destinationContext.Database.ExecuteSqlRawAsync(historySql, cancellationToken);
+                    }
 
                     // Open connection explicitly to keep PRAGMA settings active for the session
                     await destinationContext.Database.OpenConnectionAsync(cancellationToken);
@@ -105,16 +149,45 @@ namespace POS.MediatR.Tenant.Handlers
 
                     // 4. Generate SyncMetadata
                     await GenerateSyncMetadata(destinationContext, dbSetProperties, exportTime, cancellationToken);
+
+                    // 5. Copy Company Logo if exists
+                    var companyProfile = await destinationContext.CompanyProfiles.IgnoreQueryFilters().FirstOrDefaultAsync(cancellationToken);
+                    if (companyProfile != null && !string.IsNullOrEmpty(companyProfile.LogoUrl))
+                    {
+                        try
+                        {
+                            var relativePath = Path.Combine(_pathHelper.CompanyLogo, companyProfile.LogoUrl).Replace("\\", "/");
+                            var sourcePhysicalPath = _fileStorageService.GetPhysicalPath(relativePath);
+
+                            if (File.Exists(sourcePhysicalPath))
+                            {
+                                var destLogoDir = Path.Combine(tempFolder, "wwwroot", _pathHelper.CompanyLogo);
+                                if (!Directory.Exists(destLogoDir)) Directory.CreateDirectory(destLogoDir);
+
+                                var destLogoPath = Path.Combine(destLogoDir, companyProfile.LogoUrl);
+                                File.Copy(sourcePhysicalPath, destLogoPath, true);
+                            }
+                        }
+                        catch (Exception ex)
+                        {
+                            // Log but don't fail the whole export just for the logo
+                            System.Console.WriteLine($"Warning: Failed to copy company logo: {ex.Message}");
+                        }
+                    }
                 }
 
                 // Force release of file locks
                 Microsoft.Data.Sqlite.SqliteConnection.ClearAllPools();
                 
                 // 5. Generate appsettings.json
+                var jwtSettings = new Dictionary<string, string>();
+                _configuration.GetSection("JwtSettings").Bind(jwtSettings);
+
                 var appSettings = new
                 {
                     TenantId = request.TenantId,
                     ApiKey = request.ApiKey,
+                    JwtSettings = jwtSettings,
                     SyncSettings = new
                     {
                         CloudApiUrl = request.CloudApiUrl,

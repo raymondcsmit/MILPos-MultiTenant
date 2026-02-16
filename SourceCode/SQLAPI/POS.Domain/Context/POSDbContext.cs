@@ -129,6 +129,20 @@ namespace POS.Domain
         protected override void OnModelCreating(ModelBuilder builder)
         {
             base.OnModelCreating(builder);
+            
+            if (Database.IsSqlite())
+            {
+                builder.Entity<User>(b =>
+                {
+                    b.Property(u => u.NormalizedUserName).UseCollation("NOCASE");
+                    b.Property(u => u.NormalizedEmail).UseCollation("NOCASE");
+                });
+
+                builder.Entity<Role>(b =>
+                {
+                    b.Property(r => r.NormalizedName).UseCollation("NOCASE");
+                });
+            }
 
 
             // DailyProductPrice Configuration
