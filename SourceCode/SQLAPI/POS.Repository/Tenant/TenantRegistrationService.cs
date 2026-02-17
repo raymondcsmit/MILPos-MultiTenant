@@ -402,7 +402,7 @@ namespace POS.Repository
 
         private async Task<Dictionary<string, Guid>> SeedRolesAsync(Tenant tenant, User adminUser)
         {
-            var roles = _context.Roles.Count()>0? _context.Roles.ToList() : ReadCsv<Role>("Roles.csv");
+            var roles = _context.Roles.IgnoreQueryFilters().Where(c=>c.TenantId==Guid.Empty).Count()>0? _context.Roles.IgnoreQueryFilters().Where(c => c.TenantId == Guid.Empty).ToList() : ReadCsv<Role>("Roles.csv");
             var roleMap = new Dictionary<string, Guid>(); 
 
             foreach (var oldRole in roles)

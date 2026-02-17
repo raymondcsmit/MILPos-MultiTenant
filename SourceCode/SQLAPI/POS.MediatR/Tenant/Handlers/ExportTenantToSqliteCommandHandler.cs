@@ -96,13 +96,13 @@ namespace POS.MediatR.Tenant.Handlers
                     // 2. Pre-fetch User and Role IDs for filtering dependent entities
                     var userIds = await _sourceContext.Users
                         .IgnoreQueryFilters()
-                        .Where(u => u.TenantId == request.TenantId)
+                        .Where(u => u.TenantId == request.TenantId || u.TenantId == Guid.Empty)
                         .Select(u => u.Id)
                         .ToListAsync(cancellationToken);
 
                     var roleIds = await _sourceContext.Roles
                         .IgnoreQueryFilters()
-                        .Where(r => r.TenantId == request.TenantId)
+                        .Where(r => r.TenantId == request.TenantId || r.TenantId == Guid.Empty)
                         .Select(r => r.Id)
                         .ToListAsync(cancellationToken);
 

@@ -27,12 +27,20 @@ namespace POS.MediatR.Tenant.Handlers
                     Name = request.Name,
                     Subdomain = request.Subdomain,
                     AdminEmail = request.AdminEmail ?? request.ContactEmail, // Use ContactEmail as fallback
-                    AdminPassword = request.AdminPassword ?? "Admin@123", // Default password if not provided
+                    AdminPassword = request.AdminPassword ?? "admin@123", // Default password if not provided
                     Phone = request.ContactPhone,
                     Address = request.Address,
                     BusinessType = request.BusinessType ?? "Retail" // Default to Retail
                 };
-
+                //var dto = new RegisterTenantDto
+                //{
+                //    Name = request.Name,
+                //    Subdomain = request.Subdomain,
+                //    AdminEmail = request.AdminEmail,
+                //    AdminPassword = request.AdminPassword,
+                //    Phone = request.Phone,
+                //    Address = request.Address
+                //};
                 var tenant = await _registrationService.RegisterTenantAsync(dto);
                 return ServiceResponse<POS.Data.Entities.Tenant>.ReturnResultWith200(tenant);
             }
