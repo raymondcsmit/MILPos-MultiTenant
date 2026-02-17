@@ -5,6 +5,7 @@ import { provideTranslateService } from '@ngx-translate/core';
 import { provideTranslateHttpLoader } from '@ngx-translate/http-loader';
 import { provideHttpClient, withInterceptors } from '@angular/common/http';
 import { HttpRequestInterceptor } from './http-request-interceptor';
+import { CacheInterceptor } from '@core/interceptors/cache.interceptor';
 import { provideNativeDateAdapter } from '@angular/material/core';
 import { provideStoreDevtools } from '@ngrx/store-devtools';
 import { FeatherModule } from 'angular-feather';
@@ -28,7 +29,7 @@ export const appConfig: ApplicationConfig = {
     }),
     CurrencyPipe,
     provideHttpClient(
-      withInterceptors([HttpRequestInterceptor]),
+      withInterceptors([CacheInterceptor, HttpRequestInterceptor]),
     ),
     importProvidersFrom(
       JwtModule.forRoot({

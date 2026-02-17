@@ -17,6 +17,7 @@ import {
 import { TranslationService } from '@core/services/translation.service';
 import { WrLicenseService } from '@core/services/wr-license.service';
 import { FinancialYear } from '../../accounting/financial-year/financial-year';
+import { CacheSyncService } from '../services/cache-sync.service';
 
 @Injectable({ providedIn: 'root' })
 export class SecurityService {
@@ -226,7 +227,8 @@ export class SecurityService {
     private http: HttpClient,
     private router: Router,
     private clonerService: ClonerService,
-    private translationService: TranslationService
+    private translationService: TranslationService,
+    private cacheSyncService: CacheSyncService
   ) { }
 
   login(entity: User): Observable<UserAuth> {
@@ -248,6 +250,7 @@ export class SecurityService {
             localStorage.setItem('userMenus', JSON.stringify(resp.menus));
         }
         this._securityObject$.next(resp.user);
+        this.cacheSyncService.syncMasterData();
       })
     );
   }
@@ -258,6 +261,7 @@ export class SecurityService {
   }
 
   logout(): void {
+    this.cacheSyncService.clearCache();
     this.resetSecurityObject();
   }
 
