@@ -1,0 +1,1256 @@
+﻿@use "sass:map";
+@use "variables" as var;
+
+// body {
+//   background-color: #f1f2f7;
+// }
+
+// body {
+//   @include transition(all 0.5s);
+//   font-family: "Roboto", sans-serif;
+//   font-size: 14px;
+// }
+
+/* component (or global) CSS */
+.expandable-panel {
+  overflow: hidden;
+  margin: 15px;
+}
+
+/* stripe even data rows, skip detail rows */
+.odd-row {
+  background-color: #f7faf9;
+  /* light gray */
+}
+
+/* stripe odd data rows, skip detail rows */
+.even-row {
+  background-color: var(--surface-color) !important;
+  /* white */
+}
+
+/* animation for entering */
+.expandanimation {
+  transition: height 225ms cubic-bezier(0.4, 0.0, 0.2, 1),
+    opacity 225ms;
+  height: auto;
+  opacity: 1;
+
+  @starting-style {
+    height: 0;
+    opacity: 0;
+  }
+}
+
+/* animation for leaving */
+.collapseanimation {
+  transition: height 225ms cubic-bezier(0.4, 0.0, 0.2, 1), opacity 225ms;
+  height: 0;
+  opacity: 0;
+}
+
+.navbar {
+  padding: 0 !important;
+}
+
+nav {
+  position: fixed !important;
+}
+
+.navbar-collapse {
+  flex-basis: auto !important;
+}
+
+html {
+  height: 100%;
+}
+
+ul li {
+  list-style-type: none;
+}
+
+.mat-mdc-select-placeholder {
+  outline: none !important;
+  font-size: var.$font-size !important;
+  text-decoration: none;
+
+  &:hover {
+    text-decoration: none;
+  }
+}
+
+.mat-mdc-mini-fab {
+  width: 30px !important;
+  height: 30px !important;
+}
+
+.mat-mdc-option {
+  font-size: var.$font-size !important;
+}
+
+.mat-mdc-select-value {
+  width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: var.$font-size;
+  // color: var(--text-color);
+}
+
+img {
+  max-width: 100%;
+}
+
+.row {
+  margin-bottom: 0px !important;
+}
+
+ol,
+ul,
+dl {
+  padding-left: 0px;
+  list-style-type: none;
+}
+
+section {
+  &.content {
+    margin: 100px 15px 0 276px;
+    min-height: calc(100vh - 101px);
+    @include var.transition(0.5s);
+
+    .content-block {
+      padding: 0px 10px 0px 15px;
+    }
+  }
+}
+
+.horizontal-layout {
+  section {
+    &.content {
+      margin: 170px 15px 0 15px;
+      float: left;
+      width: calc(100% - 30px);
+    }
+  }
+}
+
+.pull-left {
+  float: left !important;
+}
+
+.pull-right {
+  float: right !important;
+}
+
+table {
+  .checkbox {
+    [type="checkbox"]+label {
+      margin: 0;
+      height: 20px;
+      padding-left: 20px;
+      vertical-align: middle;
+    }
+  }
+}
+
+.horizontal-layout {
+
+  .sidebar,
+  .nav-left-menu {
+    display: none;
+  }
+}
+
+
+/* Apply only left and right borders */
+// .mat-mdc-table th,
+// .mat-mdc-table td {
+//   border-left: 1px solid #e5e7eb;
+//   border-right: 1px solid #e5e7eb;
+// }
+
+/* Optional: top/bottom border for the whole table */
+.mat-mdc-table tr th:first-child {
+  border-top: 1px solid var(--border-color);
+  border-left: 1px solid var(--border-color) !important;
+}
+
+.mat-mdc-table tr td:first-child {
+  border-bottom: 1px solid var(--border-color);
+  border-left: 1px solid var(--border-color) !important;
+}
+
+.mat-mdc-table tr th:last-child {
+  border-top: 1px solid var(--border-color);
+  border-right: 1px solid var(--border-color) !important;
+}
+
+.mat-mdc-table tr td:last-child {
+  border-bottom: 1px solid var(--border-color);
+  border-right: 1px solid var(--border-color) !important;
+}
+
+.mat-mdc-table {
+  background: transparent !important;
+
+  /* stripe even data rows, skip detail rows */
+  tr.mat-mdc-row:nth-child(odd) {
+    background-color: rgba(255, 255, 255, 0.05) !important;
+  }
+
+  /* stripe odd data rows, skip detail rows */
+  tr.mat-mdc-row:nth-child(even) {
+    background-color: transparent !important;
+  }
+}
+
+
+
+.bootstrap-notify-container {
+  max-width: 320px;
+  text-align: center;
+}
+
+.map iframe {
+  width: 100%;
+}
+
+.jqvmap-label {
+  position: absolute;
+  display: none;
+  -webkit-border-radius: 30px;
+  -moz-border-radius: 30px;
+  border-radius: 30px;
+  background: #eee;
+  color: black;
+  font-size: 14px;
+  font-family: sans-serif, Verdana;
+  padding: 10px;
+  pointer-events: none;
+}
+
+.navbar-toggle,
+.bars:before,
+.bars:after {
+  color: var(--text-color) !important;
+}
+
+.logo-black {
+
+  .navbar-toggle,
+  .bars:before,
+  .bars:after {
+    color: var(--text-color) !important;
+  }
+}
+
+.dark {
+  .sidemenu-collapse i {
+    color: #fff;
+  }
+
+  .nav {
+    >li {
+      >a {
+        color: var(--text-color);
+      }
+    }
+  }
+}
+
+.sidemenu-collapse i {
+  color: #0d091d;
+}
+
+.nav {
+  >li {
+    >a {
+      color: #0d091d;
+    }
+  }
+}
+
+.border-apply {
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2) !important;
+}
+
+input::-webkit-input-placeholder {
+  font-size: var.$font-size;
+  color: #adabab;
+}
+
+input:-moz-placeholder {
+  /* Firefox 18- */
+  font-size: var.$font-size;
+  color: #adabab;
+}
+
+input::-moz-placeholder {
+  /* Firefox 19+ */
+  font-size: var.$font-size;
+  color: #adabab;
+}
+
+input:-ms-input-placeholder {
+  font-size: var.$font-size;
+  color: #adabab;
+}
+
+textarea::-webkit-input-placeholder {
+  font-size: var.$font-size;
+  color: #adabab;
+}
+
+textarea:-moz-placeholder {
+  /* Firefox 18- */
+  font-size: var.$font-size;
+  color: #adabab;
+}
+
+textarea::-moz-placeholder {
+  /* Firefox 19+ */
+  font-size: var.$font-size;
+  color: #adabab;
+}
+
+textarea:-ms-input-placeholder {
+  font-size: var.$font-size;
+  color: #adabab;
+}
+
+tr.bg-warning1 td {
+  background-color: var(--warn-50) !important;
+}
+
+.grid-header-color {
+  background-color: var(--primary-700) !important;
+  color: #fff !important;
+}
+
+.table-pos>thead>tr>th {
+  background-color: rgba(var(--primary-700-rgb), 0.8) !important; // Semi-transparent header
+  backdrop-filter: blur(5px);
+  color: #fff !important;
+}
+
+.table-pos>tbody>tr>td {
+  background-color: transparent !important;
+  color: var(--text-color) !important;
+}
+
+.mat-sort-header-arrow {
+  color: var(--text-color) !important;
+}
+
+@media screen and (max-width: 1169px) {
+  .horizontal-layout {
+    .sidebar {
+      display: block;
+    }
+
+    .top-sidebar {
+      display: none;
+    }
+
+    section.content {
+      margin-top: 100px;
+    }
+  }
+}
+
+// @media screen and (min-width: 768px) and (max-width: 1024px) {
+//   section.content {
+//     margin: 65px 15px 0 !important;
+//   }
+// }
+
+.font-icon {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  margin-bottom: 20px;
+  padding: 10px;
+  transition: all 0.2s;
+
+  .icon-preview {
+    font-size: 1.8rem;
+    margin-right: 10px;
+    line-height: 1;
+    color: #333439;
+  }
+}
+
+@media screen and (min-width: 1400px) {
+  .boxed-layout .container {
+    width: 1370px;
+    max-width: 100%;
+  }
+}
+
+.breadcrumb-title {
+  background-color: transparent;
+  font-size: 15px;
+  align-items: center;
+  margin: 30px 0px;
+  padding: 0px;
+  color: var(--text-color);
+}
+
+.page-title {
+  font-size: 20px;
+  font-weight: 500;
+  color: var(--text-color);
+
+  i {
+    padding: 0px 5px;
+
+    &:before {
+      color: #717883;
+      font-size: 20px;
+    }
+  }
+}
+
+.page-title-sub {
+  font-size: 15px;
+  font-weight: 500;
+  color: var(--text-color);
+
+  i {
+    padding: 0px 5px;
+
+    &:before {
+      color: #717883;
+      font-size: 20px;
+    }
+  }
+}
+
+// .mat-mdc-header-row {
+//   background-color: #f5f5f5 !important;
+// }
+
+.file-preview-overlay-container {
+  width: 100%;
+  height: 100%;
+  overflow: auto;
+}
+
+.cdk-overlay-pane {
+  display: block !important;
+}
+
+.mat-mdc-paginator {
+  background-color: var(--background-color) !important;
+}
+
+.mat-mdc-footer-row {
+  background-color: var(--background-color) !important;
+}
+
+.small-icon {
+  height: 15px !important;
+  width: 15px !important;
+}
+
+.medium-icon {
+  height: 20px !important;
+  width: 20px !important;
+}
+
+.dialog-title {
+  font-size: 20px !important;
+  font-weight: 500 !important;
+  color: var(--text-color) !important;
+}
+
+.calendar-button {
+  border-radius: 0rem 0.2rem 0.2rem 0rem !important;
+}
+
+.white-background {
+  background-color: var(--surface-color) !important;
+}
+
+.doc-link {
+  color: #007bff;
+  text-decoration: none;
+  cursor: pointer !important;
+
+  &:hover {
+    text-decoration: underline;
+  }
+}
+
+.cursor-pointer {
+  cursor: pointer;
+}
+
+.timepicker-overlay {
+  z-index: 9999 !important;
+}
+
+.timepicker-backdrop-overlay {
+  z-index: 9999 !important;
+}
+
+.timepicker__header {
+  background-color: map.get(var.$colors, "indigo") !important;
+}
+
+.timepicker-button {
+  color: map.get(var.$colors, "indigo") !important;
+}
+
+.clock-face__number>span.active {
+  background-color: map.get(var.$colors, "indigo") !important;
+}
+
+.clock-face__clock-hand {
+  background-color: map.get(var.$colors, "indigo") !important;
+}
+
+// .mat-pseudo-checkbox-full.mat-pseudo-checkbox-checked {
+//   background-color: #3f51b5 !important;
+// }
+
+.mdc-checkbox__native-control:enabled:checked~.mdc-checkbox__background,
+.mdc-checkbox__native-control:enabled:indeterminate~.mdc-checkbox__background {
+  border-color: #3f51b5 !important;
+  background-color: #3f51b5 !important;
+}
+
+.pdf-viewer-height {
+  height: calc(100vh - 65px);
+}
+
+.grid-height-small {
+  max-height: calc(100vh - 275px) !important;
+  overflow-y: auto;
+}
+
+.grid-height-medium {
+  max-height: calc(100vh - 300px) !important;
+  overflow-y: auto;
+}
+
+.grid-height-large {
+  max-height: calc(100vh - 175px) !important;
+  overflow-y: auto;
+}
+
+.grid-height-auto {
+  max-height: auto !important;
+  overflow-y: auto;
+}
+
+.grid-height-permission {
+  max-height: 300px !important;
+  overflow-y: auto;
+}
+
+.grid-height-reminder {
+  max-height: 450px !important;
+  overflow-y: auto;
+}
+
+//   .mat-mdc-header-row {
+//     height: 41px;
+//   }
+
+//   .mat-mdc-footer-row {
+//     height: 40px;
+//   }
+
+//   .mat-mdc-row {
+//     height: 40px;
+//   }
+
+//   .mat-mdc-icon-button {
+//     height: 24px !important;
+//     /* Decrease the height */
+//     width: 24px !important;
+//   }
+
+//   .mat-mdc-icon-button.mat-mdc-button-base {
+//     height: 24px !important;
+//     /* Decrease the height */
+//     width: 24px !important;
+//     /* Ensure the width matches the height */
+//     display: flex;
+//     align-items: center;
+//     /* Center icon vertically */
+//     justify-content: center;
+//     padding: 0px;
+//     /* Center icon horizontally */
+//   }
+
+//   /* Adjust the overall height of the mat-paginator */
+//   .mat-mdc-paginator {
+//     height: 30px;
+//     /* Set the desired height */
+//     display: flex;
+//     align-items: center;
+//     /* Center text vertically */
+
+//     .mat-mdc-paginator-range-actions,
+//     .mat-mdc-paginator-page-size {
+//       height: 30px;
+//       /* Set the desired height */
+//       display: flex;
+//       align-items: center;
+//       /* Center text vertically */
+//     }
+
+//     .mat-mdc-paginator-page-size-select {
+//       height: 30px;
+//       /* Set the desired height */
+//       display: flex;
+//       align-items: center;
+//       /* Center text vertically */
+//     }
+
+//     .mat-mdc-paginator-touch-target {
+//       height: 30px;
+//       /* Set the desired height */
+//       display: flex;
+//       align-items: center;
+//       /* Center text vertically */
+//     }
+
+//     .mat-mdc-form-field-flex {
+//       height: 30px;
+//     }
+
+//     .mdc-text-field--outlined .mat-mdc-form-field-infix,
+//     .mdc-text-field--no-label .mat-mdc-form-field-infix {
+//       padding: 3px !important;
+//     }
+//   }
+// }
+
+
+
+//   .mat-mdc-header-row {
+//     height: 41px;
+//   }
+
+//   .mat-mdc-footer-row {
+//     height: 40px;
+//   }
+
+//   .mat-mdc-row {
+//     height: 40px;
+//   }
+
+//   .mat-mdc-icon-button {
+//     height: 24px !important;
+//     /* Decrease the height */
+//     width: 24px !important;
+//   }
+
+//   .mat-mdc-icon-button.mat-mdc-button-base {
+//     height: 24px !important;
+//     /* Decrease the height */
+//     width: 24px !important;
+//     /* Ensure the width matches the height */
+//     display: flex;
+//     align-items: center;
+//     /* Center icon vertically */
+//     justify-content: center;
+//     padding: 0px;
+//     /* Center icon horizontally */
+//   }
+
+//   /* Adjust the overall height of the mat-paginator */
+//   .mat-mdc-paginator {
+//     height: 30px;
+//     /* Set the desired height */
+//     display: flex;
+//     align-items: center;
+//     /* Center text vertically */
+
+//     .mat-mdc-paginator-range-actions,
+//     .mat-mdc-paginator-page-size {
+//       height: 30px;
+//       /* Set the desired height */
+//       display: flex;
+//       align-items: center;
+//       /* Center text vertically */
+//     }
+
+//     .mat-mdc-paginator-page-size-select {
+//       height: 30px;
+//       /* Set the desired height */
+//       display: flex;
+//       align-items: center;
+//       /* Center text vertically */
+//     }
+
+//     .mat-mdc-paginator-touch-target {
+//       height: 30px;
+//       /* Set the desired height */
+//       display: flex;
+//       align-items: center;
+//       /* Center text vertically */
+//     }
+
+//     .mat-mdc-form-field-flex {
+//       height: 30px;
+//     }
+
+//     .mdc-text-field--outlined .mat-mdc-form-field-infix,
+//     .mdc-text-field--no-label .mat-mdc-form-field-infix {
+//       padding: 3px !important;
+//     }
+//   }
+// }
+
+
+//   .mat-mdc-icon-button.mat-mdc-button-base {
+//     height: 24px !important;
+//     /* Decrease the height */
+//     width: 24px !important;
+//     /* Ensure the width matches the height */
+//     display: flex;
+//     align-items: center;
+//     /* Center icon vertically */
+//     justify-content: center;
+//     padding: 0px;
+//     /* Center icon horizontally */
+//   }
+
+//   /* Adjust the overall height of the mat-paginator */
+//   .mat-mdc-paginator {
+//     height: 30px;
+//     /* Set the desired height */
+//     display: flex;
+//     align-items: center;
+//     /* Center text vertically */
+
+//     .mat-mdc-paginator-range-actions,
+//     .mat-mdc-paginator-page-size {
+//       height: 30px;
+//       /* Set the desired height */
+//       display: flex;
+//       align-items: center;
+//       /* Center text vertically */
+//     }
+
+//     .mat-mdc-paginator-page-size-select {
+//       height: 30px;
+//       /* Set the desired height */
+//       display: flex;
+//       align-items: center;
+//       /* Center text vertically */
+//     }
+
+//     .mat-mdc-paginator-touch-target {
+//       height: 30px;
+//       /* Set the desired height */
+//       display: flex;
+//       align-items: center;
+//       /* Center text vertically */
+//     }
+
+//     .mat-mdc-form-field-flex {
+//       height: 30px;
+//     }
+
+//     .mdc-text-field--outlined .mat-mdc-form-field-infix,
+//     .mdc-text-field--no-label .mat-mdc-form-field-infix {
+//       padding: 3px !important;
+//     }
+//   }
+// }
+
+
+
+//   .mat-mdc-header-row {
+//     height: 41px;
+//   }
+
+//   .mat-mdc-footer-row {
+//     height: 40px;
+//   }
+
+//   .mat-mdc-row {
+//     height: 40px;
+//   }
+
+//   .mat-mdc-icon-button {
+//     height: 24px !important;
+//     /* Decrease the height */
+//     width: 24px !important;
+//   }
+
+//   .mat-mdc-icon-button.mat-mdc-button-base {
+//     height: 24px !important;
+//     /* Decrease the height */
+//     width: 24px !important;
+//     /* Ensure the width matches the height */
+//     display: flex;
+//     align-items: center;
+//     /* Center icon vertically */
+//     justify-content: center;
+//     padding: 0px;
+//     /* Center icon horizontally */
+//   }
+
+//   /* Adjust the overall height of the mat-paginator */
+//   .mat-mdc-paginator {
+//     height: 30px;
+//     /* Set the desired height */
+//     display: flex;
+//     align-items: center;
+//     /* Center text vertically */
+
+//     .mat-mdc-paginator-range-actions,
+//     .mat-mdc-paginator-page-size {
+//       height: 30px;
+//       /* Set the desired height */
+//       display: flex;
+//       align-items: center;
+//       /* Center text vertically */
+//     }
+
+//     .mat-mdc-paginator-page-size-select {
+//       height: 30px;
+//       /* Set the desired height */
+//       display: flex;
+//       align-items: center;
+//       /* Center text vertically */
+//     }
+
+//     .mat-mdc-paginator-touch-target {
+//       height: 30px;
+//       /* Set the desired height */
+//       display: flex;
+//       align-items: center;
+//       /* Center text vertically */
+//     }
+
+//     .mat-mdc-form-field-flex {
+//       height: 30px;
+//     }
+
+//     .mdc-text-field--outlined .mat-mdc-form-field-infix,
+//     .mdc-text-field--no-label .mat-mdc-form-field-infix {
+//       padding: 3px !important;
+//     }
+//   }
+// }
+
+
+
+//   .mat-mdc-header-row {
+//     height: 41px;
+//   }
+
+//   .mat-mdc-footer-row {
+//     height: 40px;
+//   }
+
+//   .mat-mdc-row {
+//     height: 40px;
+//   }
+
+//   .mat-mdc-icon-button {
+//     height: 24px !important;
+//     /* Decrease the height */
+//     width: 24px !important;
+//   }
+
+//   .mat-mdc-icon-button.mat-mdc-button-base {
+//     height: 24px !important;
+//     /* Decrease the height */
+//     width: 24px !important;
+//     /* Ensure the width matches the height */
+//     display: flex;
+//     align-items: center;
+//     /* Center icon vertically */
+//     justify-content: center;
+//     padding: 0px;
+//     /* Center icon horizontally */
+//   }
+
+//   /* Adjust the overall height of the mat-paginator */
+//   .mat-mdc-paginator {
+//     height: 30px;
+//     /* Set the desired height */
+//     display: flex;
+//     align-items: center;
+//     /* Center text vertically */
+
+//     .mat-mdc-paginator-range-actions,
+//     .mat-mdc-paginator-page-size {
+//       height: 30px;
+//       /* Set the desired height */
+//       display: flex;
+//       align-items: center;
+//       /* Center text vertically */
+//     }
+
+//     .mat-mdc-paginator-page-size-select {
+//       height: 30px;
+//       /* Set the desired height */
+//       display: flex;
+//       align-items: center;
+//       /* Center text vertically */
+//     }
+
+//     .mat-mdc-paginator-touch-target {
+//       height: 30px;
+//       /* Set the desired height */
+//       display: flex;
+//       align-items: center;
+//       /* Center text vertically */
+//     }
+
+//     .mat-mdc-form-field-flex {
+//       height: 30px;
+//     }
+
+//     .mdc-text-field--outlined .mat-mdc-form-field-infix,
+//     .mdc-text-field--no-label .mat-mdc-form-field-infix {
+//       padding: 3px !important;
+//     }
+//   }
+// }
+
+
+
+//   .mat-mdc-header-row {
+//     height: 41px;
+//   }
+
+//   .mat-mdc-footer-row {
+//     height: 40px;
+//   }
+
+//   .mat-mdc-row {
+//     height: 40px;
+//   }
+
+//   .mat-mdc-icon-button {
+//     height: 24px !important;
+//     /* Decrease the height */
+//     width: 24px !important;
+//   }
+
+//   .mat-mdc-icon-button.mat-mdc-button-base {
+//     height: 24px !important;
+//     /* Decrease the height */
+//     width: 24px !important;
+//     /* Ensure the width matches the height */
+//     display: flex;
+//     align-items: center;
+//     /* Center icon vertically */
+//     justify-content: center;
+//     padding: 0px;
+//     /* Center icon horizontally */
+//   }
+
+//   /* Adjust the overall height of the mat-paginator */
+//   .mat-mdc-paginator {
+//     height: 30px;
+//     /* Set the desired height */
+//     display: flex;
+//     align-items: center;
+//     /* Center text vertically */
+
+//     .mat-mdc-paginator-range-actions,
+//     .mat-mdc-paginator-page-size {
+//       height: 30px;
+//       /* Set the desired height */
+//       display: flex;
+//       align-items: center;
+//       /* Center text vertically */
+//     }
+
+//     .mat-mdc-paginator-page-size-select {
+//       height: 30px;
+//       /* Set the desired height */
+//       display: flex;
+//       align-items: center;
+//       /* Center text vertically */
+//     }
+
+//     .mat-mdc-paginator-touch-target {
+//       height: 30px;
+//       /* Set the desired height */
+//       display: flex;
+//       align-items: center;
+//       /* Center text vertically */
+//     }
+
+//     .mat-mdc-form-field-flex {
+//       height: 30px;
+//     }
+
+//     .mdc-text-field--outlined .mat-mdc-form-field-infix,
+//     .mdc-text-field--no-label .mat-mdc-form-field-infix {
+//       padding: 3px !important;
+//     }
+//   }
+// }
+
+.spinner-container {
+  position: absolute;
+  top: 0;
+  left: 0;
+  bottom: 56px;
+  right: 0;
+  z-index: 5000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.logo-img {
+  width: auto;
+  height: 45px;
+}
+
+.user_profile {
+  padding-top: 5px;
+}
+
+@for $index from 0 through 1000 {
+  $size: $index * 2;
+
+  .table-column-#{$size} {
+    // flex: 0 1 #{$size}#{"px"};
+    min-width: #{$size}#{"px"};
+    // padding-left: 1rem !important;
+    // padding-right: 1rem !important;
+  }
+}
+
+@for $index from 0 through 1000 {
+  $size: $index * 2;
+
+  .table-column-fix-#{$size} {
+    width: #{$size}#{"px"};
+  }
+}
+
+.mat-select-control {
+  margin-left: -13px !important;
+  margin-top: 8px !important;
+
+  .mat-mdc-option {
+    min-height: 40px;
+  }
+}
+
+.mat-mdc-menu-item {
+  min-height: 38px !important;
+}
+
+.alt-bg .wrap:nth-child(odd) {
+  background-color: #f9f9f9;
+  border-top: 1px solid #cacaca;
+  border-left: 1px solid #cacaca;
+  border-right: 1px solid #cacaca;
+}
+
+.alt-bg .wrap:nth-child(even) {
+  background-color: #fff;
+  border-top: 1px solid #cacaca;
+  border-left: 1px solid #cacaca;
+  border-right: 1px solid #cacaca;
+}
+
+.mat-mdc-menu-content,
+.mat-mdc-menu-content .mat-mdc-menu-item .mat-mdc-menu-item-text {
+  font-size: 15px !important;
+}
+
+.mat-mdc-menu-content .material-icons {
+  font-size: 20px !important;
+}
+
+.mat-expansion-panel:not([class*="mat-elevation-z"]) {
+  box-shadow: none !important;
+  background-color: #f5f5f5;
+}
+
+.ng-scrollbar-thumb {
+  background-color: rgb(103 119 239) !important;
+}
+
+.ng-scrollbar-track {
+  background-color: #acacac !important;
+}
+
+.folder_shared {
+  color: #f2d300;
+  font-size: 30px;
+  margin-top: 0;
+  float: left;
+}
+
+.list-img {
+  width: 30px;
+}
+
+::ng-deep .mat-mdc-icon-button .mat-mdc-button-touch-target {
+  height: 30px !important;
+}
+
+// ::ng-deep .mat-mdc-icon-button.mat-mdc-button-base {
+//   height: 30px !important;
+// }
+
+.height-30 {
+  height: 30px !important;
+}
+
+.text-decoration-none {
+  text-decoration: none;
+}
+
+.loading-text {
+  position: fixed;
+  bottom: 10px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: rgba(0, 0, 0, 0.7);
+  color: white;
+  padding: 10px 20px;
+  border-radius: 5px;
+  font-size: 16px;
+  text-align: center;
+}
+
+::ng-deep .mat-mdc-tooltip {
+  background-color: #3f51b5 !important;
+  /* Replace with your primary color */
+  color: white !important;
+}
+
+.shared-icon {
+  max-height: 21px;
+  margin-top: -14px;
+}
+
+@media (min-width: 320px) and (max-width: 480px) {
+  .mat-expansion-panel-body {
+    padding: 0 4px 16px !important;
+  }
+
+  .folder_shared {
+    width: 30px !important;
+  }
+
+  .mat-mdc-header-cell,
+  .mat-sort-header-content {
+    white-space: nowrap !important;
+  }
+
+  .mat-mdc-cell {
+    white-space: nowrap !important;
+  }
+
+  .page-title {
+    font-size: 16px;
+  }
+
+  .page-title-sub {
+    font-size: 12px;
+  }
+}
+
+@media (min-width: 480px) and (max-width: 768px) {
+  .folder_shared {
+    margin-right: 10px !important;
+  }
+}
+
+.zoom {
+  .html {
+    .body {
+      padding: 0px !important;
+    }
+  }
+}
+
+.editor .NgxEditor__Content {
+  min-height: 100px;
+}
+
+.btn-primary {
+  background-color: #3f51b5 !important;
+}
+
+.bg-primary {
+  background-color: #3f51b5 !important;
+}
+
+.mat-mdc-paginator-container {
+  padding-top: 10px;
+  justify-content: flex-start !important;
+  padding-left: 16px;
+}
+
+.course-pointer {
+  cursor: pointer;
+}
+
+#toast-container {
+  position: fixed !important;
+}
+
+.mat-mdc-table {
+  width: 100%;
+  overflow-x: auto;
+}
+
+@for $index from 0 through 300 {
+  $size: $index * 2;
+
+  .table-column-#{$size} {
+    // flex: 0 1 #{$size}#{"px"};
+    min-width: #{$size}#{"px"};
+  }
+}
+
+tr.example-detail-row {
+  height: 0 !important;
+  border: 0 solid transparent !important;
+}
+
+.example-element-row td {
+  border-bottom-width: 0 !important;
+  border: 0 !important;
+}
+
+.example-element-detail {
+  overflow: hidden;
+  display: flex;
+
+}
+
+.cdk-column-expandedDetail {
+  border: 0 solid transparent !important;
+}
+
+.inner-table {
+  margin: 1em;
+  padding: 1em;
+  width: 100% !important;
+}
+
+.grid-img-thumbnail {
+  width: 33px;
+}
+
+.NgxEditor__MenuBar {
+  border: 1px solid #ccc;
+  border-bottom: none;
+}
+
+.NgxEditor {
+  border-radius: 0px !important;
+}

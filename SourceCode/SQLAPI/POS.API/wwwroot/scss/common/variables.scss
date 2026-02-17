@@ -1,0 +1,130 @@
+@use 'sass:color';
+
+$colors: (
+  'red': var(--warn-500),
+  'pink': var(--primary-500), // Mapping generic names to theme roles
+  'purple': var(--primary-700),
+  'indigo': var(--primary-900),
+  'blue': var(--primary-500),
+  'cyan': var(--primary-500),
+  'teal': var(--secondary-500),
+  'green': var(--secondary-500),
+  'yellow': var(--warn-300),
+  'orange': var(--warn-500),
+  'deep-orange': var(--warn-800),
+  'brown': #795548, // Keep as static if not part of main palette
+  'grey': #9e9e9e,
+  'black': #000000,
+  'white': var(--surface-color)) !default;
+
+$linear-colors: (
+  'green': linear-gradient(45deg, #9ce89d, #cdfa7e),
+  'orange': linear-gradient(135deg, #ffc480, #ff763b),
+  'cyan': linear-gradient(45deg, #72c2ff, #86f0ff),
+  'red': linear-gradient(316deg, #fc5286, #fbaaa2),
+  'purple': linear-gradient(230deg, #759bff, #843cf6),
+  'purple-dark': linear-gradient(45deg, #a52dd8, #e29bf1),
+  'card1': linear-gradient(to left, #3a7bd5, #3a6073),
+  'card2': linear-gradient(to right, #c33764, #1d2671),
+  'card3': linear-gradient(to left, #134e5e, #71b280),
+  'card4': linear-gradient(to left, #d38312, #a83279)
+);
+
+//Fonts Family
+$navbar-font-family: 'Roboto', sans-serif;
+$sidebar-font-family: 'Roboto', sans-serif;
+$font-size: 14px;
+
+$theme-white: var(--surface-color);
+$theme-active-color: var(--primary-500);
+$theme-sidemenu-active-color: var(--primary-contrast-500);
+$theme-legal-bg: var(--background-color);
+$theme-bar: var(--background-color);
+$theme-navbar-brand: var(--text-color);
+$theme-navbar-brand_active: var(--primary-500);
+$theme-navbar-brand_hover: var(--primary-400);
+$theme-navbar-brand_focus: var(--primary-400);
+$theme-nav-anchor: var(--text-color);
+$theme-nav-anchor_hover: rgba(0, 0, 0, 0);
+$theme-nav-anchor_focus: rgba(0, 0, 0, 0);
+$theme-nav-anchor-opened: rgba(0, 0, 0, 0);
+$theme-nav-anchor-opened_hover: rgba(0, 0, 0, 0);
+$theme-nav-anchor-opened_focus: rgba(0, 0, 0, 0);
+$theme-menu-list-active: rgba(0, 0, 0, 0);
+$theme-menu-list-toggled: rgba(0, 0, 0, 0);
+$theme-menu-list-submenu: rgba(0, 0, 0, 0);
+$theme-sidebar-menu-active: var(--primary-500);
+$theme-sidebar-menu-hover: var(--primary-500);
+
+@mixin border-radius($radius) {
+  -webkit-border-radius: $radius;
+  -moz-border-radius: $radius;
+  -ms-border-radius: $radius;
+  border-radius: $radius;
+}
+
+@mixin box-shadow($shadowinfo) {
+  -webkit-box-shadow: $shadowinfo;
+  -moz-box-shadow: $shadowinfo;
+  -ms-box-shadow: $shadowinfo;
+  box-shadow: $shadowinfo;
+}
+
+@mixin transform($transform) {
+  -moz-transform: $transform;
+  -ms-transform: $transform;
+  -o-transform: $transform;
+  -webkit-transform: $transform;
+  transform: $transform;
+}
+
+@mixin transition($transition) {
+  -moz-transition: $transition;
+  -o-transition: $transition;
+  -webkit-transition: $transition;
+  transition: $transition;
+}
+
+@mixin three-dots-overflow() {
+  white-space: nowrap;
+  -ms-text-overflow: ellipsis;
+  -o-text-overflow: ellipsis;
+  text-overflow: ellipsis;
+  overflow: hidden;
+}
+
+@mixin navbar-link-color($textcolor, $navbarcolor, $opacity) {
+
+  .navbar-brand,
+  .navbar-brand:hover,
+  .navbar-brand:active,
+  .navbar-brand:focus {
+    color: $textcolor;
+  }
+
+  .nav>li>a:hover,
+  .nav>li>a:focus,
+  .nav .open>a,
+  .nav .open>a:hover,
+  .nav .open>a:focus {
+    background-color: color.adjust($navbarcolor, $alpha: -$opacity);
+  }
+
+  .nav>li>a {
+    color: $textcolor;
+  }
+
+  .bars {
+    float: left;
+    padding: 10px 20px;
+    font-size: 22px;
+    color: $textcolor;
+    margin-right: 10px;
+    margin-left: -10px;
+    margin-top: 4px;
+  }
+
+  .bars:hover {
+    background-color: rgba(0, 0, 0, 0.08);
+  }
+}

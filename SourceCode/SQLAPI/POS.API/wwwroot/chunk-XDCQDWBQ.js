@@ -1,0 +1,1 @@
+import{a as t}from"./chunk-JCTJTPDO.js";var e=class extends t{orderNumber="";customerName="";soCreatedDate;customerId="";fromDate;toDate;productId;isSalesOrderRequest=!1;status=2;productName;locationId="";deliveryStatus;paymentStatus};export{e as a};

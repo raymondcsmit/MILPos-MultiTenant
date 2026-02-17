@@ -22,7 +22,7 @@ export class IndexedDbService {
   private dbPromise: Promise<IDBPDatabase<POSDB>>;
 
   constructor() {
-    this.dbPromise = openDB<POSDB>('pos-db', 1, {
+    this.dbPromise = openDB<POSDB>('pos-db', 2, {
       upgrade(db) {
         if (!db.objectStoreNames.contains('lookups')) {
           db.createObjectStore('lookups');
