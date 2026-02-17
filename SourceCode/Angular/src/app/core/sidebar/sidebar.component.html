@@ -7,9 +7,9 @@
         <ul id="sidebarnav" class="list">
           <!-- Top Most level menu -->
           @for (sidebarItem of sidebarItems; track sidebarItem) {
-          <li [routerLinkActiveOptions]="{ exact: true }" [routerLinkActiveOptions]="{ exact: true }"
+          <li [routerLinkActiveOptions]="{ exact: true }"
             [routerLinkActive]="sidebarItem.submenu.length !== 0 ? 'active' : 'active-top'">
-            <a [routerLink]="sidebarItem.class === '' ? [sidebarItem.path] : null" [ngClass]="[sidebarItem.class || '']"
+            <a [routerLink]="sidebarItem.submenu.length === 0 ? ['/', sidebarItem.path] : null" [ngClass]="[sidebarItem.class || '']"
               (click)="callToggleMenu($event, sidebarItem.submenu.length)" class="menu-top">
               <mat-icon class="medium-icon fs-6 align-middle me-1 text-white">{{sidebarItem.icon}}</mat-icon>
               <span class="hide-menu">{{sidebarItem.title | translate}}

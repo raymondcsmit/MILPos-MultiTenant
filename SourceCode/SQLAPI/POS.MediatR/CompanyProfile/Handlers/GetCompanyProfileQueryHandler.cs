@@ -3,6 +3,7 @@ using System.IO;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using Microsoft.Extensions.DependencyInjection;
 using AutoMapper;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
@@ -18,22 +19,51 @@ using POS.Repository.Accouting;
 namespace POS.MediatR.Handlers;
 
 public class GetCompanyProfileQueryHandler(
-    ICompanyProfileRepository companyProfileRepository,
+    IServiceScopeFactory serviceScopeFactory,
     IMapper mapper,
-    PathHelper pathHelper,
-    ILanguageRepository languageRepository,
-    ILocationRepository locationRepository,
-    IFinancialYearRepository financialYearRepository,
-    IMediator mediator)
+    PathHelper pathHelper)
     : IRequestHandler<GetCompanyProfileQuery, CompanyProfileDto>
 {
 
     public async Task<CompanyProfileDto> Handle(GetCompanyProfileQuery request, CancellationToken cancellationToken)
     {
-        var locations = await locationRepository.All.ToListAsync();
-        var financialYears = await financialYearRepository.All.ToListAsync();
-        var languages = await languageRepository.All.OrderBy(c => c.Order).ToListAsync();
-        var companyProfile = await companyProfileRepository.All.FirstOrDefaultAsync();
+        // Define tasks to run in parallel using separate scopes to avoid DbContext threading issues
+        var locationsTask = Task.Run(async () =>
+        {
+            using var scope = serviceScopeFactory.CreateScope();
+            var repo = scope.ServiceProvider.GetRequiredService<ILocationRepository>();
+            return await repo.All.AsNoTracking().ToListAsync(cancellationToken);
+        }, cancellationToken);
+
+        var financialYearsTask = Task.Run(async () =>
+        {
+            using var scope = serviceScopeFactory.CreateScope();
+            var repo = scope.ServiceProvider.GetRequiredService<IFinancialYearRepository>();
+            return await repo.All.AsNoTracking().ToListAsync(cancellationToken);
+        }, cancellationToken);
+
+        var languagesTask = Task.Run(async () =>
+        {
+            using var scope = serviceScopeFactory.CreateScope();
+            var med = scope.ServiceProvider.GetRequiredService<IMediator>();
+            return await med.Send(new GetAllLanguageCommand(), cancellationToken);
+        }, cancellationToken);
+
+        var companyProfileTask = Task.Run(async () =>
+        {
+            using var scope = serviceScopeFactory.CreateScope();
+            var repo = scope.ServiceProvider.GetRequiredService<ICompanyProfileRepository>();
+            return await repo.All.AsNoTracking().FirstOrDefaultAsync(cancellationToken);
+        }, cancellationToken);
+
+        // Wait for all tasks to complete
+        await Task.WhenAll(locationsTask, financialYearsTask, languagesTask, companyProfileTask);
+
+        var locations = await locationsTask;
+        var financialYears = await financialYearsTask;
+        var languages = await languagesTask;
+        var companyProfile = await companyProfileTask;
+
         if (companyProfile == null)
         {
             companyProfile = new CompanyProfile
@@ -48,7 +78,7 @@ public class GetCompanyProfileQueryHandler(
         }
 
         var response = mapper.Map<CompanyProfileDto>(companyProfile);
-        response.Languages = await mediator.Send(new GetAllLanguageCommand());
+        response.Languages = languages;
         response.Locations = mapper.Map<List<LocationDto>>(locations);
         response.FinancialYears = mapper.Map<List<FinancialYearDto>>(financialYears);
         if (!string.IsNullOrWhiteSpace(response.LogoUrl))
@@ -56,6 +86,6 @@ public class GetCompanyProfileQueryHandler(
             var logoFileName = Path.GetFileName(response.LogoUrl);
             response.LogoUrl = Path.Combine(pathHelper.CompanyLogo, logoFileName).Replace("\\", "/");
         }
-        return mapper.Map<CompanyProfileDto>(response);
+        return response;
     }
 }

@@ -69,7 +69,9 @@ body {
 
 // Dialogs & Menus
 .mat-mdc-dialog-container {
-    @include glass.glass-panel($opacity: 0.9, $blur: 20px);
+    @include glass.glass-panel($opacity: 0.15, $blur: 20px); // Reduced opacity to default
+    background: var(--glass-bg) !important; // Use theme-defined glass color
+    border: 1px solid var(--glass-border) !important; // Use theme-defined border
     .mdc-dialog__surface { 
         background: transparent !important;
         box-shadow: none !important;
