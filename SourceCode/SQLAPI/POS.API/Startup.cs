@@ -30,8 +30,11 @@ using POS.Domain;
 using POS.Domain.Sync;
 using POS.Domain.ImportExport;
 using POS.Helper;
+using POS.Helper.Services;
 using POS.MediatR.PipeLineBehavior;
 using POS.Repository;
+using POS.Repository.Tenant;
+using POS.Common.Services;
 using Microsoft.OpenApi.Models;
 
 namespace POS.API
@@ -65,6 +68,9 @@ namespace POS.API
             // Configure deployment settings
             services.Configure<DeploymentSettings>(Configuration);
             var deploymentSettings = Configuration.Get<DeploymentSettings>();
+            
+            // Register Master Tenant Settings
+            services.Configure<MasterTenantSettings>(Configuration.GetSection("MasterTenant"));
             
             // Register tenant provider based on deployment mode
             if (deploymentSettings?.MultiTenancy?.Enabled == true)
@@ -160,8 +166,17 @@ namespace POS.API
             services.AddScoped<SeedingService>();
             services.AddScoped<MenuItemSeedingService>();
             services.AddScoped<ITenantRegistrationService, TenantRegistrationService>();
+            services.AddScoped<ITenantDataCloner, TenantDataCloner>();
             services.AddScoped<TenantDataMigrationService>();
             services.AddScoped<POS.Common.Services.IFileStorageService, POS.Helper.Services.FileStorageService>();
+            
+            // Core Utility Services
+            services.AddScoped<ICsvParserService, CsvParserService>();
+            services.AddScoped<IDbUtilityService, DbUtilityService>();
+            services.AddScoped<ISecurityService, SecurityService>();
+            
+            // Business Logic Services
+            services.AddScoped<ITenantInitializationService, TenantInitializationService>();
             
             // Import/Export Services
             services.AddScoped<IImportExportService<POS.Data.Product>, ProductImportExportService>();

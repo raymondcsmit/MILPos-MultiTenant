@@ -14,6 +14,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
+using POS.Common.Services;
 
 namespace POS.MediatR.Tenant.Handlers
 {
@@ -24,19 +25,22 @@ namespace POS.MediatR.Tenant.Handlers
         private readonly PathHelper _pathHelper;
         private readonly IWebHostEnvironment _webHostEnvironment;
         private readonly Microsoft.Extensions.Configuration.IConfiguration _configuration;
+        private readonly IDbUtilityService _dbUtilityService;
 
         public ExportTenantToSqliteCommandHandler(
             POSDbContext sourceContext, 
             POS.Common.Services.IFileStorageService fileStorageService,
             PathHelper pathHelper,
             IWebHostEnvironment webHostEnvironment,
-            Microsoft.Extensions.Configuration.IConfiguration configuration)
+            Microsoft.Extensions.Configuration.IConfiguration configuration,
+            IDbUtilityService dbUtilityService)
         {
             _sourceContext = sourceContext;
             _fileStorageService = fileStorageService;
             _pathHelper = pathHelper;
             _webHostEnvironment = webHostEnvironment;
             _configuration = configuration;
+            _dbUtilityService = dbUtilityService;
         }
 
         public async Task<ServiceResponse<ExportTenantToSqliteCommandResult>> Handle(ExportTenantToSqliteCommand request, CancellationToken cancellationToken)
@@ -77,21 +81,13 @@ namespace POS.MediatR.Tenant.Handlers
                         await destinationContext.Database.EnsureCreatedAsync(cancellationToken);
 
                         // Manually inject Migration History so client thinks it's migrated
-                        var historySql = @"
-                            CREATE TABLE IF NOT EXISTS ""__EFMigrationsHistory"" (
-                                ""MigrationId"" TEXT NOT NULL CONSTRAINT ""PK___EFMigrationsHistory"" PRIMARY KEY,
-                                ""ProductVersion"" TEXT NOT NULL
-                            );
-                            INSERT INTO ""__EFMigrationsHistory"" (""MigrationId"", ""ProductVersion"")
-                            VALUES ('20260213024351_MainInitSqlite', '10.0.2');
-                        ";
-                        await destinationContext.Database.ExecuteSqlRawAsync(historySql, cancellationToken);
+                        await _dbUtilityService.EnsureMigrationHistoryAsync(destinationContext);
                     }
 
-                    // Open connection explicitly to keep PRAGMA settings active for the session
+                    // Open connection explicitly to keep settings active for the session
                     await destinationContext.Database.OpenConnectionAsync(cancellationToken);
                     // DISABLE FOREIGN KEY CONSTRAINTS during import to avoid ordering issues
-                    await destinationContext.Database.ExecuteSqlRawAsync("PRAGMA foreign_keys = OFF;", cancellationToken);
+                    await _dbUtilityService.DisableForeignKeyCheckAsync(destinationContext);
 
                     // 2. Pre-fetch User and Role IDs for filtering dependent entities
                     var userIds = await _sourceContext.Users
@@ -138,9 +134,13 @@ namespace POS.MediatR.Tenant.Handlers
                             {
                                 msg = tie.InnerException.InnerException?.Message ?? tie.InnerException.Message;
                             }
-                            errors.AppendLine($"Failed to copy {entityType.Name}: {msg}");
+                            errors.AppendLine($"{entityType.Name}: {msg}");
                         }
                     }
+
+                    // RE-ENABLE FOREIGN KEY CONSTRAINTS
+                    await _dbUtilityService.EnableForeignKeyCheckAsync(destinationContext);
+                    await destinationContext.Database.CloseConnectionAsync();
                     
                     if (errors.Length > 0)
                     {

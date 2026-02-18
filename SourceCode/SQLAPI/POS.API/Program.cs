@@ -19,6 +19,7 @@ using System;
 using System.IO;
 
 using OfficeOpenXml; // Add this namespace
+using System.Linq;
 
 var builder = WebApplication.CreateBuilder(args);
 ExcelPackage.License.SetNonCommercialOrganization("MIL POS");
@@ -119,8 +120,8 @@ try
 {
     using (var serviceScope = app.Services.GetService<IServiceScopeFactory>().CreateScope())
     {
-        var context = serviceScope.ServiceProvider.GetRequiredService<POSDbContext>();
-        context.Database.Migrate();
+            var context = serviceScope.ServiceProvider.GetRequiredService<POSDbContext>();
+            context.Database.Migrate();
 
         // Seed data using SeedingService
         var seedingEnabled = builder.Configuration.GetValue<bool>("SeedingConfig:Enabled", true);

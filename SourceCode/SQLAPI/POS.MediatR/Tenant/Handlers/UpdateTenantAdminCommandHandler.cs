@@ -6,8 +6,10 @@ using POS.Data;
 using POS.Data.Dto;
 using POS.Data.Entities;
 using POS.Helper;
+using POS.MediatR.CommandAndQuery;
 using POS.MediatR.Tenant.Commands;
 using POS.Repository;
+using System;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -19,15 +21,18 @@ namespace POS.MediatR.Tenant.Handlers
         private readonly IGenericRepository<POS.Data.Entities.Tenant> _tenantRepository;
         private readonly UserManager<User> _userManager;
         private readonly RoleManager<Role> _roleManager;
+        private readonly IMediator _mediator;
 
         public UpdateTenantAdminCommandHandler(
             IGenericRepository<POS.Data.Entities.Tenant> tenantRepository,
             UserManager<User> userManager,
-            RoleManager<Role> roleManager)
+            RoleManager<Role> roleManager,
+            IMediator mediator)
         {
             _tenantRepository = tenantRepository;
             _userManager = userManager;
             _roleManager = roleManager;
+            _mediator = mediator;
         }
 
         public async Task<ServiceResponse<bool>> Handle(UpdateTenantAdminCommand request, CancellationToken cancellationToken)
@@ -46,7 +51,7 @@ namespace POS.MediatR.Tenant.Handlers
                 user = await _userManager.Users.IgnoreQueryFilters()
                    .FirstOrDefaultAsync(u => u.NormalizedEmail == requestUserName, cancellationToken);
             }
-            //var user = await _userManager.FindByEmailAsync(request.AdminEmail)?? _userManager.Users.Where(us=>us.Email== request.AdminEmail||us.NormalizedEmail==request.AdminEmail.ToUpper()).FirstOrDefault();
+            
             if (user != null)
             {
                 // User exists, check if belongs to this tenant
@@ -76,30 +81,36 @@ namespace POS.MediatR.Tenant.Handlers
             }
             else
             {
-                // Create new user
+                // Create new user via Command
                 if (string.IsNullOrEmpty(request.NewPassword))
                 {
                     return ServiceResponse<bool>.ReturnFailed(400, "Password is required for new user");
                 }
 
-                user = new User
+                var addUserCmd = new AddUserCommand
                 {
-                    UserName = request.AdminEmail,
                     Email = request.AdminEmail,
+                    UserName = request.AdminEmail,
                     FirstName = "Admin",
                     LastName = "User",
+                    Password = request.NewPassword,
                     TenantId = request.TenantId,
                     IsActive = true,
-                    EmailConfirmed = true // Auto confirm for admin created by superadmin
+                    // Role assignment handled below to ensure consistency
                 };
 
-                var result = await _userManager.CreateAsync(user, request.NewPassword);
-                if (!result.Succeeded)
+                var result = await _mediator.Send(addUserCmd, cancellationToken);
+                if (!result.Success)
                 {
-                    return ServiceResponse<bool>.ReturnFailed(400, string.Join(", ", result.Errors.Select(e => e.Description)));
+                    return ServiceResponse<bool>.ReturnFailed(400, string.Join(", ", result.Errors));
                 }
 
-                await _userManager.AddToRoleAsync(user, "Admin");
+                // Assign Role
+                user = await _userManager.FindByIdAsync(result.Data.Id.ToString());
+                if (user != null) 
+                {
+                    await _userManager.AddToRoleAsync(user, "Admin");
+                }
 
                 return ServiceResponse<bool>.ReturnResultWith200(true);
             }
