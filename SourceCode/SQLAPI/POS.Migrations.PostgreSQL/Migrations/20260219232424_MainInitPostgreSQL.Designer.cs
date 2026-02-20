@@ -12,7 +12,7 @@ using POS.Domain;
 namespace POS.Migrations.PostgreSQL.Migrations
 {
     [DbContext(typeof(POSDbContext))]
-    [Migration("20260216151935_MainInitPostgreSQL")]
+    [Migration("20260219232424_MainInitPostgreSQL")]
     partial class MainInitPostgreSQL
     {
         /// <inheritdoc />
@@ -72,11 +72,17 @@ namespace POS.Migrations.PostgreSQL.Migrations
                     b.Property<long>("SyncVersion")
                         .HasColumnType("bigint");
 
+                    b.Property<Guid>("TenantId")
+                        .HasColumnType("uuid");
+
                     b.HasKey("Id");
 
                     b.HasIndex("CreatedBy");
 
                     b.HasIndex("PageId");
+
+                    b.HasIndex("TenantId")
+                        .HasDatabaseName("IX_Action_TenantId");
 
                     b.ToTable("Actions");
                 });
@@ -2180,9 +2186,15 @@ namespace POS.Migrations.PostgreSQL.Migrations
                     b.Property<long>("SyncVersion")
                         .HasColumnType("bigint");
 
+                    b.Property<Guid>("TenantId")
+                        .HasColumnType("uuid");
+
                     b.HasKey("Id");
 
                     b.HasIndex("CreatedBy");
+
+                    b.HasIndex("TenantId")
+                        .HasDatabaseName("IX_Language_TenantId");
 
                     b.ToTable("Languages");
                 });
@@ -2320,9 +2332,15 @@ namespace POS.Migrations.PostgreSQL.Migrations
                     b.Property<long>("SyncVersion")
                         .HasColumnType("bigint");
 
+                    b.Property<Guid>("TenantId")
+                        .HasColumnType("uuid");
+
                     b.HasKey("Id");
 
                     b.HasIndex("CreatedBy");
+
+                    b.HasIndex("TenantId")
+                        .HasDatabaseName("IX_PageHelper_TenantId");
 
                     b.ToTable("Pagehelpers");
                 });
@@ -3788,9 +3806,15 @@ namespace POS.Migrations.PostgreSQL.Migrations
                     b.Property<long>("SyncVersion")
                         .HasColumnType("bigint");
 
+                    b.Property<Guid>("TenantId")
+                        .HasColumnType("uuid");
+
                     b.HasKey("Id");
 
                     b.HasIndex("CreatedBy");
+
+                    b.HasIndex("TenantId")
+                        .HasDatabaseName("IX_Page_TenantId");
 
                     b.ToTable("Pages");
                 });
@@ -5097,14 +5121,46 @@ namespace POS.Migrations.PostgreSQL.Migrations
                         .HasMaxLength(200)
                         .HasColumnType("character varying(200)");
 
+                    b.Property<Guid>("CreatedBy")
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTime>("CreatedDate")
+                        .HasColumnType("timestamp without time zone");
+
+                    b.Property<Guid?>("DeletedBy")
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTime?>("DeletedDate")
+                        .HasColumnType("timestamp without time zone");
+
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("boolean");
+
+                    b.Property<DateTime?>("LastSyncedAt")
+                        .HasColumnType("timestamp without time zone");
+
+                    b.Property<Guid>("ModifiedBy")
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTime>("ModifiedDate")
+                        .HasColumnType("timestamp without time zone");
+
+                    b.Property<long>("SyncVersion")
+                        .HasColumnType("bigint");
+
+                    b.Property<Guid>("TenantId")
+                        .HasColumnType("uuid");
 
                     b.HasKey("Id");
 
                     b.HasIndex("CityId");
 
                     b.HasIndex("CountryId");
+
+                    b.HasIndex("CreatedBy");
+
+                    b.HasIndex("TenantId")
+                        .HasDatabaseName("IX_SupplierAddress_TenantId");
 
                     b.ToTable("SupplierAddresses");
                 });
@@ -6110,7 +6166,7 @@ namespace POS.Migrations.PostgreSQL.Migrations
                     b.HasOne("POS.Data.User", "CreatedByUser")
                         .WithMany()
                         .HasForeignKey("CreatedBy")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.Navigation("CreatedByUser");
@@ -6132,7 +6188,7 @@ namespace POS.Migrations.PostgreSQL.Migrations
                     b.HasOne("POS.Data.User", "CreatedByUser")
                         .WithMany()
                         .HasForeignKey("CreatedBy")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.Navigation("CreatedByUser");
@@ -7020,9 +7076,17 @@ namespace POS.Migrations.PostgreSQL.Migrations
                         .WithMany()
                         .HasForeignKey("CountryId");
 
+                    b.HasOne("POS.Data.User", "CreatedByUser")
+                        .WithMany()
+                        .HasForeignKey("CreatedBy")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
                     b.Navigation("City");
 
                     b.Navigation("Country");
+
+                    b.Navigation("CreatedByUser");
                 });
 
             modelBuilder.Entity("POS.Data.Tax", b =>

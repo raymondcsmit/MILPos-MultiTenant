@@ -1312,8 +1312,7 @@ namespace POS.Domain
             {
                 typeof(POS.Data.Country),
                 typeof(POS.Data.City),
-                typeof(POS.Data.Entities.Language),
-                typeof(POS.Data.Entities.PageHelper)
+                typeof(POS.Data.Currency)
             };
 
             // Apply to all entities inheriting from BaseEntity EXCEPT global ones

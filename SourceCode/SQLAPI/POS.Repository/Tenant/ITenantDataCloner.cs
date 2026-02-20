@@ -6,6 +6,6 @@ namespace POS.Repository
 {
     public interface ITenantDataCloner
     {
-        Task CloneTenantDataAsync(Guid sourceTenantId, POS.Data.Entities.Tenant targetTenant);
+        Task CloneTenantDataAsync(Guid sourceTenantId, POS.Data.Entities.Tenant targetTenant, POS.Data.User adminUser = null);
     }
 }

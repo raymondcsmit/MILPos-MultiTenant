@@ -4,9 +4,8 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace POS.Data
 {
-    public class SupplierAddress
+    public class SupplierAddress : BaseEntity
     {
-        public Guid Id { get; set; }
         public string Address { get; set; }
         public string CountryName { get; set; }
         public string CityName { get; set; }
@@ -16,6 +15,5 @@ namespace POS.Data
         public City City { get; set; }
         [ForeignKey("CountryId")]
         public Country Country { get; set; }
-        public bool IsDeleted { get; set; }
     }
 }

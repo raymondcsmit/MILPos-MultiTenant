@@ -58,7 +58,7 @@ export class TenantListComponent extends BaseComponent implements OnInit {
 
   manageTenant(tenant: Tenant | null): void {
     const dialogRef = this.dialog.open(TenantAddUpdateComponent, {
-      width: '800px',
+      width: '1000px',
       maxHeight: '90vh',
       direction: this.langDir,
       data: Object.assign({}, tenant) // simple copy

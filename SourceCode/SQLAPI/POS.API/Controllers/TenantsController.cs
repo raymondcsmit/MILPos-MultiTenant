@@ -48,6 +48,7 @@ namespace POS.API.Controllers
         [AllowAnonymous]
         public async Task<ActionResult<Tenant>> Register([FromBody] RegisterTenantDto dto)
         {
+            Console.WriteLine($"[TenantsController] Register request received for: {dto?.Subdomain}");
             var command = new RegisterTenantCommand
             {
                 Name = dto.Name,

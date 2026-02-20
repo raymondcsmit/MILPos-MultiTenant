@@ -2,7 +2,7 @@
 
 namespace POS.Data.Entities
 {
-    public class PageHelper : SharedBaseEntity
+    public class PageHelper : BaseEntity
     {
         public string Code { get; set; }
         public string Name { get; set; }

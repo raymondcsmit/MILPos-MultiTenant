@@ -8,6 +8,7 @@ namespace POS.MediatR.CommandAndQuery
 {
     public class AddRoleCommand : IRequest<ServiceResponse<RoleDto>>
     {
+        public Guid? Id { get; set; }
         public string Name { get; set; }
         public List<RoleClaimDto> RoleClaims { get; set; } = new List<RoleClaimDto>();
         public Guid TenantId { get; set; }

@@ -20,6 +20,7 @@ using System.IO;
 
 using OfficeOpenXml; // Add this namespace
 using System.Linq;
+using System.Threading.Tasks;
 
 var builder = WebApplication.CreateBuilder(args);
 ExcelPackage.License.SetNonCommercialOrganization("MIL POS");
@@ -118,26 +119,48 @@ var app = builder.Build();
 
 try
 {
-    using (var serviceScope = app.Services.GetService<IServiceScopeFactory>().CreateScope())
+    using (var scope = app.Services.CreateScope())
     {
-            var context = serviceScope.ServiceProvider.GetRequiredService<POSDbContext>();
+        try
+        {
+            var services = scope.ServiceProvider;
+            var context = services.GetRequiredService<POSDbContext>();
+            var seedingService = services.GetRequiredService<SeedingService>();
+
             context.Database.Migrate();
 
-        // Seed data using SeedingService
-        var seedingEnabled = builder.Configuration.GetValue<bool>("SeedingConfig:Enabled", true);
-        if (seedingEnabled)
+            // Seed data using SeedingService
+            var seedingEnabled = builder.Configuration.GetValue<bool>("SeedingConfig:Enabled", true);
+            if (seedingEnabled)
+            {
+                await seedingService.SeedAsync();
+            }
+
+            // --- START DIAGNOSTICS ---
+            Console.WriteLine("--- SEEDING DIAGNOSTICS ---");
+            var adminUser = await context.Users.IgnoreQueryFilters().FirstOrDefaultAsync(u => u.Email == "admin@gmail.com");
+            if (adminUser != null)
+            {
+                var userRoles = await context.UserRoles.IgnoreQueryFilters()
+                    .Where(ur => ur.UserId == adminUser.Id)
+                    .Join(context.Roles.IgnoreQueryFilters(), ur => ur.RoleId, r => r.Id, (ur, r) => r.Name)
+                    .ToListAsync();
+                Console.WriteLine($"Admin: {adminUser.Email}, Normalized: {adminUser.NormalizedEmail}, Active: {adminUser.IsActive}, Roles: {string.Join(", ", userRoles)}");
+            }
+            else { Console.WriteLine("Admin NOT FOUND."); }
+            Console.WriteLine("--- END DIAGNOSTICS ---");
+        }
+        catch (Exception ex)
         {
-            var seedingService = serviceScope.ServiceProvider.GetRequiredService<SeedingService>();
-            await seedingService.SeedAsync();
+            var logger = scope.ServiceProvider.GetRequiredService<ILogger<Program>>();
+            logger.LogError(ex, "An error occurred during migration or seeding.");
         }
     }
 }
 catch (System.Exception ex)
 {
-    // Log error but allow app to start if possible, or rethrow
     var logger = app.Services.GetRequiredService<ILogger<Program>>();
     logger.LogError(ex, "An error occurred while upgrading the database.");
-    // throw; // Prevent crash to allow debugging
 }
 
 ILoggerFactory loggerFactory = app.Services.GetRequiredService<ILoggerFactory>();

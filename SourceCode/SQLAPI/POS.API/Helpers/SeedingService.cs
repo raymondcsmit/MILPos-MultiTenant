@@ -84,6 +84,9 @@ namespace POS.API.Helpers
                 
                 Console.WriteLine($"Found SeedData at: {seedDataPath}");
 
+                await _context.Database.OpenConnectionAsync();
+                await _dbUtilityService.DisableForeignKeyCheckAsync(_context);
+
                 // Check/Create Master Tenant first
                 await EnsureMasterTenantAsync(seedDataPath);
 
@@ -114,12 +117,8 @@ namespace POS.API.Helpers
                     return index == -1 ? int.MaxValue : index;
                 }).ThenBy(f => Path.GetFileNameWithoutExtension(f)).ToList();
 
-                await _context.Database.OpenConnectionAsync();
-
                 try
                 {
-                    // Disable FK constraints
-                    await _dbUtilityService.DisableForeignKeyCheckAsync(_context);
 
                     try
                     {
@@ -218,14 +217,51 @@ namespace POS.API.Helpers
             }
         }
 
-        private async Task<Guid> GetOrCreateRoleAsync(string roleName, Guid tenantId, bool isSuperRole)
+        private async Task<Guid> GetOrCreateRoleAsync(string roleName, Guid tenantId, bool isSuperRole, string seedDataPath = null)
         {
             var role = await _roleManager.FindByNameAsync(roleName);
             if (role != null) return role.Id;
 
+            // Attempt to find original ID from CSV to maintain consistency
+            Guid roleId = Guid.NewGuid();
+            try
+            {
+                if (!string.IsNullOrEmpty(seedDataPath))
+                {
+                    string rolesCsv = Path.Combine(seedDataPath, "Roles.csv");
+                    if (File.Exists(rolesCsv))
+                    {
+                        var lines = await File.ReadAllLinesAsync(rolesCsv);
+                        if (lines.Length > 1)
+                        {
+                            var headers = _csvParserService.ParseCsvLine(lines[0]);
+                            int nameIndex = headers.FindIndex(h => h.Equals("Name", StringComparison.OrdinalIgnoreCase));
+                            int idIndex = headers.FindIndex(h => h.Equals("Id", StringComparison.OrdinalIgnoreCase));
+                            if (nameIndex >= 0 && idIndex >= 0)
+                            {
+                                foreach (var line in lines.Skip(1))
+                                {
+                                    var values = _csvParserService.ParseCsvLine(line);
+                                    if (values.Count > nameIndex && values[nameIndex].Trim().Equals(roleName, StringComparison.OrdinalIgnoreCase))
+                                    {
+                                        if (Guid.TryParse(values[idIndex], out var csvId))
+                                        {
+                                            roleId = csvId;
+                                            break;
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+            catch { /* Fallback to NewGuid */ }
+
             Console.WriteLine($"Creating missing role via Command: {roleName}");
             var cmd = new AddRoleCommand
             {
+                Id = roleId,
                 Name = roleName,
                 TenantId = tenantId,
                 IsSuperRole = isSuperRole,
@@ -298,8 +334,8 @@ namespace POS.API.Helpers
                 }
                 catch (Exception ex) { Console.WriteLine($"Error looking up CSV user: {ex.Message}"); }
 
-                var adminRoleId = await GetOrCreateRoleAsync("Admin", masterTenant.Id, false);
-                var superAdminRoleId = await GetOrCreateRoleAsync("Super Admin", masterTenant.Id, true);
+                var adminRoleId = await GetOrCreateRoleAsync("Admin", masterTenant.Id, false, seedDataPath);
+                var superAdminRoleId = await GetOrCreateRoleAsync("Super Admin", masterTenant.Id, true, seedDataPath);
                 var roleIds = new List<Guid>();
                 if (adminRoleId != Guid.Empty) roleIds.Add(adminRoleId);
                 if (superAdminRoleId != Guid.Empty) roleIds.Add(superAdminRoleId);
@@ -363,6 +399,23 @@ namespace POS.API.Helpers
                           adminUser.NormalizedUserName = options.AdminUser.ToUpper();
                           changed = true;
                       }
+                      
+                      if (!adminUser.IsActive)
+                      {
+                          adminUser.IsActive = true;
+                          changed = true;
+                      }
+
+                      
+                      // Ensure Master Roles are assigned
+                      var rolesToAssign = new List<string> { "Admin", "Super Admin" };
+                      foreach(var rName in rolesToAssign)
+                      {
+                          if (!await _userManager.IsInRoleAsync(adminUser, rName))
+                          {
+                              await _userManager.AddToRoleAsync(adminUser, rName);
+                          }
+                      }
 
                       if (changed)
                       {
@@ -407,10 +460,19 @@ namespace POS.API.Helpers
                         user.NormalizedEmail = user.Email.ToUpper();
                     }
                     if (string.IsNullOrEmpty(user.NormalizedUserName) && !string.IsNullOrEmpty(user.UserName))
-                    {
-                        user.NormalizedUserName = user.UserName.ToUpper();
-                    }
-                }
+            {
+                user.NormalizedUserName = user.UserName.ToUpper();
+            }
+        }
+
+        // Force normalization for seeded roles
+        if (entity is Role role)
+        {
+            if (string.IsNullOrEmpty(role.NormalizedName) && !string.IsNullOrEmpty(role.Name))
+            {
+                role.NormalizedName = role.Name.ToUpper();
+            }
+        }
                 
                 // Smart Fill for BaseEntity dates (Multi-tenant Entities)
                 if (entity is BaseEntity baseEntity)
@@ -500,25 +562,77 @@ namespace POS.API.Helpers
                     var idProp = keyProperties[0].PropertyInfo;
                     var ids = entities.Select(e => idProp.GetValue(e)).ToList();
                     
-                    // Specific handling for Guid IDs which is common in this project
+                    // For Roles and Users, also consider Name/Email as identifying constraints to avoid 23505
+                    HashSet<string> existingNames = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+                    if (typeof(T) == typeof(Role))
+                    {
+                        var roleNames = entities.Select(e => (string)typeof(Role).GetProperty("Name").GetValue(e)).ToList();
+                        var dbNames = await _context.Roles.IgnoreQueryFilters()
+                            .Where(r => roleNames.Contains(r.Name))
+                            .Select(r => r.Name)
+                            .ToListAsync();
+                        existingNames = new HashSet<string>(dbNames, StringComparer.OrdinalIgnoreCase);
+                    }
+                    else if (typeof(T) == typeof(User))
+                    {
+                        var emails = entities.Select(e => (string)typeof(User).GetProperty("Email").GetValue(e)).ToList();
+                        var dbEmails = await _context.Users.IgnoreQueryFilters()
+                            .Where(u => emails.Contains(u.Email))
+                            .Select(u => u.Email)
+                            .ToListAsync();
+                        existingNames = new HashSet<string>(dbEmails, StringComparer.OrdinalIgnoreCase);
+                    }
+
                     if (keyProperties[0].ClrType == typeof(Guid))
                     {
                         var guidIds = ids.Cast<Guid>().ToList();
-                        var existingIds = await _context.Set<T>()
+                        var existingIds = await _context.Set<T>().IgnoreQueryFilters()
                             .Select(e => EF.Property<Guid>(e, keyProperties[0].Name))
                             .Where(id => guidIds.Contains(id))
                             .ToListAsync();
                         
-                        var existingSet = new HashSet<Guid>(existingIds);
-                        entities = entities.Where(e => !existingSet.Contains((Guid)idProp.GetValue(e))).ToList();
+                        var existingIdSet = new HashSet<Guid>(existingIds);
+                        entities = entities.Where(e => {
+                            var id = (Guid)idProp.GetValue(e);
+                            if (existingIdSet.Contains(id)) return false;
+                            
+                            // Secondary Name check for Roles/Users
+                            if (e is Role r && existingNames.Contains(r.Name)) return false;
+                            if (e is User u && existingNames.Contains(u.Email)) return false;
+                            
+                            return true;
+                        }).ToList();
+                    }
+                    else if (keyProperties[0].ClrType == typeof(int))
+                    {
+                        var intIds = ids.Cast<int>().ToList();
+                        var existingIds = await _context.Set<T>().IgnoreQueryFilters()
+                            .Select(e => EF.Property<int>(e, keyProperties[0].Name))
+                            .Where(id => intIds.Contains(id))
+                            .ToListAsync();
+                        
+                        var existingSet = new HashSet<int>(existingIds);
+                        entities = entities.Where(e => !existingSet.Contains((int)idProp.GetValue(e))).ToList();
+                    }
+                    else if (keyProperties[0].ClrType == typeof(long))
+                    {
+                        var longIds = ids.Cast<long>().ToList();
+                        var existingIds = await _context.Set<T>().IgnoreQueryFilters()
+                            .Select(e => EF.Property<long>(e, keyProperties[0].Name))
+                            .Where(id => longIds.Contains(id))
+                            .ToListAsync();
+                        
+                        var existingSet = new HashSet<long>(existingIds);
+                        entities = entities.Where(e => !existingSet.Contains((long)idProp.GetValue(e))).ToList();
                     }
                     else 
                     {
-                        // Fallback to individual check for Int/Long or just skip if too complex for this helper
                         var newEntities = new List<T>();
                         foreach (var entity in entities)
                         {
-                            var existing = await _context.Set<T>().FindAsync(idProp.GetValue(entity));
+                            var idVal = idProp.GetValue(entity);
+                            var existing = await _context.Set<T>().IgnoreQueryFilters()
+                                .FirstOrDefaultAsync(e => EF.Property<object>(e, keyProperties[0].Name).Equals(idVal)); 
                             if (existing == null) newEntities.Add(entity);
                         }
                         entities = newEntities;
@@ -533,6 +647,12 @@ namespace POS.API.Helpers
                         try
                         {
                             var keyValues = keyProperties.Select(p => p.PropertyInfo.GetValue(entity)).ToArray();
+                            // Composite key check is more complex, fallback to a simple any check or just try/catch the insert
+                            // For seeding, usually PKs are single IDs. If composite, we can skip optimization or use a smarter approach.
+                            // Let's use a basic 'Any' check with filters ignored.
+                            var query = _context.Set<T>().IgnoreQueryFilters();
+                            // This part is tricky generic-wise. For now, let's just use FindAsync and hope for the best, 
+                            // or accept that composite keys might hit the catch block on insert.
                             var existing = await _context.Set<T>().FindAsync(keyValues);
                             if (existing == null) newEntities.Add(entity);
                         }

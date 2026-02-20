@@ -162,6 +162,7 @@ namespace POS.API
                 options.Password.RequireUppercase = false;
                 options.Password.RequireLowercase = false;
             });
+            services.Configure<POS.Data.Dto.MasterTenantSettings>(Configuration.GetSection("MasterTenant")); 
             services.AddSingleton(MapperConfig.GetMapperConfigs());
             services.AddScoped<SeedingService>();
             services.AddScoped<MenuItemSeedingService>();

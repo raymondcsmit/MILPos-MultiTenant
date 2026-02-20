@@ -58,7 +58,7 @@ namespace POS.Repository
                  var masterInDb = await _context.Tenants.IgnoreQueryFilters().FirstOrDefaultAsync(t => t.Id == masterSettings.TenantId || t.Subdomain == masterSettings.SubDomain);
                  if (masterInDb != null)
                  {
-                      await _tenantDataCloner.CloneTenantDataAsync(masterInDb.Id, tenant);
+                      await _tenantDataCloner.CloneTenantDataAsync(masterInDb.Id, tenant, adminUser);
                       return; 
                  }
             }
@@ -260,6 +260,30 @@ namespace POS.Repository
                 }).ToList();
 
                 _context.RoleMenuItems.AddRange(roleMenuItems);
+                await _context.SaveChangesAsync();
+            }
+
+            var adminRoleId = await _context.Roles
+                .Where(r => r.TenantId == tenant.Id && r.Name == AppConstants.Roles.Admin)
+                .Select(r => r.Id)
+                .FirstOrDefaultAsync();
+
+            if (adminRoleId != Guid.Empty)
+            {
+                var adminRoleMenuItems = menuMap.Values.Select(menuId => new RoleMenuItem
+                {
+                    Id = Guid.NewGuid(),
+                    RoleId = adminRoleId,
+                    MenuItemId = menuId,
+                    CanView = true,
+                    CanCreate = true,
+                    CanEdit = true,
+                    CanDelete = true,
+                    AssignedBy = adminUser.Id,
+                    AssignedDate = DateTime.UtcNow
+                }).ToList();
+
+                _context.RoleMenuItems.AddRange(adminRoleMenuItems);
                 await _context.SaveChangesAsync();
             }
         }

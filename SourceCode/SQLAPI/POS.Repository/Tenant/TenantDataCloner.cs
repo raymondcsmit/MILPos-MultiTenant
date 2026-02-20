@@ -20,7 +20,7 @@ namespace POS.Repository
             _context = context;
         }
 
-        public async Task CloneTenantDataAsync(Guid sourceTenantId, POS.Data.Entities.Tenant targetTenant)
+        public async Task CloneTenantDataAsync(Guid sourceTenantId, POS.Data.Entities.Tenant targetTenant, User adminUser = null)
         {
             var idMap = new Dictionary<Guid, Guid>(); // Map SourceID -> TargetID
 
@@ -28,16 +28,8 @@ namespace POS.Repository
             await CloneTableAsync<CompanyProfile>(sourceTenantId, targetTenant, idMap);
             
             // 1. Locations (Essential for Stocks)
-            await CloneTableAsync<Location>(sourceTenantId, targetTenant, idMap);
+            await CloneLocationsAsync(sourceTenantId, targetTenant, idMap, adminUser);
             
-            // 1.5. UserLocations (Admin should have access to new locations)
-            // But UserLocations links User (Global/Tenant) to Location (Cloned).
-            // The Admin User is NEW (created in RegistrationService).
-            // We might need to handle this in RegistrationService or here if we pass the Admin User.
-            // For now, RegistrationService handles UserLocations for the Main Location it creates.
-            // BUT if we clone locations, we might want to assign them to the Admin?
-            // Let's skip UserLocations for now, assuming Admin gets "IsAllLocations = true".
-
             // 2. Settings & Independent Lookups
             await CloneTableAsync<FinancialYear>(sourceTenantId, targetTenant, idMap);
             await CloneTableAsync<Tax>(sourceTenantId, targetTenant, idMap);
@@ -51,6 +43,7 @@ namespace POS.Repository
             // 3. Hierarchical Entities
             await CloneRecursiveAsync<ProductCategory>(sourceTenantId, targetTenant, idMap);
             await CloneRecursiveAsync<MenuItem>(sourceTenantId, targetTenant, idMap);
+            await CloneRecursiveAsync<LedgerAccount>(sourceTenantId, targetTenant, idMap);
 
             // 4. Products & Inventory
             await CloneProductsAsync(sourceTenantId, targetTenant, idMap); 
@@ -65,13 +58,60 @@ namespace POS.Repository
             await CloneTableAsync<Customer>(sourceTenantId, targetTenant, idMap);
             await CloneTableAsync<ContactAddress>(sourceTenantId, targetTenant, idMap);
 
+            await CloneTableAsync<PageHelper>(sourceTenantId, targetTenant, idMap);
+            await CloneTableAsync<Page>(sourceTenantId, targetTenant, idMap);
+            await CloneTableAsync<POS.Data.Action>(sourceTenantId, targetTenant, idMap);
+
             // 6. Access Control
-            await CloneRolesAsync(sourceTenantId, targetTenant, idMap);
-            
-            // 7. Pages & PageHelpers - If they have TenantId.
-            // Checked: Page is SharedBaseEntity (Global). PageHelper is?
-            // Let's check PageHelper.
-            await CloneTableAsync<PageHelper>(sourceTenantId, targetTenant, idMap); // Assuming it has TenantId, if not it will skip.
+            await CloneRolesAsync(sourceTenantId, targetTenant, idMap, adminUser);
+        }
+
+        private async Task CloneLocationsAsync(Guid sourceTenantId, POS.Data.Entities.Tenant targetTenant, Dictionary<Guid, Guid> idMap, User adminUser)
+        {
+            var sourceLocations = await _context.Locations
+                .IgnoreQueryFilters()
+                .Where(l => l.TenantId == sourceTenantId)
+                .AsNoTracking()
+                .ToListAsync();
+
+            if (!sourceLocations.Any()) return;
+
+            var newLocations = new List<Location>();
+            foreach (var loc in sourceLocations)
+            {
+                var newLoc = CloneEntity(loc, targetTenant.Id, idMap);
+                newLocations.Add(newLoc);
+            }
+
+            _context.Locations.AddRange(newLocations);
+            await _context.SaveChangesAsync();
+
+            if (adminUser != null)
+            {
+                foreach (var loc in newLocations)
+                {
+                    _context.UserLocations.Add(new UserLocation
+                    {
+                        UserId = adminUser.Id,
+                        LocationId = loc.Id
+                    });
+                }
+                await _context.SaveChangesAsync();
+            }
+        }
+
+            // 5. CRM
+            await CloneTableAsync<Supplier>(sourceTenantId, targetTenant, idMap);
+            await CloneTableAsync<SupplierAddress>(sourceTenantId, targetTenant, idMap);
+            await CloneTableAsync<Customer>(sourceTenantId, targetTenant, idMap);
+            await CloneTableAsync<ContactAddress>(sourceTenantId, targetTenant, idMap);
+
+            await CloneTableAsync<PageHelper>(sourceTenantId, targetTenant, idMap);
+            await CloneTableAsync<Page>(sourceTenantId, targetTenant, idMap);
+            await CloneTableAsync<POS.Data.Action>(sourceTenantId, targetTenant, idMap);
+
+            // 6. Access Control
+            await CloneRolesAsync(sourceTenantId, targetTenant, idMap, adminUser);
         }
 
         private async Task CloneTableAsync<T>(Guid sourceTenantId, POS.Data.Entities.Tenant targetTenant, Dictionary<Guid, Guid> idMap) where T : class
@@ -84,6 +124,7 @@ namespace POS.Repository
 
             // Get all entities from source tenant
             var sourceEntities = await dbSet
+                .IgnoreQueryFilters()
                 .Where(e => EF.Property<Guid>(e, "TenantId") == sourceTenantId)
                 .AsNoTracking()
                 .ToListAsync();
@@ -111,6 +152,7 @@ namespace POS.Repository
              if (tenantIdProp == null) return;
 
              var sourceEntities = await dbSet
+                .IgnoreQueryFilters()
                 .Where(e => EF.Property<Guid>(e, "TenantId") == sourceTenantId)
                 .AsNoTracking()
                 .ToListAsync();
@@ -125,8 +167,8 @@ namespace POS.Repository
                  newEntities.Add(newEntity);
              }
 
-             // Pass 2: Fix hierarchies (ParentId)
-             var parentIdProp = typeof(T).GetProperty("ParentId");
+             // Pass 2: Fix hierarchies (ParentId or ParentAccountId)
+             var parentIdProp = typeof(T).GetProperty("ParentId") ?? typeof(T).GetProperty("ParentAccountId");
              if (parentIdProp != null)
              {
                  foreach (var entity in newEntities)
@@ -159,6 +201,7 @@ namespace POS.Repository
         private async Task CloneProductsAsync(Guid sourceTenantId, POS.Data.Entities.Tenant targetTenant, Dictionary<Guid, Guid> idMap)
         {
             var sourceProducts = await _context.Products
+                .IgnoreQueryFilters()
                 .Where(p => p.TenantId == sourceTenantId)
                 .AsNoTracking()
                 .ToListAsync();
@@ -184,6 +227,7 @@ namespace POS.Repository
         private async Task CloneProductStocksAsync(Guid sourceTenantId, POS.Data.Entities.Tenant targetTenant, Dictionary<Guid, Guid> idMap)
         {
             var sourceStocks = await _context.ProductStocks
+                .IgnoreQueryFilters()
                 .Include(s => s.Product)
                 .Where(s => s.Product.TenantId == sourceTenantId)
                 .AsNoTracking()
@@ -227,10 +271,11 @@ namespace POS.Repository
             await _context.SaveChangesAsync();
         }
 
-        private async Task CloneRolesAsync(Guid sourceTenantId, POS.Data.Entities.Tenant targetTenant, Dictionary<Guid, Guid> idMap)
+        private async Task CloneRolesAsync(Guid sourceTenantId, POS.Data.Entities.Tenant targetTenant, Dictionary<Guid, Guid> idMap, User adminUser = null)
         {
             // Clone Roles
             var sourceRoles = await _context.Roles
+                .IgnoreQueryFilters()
                 .Where(r => r.TenantId == sourceTenantId)
                 .AsNoTracking()
                 .ToListAsync();
@@ -251,25 +296,40 @@ namespace POS.Repository
                  
                  // 1. RoleClaims
                  var sourceClaims = await _context.RoleClaims
+                    .IgnoreQueryFilters()
                     .Where(rc => rc.RoleId == role.Id)
                     .AsNoTracking()
                     .ToListAsync();
                  
                  foreach (var claim in sourceClaims)
                  {
-                     // ActionId is Global. Copy as is.
+                     // ActionId Remapping if Actions were cloned
+                     var newActionId = claim.ActionId;
+                     bool actionMapped = false;
+                     if (newActionId != Guid.Empty && idMap.TryGetValue(newActionId, out var mappedActionId))
+                     {
+                         newActionId = mappedActionId;
+                         actionMapped = true;
+                     }
+
+                     // If Action was NOT mapped, it implies the Source Action doesn't exist (orphan) 
+                     // or wasn't cloned. Using the OLD ID would point to Master Tenant's Action 
+                     // (or nowhere), which violates isolation or FK. SKIP IT.
+                     if (!actionMapped) continue;
+
                      _context.RoleClaims.Add(new RoleClaim
                      {
                          RoleId = newRole.Id,
                          ClaimType = claim.ClaimType,
                          ClaimValue = claim.ClaimValue,
-                         ActionId = claim.ActionId 
+                         ActionId = newActionId 
                      });
                  }
                  
                  // 2. RoleMenuItems
                  // Need to map MenuItemId if MenuItems were cloned
                  var sourceRoleMenus = await _context.RoleMenuItems
+                     .IgnoreQueryFilters()
                      .Where(rm => rm.RoleId == role.Id)
                      .AsNoTracking()
                      .ToListAsync();
@@ -292,9 +352,21 @@ namespace POS.Repository
                          CanCreate = rm.CanCreate,
                          CanEdit = rm.CanEdit,
                          CanDelete = rm.CanDelete,
-                         AssignedDate = DateTime.UtcNow
+                         AssignedDate = DateTime.UtcNow,
+                         AssignedBy = rm.AssignedBy
                      });
                  }
+
+                 if (adminUser != null && 
+                   (newRole.Name.Equals("Admin", StringComparison.OrdinalIgnoreCase) || 
+                    newRole.Name.Equals("Super Admin", StringComparison.OrdinalIgnoreCase)))
+                {
+                    _context.UserRoles.Add(new UserRole
+                    {
+                        UserId = adminUser.Id,
+                        RoleId = newRole.Id
+                    });
+                }
             }
             await _context.SaveChangesAsync();
         }

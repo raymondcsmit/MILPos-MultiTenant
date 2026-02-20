@@ -585,6 +585,7 @@ namespace POS.Migrations.PostgreSQL.Migrations
                     ImageUrl = table.Column<string>(type: "character varying(500)", maxLength: 500, nullable: true),
                     Isrtl = table.Column<bool>(type: "boolean", nullable: false),
                     Order = table.Column<int>(type: "integer", nullable: false),
+                    TenantId = table.Column<Guid>(type: "uuid", nullable: false),
                     CreatedDate = table.Column<DateTime>(type: "timestamp without time zone", nullable: false),
                     CreatedBy = table.Column<Guid>(type: "uuid", nullable: false),
                     ModifiedDate = table.Column<DateTime>(type: "timestamp without time zone", nullable: false),
@@ -603,7 +604,7 @@ namespace POS.Migrations.PostgreSQL.Migrations
                         column: x => x.CreatedBy,
                         principalTable: "Users",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
+                        onDelete: ReferentialAction.Restrict);
                 });
 
             migrationBuilder.CreateTable(
@@ -734,6 +735,7 @@ namespace POS.Migrations.PostgreSQL.Migrations
                     Code = table.Column<string>(type: "text", nullable: true),
                     Name = table.Column<string>(type: "text", nullable: true),
                     Description = table.Column<string>(type: "text", nullable: true),
+                    TenantId = table.Column<Guid>(type: "uuid", nullable: false),
                     CreatedDate = table.Column<DateTime>(type: "timestamp without time zone", nullable: false),
                     CreatedBy = table.Column<Guid>(type: "uuid", nullable: false),
                     ModifiedDate = table.Column<DateTime>(type: "timestamp without time zone", nullable: false),
@@ -752,7 +754,7 @@ namespace POS.Migrations.PostgreSQL.Migrations
                         column: x => x.CreatedBy,
                         principalTable: "Users",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
+                        onDelete: ReferentialAction.Restrict);
                 });
 
             migrationBuilder.CreateTable(
@@ -762,6 +764,7 @@ namespace POS.Migrations.PostgreSQL.Migrations
                     Id = table.Column<Guid>(type: "uuid", nullable: false),
                     Name = table.Column<string>(type: "text", nullable: true),
                     Order = table.Column<int>(type: "integer", nullable: false),
+                    TenantId = table.Column<Guid>(type: "uuid", nullable: false),
                     CreatedDate = table.Column<DateTime>(type: "timestamp without time zone", nullable: false),
                     CreatedBy = table.Column<Guid>(type: "uuid", nullable: false),
                     ModifiedDate = table.Column<DateTime>(type: "timestamp without time zone", nullable: false, defaultValueSql: "CURRENT_TIMESTAMP"),
@@ -1503,6 +1506,7 @@ namespace POS.Migrations.PostgreSQL.Migrations
                     Order = table.Column<int>(type: "integer", nullable: false),
                     PageId = table.Column<Guid>(type: "uuid", nullable: false),
                     Code = table.Column<string>(type: "text", nullable: true),
+                    TenantId = table.Column<Guid>(type: "uuid", nullable: false),
                     CreatedDate = table.Column<DateTime>(type: "timestamp without time zone", nullable: false),
                     CreatedBy = table.Column<Guid>(type: "uuid", nullable: false),
                     ModifiedDate = table.Column<DateTime>(type: "timestamp without time zone", nullable: false, defaultValueSql: "CURRENT_TIMESTAMP"),
@@ -1951,6 +1955,15 @@ namespace POS.Migrations.PostgreSQL.Migrations
                     CityName = table.Column<string>(type: "character varying(200)", maxLength: 200, nullable: true),
                     CountryId = table.Column<Guid>(type: "uuid", nullable: true),
                     CityId = table.Column<Guid>(type: "uuid", nullable: true),
+                    TenantId = table.Column<Guid>(type: "uuid", nullable: false),
+                    CreatedDate = table.Column<DateTime>(type: "timestamp without time zone", nullable: false),
+                    CreatedBy = table.Column<Guid>(type: "uuid", nullable: false),
+                    ModifiedDate = table.Column<DateTime>(type: "timestamp without time zone", nullable: false),
+                    ModifiedBy = table.Column<Guid>(type: "uuid", nullable: false),
+                    DeletedDate = table.Column<DateTime>(type: "timestamp without time zone", nullable: true),
+                    DeletedBy = table.Column<Guid>(type: "uuid", nullable: true),
+                    SyncVersion = table.Column<long>(type: "bigint", nullable: false),
+                    LastSyncedAt = table.Column<DateTime>(type: "timestamp without time zone", nullable: true),
                     IsDeleted = table.Column<bool>(type: "boolean", nullable: false)
                 },
                 constraints: table =>
@@ -1966,6 +1979,12 @@ namespace POS.Migrations.PostgreSQL.Migrations
                         column: x => x.CountryId,
                         principalTable: "Countries",
                         principalColumn: "Id");
+                    table.ForeignKey(
+                        name: "FK_SupplierAddresses_Users_CreatedBy",
+                        column: x => x.CreatedBy,
+                        principalTable: "Users",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
                 });
 
             migrationBuilder.CreateTable(
@@ -3339,6 +3358,11 @@ namespace POS.Migrations.PostgreSQL.Migrations
                 column: "TenantId");
 
             migrationBuilder.CreateIndex(
+                name: "IX_Action_TenantId",
+                table: "Actions",
+                column: "TenantId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_Actions_CreatedBy",
                 table: "Actions",
                 column: "CreatedBy");
@@ -3752,6 +3776,11 @@ namespace POS.Migrations.PostgreSQL.Migrations
                 column: "ProductId");
 
             migrationBuilder.CreateIndex(
+                name: "IX_Language_TenantId",
+                table: "Languages",
+                column: "TenantId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_Languages_CreatedBy",
                 table: "Languages",
                 column: "CreatedBy");
@@ -3837,9 +3866,19 @@ namespace POS.Migrations.PostgreSQL.Migrations
                 column: "ParentId");
 
             migrationBuilder.CreateIndex(
+                name: "IX_PageHelper_TenantId",
+                table: "Pagehelpers",
+                column: "TenantId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_Pagehelpers_CreatedBy",
                 table: "Pagehelpers",
                 column: "CreatedBy");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Page_TenantId",
+                table: "Pages",
+                column: "TenantId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Pages_CreatedBy",
@@ -4332,6 +4371,11 @@ namespace POS.Migrations.PostgreSQL.Migrations
                 column: "ToLocationId");
 
             migrationBuilder.CreateIndex(
+                name: "IX_SupplierAddress_TenantId",
+                table: "SupplierAddresses",
+                column: "TenantId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_SupplierAddresses_CityId",
                 table: "SupplierAddresses",
                 column: "CityId");
@@ -4340,6 +4384,11 @@ namespace POS.Migrations.PostgreSQL.Migrations
                 name: "IX_SupplierAddresses_CountryId",
                 table: "SupplierAddresses",
                 column: "CountryId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_SupplierAddresses_CreatedBy",
+                table: "SupplierAddresses",
+                column: "CreatedBy");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Supplier_Tenant_Email",

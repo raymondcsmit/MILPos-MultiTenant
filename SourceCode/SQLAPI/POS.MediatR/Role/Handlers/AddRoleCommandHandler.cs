@@ -67,7 +67,7 @@ namespace POS.MediatR.Handlers
             
             var entity = new Role
             {
-                Id = Guid.NewGuid(),
+                Id = request.Id ?? Guid.NewGuid(),
                 Name = request.Name,
                 TenantId = request.TenantId,
                 IsSuperRole = request.IsSuperRole,

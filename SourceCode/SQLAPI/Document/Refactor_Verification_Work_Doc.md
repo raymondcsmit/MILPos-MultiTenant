@@ -17,9 +17,12 @@ The original seeding logic was identified as a major performance bottleneck:
 - **LINQ Translation Fix**: Resolved a `System.InvalidOperationException` where the batch ID check could not be translated to SQL. Fixed by using `EF.Property<Guid>(e, keyName)` to ensure compatibility with Entity Framework Core's query provider.
 
 ### 2.3. Database Utility and FK Handling
-Seeding on PostgreSQL (Cloud mode) encountered Foreign Key constraint violations (`23503`):
-- **Transactional FK Suppression**: Identified that global FK suppression was sometimes ineffective inside scoped transactions.
-- **Action**: Modified `SeedingService.cs` to explicitly call `DisableForeignKeyCheckAsync` *inside* each table's seeding transaction block. This ensures that constraints are suppressed correctly regardless of the database provider's behavior.
+Seeding on PostgreSQL (Cloud mode) was failing with a Foreign Key constraint violation (`23503`) on the `Roles` table during Master Tenant initialization.
+- **Root Cause**: `EnsureMasterTenantAsync` was called before the global FK suppression was enabled. Additionally, the `AddRoleCommandHandler` used a default `CreatedBy` ID that didn't yet exist in the database.
+- **Action**: 
+    1. Moved the `DisableForeignKeyCheckAsync` call to the very beginning of the `SeedAsync` method, before any data creation logic.
+    2. Implemented `IgnoreQueryFilters()` in all seeding existence checks to ensure the service correctly identifies existing data even when tenant filters are active.
+    3. Optimized the identity ID check (Int/Long) to use batch queries, preventing N+1 performance issues on large tables like `RoleClaims`.
 
 ### 2.4. Infrastructure and Diagnostics
 - **Diagnostic Tooling**: Attempted to build a standalone diagnostic CLI to inspect DB state. While project reference issues occurred, the logic was successfully integrated into `Program.cs` as temporary debug logs to verify the Master Admin user's existence and status.
@@ -30,8 +33,9 @@ Seeding on PostgreSQL (Cloud mode) encountered Foreign Key constraint violations
 | :--- | :--- | :--- |
 | **Login Failure** | Seeding failed halfway; Master Admin not fully initialized. | Fixed Seeding Service logic and FK constraints. |
 | **Slow Seeding** | N+1 database queries and excessive log spam. | Implemented batch ID checks and optimized log levels. |
-| **FK Violation (23503)** | Constraints active during bulk insert on PostgreSQL. | Added transaction-level constraint suppression. |
-| **DateTime Format Error** | Standard `Convert` was culture-dependent. | Used `InvariantCulture` explicitly in `CsvParserService`. |
+| **FK Violation (23503)** | Constraints active during `EnsureMasterTenantAsync`. | Moved FK suppression to the start of the process. |
+| **Duplicate Key (23505)** | Global Query Filters hid existing data during check. | Added `IgnoreQueryFilters()` to existence checks. |
+| **Seeding Performance** | Individual `FindAsync` for integer keys. | Implemented batch checks for all common ID types (Guid, Int, Long). |
 
 ## 4. Current Status
 - **Seeding Service**: Status: **SUCCESS**. Verified via logs that all 50+ tables (Users, Pages, Roles, etc.) are successfully seeded.
