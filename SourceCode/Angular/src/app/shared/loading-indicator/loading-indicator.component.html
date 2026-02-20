@@ -1,5 +1,5 @@
 @if(loaderService.loading() || loaderService.pendingRequests() !=0 ){
-<div class="progress-bar-container">
-  <mat-progress-bar mode="indeterminate"></mat-progress-bar>
-</div>
+  <div class="loader-overlay">
+    <mat-spinner diameter="50"></mat-spinner>
+  </div>
 }

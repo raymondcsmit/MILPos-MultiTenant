@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Loader Mockup</title>
+    <link rel="stylesheet" href="styles.css">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+</head>
+<body>
+
+    <!-- Fake Dashboard Content -->
+    <div class="dashboard-container">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="logo">POS System</div>
+            <nav>
+                <ul>
+                    <li class="active"><i class="material-icons">dashboard</i> Dashboard</li>
+                    <li><i class="material-icons">inventory</i> Products</li>
+                    <li><i class="material-icons">shopping_cart</i> Sales</li>
+                    <li><i class="material-icons">people</i> Customers</li>
+                    <li><i class="material-icons">settings</i> Settings</li>
+                </ul>
+            </nav>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <header class="top-bar">
+                <div class="search-bar">Search...</div>
+                <div class="user-profile">
+                    <span>Admin User</span>
+                    <i class="material-icons">account_circle</i>
+                </div>
+            </header>
+
+            <div class="content-area">
+                <h1>Dashboard Overview</h1>
+                
+                <div class="stats-grid">
+                    <div class="card">
+                        <h3>Total Sales</h3>
+                        <p>$12,450.00</p>
+                    </div>
+                    <div class="card">
+                        <h3>New Orders</h3>
+                        <p>45</p>
+                    </div>
+                    <div class="card">
+                        <h3>Total Products</h3>
+                        <p>1,230</p>
+                    </div>
+                    <div class="card">
+                        <h3>Customers</h3>
+                        <p>890</p>
+                    </div>
+                </div>
+
+                <div class="chart-container">
+                    <div class="chart-placeholder">
+                        Sales Chart Placeholder
+                    </div>
+                </div>
+
+                <div class="recent-orders">
+                    <h3>Recent Orders</h3>
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Order ID</th>
+                                <th>Customer</th>
+                                <th>Status</th>
+                                <th>Amount</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>#ORD-001</td>
+                                <td>John Doe</td>
+                                <td>Completed</td>
+                                <td>$120.00</td>
+                            </tr>
+                             <tr>
+                                <td>#ORD-002</td>
+                                <td>Jane Smith</td>
+                                <td>Pending</td>
+                                <td>$45.50</td>
+                            </tr>
+                             <tr>
+                                <td>#ORD-003</td>
+                                <td>Bob Johnson</td>
+                                <td>Processing</td>
+                                <td>$230.00</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- LOADER OVERLAY -->
+    <!-- This is the part being mocked up -->
+    <div class="loader-overlay">
+        <div class="spinner-container">
+            <svg class="spinner" viewBox="0 0 50 50">
+                <circle class="path" cx="25" cy="25" r="20" fill="none" stroke-width="5"></circle>
+            </svg>
+            <p class="loading-text">Processing...</p>
+        </div>
+    </div>
+
+</body>
+</html>

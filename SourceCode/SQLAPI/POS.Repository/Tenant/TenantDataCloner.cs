@@ -100,19 +100,7 @@ namespace POS.Repository
             }
         }
 
-            // 5. CRM
-            await CloneTableAsync<Supplier>(sourceTenantId, targetTenant, idMap);
-            await CloneTableAsync<SupplierAddress>(sourceTenantId, targetTenant, idMap);
-            await CloneTableAsync<Customer>(sourceTenantId, targetTenant, idMap);
-            await CloneTableAsync<ContactAddress>(sourceTenantId, targetTenant, idMap);
 
-            await CloneTableAsync<PageHelper>(sourceTenantId, targetTenant, idMap);
-            await CloneTableAsync<Page>(sourceTenantId, targetTenant, idMap);
-            await CloneTableAsync<POS.Data.Action>(sourceTenantId, targetTenant, idMap);
-
-            // 6. Access Control
-            await CloneRolesAsync(sourceTenantId, targetTenant, idMap, adminUser);
-        }
 
         private async Task CloneTableAsync<T>(Guid sourceTenantId, POS.Data.Entities.Tenant targetTenant, Dictionary<Guid, Guid> idMap) where T : class
         {

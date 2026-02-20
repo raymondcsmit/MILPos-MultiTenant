@@ -1,5 +1,6 @@
 import { Component, inject } from '@angular/core';
 import { MatProgressBarModule } from '@angular/material/progress-bar';
+import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { LoadingProgressService } from './loading-progress-service';
 
 @Component({
@@ -7,7 +8,7 @@ import { LoadingProgressService } from './loading-progress-service';
   templateUrl: './loading-indicator.component.html',
   styleUrls: ['./loading-indicator.component.scss'],
   standalone: true,
-  imports: [MatProgressBarModule],
+  imports: [MatProgressBarModule, MatProgressSpinnerModule],
 })
 export class LoadingIndicatorComponent {
   loaderService = inject(LoadingProgressService);
