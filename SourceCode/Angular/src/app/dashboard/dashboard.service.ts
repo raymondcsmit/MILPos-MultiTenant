@@ -11,6 +11,9 @@ import { PurchaseOrderRecentDeliverySchedule } from '@core/domain-classes/purcha
 import { SalesOrderRecentShipmentDate } from '@core/domain-classes/sales-order-recent-shipment-date';
 import { ProductResourceParameter } from '@core/domain-classes/product-resource-parameter';
 import { ProductStockAlert } from '@core/domain-classes/product-stock-alert';
+import { ProductSalesComparison } from '@core/domain-classes/product-sales-comparison';
+import { IncomeComparison } from '@core/domain-classes/income-comparison';
+import { SalesComparison } from '@core/domain-classes/sales-comparison';
 
 @Injectable({ providedIn: 'root' })
 export class DashboardService {
@@ -129,5 +132,23 @@ export class DashboardService {
     const url = `Dashboard/onetime/${month}/${year}`;
     return this.httpClient.get<CalenderReminderDto[]>(url)
       .pipe(catchError(this.commonHttpErrorService.handleError));
+  }
+
+  getProductSalesComparison(locationId?: string): Observable<ProductSalesComparison[]> {
+    const url = `dashboard/product-sales-comparison`;
+    const params = locationId ? new HttpParams().set('locationId', locationId) : {};
+    return this.httpClient.get<ProductSalesComparison[]>(url, { params });
+  }
+
+  getIncomeComparison(locationId?: string): Observable<IncomeComparison[]> {
+    const url = `dashboard/income-comparison`;
+    const params = locationId ? new HttpParams().set('locationId', locationId) : {};
+    return this.httpClient.get<IncomeComparison[]>(url, { params });
+  }
+
+  getSalesComparison(locationId?: string): Observable<SalesComparison[]> {
+    const url = `dashboard/sales-comparison`;
+    const params = locationId ? new HttpParams().set('locationId', locationId) : {};
+    return this.httpClient.get<SalesComparison[]>(url, { params });
   }
 }

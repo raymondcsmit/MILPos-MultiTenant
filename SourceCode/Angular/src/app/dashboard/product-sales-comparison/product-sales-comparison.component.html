@@ -1,0 +1,24 @@
+<mat-card class="validation-card mat-elevation-z8">
+  <mat-card-header>
+      <mat-card-title>
+        {{'PRODUCT_SALES_COMPARISON' | translate}}
+      </mat-card-title>
+      <div class="filter-header">
+        <form [formGroup]="searchForm">
+          <mat-select placeholder="{{'ALL_LOCATIONS' | translate}}" class="form-control" formControlName="locationId">
+            <mat-option [value]="">{{'ALL_LOCATIONS' | translate}}</mat-option>
+            <mat-option *ngFor="let location of locations" [value]="location.id">
+              {{location.name}}
+            </mat-option>
+          </mat-select>
+        </form>
+      </div>
+  </mat-card-header>
+  <mat-card-content>
+      <div *ngIf="isDataAvailable" echarts [options]="barChartOptions" class="echart" [autoResize]="true">
+      </div>
+      <div *ngIf="!isDataAvailable" class="text-center mt-3">
+        <p>{{'NO_DATA_FOUND' | translate}}</p>
+      </div>
+  </mat-card-content>
+</mat-card>

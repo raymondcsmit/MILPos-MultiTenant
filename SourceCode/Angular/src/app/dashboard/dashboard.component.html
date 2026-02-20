@@ -16,8 +16,21 @@
       </div>
     </div>
     <div class="row">
+      <div class="col-lg-6 col-sm-12" *hasClaim="'DB_STATISTICS'">
+        <app-income-comparison></app-income-comparison>
+      </div>
+      <div class="col-lg-6 col-sm-12" *hasClaim="'DB_STATISTICS'">
+        <app-sales-comparison></app-sales-comparison>
+      </div>
+    </div>
+    <div class="row">
       <div class="col mb-2">
         <app-best-selling-product *hasClaim="'DB_BEST_SELLING_PROS'"></app-best-selling-product>
+      </div>
+    </div>
+    <div class="row">
+      <div class="col mb-2">
+        <app-product-sales-comparison *hasClaim="'DB_BEST_SELLING_PROS'"></app-product-sales-comparison>
       </div>
     </div>
   </div>
