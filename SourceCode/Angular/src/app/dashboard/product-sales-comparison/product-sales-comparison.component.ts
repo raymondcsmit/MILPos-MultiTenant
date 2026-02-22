@@ -12,6 +12,7 @@ import { NGX_ECHARTS_CONFIG, NgxEchartsModule } from 'ngx-echarts';
 import { BaseComponent } from '../../base.component';
 import { MatCardModule } from '@angular/material/card';
 import { MatIconModule } from '@angular/material/icon';
+import { CommonModule } from '@angular/common';
 
 @Component({
   selector: 'app-product-sales-comparison',
@@ -19,6 +20,7 @@ import { MatIconModule } from '@angular/material/icon';
   styleUrls: ['./product-sales-comparison.component.scss'],
   standalone: true,
   imports: [
+    CommonModule,
     PageHelpTextComponent,
     TranslateModule,
     MatSelectModule,

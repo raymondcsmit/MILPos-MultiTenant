@@ -484,6 +484,33 @@ export const routes: Routes = [
             canActivate: [AuthGuard]
           },
           {
+            path: 'reports/product-sales-compare',
+            data: { claimType: 'DB_BEST_SELLING_PROS' },
+            canActivate: [AuthGuard],
+            loadComponent: () =>
+              import('./dashboard/product-sales-comparison/product-sales-comparison.component').then(
+                (m) => m.ProductSalesComparisonComponent
+              ),
+          },
+          {
+            path: 'reports/income-compare',
+            data: { claimType: 'DB_STATISTICS' },
+            canActivate: [AuthGuard],
+            loadComponent: () =>
+              import('./dashboard/income-comparison/income-comparison.component').then(
+                (m) => m.IncomeComparisonComponent
+              ),
+          },
+          {
+            path: 'reports/sales-compare',
+            data: { claimType: 'DB_STATISTICS' },
+            canActivate: [AuthGuard],
+            loadComponent: () =>
+              import('./dashboard/sales-comparison/sales-comparison.component').then(
+                (m) => m.SalesComparisonComponent
+              ),
+          },
+          {
             path: 'unitConversation',
             canActivate: [AuthGuard],
             data: { claimType: 'PRO_MANAGE_UNIT' },

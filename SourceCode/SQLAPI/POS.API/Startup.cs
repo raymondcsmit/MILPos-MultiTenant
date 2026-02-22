@@ -359,21 +359,22 @@ namespace POS.API
             // Get deployment settings first
             var deploymentSettings = app.ApplicationServices.GetService<Microsoft.Extensions.Options.IOptions<DeploymentSettings>>()?.Value;
 
-            // Serve files from ProgramData/MILPOS/wwwroot ONLY in Desktop mode to handle permission issues in Electron
-            // This prevents HTTP 500.30 on IIS where AppData access is restricted
-            if (deploymentSettings?.DeploymentMode == "Desktop")
+            // Always serve files from ProgramData/MILPOS/wwwroot as a secondary file location.
+            // FileStorageService falls back to here when WebRoot is read-only.
+            // Without this, images saved to the fallback path return HTTP 404.
+            var appDataStaticPath = Path.Combine(
+                Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData),
+                "MILPOS", "wwwroot");
+            if (!Directory.Exists(appDataStaticPath))
             {
-                var appDataPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "milpos", "wwwroot");
-                if (!Directory.Exists(appDataPath))
-                {
-                    Directory.CreateDirectory(appDataPath);
-                }
-                app.UseStaticFiles(new StaticFileOptions
-                {
-                    FileProvider = new PhysicalFileProvider(appDataPath),
-                    RequestPath = "" 
-                });
+                Directory.CreateDirectory(appDataStaticPath);
             }
+            app.UseStaticFiles(new StaticFileOptions
+            {
+                FileProvider = new PhysicalFileProvider(appDataStaticPath),
+                RequestPath = ""
+            });
+
             
             // Apply CORS based on deployment mode
             if (deploymentSettings?.IsCloud == true)

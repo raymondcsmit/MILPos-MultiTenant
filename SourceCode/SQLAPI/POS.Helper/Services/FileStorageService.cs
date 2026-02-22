@@ -101,11 +101,13 @@ namespace POS.Helper.Services
 
         public string GetPhysicalPath(string relativePath)
         {
-            // Prefer AppData if it exists, otherwise WebRoot
-            var appDataPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData), "MILPOS", "wwwroot", relativePath.TrimStart('/').TrimStart('\\'));
-            if (File.Exists(appDataPath)) return appDataPath;
+            // Check WebRoot first (matches GetWritableDirectory() save order — WebRoot is tried first)
+            var webRootPath = Path.Combine(_webHostEnvironment.WebRootPath, relativePath.TrimStart('/').TrimStart('\\'));
+            if (File.Exists(webRootPath)) return webRootPath;
 
-            return Path.Combine(_webHostEnvironment.WebRootPath, relativePath.TrimStart('/').TrimStart('\\'));
+            // Fallback: ProgramData location (used when WebRoot is read-only)
+            var appDataPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData), "MILPOS", "wwwroot", relativePath.TrimStart('/').TrimStart('\\'));
+            return appDataPath; // Return this path even if it doesn't exist (caller handles null/missing)
         }
 
         private string GetWritableDirectory(string folderPath)
