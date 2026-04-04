@@ -21,7 +21,8 @@ export const CACHE_CONFIG = {
     'Country',
     'LedgerAccount',
     'LedgerAccounts',
-    'Suppliers'
+    'Suppliers',
+    'location',
   ],
   masterDataKeys: {
       products: 'ALL_PRODUCTS',

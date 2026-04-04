@@ -13,7 +13,8 @@ export class WrLicenseService {
   public keyValues = {
     authObj: 'auth_obj',
     COMPANY_PROFILE: 'company_profile',
-    BEARER_TOKEN: 'access_token'
+    BEARER_TOKEN: 'access_token',
+    LOCATION_CACHE: 'location_cache',
   };
 
   constructor(

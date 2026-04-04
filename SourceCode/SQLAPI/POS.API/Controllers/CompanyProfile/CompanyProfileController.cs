@@ -1,4 +1,4 @@
-﻿using MediatR;
+using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using POS.API.Helpers;
@@ -60,7 +60,7 @@ public class CompanyProfileController : BaseController
     /// <returns></returns>
     [HttpPost("activate_license")]
     [Produces("application/json", "application/xml", Type = typeof(bool))]
-    [AllowAnonymous]
+    [ClaimCheck("SETT_UPDATE_COM_PROFILE")]
     public async Task<IActionResult> AddOrUpdateLicenseKey(UpdateActivatedLicenseCommand updateActivatedLicenseCommand)
     {
         var result = await _mediator.Send(updateActivatedLicenseCommand);

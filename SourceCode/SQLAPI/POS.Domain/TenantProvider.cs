@@ -47,15 +47,6 @@ namespace POS.Domain
                 }
             }
 
-            // Try to get from custom header
-            if (httpContext?.Request?.Headers?.ContainsKey("X-Tenant-ID") == true)
-            {
-                if (Guid.TryParse(httpContext.Request.Headers["X-Tenant-ID"].FirstOrDefault(), out var tenantId))
-                {
-                    return tenantId;
-                }
-            }
-
             return null;
         }
 

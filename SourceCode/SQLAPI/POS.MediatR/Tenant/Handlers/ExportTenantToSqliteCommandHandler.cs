@@ -247,7 +247,10 @@ namespace POS.MediatR.Tenant.Handlers
                 typeof(LoginAudit), 
                 typeof(NLog), 
                 typeof(Data.EmailLog),
-                typeof(POS.Data.Entities.FBR.FBRSubmissionLog)
+                typeof(POS.Data.Entities.FBR.FBRSubmissionLog),
+                typeof(POS.Data.Action),
+                typeof(POS.Data.Page),
+                typeof(POS.Data.Entities.PageHelper)
             };
             return excludedTypes.Contains(type);
         }

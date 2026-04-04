@@ -3,6 +3,7 @@ using Microsoft.EntityFrameworkCore;
 using POS.Data;
 using POS.Data.Dto;
 using POS.Data.Entities;
+using POS.Data.Entities.Licensing;
 using POS.Data.Entities.Accounts;
 using POS.Data.Entities.Inventory;
 using POS.Common;
@@ -33,6 +34,8 @@ namespace POS.Domain
         // Multi-tenancy
         public DbSet<Tenant> Tenants { get; set; }
         
+        public DbSet<License> Licenses { get; set; }
+
         // Sync entities
         public DbSet<SyncMetadata> SyncMetadata { get; set; }
         public DbSet<SyncLog> SyncLogs { get; set; }
@@ -160,6 +163,16 @@ namespace POS.Domain
                       .WithMany()
                       .HasForeignKey(e => e.ProductId)
                       .OnDelete(DeleteBehavior.Restrict);
+            });
+
+            builder.Entity<License>(b =>
+            {
+                b.HasIndex(l => new { l.TenantId, l.Status }).HasDatabaseName("IX_License_Tenant_Status");
+                b.HasIndex(l => new { l.TenantId, l.TokenId }).HasDatabaseName("IX_License_Tenant_TokenId");
+                b.Property(l => l.Plan).HasMaxLength(100);
+                b.Property(l => l.Status).HasMaxLength(50);
+                b.Property(l => l.TokenId).HasMaxLength(100);
+                b.Property(l => l.TokenHash).HasMaxLength(200);
             });
 
             // Master Data Indexes

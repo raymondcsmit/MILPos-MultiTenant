@@ -73,5 +73,112 @@ namespace POS.Helper.Services
             }
             // For other providers, we assume migrations are correctly handled by standard mechanisms
         }
+
+        public async Task EnsureLicensingSchemaAsync(DbContext context)
+        {
+            var provider = context.Database.ProviderName ?? string.Empty;
+            var sql = GetEnsureLicensesTableSql(provider);
+            if (string.IsNullOrWhiteSpace(sql))
+            {
+                return;
+            }
+            await context.Database.ExecuteSqlRawAsync(sql);
+        }
+
+        private static string GetEnsureLicensesTableSql(string provider)
+        {
+            if (string.Equals(provider, AppConstants.DatabaseProviders.Sqlite, StringComparison.OrdinalIgnoreCase))
+            {
+                return @"
+CREATE TABLE IF NOT EXISTS ""Licenses"" (
+    ""Id"" TEXT NOT NULL CONSTRAINT ""PK_Licenses"" PRIMARY KEY,
+    ""TenantId"" TEXT NOT NULL,
+    ""TokenId"" TEXT NOT NULL,
+    ""TokenHash"" TEXT NOT NULL,
+    ""Plan"" TEXT NOT NULL,
+    ""Status"" TEXT NOT NULL,
+    ""IssuedAt"" TEXT NOT NULL,
+    ""ActivatedAt"" TEXT NULL,
+    ""ExpiresAt"" TEXT NULL,
+    ""MaxUsers"" INTEGER NULL,
+    ""CreatedDate"" TEXT NOT NULL,
+    ""CreatedBy"" TEXT NOT NULL,
+    ""ModifiedDate"" TEXT NOT NULL,
+    ""ModifiedBy"" TEXT NOT NULL,
+    ""DeletedDate"" TEXT NULL,
+    ""DeletedBy"" TEXT NULL,
+    ""SyncVersion"" INTEGER NOT NULL DEFAULT 0,
+    ""LastSyncedAt"" TEXT NULL,
+    ""IsDeleted"" INTEGER NOT NULL DEFAULT 0
+);
+CREATE INDEX IF NOT EXISTS ""IX_Licenses_TenantId_Status"" ON ""Licenses"" (""TenantId"", ""Status"");
+CREATE INDEX IF NOT EXISTS ""IX_Licenses_TenantId_TokenId"" ON ""Licenses"" (""TenantId"", ""TokenId"");
+";
+            }
+
+            if (provider.Contains(AppConstants.DatabaseProviders.PostgreSql, StringComparison.OrdinalIgnoreCase))
+            {
+                return @"
+CREATE TABLE IF NOT EXISTS ""Licenses"" (
+    ""Id"" uuid PRIMARY KEY,
+    ""TenantId"" uuid NOT NULL,
+    ""TokenId"" text NOT NULL,
+    ""TokenHash"" text NOT NULL,
+    ""Plan"" text NOT NULL,
+    ""Status"" text NOT NULL,
+    ""IssuedAt"" timestamptz NOT NULL,
+    ""ActivatedAt"" timestamptz NULL,
+    ""ExpiresAt"" timestamptz NULL,
+    ""MaxUsers"" integer NULL,
+    ""CreatedDate"" timestamptz NOT NULL,
+    ""CreatedBy"" uuid NOT NULL,
+    ""ModifiedDate"" timestamptz NOT NULL,
+    ""ModifiedBy"" uuid NOT NULL,
+    ""DeletedDate"" timestamptz NULL,
+    ""DeletedBy"" uuid NULL,
+    ""SyncVersion"" bigint NOT NULL DEFAULT 0,
+    ""LastSyncedAt"" timestamptz NULL,
+    ""IsDeleted"" boolean NOT NULL DEFAULT false
+);
+CREATE INDEX IF NOT EXISTS ""IX_Licenses_TenantId_Status"" ON ""Licenses"" (""TenantId"", ""Status"");
+CREATE INDEX IF NOT EXISTS ""IX_Licenses_TenantId_TokenId"" ON ""Licenses"" (""TenantId"", ""TokenId"");
+";
+            }
+
+            if (string.Equals(provider, AppConstants.DatabaseProviders.SqlServer, StringComparison.OrdinalIgnoreCase) ||
+                provider.Contains("SqlServer", StringComparison.OrdinalIgnoreCase))
+            {
+                return @"
+IF NOT EXISTS (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'[dbo].[Licenses]') AND type in (N'U'))
+BEGIN
+    CREATE TABLE [dbo].[Licenses] (
+        [Id] uniqueidentifier NOT NULL CONSTRAINT [PK_Licenses] PRIMARY KEY,
+        [TenantId] uniqueidentifier NOT NULL,
+        [TokenId] nvarchar(100) NOT NULL,
+        [TokenHash] nvarchar(200) NOT NULL,
+        [Plan] nvarchar(100) NOT NULL,
+        [Status] nvarchar(50) NOT NULL,
+        [IssuedAt] datetime2 NOT NULL,
+        [ActivatedAt] datetime2 NULL,
+        [ExpiresAt] datetime2 NULL,
+        [MaxUsers] int NULL,
+        [CreatedDate] datetime2 NOT NULL,
+        [CreatedBy] uniqueidentifier NOT NULL,
+        [ModifiedDate] datetime2 NOT NULL,
+        [ModifiedBy] uniqueidentifier NOT NULL,
+        [DeletedDate] datetime2 NULL,
+        [DeletedBy] uniqueidentifier NULL,
+        [SyncVersion] bigint NOT NULL CONSTRAINT [DF_Licenses_SyncVersion] DEFAULT 0,
+        [LastSyncedAt] datetime2 NULL,
+        [IsDeleted] bit NOT NULL CONSTRAINT [DF_Licenses_IsDeleted] DEFAULT 0
+    );
+    CREATE INDEX [IX_Licenses_TenantId_Status] ON [dbo].[Licenses] ([TenantId], [Status]);
+    CREATE INDEX [IX_Licenses_TenantId_TokenId] ON [dbo].[Licenses] ([TenantId], [TokenId]);
+END
+";
+            }
+
+            return string.Empty;
+        }
     }
 }

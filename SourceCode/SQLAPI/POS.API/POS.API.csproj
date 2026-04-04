@@ -110,5 +110,11 @@
 	  </Content>
 	</ItemGroup>
 
+	<ItemGroup>
+	  <None Update="POSDb.db">
+	    <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+	  </None>
+	</ItemGroup>
+
 
 </Project>

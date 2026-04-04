@@ -18,6 +18,7 @@ import { TranslationService } from '@core/services/translation.service';
 import { WrLicenseService } from '@core/services/wr-license.service';
 import { FinancialYear } from '../../accounting/financial-year/financial-year';
 import { CacheSyncService } from '../services/cache-sync.service';
+import { BusinessLocationService } from '../../business-location/business-location.service';
 
 @Injectable({ providedIn: 'root' })
 export class SecurityService {
@@ -49,8 +50,29 @@ export class SecurityService {
         companyProfileJson !== 'null' &&
         companyProfileJson !== 'undefined'
       ) {
-        this._companyProfile$.next(JSON.parse(companyProfileJson));
+        const profileData: CompanyProfile = JSON.parse(companyProfileJson);
+        // Restore cached locations if the stored profile has none (e.g. after F5 refresh)
+        if (!profileData.locations || profileData.locations.length === 0) {
+          const locationJson = sessionStorage.getItem(this.wrLicenseService.keyValues.LOCATION_CACHE);
+          if (locationJson) {
+            profileData.locations = JSON.parse(locationJson);
+          }
+        }
+        this._companyProfile$.next(profileData);
       }
+    }
+  }
+
+  /** Cache location list in sessionStorage and merge into companyProfile so all
+   *  subscribers (CommonService.getLocationsForCurrentUser etc.) see fresh data. */
+  setLocationsCache(locations: BusinessLocation[]) {
+    sessionStorage.setItem(
+      this.wrLicenseService.keyValues.LOCATION_CACHE,
+      JSON.stringify(locations)
+    );
+    const current = this._companyProfile$.value;
+    if (current) {
+      this._companyProfile$.next({ ...current, locations });
     }
   }
 
@@ -228,7 +250,8 @@ export class SecurityService {
     private router: Router,
     private clonerService: ClonerService,
     private translationService: TranslationService,
-    private cacheSyncService: CacheSyncService
+    private cacheSyncService: CacheSyncService,
+    private businessLocationService: BusinessLocationService
   ) { }
 
   login(entity: User): Observable<UserAuth> {
@@ -250,6 +273,11 @@ export class SecurityService {
             localStorage.setItem('userMenus', JSON.stringify(resp.menus));
         }
         this._securityObject$.next(resp.user);
+        // Pre-load locations immediately at login so all components read from cache
+        this.businessLocationService.getLocations().subscribe({
+          next: (locations) => this.setLocationsCache(locations),
+          error: (err) => console.error('Could not pre-load locations:', err)
+        });
         this.cacheSyncService.syncMasterData();
       })
     );
@@ -269,9 +297,12 @@ export class SecurityService {
     localStorage.removeItem(this.wrLicenseService.keyValues.authObj);
     localStorage.removeItem(this.wrLicenseService.keyValues.BEARER_TOKEN);
     localStorage.removeItem('userMenus');
+    sessionStorage.removeItem(this.wrLicenseService.keyValues.LOCATION_CACHE);
+    this._companyProfile$.next(null);
     this._securityObject$.next(null);
     this._token = null;
     this._claims = [];
+    this._selectedLocation = '';
     this.router.navigate(['/login']);
   }
 

@@ -50,24 +50,40 @@ namespace POS.Repository
 
         public async Task<List<ProductDto>> GetDtos(IQueryable<Product> source, int skip, int pageSize)
         {
+            List<Product> entities;
             if (pageSize == 0)
             {
-                var entities = await source
+                entities = await source
                     .AsNoTracking()
                     .ToListAsync();
-
-                return _mapper.Map<List<ProductDto>>(entities);
             }
             else
             {
-                var entities = await source
+                entities = await source
                     .Skip(skip)
                     .Take(pageSize)
                     .AsNoTracking()
                     .ToListAsync();
-
-                return _mapper.Map<List<ProductDto>>(entities);
             }
+
+            var dtos = _mapper.Map<List<ProductDto>>(entities);
+
+            // Prefix ProductUrl with the image folder path so the frontend
+            // receives the full relative path (e.g. "ProductImages/abc.png")
+            // instead of a raw filename. Matches GetProductCommandHandler behavior.
+            if (_pathHelper != null)
+            {
+                foreach (var dto in dtos)
+                {
+                    if (!string.IsNullOrWhiteSpace(dto.ProductUrl)
+                        && !dto.ProductUrl.Contains('/') && !dto.ProductUrl.Contains('\\'))
+                    {
+                        dto.ProductUrl = Path.Combine(_pathHelper.ProductImagePath, dto.ProductUrl).Replace('\\', '/');
+                    }
+                }
+            }
+
+            return dtos;
         }
     }
 }

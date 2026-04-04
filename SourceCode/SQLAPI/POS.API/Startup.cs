@@ -175,6 +175,7 @@ namespace POS.API
             services.AddScoped<ICsvParserService, CsvParserService>();
             services.AddScoped<IDbUtilityService, DbUtilityService>();
             services.AddScoped<ISecurityService, SecurityService>();
+            services.AddScoped<ILicenseTokenService, LicenseTokenService>();
             
             // Business Logic Services
             services.AddScoped<ITenantInitializationService, TenantInitializationService>();

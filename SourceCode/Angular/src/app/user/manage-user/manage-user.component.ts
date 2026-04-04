@@ -23,7 +23,6 @@ import { MatCardModule } from '@angular/material/card';
 import { HasClaimDirective } from '@shared/has-claim.directive';
 import { MatCheckboxModule } from '@angular/material/checkbox';
 import { BaseComponent } from '../../base.component';
-import { BusinessLocationService } from '../../business-location/business-location.service';
 import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
 
@@ -60,8 +59,7 @@ export class ManageUserComponent extends BaseComponent implements OnInit {
     private activeRoute: ActivatedRoute,
     private userService: UserService,
     private toastrService: ToastrService,
-    private commonService: CommonService,
-    private businessLocationService: BusinessLocationService
+    private commonService: CommonService
   ) {
     super();
     this.getLangDir();
@@ -143,7 +141,8 @@ export class ManageUserComponent extends BaseComponent implements OnInit {
   };
 
   getLocations() {
-    this.businessLocationService.getLocations().subscribe((locations: BusinessLocation[]) => {
+    // Read from SecurityService cache (loaded at login) — no extra API call
+    this.commonService.getAllLocations().subscribe((locations: BusinessLocation[]) => {
       this.locations = locations;
 
       if (this.isEditMode && this.user?.userLocations) {

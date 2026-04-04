@@ -12,6 +12,7 @@ import { firstValueFrom } from 'rxjs';
 import { HttpResponse } from '@angular/common/http';
 import { Supplier } from '@core/domain-classes/supplier';
 import { Customer } from '@core/domain-classes/customer';
+import { BusinessLocationService } from '../../business-location/business-location.service';
 
 @Injectable({
   providedIn: 'root'
@@ -23,14 +24,16 @@ export class CacheSyncService {
     private supplierService: SupplierService,
     private customerService: CustomerService,
     private idbService: IndexedDbService,
-    private toastrService: ToastrService
+    private toastrService: ToastrService,
+    private businessLocationService: BusinessLocationService
   ) { }
 
   async syncMasterData() {
     await Promise.all([
         this.syncProducts(),
         this.syncSuppliers(),
-        this.syncCustomers()
+        this.syncCustomers(),
+        this.syncLocations(),
     ]);
   }
 
@@ -83,5 +86,19 @@ export class CacheSyncService {
   async clearCache() {
       await firstValueFrom(this.idbService.clearDatabase());
       console.log('Cache Cleared');
+  }
+
+  private async syncLocations() {
+    try {
+      // SecurityService.login() also calls getLocations() — because 'location' is
+      // whitelisted in the HTTP interceptor, both calls share the same cached
+      // response so only ONE actual network request is made.
+      const locations = await firstValueFrom(this.businessLocationService.getLocations());
+      if (locations && locations.length > 0) {
+        console.log('Master Data (Locations) Synced:', locations.length);
+      }
+    } catch (error) {
+      console.error('Failed to sync locations', error);
+    }
   }
 }

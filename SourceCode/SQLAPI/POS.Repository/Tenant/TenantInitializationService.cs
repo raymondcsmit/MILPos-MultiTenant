@@ -17,6 +17,7 @@ namespace POS.Repository.Tenant
         public POS.Data.Entities.Tenant InitializeNewTenant(string name, string subdomain, string adminEmail, string phone, string address, string businessType = null)
         {
             var tenantId = Guid.NewGuid();
+            var trialEndsAt = DateTime.UtcNow.AddDays(AppConstants.TenantConfig.TrialPeriodDays);
             return new POS.Data.Entities.Tenant
             {
                 Id = tenantId,
@@ -29,7 +30,9 @@ namespace POS.Repository.Tenant
                 CreatedDate = DateTime.UtcNow,
                 SubscriptionPlan = AppConstants.TenantConfig.TrialPlan,
                 SubscriptionStartDate = DateTime.UtcNow,
-                SubscriptionEndDate = DateTime.UtcNow.AddDays(AppConstants.TenantConfig.TrialPeriodDays),
+                SubscriptionEndDate = trialEndsAt,
+                TrialExpiryDate = trialEndsAt,
+                LicenseType = LicenseType.Trial.ToString(),
                 MaxUsers = AppConstants.TenantConfig.DefaultMaxUsers,
                 BusinessType = businessType ?? AppConstants.BusinessType.Retail,
                 ApiKey = _securityService.GenerateSecureApiKey(),

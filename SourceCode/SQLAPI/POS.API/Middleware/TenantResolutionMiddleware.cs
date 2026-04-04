@@ -39,9 +39,13 @@ namespace POS.API.Middleware
             }
 
             // Fallback to header
-            if (!tenantId.HasValue && context.Request.Headers.ContainsKey("X-Tenant-ID"))
+            if (!tenantId.HasValue && context.User?.Identity?.IsAuthenticated == true)
             {
-                if (Guid.TryParse(context.Request.Headers["X-Tenant-ID"].FirstOrDefault(), out var headerTenantId))
+                var isSuperAdminClaim = context.User.FindFirst("isSuperAdmin");
+                bool isSuperAdmin = isSuperAdminClaim?.Value?.ToLower() == "true";
+
+                if (isSuperAdmin && context.Request.Headers.ContainsKey("X-Tenant-ID") &&
+                    Guid.TryParse(context.Request.Headers["X-Tenant-ID"].FirstOrDefault(), out var headerTenantId))
                 {
                     tenantId = headerTenantId;
                 }

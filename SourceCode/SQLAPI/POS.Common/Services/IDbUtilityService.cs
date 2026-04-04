@@ -8,5 +8,6 @@ namespace POS.Common.Services
         Task DisableForeignKeyCheckAsync(DbContext context);
         Task EnableForeignKeyCheckAsync(DbContext context);
         Task EnsureMigrationHistoryAsync(DbContext context);
+        Task EnsureLicensingSchemaAsync(DbContext context);
     }
 }
