@@ -1,3 +1,4 @@
+using POS.Helper;
 using MediatR;
 using POS.Helper;
 using System;
@@ -13,3 +14,4 @@ namespace POS.MediatR.Tenant.Commands
         public string NewPassword { get; set; }
     }
 }
+

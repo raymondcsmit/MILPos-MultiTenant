@@ -1,9 +1,8 @@
+using MediatR;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using POS.Data;
-using POS.Data.Entities.FBR;
-using POS.Domain;
-using POS.Domain.FBR;
+using POS.Helper;
+using POS.MediatR.FBR.Commands;
+using POS.MediatR.FBR.Queries;
 using System;
 using System.Threading.Tasks;
 
@@ -13,13 +12,11 @@ namespace POS.API.Controllers.FBR
     [Route("api/fbr")]
     public class FBRController : ControllerBase
     {
-        private readonly IFBRInvoiceService _fbrService;
-        private readonly POSDbContext _context;
+        private readonly IMediator _mediator;
         
-        public FBRController(IFBRInvoiceService fbrService, POSDbContext context)
+        public FBRController(IMediator mediator)
         {
-            _fbrService = fbrService;
-            _context = context;
+            _mediator = mediator;
         }
         
         /// <summary>
@@ -28,19 +25,15 @@ namespace POS.API.Controllers.FBR
         [HttpPost("submit/{salesOrderId}")]
         public async Task<IActionResult> SubmitInvoice(Guid salesOrderId)
         {
-            var salesOrder = await _context.SalesOrders.FindAsync(salesOrderId);
-            if (salesOrder == null)
-                return NotFound();
-            
-            try
+            var command = new SubmitFBRInvoiceCommand { SalesOrderId = salesOrderId };
+            var response = await _mediator.Send(command);
+
+            if (response.Success)
             {
-                var response = await _fbrService.SubmitInvoiceAsync(salesOrder);
-                return Ok(response);
+                return Ok(response.Data);
             }
-            catch (Exception ex)
-            {
-                return BadRequest(new { error = ex.Message });
-            }
+
+            return BadRequest(new { error = string.Join(", ", response.Errors) });
         }
         
         /// <summary>
@@ -49,20 +42,15 @@ namespace POS.API.Controllers.FBR
         [HttpGet("status/{salesOrderId}")]
         public async Task<IActionResult> GetStatus(Guid salesOrderId)
         {
-            var salesOrder = await _context.SalesOrders.FindAsync(salesOrderId);
-            if (salesOrder == null)
-                return NotFound();
-            
-            return Ok(new
+            var query = new GetFBRInvoiceStatusQuery { SalesOrderId = salesOrderId };
+            var response = await _mediator.Send(query);
+
+            if (response.Success)
             {
-                fbrStatus = salesOrder.FBRStatus.ToString(),
-                fbrInvoiceNumber = salesOrder.FBRInvoiceNumber,
-                fbrUSIN = salesOrder.FBRUSIN,
-                submittedAt = salesOrder.FBRSubmittedAt,
-                acknowledgedAt = salesOrder.FBRAcknowledgedAt,
-                retryCount = salesOrder.FBRRetryCount,
-                errorMessage = salesOrder.FBRErrorMessage
-            });
+                return Ok(response.Data);
+            }
+
+            return NotFound(new { error = string.Join(", ", response.Errors) });
         }
     }
 }

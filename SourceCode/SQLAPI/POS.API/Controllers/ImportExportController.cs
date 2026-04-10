@@ -6,12 +6,13 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using POS.Data;
 using POS.Domain.ImportExport;
+using POS.Helper;
 
 namespace POS.API.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
-    public class ImportExportController : ControllerBase
+    public class ImportExportController : BaseController
     {
         private readonly IImportExportService<POS.Data.Product> _productService;
         private readonly IImportExportService<POS.Data.Customer> _customerService;
@@ -36,7 +37,7 @@ namespace POS.API.Controllers
         public async Task<IActionResult> ImportProducts(IFormFile file)
         {
             if (file == null || file.Length == 0)
-                return BadRequest(new { error = "No file uploaded" });
+                return ReturnFormattedResponse(ServiceResponse<object>.ReturnFailed(400, "No file uploaded"));
 
             try
             {
@@ -47,19 +48,19 @@ namespace POS.API.Controllers
                 using var stream = file.OpenReadStream();
                 var result = await _productService.ImportAsync(stream, format);
 
-                return Ok(new
+                return ReturnFormattedResponse(ServiceResponse<object>.ReturnResultWith200(new
                 {
                     success = result.IsSuccess,
                     totalRecords = result.TotalRecords,
                     successCount = result.SuccessCount,
                     failureCount = result.FailureCount,
                     errors = result.Errors
-                });
+                }));
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Error importing products");
-                return StatusCode(500, new { error = "Import failed", message = ex.Message });
+                return ReturnFormattedResponse(ServiceResponse<object>.ReturnFailed(500, $"Import failed: {ex.Message}"));
             }
         }
 
@@ -67,7 +68,7 @@ namespace POS.API.Controllers
         public async Task<IActionResult> ValidateProducts(IFormFile file)
         {
             if (file == null || file.Length == 0)
-                return BadRequest(new { error = "No file uploaded" });
+                return ReturnFormattedResponse(ServiceResponse<object>.ReturnFailed(400, "No file uploaded"));
 
             try
             {
@@ -78,19 +79,19 @@ namespace POS.API.Controllers
                 using var stream = file.OpenReadStream();
                 var result = await _productService.ValidateImportAsync(stream, format);
 
-                return Ok(new
+                return ReturnFormattedResponse(ServiceResponse<object>.ReturnResultWith200(new
                 {
                     success = result.IsSuccess,
                     totalRecords = result.TotalRecords,
                     successCount = result.SuccessCount,
                     failureCount = result.FailureCount,
                     errors = result.Errors
-                });
+                }));
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Error validating products");
-                return StatusCode(500, new { error = "Validation failed", message = ex.Message });
+                return ReturnFormattedResponse(ServiceResponse<object>.ReturnFailed(500, $"Validation failed: {ex.Message}"));
             }
         }
 
@@ -113,7 +114,7 @@ namespace POS.API.Controllers
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Error exporting products");
-                return StatusCode(500, new { error = "Export failed", message = ex.Message });
+                return ReturnFormattedResponse(ServiceResponse<object>.ReturnFailed(500, $"Export failed: {ex.Message}"));
             }
         }
 
@@ -134,7 +135,7 @@ namespace POS.API.Controllers
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Error generating product template");
-                return StatusCode(500, new { error = "Template generation failed", message = ex.Message });
+                return ReturnFormattedResponse(ServiceResponse<object>.ReturnFailed(500, $"Template generation failed: {ex.Message}"));
             }
         }
 
@@ -146,7 +147,7 @@ namespace POS.API.Controllers
         public async Task<IActionResult> ImportCustomers(IFormFile file)
         {
             if (file == null || file.Length == 0)
-                return BadRequest(new { error = "No file uploaded" });
+                return ReturnFormattedResponse(ServiceResponse<object>.ReturnFailed(400, "No file uploaded"));
 
             try
             {
@@ -154,19 +155,19 @@ namespace POS.API.Controllers
                 using var stream = file.OpenReadStream();
                 var result = await _customerService.ImportAsync(stream, format);
 
-                return Ok(new
+                return ReturnFormattedResponse(ServiceResponse<object>.ReturnResultWith200(new
                 {
                     success = result.IsSuccess,
                     totalRecords = result.TotalRecords,
                     successCount = result.SuccessCount,
                     failureCount = result.FailureCount,
                     errors = result.Errors
-                });
+                }));
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Error importing customers");
-                return StatusCode(500, new { error = "Import failed", message = ex.Message });
+                return ReturnFormattedResponse(ServiceResponse<object>.ReturnFailed(500, $"Import failed: {ex.Message}"));
             }
         }
 
@@ -186,7 +187,7 @@ namespace POS.API.Controllers
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Error exporting customers");
-                return StatusCode(500, new { error = "Export failed", message = ex.Message });
+                return ReturnFormattedResponse(ServiceResponse<object>.ReturnFailed(500, $"Export failed: {ex.Message}"));
             }
         }
 
@@ -205,7 +206,7 @@ namespace POS.API.Controllers
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Error generating customer template");
-                return StatusCode(500, new { error = "Template generation failed", message = ex.Message });
+                return ReturnFormattedResponse(ServiceResponse<object>.ReturnFailed(500, $"Template generation failed: {ex.Message}"));
             }
         }
 
@@ -217,7 +218,7 @@ namespace POS.API.Controllers
         public async Task<IActionResult> ImportSuppliers(IFormFile file)
         {
             if (file == null || file.Length == 0)
-                return BadRequest(new { error = "No file uploaded" });
+                return ReturnFormattedResponse(ServiceResponse<object>.ReturnFailed(400, "No file uploaded"));
 
             try
             {
@@ -225,19 +226,19 @@ namespace POS.API.Controllers
                 using var stream = file.OpenReadStream();
                 var result = await _supplierService.ImportAsync(stream, format);
 
-                return Ok(new
+                return ReturnFormattedResponse(ServiceResponse<object>.ReturnResultWith200(new
                 {
                     success = result.IsSuccess,
                     totalRecords = result.TotalRecords,
                     successCount = result.SuccessCount,
                     failureCount = result.FailureCount,
                     errors = result.Errors
-                });
+                }));
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Error importing suppliers");
-                return StatusCode(500, new { error = "Import failed", message = ex.Message });
+                return ReturnFormattedResponse(ServiceResponse<object>.ReturnFailed(500, $"Import failed: {ex.Message}"));
             }
         }
 
@@ -257,7 +258,7 @@ namespace POS.API.Controllers
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Error exporting suppliers");
-                return StatusCode(500, new { error = "Export failed", message = ex.Message });
+                return ReturnFormattedResponse(ServiceResponse<object>.ReturnFailed(500, $"Export failed: {ex.Message}"));
             }
         }
 
@@ -276,7 +277,7 @@ namespace POS.API.Controllers
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Error generating supplier template");
-                return StatusCode(500, new { error = "Template generation failed", message = ex.Message });
+                return ReturnFormattedResponse(ServiceResponse<object>.ReturnFailed(500, $"Template generation failed: {ex.Message}"));
             }
         }
 

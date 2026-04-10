@@ -1,3 +1,4 @@
+using POS.Helper;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Caching.Memory;
@@ -70,3 +71,4 @@ namespace POS.MediatR.Tenant.Handlers
         }
     }
 }
+

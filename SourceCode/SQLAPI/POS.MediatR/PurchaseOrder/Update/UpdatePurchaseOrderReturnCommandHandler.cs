@@ -1,4 +1,4 @@
-﻿using AutoMapper;
+using AutoMapper;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
@@ -218,8 +218,11 @@ namespace POS.MediatR.PurchaseOrder.Handlers
 
         public async Task<ServiceResponse<bool>> Handle(UpdatePurchaseOrderReturnCommand request, CancellationToken cancellationToken)
         {
+            try
+            {
+                await _uow.BeginTransactionAsync();
 
-            var purchaseOrderUpdate = _mapper.Map<POS.Data.PurchaseOrder>(request);
+                var purchaseOrderUpdate = _mapper.Map<POS.Data.PurchaseOrder>(request);
             purchaseOrderUpdate.PurchaseOrderItems.ForEach(item =>
             {
                 item.Product = null;
@@ -280,6 +283,7 @@ namespace POS.MediatR.PurchaseOrder.Handlers
 
             if (await _uow.SaveAsync() <= 0)
             {
+                await _uow.RollbackTransactionAsync();
                 _logger.LogError("Error while Updating purchase Order.");
                 return ServiceResponse<bool>.Return500();
             }
@@ -384,6 +388,13 @@ namespace POS.MediatR.PurchaseOrder.Handlers
                             _purchaseOrderRepository.Update(purchaseOrder);
                             _purchaseOrderPaymentRepository.Add(purchasePayment);
                             await _paymentService.ProcessPaymentAsync(paymentDto);
+                            
+                            if (await _uow.SaveAsync() <= 0)
+                            {
+                                await _uow.RollbackTransactionAsync();
+                                _logger.LogError("Error while Updating purchase Order Refund Payment.");
+                                return ServiceResponse<bool>.Return500();
+                            }
 
                         }
                         catch (System.Exception ex)
@@ -398,7 +409,15 @@ namespace POS.MediatR.PurchaseOrder.Handlers
                 _logger.LogError(ex, "error while saving purchase Order Return payment Accounting");
             }
 
+            await _uow.CommitTransactionAsync();
             return ServiceResponse<bool>.ReturnResultWith201(true);
+            }
+            catch (System.Exception ex)
+            {
+                await _uow.RollbackTransactionAsync();
+                _logger.LogError(ex, "Unhandled error during purchase order return update.");
+                return ServiceResponse<bool>.ReturnException(ex);
+            }
         }
     }
 }

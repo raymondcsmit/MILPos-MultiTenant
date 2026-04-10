@@ -1,3 +1,4 @@
+using POS.Helper;
 namespace POS.MediatR.Tenant.Commands
 {
     public class ExportTenantToSqliteCommandResponse
@@ -7,3 +8,4 @@ namespace POS.MediatR.Tenant.Commands
         public string ContentType { get; set; }
     }
 }
+

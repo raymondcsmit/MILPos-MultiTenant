@@ -1,3 +1,4 @@
+using POS.Helper;
 using MediatR;
 using POS.Data.Dto;
 using POS.Helper;
@@ -11,3 +12,4 @@ namespace POS.MediatR.Tenant.Commands
         public string Email { get; set; } // Current user email to impersonate/login as in new tenant
     }
 }
+

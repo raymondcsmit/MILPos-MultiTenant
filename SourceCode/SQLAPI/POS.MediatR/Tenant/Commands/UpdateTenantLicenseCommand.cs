@@ -1,3 +1,4 @@
+using POS.Helper;
 using MediatR;
 using POS.Data;
 using POS.Helper;
@@ -12,3 +13,4 @@ namespace POS.MediatR.Tenant.Commands
         public DateTime? TrialExpiryDate { get; set; }
     }
 }
+

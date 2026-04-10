@@ -1,3 +1,4 @@
+using POS.Helper;
 using MediatR;
 using POS.Helper;
 using System.ComponentModel.DataAnnotations;
@@ -40,3 +41,4 @@ namespace POS.MediatR.Tenant.Commands
         public bool TermsAccepted { get; set; }
     }
 }
+

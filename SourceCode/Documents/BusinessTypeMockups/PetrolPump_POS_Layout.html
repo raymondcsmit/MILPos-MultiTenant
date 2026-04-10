@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Petrol Pump POS - Split Layout Mockup</title>
+    <!-- Bootstrap 5 -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <style>
+        body, html { height: 100%; background-color: #f0f2f5; overflow: hidden; font-family: 'Segoe UI', sans-serif; }
+         .pos-container { height: 100vh; display: flex; flex-direction: row; }
+        .product-section { flex: 7; background: #fff; display: flex; flex-direction: column; border-right: 1px solid #e0e0e0; }
+        .cart-section { flex: 3; background: #f8f9fa; display: flex; flex-direction: column; box-shadow: -2px 0 5px rgba(0,0,0,0.05); min-width: 400px; }
+
+        .nozzle-grid { padding: 20px; overflow-y: auto; }
+        .nozzle-card {
+            border: 2px solid #e0e0e0; border-radius: 12px; padding: 15px; background: white; cursor: pointer; transition: all 0.2s; position: relative; overflow: hidden;
+        }
+        .nozzle-card:hover { transform: translateY(-3px); box-shadow: 0 5px 15px rgba(0,0,0,0.1); }
+        .nozzle-card.selected { border-color: #1976d2; background-color: #e3f2fd; }
+        
+        .fuel-icon { font-size: 3rem; margin-bottom: 10px; }
+        .fuel-super { color: #2e7d32; } /* Green for Petrol usually */
+        .fuel-diesel { color: #fbc02d; } /* Yellow/Gold for Diesel */
+        
+        .nozzle-badge { position: absolute; top: 10px; right: 10px; font-size: 0.8rem; padding: 4px 8px; border-radius: 10px; background: #eee; }
+        
+        .meter-input-group { background: #fff; padding: 15px; border-radius: 8px; border: 1px solid #ddd; margin-bottom: 10px; }
+    </style>
+</head>
+<body>
+
+<div class="pos-container">
+    <!-- LEFT: Pump & Nozzle Selector -->
+    <div class="product-section bg-light">
+        <div class="p-3 bg-white border-bottom shadow-sm">
+            <h5 class="m-0 fw-bold text-primary">Pump Station Overview</h5>
+            <small class="text-muted">Select a Nozzle to enter readings</small>
+        </div>
+
+        <div class="nozzle-grid">
+            <div class="row g-4">
+                <!-- Pump 1 -->
+                <div class="col-12"><h6 class="text-muted border-bottom pb-2">Pump Island A</h6></div>
+                
+                <div class="col-xl-3 col-lg-4 col-md-6">
+                    <div class="nozzle-card selected">
+                        <span class="nozzle-badge">N-01</span>
+                        <div class="text-center">
+                            <span class="material-icons fuel-icon fuel-super">local_gas_station</span>
+                            <h5 class="fw-bold mb-1">Super Petrol</h5>
+                            <div class="text-muted small">Current: 14500.00 L</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-xl-3 col-lg-4 col-md-6">
+                    <div class="nozzle-card">
+                        <span class="nozzle-badge">N-02</span>
+                        <div class="text-center">
+                            <span class="material-icons fuel-icon fuel-super">local_gas_station</span>
+                            <h5 class="fw-bold mb-1">Super Petrol</h5>
+                            <div class="text-muted small">Current: 12100.00 L</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-xl-3 col-lg-4 col-md-6">
+                    <div class="nozzle-card">
+                         <span class="nozzle-badge">N-03</span>
+                        <div class="text-center">
+                            <span class="material-icons fuel-icon fuel-diesel">local_shipping</span>
+                            <h5 class="fw-bold mb-1">Diesel</h5>
+                            <div class="text-muted small">Current: 5000.00 L</div>
+                        </div>
+                    </div>
+                </div>
+
+                 <!-- Pump 2 -->
+                 <div class="col-12 mt-4"><h6 class="text-muted border-bottom pb-2">Pump Island B</h6></div>
+
+                 <div class="col-xl-3 col-lg-4 col-md-6">
+                    <div class="nozzle-card">
+                         <span class="nozzle-badge">N-04</span>
+                        <div class="text-center">
+                            <span class="material-icons fuel-icon fuel-super">local_gas_station</span>
+                            <h5 class="fw-bold mb-1">Super Petrol</h5>
+                            <div class="text-muted small">Current: 8000.00 L</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- RIGHT: Entry & Cart -->
+    <div class="cart-section">
+        <div class="cart-header bg-primary text-white">
+             <div class="d-flex justify-content-between align-items-center">
+                <div>
+                     <span class="d-block small opacity-75">Attendant</span>
+                     <span class="fw-bold">Ali (Shift A)</span>
+                </div>
+                <div class="text-end">
+                    <span class="d-block small opacity-75">Date</span>
+                    <span class="fw-bold">28 Jan 2026</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="flex-grow-1 overflow-auto p-3">
+            <!-- Active Input Area for Selected Nozzle -->
+            <div class="meter-input-group border-primary shadow-sm">
+                <div class="d-flex justify-content-between mb-2">
+                    <strong class="text-primary">Nozzle 01 - Super</strong>
+                    <span class="badge bg-primary">Rate: 280.00</span>
+                </div>
+                <div class="row g-2">
+                    <div class="col-6">
+                        <label class="small text-muted">Start Reading</label>
+                        <input type="number" class="form-control bg-light" value="14500.00" readonly>
+                    </div>
+                    <div class="col-6">
+                        <label class="small text-dark fw-bold">End Reading</label>
+                        <input type="number" class="form-control border-primary fw-bold" value="14550.00" autofocus>
+                    </div>
+                    <div class="col-12">
+                        <div class="d-flex justify-content-between align-items-center bg-light p-2 rounded mt-1">
+                             <span class="small">Sold: <strong>50.00 Liters</strong></span>
+                             <span class="fw-bold text-success">Total: 14,000.00</span>
+                        </div>
+                    </div>
+                    <div class="col-12 mt-2">
+                        <button class="btn btn-sm btn-primary w-100">Add to Shift Log</button>
+                    </div>
+                </div>
+            </div>
+
+            <hr class="my-3">
+            <h6 class="text-muted mb-3">Shift Entries</h6>
+
+            <!-- Logged Item -->
+            <div class="cart-item bg-white rounded border mb-2">
+                <div class="d-flex justify-content-between">
+                    <span class="fw-bold">Nozzle 03 - Diesel</span>
+                     <span class="fw-bold">5,800.00</span>
+                </div>
+                 <div class="d-flex justify-content-between small text-muted">
+                    <span>20.00 Liters @ 290.00</span>
+                    <span><i class="material-icons align-middle fs-6">edit</i></span>
+                </div>
+            </div>
+        </div>
+
+        <div class="cart-footer">
+            <div class="total-row grand-total">
+                <span>Total Shift Sale</span>
+                <span class="text-primary">19,800.00</span>
+            </div>
+            <button class="btn btn-success w-100 py-3 fw-bold mt-2">CLOSE SHIFT</button>
+        </div>
+    </div>
+</div>
+
+</body>
+</html>

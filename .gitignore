@@ -442,7 +442,6 @@ coverage/
 *.orig
 clientapp/dist/
 wwwroot/dist/
-/SourceCode/Documents
 /SourceCode/SeedData
 /SourceCode/Angular/publish-release.ps1
 

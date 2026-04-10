@@ -1,3 +1,4 @@
+using POS.Helper;
 using MediatR;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
@@ -9,6 +10,7 @@ using POS.MediatR.Tenant.Commands;
 using POS.Repository;
 using POS.Common.GenericRepository;
 using System.Collections.Generic;
+using POS.Helper;
 using System.Linq;
 using System.Security.Claims;
 using System.Threading;
@@ -82,3 +84,4 @@ namespace POS.MediatR.Tenant.Handlers
         }
     }
 }
+

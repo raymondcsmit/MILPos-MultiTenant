@@ -1,3 +1,4 @@
+using POS.Helper;
 using MediatR;
 using POS.Data.Dto;
 using POS.Helper;
@@ -10,3 +11,4 @@ namespace POS.MediatR.Tenant.Commands
         public Guid TenantId { get; set; }
     }
 }
+

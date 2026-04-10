@@ -7,7 +7,7 @@
     <FrameworkReference Include="Microsoft.AspNetCore.App" />
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="AutoMapper" Version="13.0.1" />
+    <PackageReference Include="AutoMapper" Version="14.0.0" />
     <PackageReference Include="FluentValidation" Version="12.1.1" />
     <PackageReference Include="FluentValidation.DependencyInjectionExtensions" Version="12.1.1" />
     <PackageReference Include="MediatR" Version="14.0.0" />
@@ -17,9 +17,9 @@
   <ItemGroup>
     <ProjectReference Include="..\POS.Common\POS.Common.csproj" />
     <ProjectReference Include="..\POS.Data\POS.Data.csproj" />
-    <ProjectReference Include="..\POS.Domain\POS.Domain.csproj" />
-    <ProjectReference Include="..\POS.Helper\POS.Helper.csproj" />
+        <ProjectReference Include="..\POS.Helper\POS.Helper.csproj" />
     <ProjectReference Include="..\POS.Repository\POS.Repository.csproj" />
+    <ProjectReference Include="..\POS.Domain\POS.Domain.csproj" />
   </ItemGroup>
 
   <ItemGroup>

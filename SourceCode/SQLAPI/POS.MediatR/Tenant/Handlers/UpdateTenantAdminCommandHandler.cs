@@ -1,3 +1,4 @@
+using POS.Helper;
 using MediatR;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
@@ -117,3 +118,4 @@ namespace POS.MediatR.Tenant.Handlers
         }
     }
 }
+

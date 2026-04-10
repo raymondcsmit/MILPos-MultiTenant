@@ -2,6 +2,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\POS.Domain\POS.Domain.csproj" />
+    <ProjectReference Include="..\POS.Helper\POS.Helper.csproj" />
   </ItemGroup>
 
   <ItemGroup>

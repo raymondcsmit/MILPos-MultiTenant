@@ -1,11 +1,10 @@
+using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 using POS.Data.Entities.Inventory;
-using POS.Domain;
+using POS.MediatR.InventoryBatch.Queries;
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
 
 namespace POS.API.Controllers
@@ -15,21 +14,25 @@ namespace POS.API.Controllers
     [Authorize]
     public class InventoryBatchController : ControllerBase
     {
-        private readonly POSDbContext _context;
+        private readonly IMediator _mediator;
 
-        public InventoryBatchController(POSDbContext context)
+        public InventoryBatchController(IMediator mediator)
         {
-            _context = context;
+            _mediator = mediator;
         }
 
         [HttpGet("{productId}")]
         public async Task<ActionResult<IEnumerable<InventoryBatch>>> GetBatches(Guid productId)
         {
-            var batches = await _context.InventoryBatches
-                                        .Where(b => b.ProductId == productId && b.Quantity > 0 && b.IsActive)
-                                        .OrderBy(b => b.ExpiryDate)
-                                        .ToListAsync();
-            return Ok(batches);
+            var query = new GetInventoryBatchesQuery { ProductId = productId };
+            var response = await _mediator.Send(query);
+
+            if (response.Success)
+            {
+                return Ok(response.Data);
+            }
+
+            return BadRequest(new { message = string.Join(", ", response.Errors) });
         }
     }
 }

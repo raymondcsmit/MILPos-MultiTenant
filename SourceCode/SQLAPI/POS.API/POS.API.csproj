@@ -1,8 +1,10 @@
-﻿<Project Sdk="Microsoft.NET.Sdk.Web">
+<Project Sdk="Microsoft.NET.Sdk.Web">
 
 	<PropertyGroup>
 		<TargetFramework>net10.0</TargetFramework>
 		<UserSecretsId>59c02045-596a-4f38-9476-40995e33d270</UserSecretsId>
+		<DisableStaticWebAssetsCompression>true</DisableStaticWebAssetsCompression>
+		<CompressionEnabled>false</CompressionEnabled>
 	</PropertyGroup>
 
 	<PropertyGroup>
@@ -36,7 +38,7 @@
 	</ItemGroup>
 
 	<ItemGroup>
-		<PackageReference Include="AutoMapper" Version="13.0.1" />
+		<PackageReference Include="AutoMapper" Version="14.0.0" />
 		<PackageReference Include="Dapper" Version="2.1.66" />
 		<PackageReference Include="FluentValidation" Version="12.1.1" />
 		<PackageReference Include="FluentValidation.DependencyInjectionExtensions" Version="12.1.1" />
@@ -71,12 +73,12 @@
 	<ItemGroup>
 		<ProjectReference Include="..\POS.Common\POS.Common.csproj" />
 		<ProjectReference Include="..\POS.Data\POS.Data.csproj" />
-		<ProjectReference Include="..\POS.Domain\POS.Domain.csproj" />
-		<ProjectReference Include="..\POS.Helper\POS.Helper.csproj" />
+				<ProjectReference Include="..\POS.Helper\POS.Helper.csproj" />
 		<ProjectReference Include="..\POS.MediatR\POS.MediatR.csproj" />
 		<ProjectReference Include="..\POS.Migrations.PostgreSQL\POS.Migrations.PostgreSQL.csproj" />
 		<ProjectReference Include="..\POS.Migrations.Sqlite\POS.Migrations.Sqlite.csproj" />
 		<ProjectReference Include="..\POS.Migrations.SqlServer\POS.Migrations.SqlServer.csproj" />
+		<ProjectReference Include="..\POS.Domain\POS.Domain.csproj" />
 	</ItemGroup>
 
 	<ItemGroup>

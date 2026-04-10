@@ -1,3 +1,4 @@
+using POS.Helper;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -27,16 +28,13 @@ namespace POS.API.Controllers
     [Route("api/[controller]")]
     public class TenantsController : ControllerBase
     {
-        private readonly POSDbContext _context;
         private readonly TenantDataMigrationService _migrationService;
         private readonly IMediator _mediator;
 
         public TenantsController(
-            POSDbContext context, 
             TenantDataMigrationService migrationService, 
             IMediator mediator)
         {
-            _context = context;
             _migrationService = migrationService;
             _mediator = mediator;
         }
@@ -74,14 +72,15 @@ namespace POS.API.Controllers
         /// </summary>
         [HttpGet]
         [Authorize(Policy = AppConstants.Policies.SuperAdmin)]
-        public async Task<ActionResult<List<Tenant>>> GetAllTenants()
+        public async Task<ActionResult<ServiceResponse<List<Tenant>>>> GetAllTenants()
         {
-            var tenants = await _context.Tenants
-                .IgnoreQueryFilters()
-                .OrderBy(t => t.Name)
-                .ToListAsync();
-            
-            return Ok(tenants);
+            var query = new POS.MediatR.Tenant.Queries.GetAllTenantsQuery();
+            var response = await _mediator.Send(query);
+            if (response.Success)
+            {
+                return Ok(response.Data);
+            }
+            return BadRequest(new { message = string.Join(", ", response.Errors) });
         }
 
         /// <summary>
@@ -89,16 +88,15 @@ namespace POS.API.Controllers
         /// </summary>
         [HttpGet("{id}")]
         [Authorize(Policy = AppConstants.Policies.SuperAdmin)]
-        public async Task<ActionResult<Tenant>> GetTenant(Guid id)
+        public async Task<ActionResult<ServiceResponse<Tenant>>> GetTenant(Guid id)
         {
-            var tenant = await _context.Tenants
-                .IgnoreQueryFilters()
-                .FirstOrDefaultAsync(t => t.Id == id);
-            
-            if (tenant == null)
-                return NotFound();
-
-            return Ok(tenant);
+            var query = new POS.MediatR.Tenant.Queries.GetTenantQuery { Id = id };
+            var response = await _mediator.Send(query);
+            if (response.Success)
+            {
+                return Ok(response.Data);
+            }
+            return NotFound(new { message = string.Join(", ", response.Errors) });
         }
 
         /// <summary>
@@ -106,18 +104,8 @@ namespace POS.API.Controllers
         /// </summary>
         [HttpPost]
         [Authorize(Policy = AppConstants.Policies.SuperAdmin)]
-        public async Task<ActionResult<Tenant>> CreateTenant([FromBody] CreateTenantDto dto)
+        public async Task<ActionResult<ServiceResponse<Tenant>>> CreateTenant([FromBody] CreateTenantDto dto)
         {
-            // Check if subdomain already exists
-            var existingTenant = await _context.Tenants
-                .IgnoreQueryFilters()
-                .FirstOrDefaultAsync(t => t.Subdomain == dto.Subdomain);
-
-            if (existingTenant != null)
-            {
-                return BadRequest(new { message = "Subdomain already exists" });
-            }
-
             var command = new CreateTenantCommand
             {
                 Name = dto.Name,
@@ -126,15 +114,14 @@ namespace POS.API.Controllers
                 ContactPhone = dto.ContactPhone,
                 Address = dto.Address,
                 AdminEmail = dto.AdminEmail ?? dto.ContactEmail,
-                AdminPassword = dto.AdminPassword,
-                //BusinessType = dto.BusinessType // Assuming dto has BusinessType, if not default will be used
+                AdminPassword = dto.AdminPassword
             };
 
             var response = await _mediator.Send(command);
 
             if (response.Success)
             {
-                return CreatedAtAction(nameof(GetTenant), new { id = response.Data.Id }, response.Data);
+                return CreatedAtAction(nameof(GetTenant), new { id = response.Data.Id }, response);
             }
 
             return BadRequest(new { message = string.Join(", ", response.Errors) });
@@ -144,28 +131,27 @@ namespace POS.API.Controllers
         /// Update tenant (SuperAdmin only)
         /// </summary>
         [HttpPut("{id}")]
-        //[Authorize(Roles = "SuperAdmin")]
         [Authorize(Policy = AppConstants.Policies.SuperAdmin)]
-        public async Task<ActionResult<Tenant>> UpdateTenant(Guid id, [FromBody] UpdateTenantDto dto)
+        public async Task<ActionResult<ServiceResponse<Tenant>>> UpdateTenant(Guid id, [FromBody] UpdateTenantDto dto)
         {
-            var tenant = await _context.Tenants
-                .IgnoreQueryFilters()
-                .FirstOrDefaultAsync(t => t.Id == id);
+            var command = new UpdateTenantCommand
+            {
+                Id = id,
+                Name = dto.Name,
+                ContactEmail = dto.ContactEmail,
+                ContactPhone = dto.ContactPhone,
+                Address = dto.Address,
+                IsActive = dto.IsActive,
+                MaxUsers = dto.MaxUsers,
+                SubscriptionPlan = dto.SubscriptionPlan
+            };
 
-            if (tenant == null)
-                return NotFound();
-
-            tenant.Name = dto.Name ?? tenant.Name;
-            tenant.ContactEmail = dto.ContactEmail ?? tenant.ContactEmail;
-            tenant.ContactPhone = dto.ContactPhone ?? tenant.ContactPhone;
-            tenant.Address = dto.Address ?? tenant.Address;
-            tenant.IsActive = dto.IsActive ?? tenant.IsActive;
-            tenant.MaxUsers = dto.MaxUsers ?? tenant.MaxUsers;
-            tenant.SubscriptionPlan = dto.SubscriptionPlan ?? tenant.SubscriptionPlan;
-
-            await _context.SaveChangesAsync();
-
-            return Ok(tenant);
+            var response = await _mediator.Send(command);
+            if (response.Success)
+            {
+                return Ok(response);
+            }
+            return NotFound(new { message = string.Join(", ", response.Errors) });
         }
 
         /// <summary>
@@ -193,19 +179,16 @@ namespace POS.API.Controllers
         [HttpDelete("{id}")]
         //[Authorize(Roles = "SuperAdmin")]
         [Authorize(Policy = AppConstants.Policies.SuperAdmin)]
-        public async Task<ActionResult> DeactivateTenant(Guid id)
+        public async Task<ActionResult<ServiceResponse<bool>>> DeactivateTenant(Guid id)
         {
-            var tenant = await _context.Tenants
-                .IgnoreQueryFilters()
-                .FirstOrDefaultAsync(t => t.Id == id);
-
-            if (tenant == null)
-                return NotFound();
-
-            tenant.IsActive = false;
-            await _context.SaveChangesAsync();
-
-            return NoContent();
+            var command = new DeactivateTenantCommand { Id = id };
+            var response = await _mediator.Send(command);
+            
+            if (response.Success)
+            {
+                return Ok(response);
+            }
+            return NotFound(new { message = string.Join(", ", response.Errors) });
         }
 
         /// <summary>
@@ -392,3 +375,4 @@ namespace POS.API.Controllers
         public bool IsActive { get; set; }
     }
 }
+

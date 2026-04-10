@@ -17,5 +17,5 @@
   <ItemGroup>
     <ProjectReference Include="..\POS.Data\POS.Data.csproj" />
     <ProjectReference Include="..\POS.Domain\POS.Domain.csproj" />
-  </ItemGroup>
+      </ItemGroup>
 </Project>

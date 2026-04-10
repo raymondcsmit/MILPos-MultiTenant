@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Petrol Pump Sales Order - Mockup</title>
+    <!-- Using Bootstrap 5 for layout to match existing app structure -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <style>
+        body { background-color: #f5f5f5; font-family: Roboto, "Helvetica Neue", sans-serif; }
+        .page-title { font-size: 24px; font-weight: 500; color: #333; }
+        .card { border: none; box-shadow: 0 2px 5px rgba(0,0,0,0.1); border-radius: 4px; }
+        .table-pos thead th { background-color: #e3f2fd; color: #1565c0; font-weight: 600; font-size: 0.85rem; } /* Blue Theme */
+        .form-label { font-size: 0.85rem; font-weight: 500; color: #666; }
+        .btn-primary { background-color: #1976d2; border-color: #1976d2; }
+        .text-danger { color: #f44336 !important; }
+        .grid-img-thumbnail { width: 40px; height: 40px; border-radius: 50%; background: #ddd; display: flex; align-items: center; justify-content: center; }
+    </style>
+</head>
+<body class="p-3">
+
+<div class="container-fluid">
+    <!-- Header -->
+    <div class="d-flex mb-3 align-items-center">
+         <div class="me-auto">
+            <span class="page-title">Manage Sales <small class="text-muted">(Petrol Pump Mode)</small></span>
+        </div>
+    </div>
+
+    <!-- Main Form -->
+    <div class="card p-4">
+        <div class="row g-3 mb-4">
+             <!-- Order Info -->
+            <div class="col-lg-4 col-sm-6">
+                <label class="form-label text-danger">Shift / Invoice # *</label>
+                <input type="text" class="form-control" value="SHIFT-A-001">
+            </div>
+            <div class="col-lg-4 col-sm-6">
+                <label class="form-label text-danger">Date *</label>
+                <input type="date" class="form-control" value="2026-01-28">
+            </div>
+             <div class="col-lg-4 col-sm-6">
+                <label class="form-label text-danger">Attendant *</label>
+                 <select class="form-select">
+                    <option>Sajid (Shift A)</option>
+                    <option>Kamran (Shift B)</option>
+                </select>
+            </div>
+        </div>
+
+        <!-- No Item Search - Items are fixed (Fuels) usually -->
+
+        <!-- Order Items Table -->
+        <h5 class="mb-3 text-primary">Pump Readings</h5>
+        <div class="table-responsive">
+            <table class="table table-bordered table-pos align-middle">
+                <thead>
+                    <tr>
+                        <th style="width: 20%">Fuel Type</th>
+                        <th style="width: 20%" class="table-active">Nozzle Selection</th> <!-- NEW -->
+                        <th style="width: 25%">Meter Readings (Liters)</th> <!-- NEW -->
+                        <th style="width: 10%">Quantity</th>
+                        <th style="width: 10%">Rate</th>
+                         <th style="width: 15%">Total Amount</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <!-- Item 1 -->
+                    <tr>
+                        <td>
+                            <div class="d-flex align-items-center gap-2">
+                                <div class="grid-img-thumbnail text-white bg-success">
+                                    <span class="material-icons">local_gas_station</span>
+                                </div>
+                                <div class="fw-bold">Super Petrol</div>
+                            </div>
+                        </td>
+                        <td class="bg-light">
+                            <label class="form-label small mb-1">Select Nozzle</label>
+                            <select class="form-select">
+                                <option>Nozzle 1 (Pump A)</option>
+                                <option>Nozzle 2 (Pump A)</option>
+                            </select>
+                        </td>
+                        <td>
+                            <div class="row g-1">
+                                <div class="col-6">
+                                    <label class="form-label small mb-0">Start</label>
+                                    <input type="number" class="form-control form-control-sm" value="10500.00" readonly>
+                                </div>
+                                <div class="col-6">
+                                    <label class="form-label small mb-0 text-primary">End (Current)</label>
+                                    <input type="number" class="form-control form-control-sm border-primary" value="10550.00">
+                                </div>
+                            </div>
+                        </td>
+                        <td>
+                            <!-- Auto Calculated: 10550 - 10500 -->
+                            <input type="text" class="form-control form-control-sm fw-bold text-center" value="50.00" readonly>
+                        </td>
+                        <td>
+                            <input type="number" class="form-control form-control-sm" value="280.00" readonly>
+                        </td>
+                        <td class="fw-bold text-end">
+                            14,000.00
+                        </td>
+                    </tr>
+
+                     <!-- Item 2 -->
+                    <tr>
+                        <td>
+                            <div class="d-flex align-items-center gap-2">
+                                <div class="grid-img-thumbnail text-white bg-dark">
+                                    <span class="material-icons">local_shipping</span>
+                                </div>
+                                <div class="fw-bold">Diesel</div>
+                            </div>
+                        </td>
+                         <td class="bg-light">
+                            <label class="form-label small mb-1">Select Nozzle</label>
+                            <select class="form-select">
+                                <option>Nozzle 3 (Pump B)</option>
+                            </select>
+                        </td>
+                        <td>
+                            <div class="row g-1">
+                                <div class="col-6">
+                                    <label class="form-label small mb-0">Start</label>
+                                    <input type="number" class="form-control form-control-sm" value="5000.00" readonly>
+                                </div>
+                                <div class="col-6">
+                                    <label class="form-label small mb-0 text-primary">End (Current)</label>
+                                    <input type="number" class="form-control form-control-sm border-primary" value="5000.00">
+                                </div>
+                            </div>
+                        </td>
+                        <td>
+                            <input type="text" class="form-control form-control-sm fw-bold text-center" value="0.00" readonly>
+                        </td>
+                        <td>
+                            <input type="number" class="form-control form-control-sm" value="290.00" readonly>
+                        </td>
+                         <td class="fw-bold text-end">
+                            0.00
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Footer Totals -->
+        <div class="row mt-3 justify-content-end">
+            <div class="col-lg-4">
+                <div class="d-flex justify-content-between mb-3">
+                    <span class="fw-bold fs-4">Total Sale:</span>
+                    <span class="fw-bold fs-4 text-primary">14,000.00</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Action Buttons -->
+        <div class="d-flex gap-2">
+            <button class="btn btn-success"><span class="material-icons align-middle">done_all</span> Close Shift & Save</button>
+            <button class="btn btn-danger"><span class="material-icons align-middle">cancel</span> Cancel</button>
+        </div>
+    </div>
+</div>
+
+</body>
+</html>

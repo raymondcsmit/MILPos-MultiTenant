@@ -1,3 +1,4 @@
+using POS.Helper;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 using POS.Common;
@@ -116,3 +117,4 @@ namespace POS.MediatR.Tenant.Handlers
         }
     
 }
+

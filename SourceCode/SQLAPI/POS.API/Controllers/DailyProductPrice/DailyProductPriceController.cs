@@ -13,7 +13,7 @@ namespace POS.API.Controllers
     [Route("api/[controller]")]
     [ApiController]
     [Authorize]
-    public class DailyProductPriceController : ControllerBase
+    public class DailyProductPriceController : BaseController
     {
         private readonly IMediator _mediator;
 
@@ -69,7 +69,7 @@ namespace POS.API.Controllers
         public async Task<IActionResult> GetEffectivePrice(Guid productId, [FromQuery] DateTime? date)
         {
             // This would need a separate query/handler - placeholder for now
-            return Ok(new { ProductId = productId, EffectivePrice = 0m, Date = date ?? DateTime.Today });
+            return ReturnFormattedResponse(ServiceResponse<object>.ReturnResultWith200(new { ProductId = productId, EffectivePrice = 0m, Date = date ?? DateTime.Today }));
         }
     }
 }

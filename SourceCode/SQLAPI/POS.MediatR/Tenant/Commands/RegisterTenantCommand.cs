@@ -1,3 +1,4 @@
+using POS.Helper;
 using MediatR;
 using POS.Data.Dto.Tenant;
 using POS.Data.Entities;
@@ -16,3 +17,4 @@ namespace POS.MediatR.Tenant.Commands
         public string BusinessType { get; set; }
     }
 }
+

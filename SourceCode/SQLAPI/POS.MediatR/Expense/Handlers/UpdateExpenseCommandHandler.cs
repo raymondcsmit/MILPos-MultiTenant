@@ -1,4 +1,4 @@
-﻿using AutoMapper;
+using AutoMapper;
 using MediatR;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.EntityFrameworkCore;
@@ -88,55 +88,58 @@ namespace POS.MediatR.Handlers
 
         public async Task<ServiceResponse<bool>> Handle(UpdateExpenseCommand request, CancellationToken cancellationToken)
         {
-            var entityExist = await _expenseRepository.All.Where(c=>c.Id==request.Id).FirstOrDefaultAsync();
-            if (entityExist == null)
-            {
-                _logger.LogError("Expense does not exists.");
-                return ServiceResponse<bool>.Return409("Expense does not exists.");
-            }
-
-            var expenseTaxes = _expenseTaxRepository.All.Where(c=>c.ExpenseId== request.Id).ToList();
-            if (expenseTaxes.Count > 0)
-            {
-                _expenseTaxRepository.RemoveRange(expenseTaxes);
-            }
-
-            _mapper.Map(request, entityExist);
-
-            if (entityExist.ExpenseTaxes != null & entityExist.ExpenseTaxes.Count() > 0)
-            {
-                entityExist.ExpenseTaxes.ForEach(x => x.Tax = null);
-            }
-
-            if (request.IsReceiptChange)
-            {
-                if (!string.IsNullOrWhiteSpace(request.DocumentData)
-                    && !string.IsNullOrWhiteSpace(request.ReceiptName))
-                {
-                    var extension = Path.GetExtension(request.ReceiptName);
-                    var id = Guid.NewGuid();
-                    var path = $"{id}{extension}";
-                    try
-                    {
-                         await _fileStorageService.SaveFileAsync(_pathHelper.Attachments, request.DocumentData, path);
-                         entityExist.ReceiptPath = path;
-                    }
-                    catch
-                    {
-                        _logger.LogError("Error while saving files", entityExist);
-                    }
-                }
-                else
-                {
-                    entityExist.ReceiptPath = null;
-                    entityExist.ReceiptName = null;
-                }
-            }
-
-            _expenseRepository.Update(entityExist);
-          
             try
-            {  //Remove accounting
+            {
+                await _uow.BeginTransactionAsync();
+
+                var entityExist = await _expenseRepository.All.Where(c=>c.Id==request.Id).FirstOrDefaultAsync();
+                if (entityExist == null)
+                {
+                    _logger.LogError("Expense does not exists.");
+                    return ServiceResponse<bool>.Return409("Expense does not exists.");
+                }
+
+                var expenseTaxes = _expenseTaxRepository.All.Where(c=>c.ExpenseId== request.Id).ToList();
+                if (expenseTaxes.Count > 0)
+                {
+                    _expenseTaxRepository.RemoveRange(expenseTaxes);
+                }
+
+                _mapper.Map(request, entityExist);
+
+                if (entityExist.ExpenseTaxes != null & entityExist.ExpenseTaxes.Count() > 0)
+                {
+                    entityExist.ExpenseTaxes.ForEach(x => x.Tax = null);
+                }
+
+                if (request.IsReceiptChange)
+                {
+                    if (!string.IsNullOrWhiteSpace(request.DocumentData)
+                        && !string.IsNullOrWhiteSpace(request.ReceiptName))
+                    {
+                        var extension = Path.GetExtension(request.ReceiptName);
+                        var id = Guid.NewGuid();
+                        var path = $"{id}{extension}";
+                        try
+                        {
+                             await _fileStorageService.SaveFileAsync(_pathHelper.Attachments, request.DocumentData, path);
+                             entityExist.ReceiptPath = path;
+                        }
+                        catch
+                        {
+                            _logger.LogError("Error while saving files", entityExist);
+                        }
+                    }
+                    else
+                    {
+                        entityExist.ReceiptPath = null;
+                        entityExist.ReceiptName = null;
+                    }
+                }
+
+                _expenseRepository.Update(entityExist);
+              
+                //Remove accounting
                 var oldtransaction = await _transactionRepository.All
                        .Where(c => c.ReferenceNumber == entityExist.Reference)
                            .Include(c => c.AccountingEntries).FirstOrDefaultAsync();
@@ -148,20 +151,12 @@ namespace POS.MediatR.Handlers
                 }
                 if (await _uow.SaveAsync() <= 0)
                 {
+                    await _uow.RollbackTransactionAsync();
                     _logger.LogError("Error while saving Expense.");
                     return ServiceResponse<bool>.Return500();
                 }
-            }
-            catch (System.Exception ex)
-            {
-                _logger.LogError(ex,"Error while saving Expense.");
-                return ServiceResponse<bool>.Return500();
-            }
-         
 
-            //Add Accounting and transaction
-            try
-            {
+                //Add Accounting and transaction
                 var requestTaxIds = request.ExpenseTaxIds?.ToList() ?? new List<Guid>();
                 //Current financial Year
                 var financialYearId = await _financialYearRepository.All.Where(c => !c.IsClosed).Select(c => c.Id).FirstOrDefaultAsync();
@@ -214,16 +209,20 @@ namespace POS.MediatR.Handlers
                 await strategy.ProcessTransactionAsync(tempTransaction);
                 if (await _uow.SaveAsync() <= 0)
                 {
+                    await _uow.RollbackTransactionAsync();
                     _logger.LogError("Error while saving Expense");
                     return ServiceResponse<bool>.Return500();
                 }
+
+                await _uow.CommitTransactionAsync();
+                return ServiceResponse<bool>.ReturnSuccess();
             }
-            catch(System.Exception ex)
+            catch (System.Exception ex)
             {
-                _logger.LogError(ex, "Error while saving Accounting");
+                await _uow.RollbackTransactionAsync();
+                _logger.LogError(ex, "Error while saving Accounting or Expense");
                 return ServiceResponse<bool>.Return500();
             }
-            return ServiceResponse<bool>.ReturnSuccess();
         }
     }
 }

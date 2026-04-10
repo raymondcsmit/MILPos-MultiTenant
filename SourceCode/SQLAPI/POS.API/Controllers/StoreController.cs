@@ -28,6 +28,7 @@ namespace POS.API.Controllers
             _mediator = mediator;
         }
 
+        [HttpGet]
         public async Task<IActionResult> Index([FromQuery] string searchQuery, [FromQuery] int skip = 0)
         {
             var tenantName = RouteData.Values["tenantName"]?.ToString();
@@ -58,7 +59,7 @@ namespace POS.API.Controllers
             return View(result);
         }
 
-        [Route("cart")]
+        [HttpGet("cart")]
         public IActionResult Cart()
         {
             var cart = GetCart();

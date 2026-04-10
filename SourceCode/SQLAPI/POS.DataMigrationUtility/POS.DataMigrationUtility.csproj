@@ -9,7 +9,7 @@
   <ItemGroup>
     <ProjectReference Include="..\POS.Data\POS.Data.csproj" />
     <ProjectReference Include="..\POS.Domain\POS.Domain.csproj" />
-  </ItemGroup>
+      </ItemGroup>
 
   <ItemGroup>
     <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="10.0.2">
