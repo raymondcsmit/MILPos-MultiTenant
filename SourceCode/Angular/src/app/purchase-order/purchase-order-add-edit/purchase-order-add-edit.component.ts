@@ -269,9 +269,10 @@ export class PurchaseOrderAddEditComponent extends BaseComponent {
           this.isEdit = true;
           this.purchaseOrderForm = this.fb.group({
             locationId: [
-              { value: this.purchaseOrder.locationId, disabled: true },
-            ],
-            orderNumber: [this.purchaseOrder.orderNumber, [Validators.required],
+                { value: this.purchaseOrder.locationId, disabled: true },
+              ],
+              salesPersonId: [this.purchaseOrder.salesPersonId],
+              orderNumber: [this.purchaseOrder.orderNumber, [Validators.required],
             ],
             deliveryDate: [
               this.purchaseOrder.deliveryDate,
@@ -301,14 +302,15 @@ export class PurchaseOrderAddEditComponent extends BaseComponent {
           this.isEdit = false;
           const dateTime = new Date();
           this.purchaseOrderForm = this.fb.group({
-            orderNumber: ['', [Validators.required]],
-            deliveryDate: [this.CurrentDate, [Validators.required]],
-            poCreatedDate: [this.CurrentDate, [Validators.required]],
-            poCreatedTime: [dateTime],
-            deliveryStatus: [PurchaseDeliveryStatusEnum.Pending],
-            supplierId: ['', [Validators.required]],
-            locationId: ['', [Validators.required]],
-            note: [''],
+              orderNumber: ['', [Validators.required]],
+              deliveryDate: [this.CurrentDate, [Validators.required]],
+              poCreatedDate: [this.CurrentDate, [Validators.required]],
+              poCreatedTime: [dateTime],
+              deliveryStatus: [PurchaseDeliveryStatusEnum.Pending],
+              supplierId: ['', [Validators.required]],
+              locationId: ['', [Validators.required]],
+              salesPersonId: [''],
+              note: [''],
             termAndCondition: [''],
             purchaseOrderItems: this.fb.array([]),
           });
@@ -695,10 +697,11 @@ export class PurchaseOrderAddEditComponent extends BaseComponent {
       totalDiscount: this.totalDiscount,
       totalTax: this.totalTax,
       note: this.purchaseOrderForm.get('note')?.value,
-      termAndCondition: this.purchaseOrderForm.get('termAndCondition')?.value,
-      purchaseOrderItems: [],
-      locationId: this.purchaseOrderForm.get('locationId')?.value,
-      totalRoundOff: this.totalRoundOff,
+        termAndCondition: this.purchaseOrderForm.get('termAndCondition')?.value,
+        purchaseOrderItems: [],
+        locationId: this.purchaseOrderForm.get('locationId')?.value,
+        salesPersonId: this.purchaseOrderForm.get('salesPersonId')?.value,
+        totalRoundOff: this.totalRoundOff,
       totalRefundAmount: 0,
     };
 

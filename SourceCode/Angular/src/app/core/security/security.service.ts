@@ -289,7 +289,6 @@ export class SecurityService {
   }
 
   logout(): void {
-    this.cacheSyncService.clearCache();
     this.resetSecurityObject();
   }
 
@@ -298,6 +297,7 @@ export class SecurityService {
     localStorage.removeItem(this.wrLicenseService.keyValues.BEARER_TOKEN);
     localStorage.removeItem('userMenus');
     sessionStorage.removeItem(this.wrLicenseService.keyValues.LOCATION_CACHE);
+    this.cacheSyncService.clearCache(); // Ensure IndexedDB is cleared on reset
     this._companyProfile$.next(null);
     this._securityObject$.next(null);
     this._token = null;
@@ -311,6 +311,15 @@ export class SecurityService {
     if (companyProfile.logoUrl) {
       companyProfile.logoUrl = `${environment.apiUrl}${companyProfile.logoUrl}`;
     }
+
+    // Fix: Restore cached locations if the server profile has none (prevents empty dropdowns after login)
+    if (!companyProfile.locations || companyProfile.locations.length === 0) {
+      const locationJson = sessionStorage.getItem(this.wrLicenseService.keyValues.LOCATION_CACHE);
+      if (locationJson) {
+        companyProfile.locations = JSON.parse(locationJson);
+      }
+    }
+
     this._companyProfile$.next(companyProfile);
   }
 

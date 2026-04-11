@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 
 namespace POS.Data.Dto
@@ -16,6 +16,10 @@ namespace POS.Data.Dto
         public PurchaseDeliveryStatus DeliveryStatus { get; set; }
         public Guid SupplierId { get; set; }
         public string SupplierName { get; set; }
+        
+        public Guid? SalesPersonId { get; set; }
+        public string SalesPersonName { get; set; }
+        
         public decimal TotalAmount { get; set; }
         public decimal TotalTax { get; set; }
         public decimal TotalDiscount { get; set; }

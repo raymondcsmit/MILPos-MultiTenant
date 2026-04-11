@@ -1,4 +1,4 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading;
@@ -19,7 +19,10 @@ using POS.Repository.Accouting;
 namespace POS.MediatR.Handlers;
 
 public class GetCompanyProfileQueryHandler(
-    IServiceScopeFactory serviceScopeFactory,
+    ILocationRepository locationRepository,
+    IFinancialYearRepository financialYearRepository,
+    IMediator mediator,
+    ICompanyProfileRepository companyProfileRepository,
     IMapper mapper,
     PathHelper pathHelper)
     : IRequestHandler<GetCompanyProfileQuery, CompanyProfileDto>
@@ -27,42 +30,11 @@ public class GetCompanyProfileQueryHandler(
 
     public async Task<CompanyProfileDto> Handle(GetCompanyProfileQuery request, CancellationToken cancellationToken)
     {
-        // Define tasks to run in parallel using separate scopes to avoid DbContext threading issues
-        var locationsTask = Task.Run(async () =>
-        {
-            using var scope = serviceScopeFactory.CreateScope();
-            var repo = scope.ServiceProvider.GetRequiredService<ILocationRepository>();
-            return await repo.All.AsNoTracking().ToListAsync(cancellationToken);
-        }, cancellationToken);
-
-        var financialYearsTask = Task.Run(async () =>
-        {
-            using var scope = serviceScopeFactory.CreateScope();
-            var repo = scope.ServiceProvider.GetRequiredService<IFinancialYearRepository>();
-            return await repo.All.AsNoTracking().ToListAsync(cancellationToken);
-        }, cancellationToken);
-
-        var languagesTask = Task.Run(async () =>
-        {
-            using var scope = serviceScopeFactory.CreateScope();
-            var med = scope.ServiceProvider.GetRequiredService<IMediator>();
-            return await med.Send(new GetAllLanguageCommand(), cancellationToken);
-        }, cancellationToken);
-
-        var companyProfileTask = Task.Run(async () =>
-        {
-            using var scope = serviceScopeFactory.CreateScope();
-            var repo = scope.ServiceProvider.GetRequiredService<ICompanyProfileRepository>();
-            return await repo.All.AsNoTracking().FirstOrDefaultAsync(cancellationToken);
-        }, cancellationToken);
-
-        // Wait for all tasks to complete
-        await Task.WhenAll(locationsTask, financialYearsTask, languagesTask, companyProfileTask);
-
-        var locations = await locationsTask;
-        var financialYears = await financialYearsTask;
-        var languages = await languagesTask;
-        var companyProfile = await companyProfileTask;
+        // Execute sequentially to preserve IHttpContextAccessor/Tenant context safely
+        var locations = await locationRepository.All.AsNoTracking().ToListAsync(cancellationToken);
+        var financialYears = await financialYearRepository.All.AsNoTracking().ToListAsync(cancellationToken);
+        var languages = await mediator.Send(new GetAllLanguageCommand(), cancellationToken);
+        var companyProfile = await companyProfileRepository.All.AsNoTracking().FirstOrDefaultAsync(cancellationToken);
 
         if (companyProfile == null)
         {

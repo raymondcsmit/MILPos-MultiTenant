@@ -476,6 +476,9 @@ namespace POS.Migrations.PostgreSQL.Migrations
                     b.Property<DateTime?>("LastSyncedAt")
                         .HasColumnType("timestamp without time zone");
 
+                    b.Property<Guid?>("LocationId")
+                        .HasColumnType("uuid");
+
                     b.Property<string>("MobileNo")
                         .HasMaxLength(50)
                         .HasColumnType("character varying(50)");
@@ -489,6 +492,9 @@ namespace POS.Migrations.PostgreSQL.Migrations
                     b.Property<string>("PhoneNo")
                         .HasMaxLength(50)
                         .HasColumnType("character varying(50)");
+
+                    b.Property<Guid?>("SalesPersonId")
+                        .HasColumnType("uuid");
 
                     b.Property<Guid?>("ShippingAddressId")
                         .HasColumnType("uuid");
@@ -516,6 +522,10 @@ namespace POS.Migrations.PostgreSQL.Migrations
                     b.HasIndex("BillingAddressId");
 
                     b.HasIndex("CreatedBy");
+
+                    b.HasIndex("LocationId");
+
+                    b.HasIndex("SalesPersonId");
 
                     b.HasIndex("ShippingAddressId");
 
@@ -4148,6 +4158,9 @@ namespace POS.Migrations.PostgreSQL.Migrations
                     b.Property<string>("PurchaseReturnNote")
                         .HasColumnType("text");
 
+                    b.Property<Guid?>("SalesPersonId")
+                        .HasColumnType("uuid");
+
                     b.Property<int>("Status")
                         .HasColumnType("integer");
 
@@ -4187,6 +4200,8 @@ namespace POS.Migrations.PostgreSQL.Migrations
                     b.HasIndex("CreatedBy");
 
                     b.HasIndex("LocationId");
+
+                    b.HasIndex("SalesPersonId");
 
                     b.HasIndex("SupplierId");
 
@@ -4783,6 +4798,9 @@ namespace POS.Migrations.PostgreSQL.Migrations
                     b.Property<string>("SaleType")
                         .HasColumnType("text");
 
+                    b.Property<Guid?>("SalesPersonId")
+                        .HasColumnType("uuid");
+
                     b.Property<int>("Status")
                         .HasColumnType("integer");
 
@@ -4821,6 +4839,8 @@ namespace POS.Migrations.PostgreSQL.Migrations
                     b.HasIndex("CustomerId");
 
                     b.HasIndex("LocationId");
+
+                    b.HasIndex("SalesPersonId");
 
                     b.HasIndex("TenantId", "CustomerId")
                         .HasDatabaseName("IX_SalesOrder_Tenant_Customer");
@@ -5682,6 +5702,14 @@ namespace POS.Migrations.PostgreSQL.Migrations
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
+                    b.HasOne("POS.Data.Entities.Location", "Location")
+                        .WithMany()
+                        .HasForeignKey("LocationId");
+
+                    b.HasOne("POS.Data.User", "SalesPerson")
+                        .WithMany()
+                        .HasForeignKey("SalesPersonId");
+
                     b.HasOne("POS.Data.Entities.ContactAddress", "ShippingAddress")
                         .WithMany()
                         .HasForeignKey("ShippingAddressId")
@@ -5690,6 +5718,10 @@ namespace POS.Migrations.PostgreSQL.Migrations
                     b.Navigation("BillingAddress");
 
                     b.Navigation("CreatedByUser");
+
+                    b.Navigation("Location");
+
+                    b.Navigation("SalesPerson");
 
                     b.Navigation("ShippingAddress");
                 });
@@ -6793,6 +6825,10 @@ namespace POS.Migrations.PostgreSQL.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
+                    b.HasOne("POS.Data.User", "SalesPerson")
+                        .WithMany()
+                        .HasForeignKey("SalesPersonId");
+
                     b.HasOne("POS.Data.Supplier", "Supplier")
                         .WithMany()
                         .HasForeignKey("SupplierId")
@@ -6802,6 +6838,8 @@ namespace POS.Migrations.PostgreSQL.Migrations
                     b.Navigation("CreatedByUser");
 
                     b.Navigation("Location");
+
+                    b.Navigation("SalesPerson");
 
                     b.Navigation("Supplier");
                 });
@@ -7029,11 +7067,17 @@ namespace POS.Migrations.PostgreSQL.Migrations
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
+                    b.HasOne("POS.Data.User", "SalesPerson")
+                        .WithMany()
+                        .HasForeignKey("SalesPersonId");
+
                     b.Navigation("CreatedByUser");
 
                     b.Navigation("Customer");
 
                     b.Navigation("Location");
+
+                    b.Navigation("SalesPerson");
                 });
 
             modelBuilder.Entity("POS.Data.SalesOrderItem", b =>

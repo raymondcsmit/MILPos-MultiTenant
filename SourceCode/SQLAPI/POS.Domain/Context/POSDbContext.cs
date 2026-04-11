@@ -182,11 +182,13 @@ namespace POS.Domain
                 b.HasIndex(p => new { p.TenantId, p.Code }).IsUnique().HasDatabaseName("IX_Product_Tenant_Code");
                 b.HasIndex(p => new { p.TenantId, p.Barcode }).HasDatabaseName("IX_Product_Tenant_Barcode");
                 b.HasIndex(p => new { p.TenantId, p.CategoryId }).HasDatabaseName("IX_Product_Tenant_Category");
+                b.HasIndex(p => new { p.TenantId, p.IsDeleted }).HasDatabaseName("IX_Product_Tenant_IsDeleted");
             });
 
             builder.Entity<ProductCategory>(b =>
             {
                 b.HasIndex(c => new { c.TenantId, c.Name }).HasDatabaseName("IX_ProductCategory_Tenant_Name");
+                b.HasIndex(c => new { c.TenantId, c.IsDeleted }).HasDatabaseName("IX_ProductCategory_Tenant_IsDeleted");
             });
 
             builder.Entity<Brand>(b =>
@@ -211,6 +213,7 @@ namespace POS.Domain
                 b.HasIndex(s => new { s.TenantId, s.SOCreatedDate }).HasDatabaseName("IX_SalesOrder_Tenant_Date");
                 b.HasIndex(s => new { s.TenantId, s.CustomerId }).HasDatabaseName("IX_SalesOrder_Tenant_Customer");
                 b.HasIndex(s => new { s.TenantId, s.Status }).HasDatabaseName("IX_SalesOrder_Tenant_Status");
+                b.HasIndex(s => new { s.TenantId, s.IsDeleted, s.SOCreatedDate }).HasDatabaseName("IX_SalesOrder_Tenant_IsDeleted_Date");
             });
 
             builder.Entity<PurchaseOrder>(b =>
@@ -218,11 +221,19 @@ namespace POS.Domain
                 b.HasIndex(p => new { p.TenantId, p.OrderNumber }).IsUnique().HasDatabaseName("IX_PurchaseOrder_Tenant_Number");
                 b.HasIndex(p => new { p.TenantId, p.POCreatedDate }).HasDatabaseName("IX_PurchaseOrder_Tenant_Date");
                 b.HasIndex(p => new { p.TenantId, p.SupplierId }).HasDatabaseName("IX_PurchaseOrder_Tenant_Supplier");
+                b.HasIndex(p => new { p.TenantId, p.IsDeleted, p.POCreatedDate }).HasDatabaseName("IX_PurchaseOrder_Tenant_IsDeleted_Date");
             });
 
             builder.Entity<SalesOrderItem>(b =>
             {
                 b.HasIndex(si => si.SalesOrderId).HasDatabaseName("IX_SalesOrderItem_SalesOrder");
+                b.HasIndex(si => si.ProductId).HasDatabaseName("IX_SalesOrderItem_Product");
+            });
+
+            builder.Entity<PurchaseOrderItem>(b =>
+            {
+                b.HasIndex(pi => pi.PurchaseOrderId).HasDatabaseName("IX_PurchaseOrderItem_PurchaseOrder");
+                b.HasIndex(pi => pi.ProductId).HasDatabaseName("IX_PurchaseOrderItem_Product");
             });
 
             // CRM Indexes
@@ -244,11 +255,17 @@ namespace POS.Domain
             {
                 b.HasIndex(e => new { e.TenantId, e.ExpenseDate }).HasDatabaseName("IX_Expense_Tenant_Date");
                 b.HasIndex(e => new { e.TenantId, e.ExpenseCategoryId }).HasDatabaseName("IX_Expense_Tenant_Category");
+                b.HasIndex(e => new { e.TenantId, e.IsDeleted, e.ExpenseDate }).HasDatabaseName("IX_Expense_Tenant_IsDeleted_Date");
             });
 
             builder.Entity<Transaction>(b =>
             {
                 b.HasIndex(t => new { t.TenantId, t.TransactionDate }).HasDatabaseName("IX_Transaction_Tenant_Date");
+            });
+
+            builder.Entity<TransactionItem>(b =>
+            {
+                b.HasIndex(ti => ti.TransactionId).HasDatabaseName("IX_TransactionItem_Transaction");
             });
 
             // User Identity Indexes (Custom)

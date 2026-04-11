@@ -1,4 +1,4 @@
-﻿using MediatR;
+using MediatR;
 using POS.Data;
 using POS.Data.Dto;
 using POS.Data.Entities.Accounts;
@@ -38,6 +38,8 @@ namespace POS.MediatR.CommandAndQuery
         public string BuyerPhoneNumber { get; set; }
         public string BuyerAddress { get; set; }
         public string SaleType { get; set; }
+        
+        public Guid? SalesPersonId { get; set; }
 
     }
 }

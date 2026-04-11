@@ -1,4 +1,4 @@
-﻿using AutoMapper;
+using AutoMapper;
 using Microsoft.EntityFrameworkCore;
 using POS.Common.GenericRepository;
 using POS.Common.UnitOfWork;
@@ -39,7 +39,9 @@ namespace POS.Repository
             IQueryable<Product> collectionBeforePaging =
                 AllIncluding(c => c.Brand, cs => cs.ProductCategory, u => u.Unit)
                 .Include(c => c.ProductTaxes)
-                    .ThenInclude(c => c.Tax);
+                    .ThenInclude(c => c.Tax)
+                .AsNoTracking()
+                .AsSplitQuery();
 
             if (productResource.IgnoreTenantFilter)
             {

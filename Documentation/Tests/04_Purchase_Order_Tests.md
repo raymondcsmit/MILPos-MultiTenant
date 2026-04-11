@@ -1,55 +1,200 @@
-# Purchase Order Management - Comprehensive Test Suite
+# Purchase Order Management - Enhanced End-to-End Test Suite
 
-## 1. Test Objectives & Scope
-**Module**: Purchase_Order
-**Description**: Handles purchasing from suppliers, stock receiving, and purchase returns.
-**Objective**: Ensure complete end-to-end reliability, data integrity, and UI/UX correctness for all features within this module.
+## 1. Module Overview
+**Description:** Handles purchasing from suppliers, stock receiving, and purchase returns.
 
-## 2. Test Data Sets
-This module requires specific data setups before execution.
-
-### 2.1 Normal Operations
-* **Data**: Valid supplier, valid products, standard quantities.
-* **Purpose**: Verify standard "happy path" workflows.
-
-### 2.2 Boundary Conditions
-* **Data**: PO with 500 line items.
-* **Purpose**: Verify system stability at the absolute limits of acceptable input.
-
-### 2.3 Error Scenarios & Edge Cases
-* **Data**: Inactive supplier, product not found, zero quantity. | PO received, but product was deleted concurrently.
-* **Purpose**: Ensure the system gracefully handles invalid states, rejects bad data with standard `ApiResponse`, and maintains ACID properties.
+> **Note for Junior Testers:** The test cases below provide concrete, step-by-step instructions. Please read the "Domain Context" to understand *why* we test this feature, and strictly follow the exact values provided in "Test Data".
 
 ---
 
-## 3. Unit Tests (White-Box)
-*Validates internal logic, isolated methods, utility calculations, and specific code paths without database access.*
+### Test Case: PUR-BB-01 - Create and Receive PO via UI
+**Test Type:** System Test (Black-Box)
 
-| Test ID | Objective | Steps | Expected Result | Actual Result | Pass/Fail |
-|---------|-----------|-------|-----------------|---------------|-----------|
-| PUR-UT-01 | Validate Purchase Order Total calculation | Add 3 items with different prices, quantities, and discounts | Subtotal, Tax, Discount, and Grand Total match expected mathematical output | [ ] | [ ] |
-| PUR-UT-02 | Validate Purchase Return validation | Attempt to return 10 items when only 5 were purchased | Validation Exception thrown | [ ] | [ ] |
+#### 🧠 Domain Context for Junior Testers
+A Purchase Order (PO) is a request sent to a supplier to buy goods. Once the goods arrive, the PO is marked 'Received' and our inventory increases.
 
-## 4. Integration Tests (White-Box / Black-Box)
-*Verifies interaction between API Controllers, MediatR Handlers, EF Core Repositories, and the underlying Database.*
+#### 🛠 Preconditions
+- Logged in as Admin.
+- A supplier named 'Global Traders' exists.
+- A product named 'Laptop' exists.
 
-| Test ID | Objective | Steps | Expected Result | Actual Result | Pass/Fail |
-|---------|-----------|-------|-----------------|---------------|-----------|
-| PUR-IT-01 | Verify Stock increments on Purchase Order completion | Create PO for 50 items, mark as 'Received' | ProductStock table increments by 50 for the specific location | [ ] | [ ] |
-| PUR-IT-02 | Verify Accounting Entry generation | Complete a Purchase Order with 'Paid' status | Double-entry records created in AccountingEntry table (Debit Inventory, Credit Cash) | [ ] | [ ] |
+#### 📦 Test Data (Concrete Input Values)
+- **Supplier:** `Global Traders`
+- **Product:** `Laptop`
+- **Quantity:** `50`
+- **Status:** `Received`
 
-## 5. System Tests (Black-Box / End-to-End)
-*Examines application flows from a strictly end-user perspective via the Angular Frontend or Postman API calls.*
+#### 🚀 Step-by-Step Execution
+1. Navigate to 'Purchases -> Add Purchase'.
+2. Select `Global Traders` from the supplier dropdown.
+3. Add `Laptop` to the item list and set quantity to `50`.
+4. Change the PO Status dropdown to `Received`.
+5. Click 'Save'.
 
-| Test ID | Objective | Steps | Expected Result | Actual Result | Pass/Fail |
-|---------|-----------|-------|-----------------|---------------|-----------|
-| PUR-BB-01 | Create and Receive PO via UI | Go to Purchases -> Add, select Supplier, add 2 items, submit as Received | PO Status is Received, Inventory updated | [ ] | [ ] |
-| PUR-BB-02 | Purchase Order Payment Partial | Create $1000 PO, add $500 payment | PO Status is 'Partial', Balance Due is $500 | [ ] | [ ] |
+#### ✅ Expected Results
+- Success toast appears. Redirected to Purchase List.
 
-## 6. Internal Logic Tests (White-Box)
-*Deep-dive validation of transaction scopes, concurrency, security policies, and architectural constraints.*
+#### 🔍 Post-Execution Verification Criteria
+- Navigate to the Products page. Verify the stock for 'Laptop' has increased by 50.
 
-| Test ID | Objective | Steps | Expected Result | Actual Result | Pass/Fail |
-|---------|-----------|-------|-----------------|---------------|-----------|
-| PUR-WB-01 | Validate IDbContextTransaction across multiple Repositories | Trace AddPurchaseOrderCommandHandler. Verify _purchaseOrderRepo, _inventoryRepo, and _accountingRepo share the same transaction ID | All inserts succeed or all fail together | [ ] | [ ] |
-| PUR-WB-02 | Verify Supplier Ledger updating logic | Trace logic updating the supplier's running balance | Supplier balance accurately reflects the new PO debt | [ ] | [ ] |
+### Test Case: PUR-BB-02 - Purchase Order Payment Partial
+**Test Type:** System Test (Black-Box)
+
+#### 🧠 Domain Context for Junior Testers
+Businesses often pay suppliers in installments. If a PO costs $1000 and we pay $500, the PO status is 'Partial'.
+
+#### 🛠 Preconditions
+- An existing PO for $1000 with status 'Pending Payment'.
+
+#### 📦 Test Data (Concrete Input Values)
+- **Payment Amount:** `$500`
+- **Payment Method:** `Bank Transfer`
+
+#### 🚀 Step-by-Step Execution
+1. Navigate to the Purchase List.
+2. Click 'Add Payment' on the $1000 PO.
+3. Enter `$500` in the amount field.
+4. Select `Bank Transfer`.
+5. Click 'Submit'.
+
+#### ✅ Expected Results
+- Payment is recorded successfully.
+
+#### 🔍 Post-Execution Verification Criteria
+- The PO status changes to 'Partial'. The 'Balance Due' displays as $500.
+
+### Test Case: PUR-IT-01 - Verify Stock increments on Purchase Order completion
+**Test Type:** Integration Test
+
+#### 🧠 Domain Context for Junior Testers
+Ensures the backend database actually updates the inventory tables when a PO is marked 'Received'.
+
+#### 🛠 Preconditions
+- Test database running. 'Laptop' stock is exactly 0.
+
+#### 📦 Test Data (Concrete Input Values)
+- **PO Payload:** 10 Laptops, Status = 'Received'.
+
+#### 🚀 Step-by-Step Execution
+1. Run integration test `Verify_PO_Received_UpdatesStock`.
+2. Send POST request to `/api/purchases`.
+
+#### ✅ Expected Results
+- API returns 200 OK.
+
+#### 🔍 Post-Execution Verification Criteria
+- Query `ProductStock` table for Laptop. Assert stock is exactly 10.
+
+### Test Case: PUR-IT-02 - Verify Accounting Entry generation
+**Test Type:** Integration Test
+
+#### 🧠 Domain Context for Junior Testers
+Every financial transaction must balance in accounting. Paying a supplier reduces our Cash and reduces our Accounts Payable debt.
+
+#### 🛠 Preconditions
+- Test database running.
+
+#### 📦 Test Data (Concrete Input Values)
+- **Payment Payload:** $500 paid to Supplier.
+
+#### 🚀 Step-by-Step Execution
+1. Run integration test `Verify_POPayment_CreatesLedgerEntries`.
+2. Send POST request to `/api/purchase-payments`.
+
+#### ✅ Expected Results
+- API returns 200 OK.
+
+#### 🔍 Post-Execution Verification Criteria
+- Query `AccountingEntries` table. Verify two rows were created: Debit Accounts Payable ($500) and Credit Cash ($500).
+
+### Test Case: PUR-UT-01 - Validate Purchase Order Total calculation
+**Test Type:** Unit Test (White-Box)
+
+#### 🧠 Domain Context for Junior Testers
+Calculates the grand total of a PO by summing line items, applying taxes, and subtracting discounts.
+
+#### 🛠 Preconditions
+- Unit test project built.
+
+#### 📦 Test Data (Concrete Input Values)
+- **Item 1:** $100 x 2
+- **Item 2:** $50 x 1
+- **Discount:** $20
+- **Tax:** 10%
+
+#### 🚀 Step-by-Step Execution
+1. Run `Calculate_POTotal_ReturnsCorrectMath`.
+2. Pass the items, discount, and tax to the calculation engine.
+
+#### ✅ Expected Results
+- Subtotal = $250. Discounted = $230. Tax = $23. Grand Total = $253.
+
+#### 🔍 Post-Execution Verification Criteria
+- Test passes.
+
+### Test Case: PUR-UT-02 - Validate Purchase Return validation
+**Test Type:** Unit Test (White-Box)
+
+#### 🧠 Domain Context for Junior Testers
+We cannot return more items to a supplier than we originally purchased from them. This prevents inventory corruption.
+
+#### 🛠 Preconditions
+- Original PO had 5 Laptops.
+
+#### 📦 Test Data (Concrete Input Values)
+- **Return Request:** 10 Laptops
+
+#### 🚀 Step-by-Step Execution
+1. Run `Validate_OverReturn_ThrowsException`.
+2. Dispatch the `AddPurchaseReturnCommand` with 10 items.
+
+#### ✅ Expected Results
+- The validation engine catches the discrepancy and throws a Validation Exception.
+
+#### 🔍 Post-Execution Verification Criteria
+- Test passes, proving the guardrail works.
+
+### Test Case: PUR-WB-01 - Validate IDbContextTransaction across multiple Repositories
+**Test Type:** Internal Logic Test (White-Box)
+
+#### 🧠 Domain Context for Junior Testers
+When receiving a PO, we save the PO, update Inventory, and write Accounting logs. If one fails, ALL must fail (Atomicity) to prevent corrupt data.
+
+#### 🛠 Preconditions
+- Mock the `AccountingRepository` to throw a Database Error.
+
+#### 📦 Test Data (Concrete Input Values)
+- **Valid PO Payload**
+
+#### 🚀 Step-by-Step Execution
+1. Execute `Validate_TransactionRollback_OnPartialFailure`.
+2. Dispatch the `AddPurchaseOrderCommand`.
+
+#### ✅ Expected Results
+- The PO saves, the Inventory updates, but Accounting throws an error. The `_uow.RollbackTransactionAsync()` is triggered.
+
+#### 🔍 Post-Execution Verification Criteria
+- Assert the database is completely empty. Neither the PO nor the Inventory changes were permanently saved.
+
+### Test Case: PUR-WB-02 - Verify Supplier Ledger updating logic
+**Test Type:** Internal Logic Test (White-Box)
+
+#### 🧠 Domain Context for Junior Testers
+A supplier's ledger tracks how much money we owe them in total across all purchases.
+
+#### 🛠 Preconditions
+- Supplier balance is $0.
+
+#### 📦 Test Data (Concrete Input Values)
+- **PO Amount:** $1000 (Unpaid)
+
+#### 🚀 Step-by-Step Execution
+1. Execute `Validate_SupplierLedger_IncreasesOnPurchase`.
+2. Process the PO creation.
+
+#### ✅ Expected Results
+- The Supplier's `TotalPayable` field increases by $1000.
+
+#### 🔍 Post-Execution Verification Criteria
+- Process a $500 payment. Verify the `TotalPayable` drops to $500.
+

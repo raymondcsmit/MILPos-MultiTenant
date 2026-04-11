@@ -107,7 +107,7 @@ namespace POS.MediatR.Handlers
 
                 _mapper.Map(request, entityExist);
 
-                if (entityExist.ExpenseTaxes != null & entityExist.ExpenseTaxes.Count() > 0)
+                if (entityExist.ExpenseTaxes != null && entityExist.ExpenseTaxes.Any())
                 {
                     entityExist.ExpenseTaxes.ForEach(x => x.Tax = null);
                 }

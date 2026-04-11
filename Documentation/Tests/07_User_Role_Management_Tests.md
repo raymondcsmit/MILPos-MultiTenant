@@ -1,55 +1,194 @@
-# User & Role Management - Comprehensive Test Suite
+# User & Role Management - Enhanced End-to-End Test Suite
 
-## 1. Test Objectives & Scope
-**Module**: User_Role_Management
-**Description**: Handles user authentication, role-based access control (RBAC), and JWT token generation.
-**Objective**: Ensure complete end-to-end reliability, data integrity, and UI/UX correctness for all features within this module.
+## 1. Module Overview
+**Description:** Handles user authentication, role-based access control (RBAC), and JWT token generation.
 
-## 2. Test Data Sets
-This module requires specific data setups before execution.
-
-### 2.1 Normal Operations
-* **Data**: Valid email, standard strong password.
-* **Purpose**: Verify standard "happy path" workflows.
-
-### 2.2 Boundary Conditions
-* **Data**: Password with exactly 8 characters.
-* **Purpose**: Verify system stability at the absolute limits of acceptable input.
-
-### 2.3 Error Scenarios & Edge Cases
-* **Data**: Incorrect password, non-existent email, locked account. | User assigned to a role that has been deleted concurrently.
-* **Purpose**: Ensure the system gracefully handles invalid states, rejects bad data with standard `ApiResponse`, and maintains ACID properties.
+> **Note for Junior Testers:** The test cases below provide concrete, step-by-step instructions. Please read the "Domain Context" to understand *why* we test this feature, and strictly follow the exact values provided in "Test Data".
 
 ---
 
-## 3. Unit Tests (White-Box)
-*Validates internal logic, isolated methods, utility calculations, and specific code paths without database access.*
+### Test Case: USR-BB-01 - UI Login Flow
+**Test Type:** System Test (Black-Box)
 
-| Test ID | Objective | Steps | Expected Result | Actual Result | Pass/Fail |
-|---------|-----------|-------|-----------------|---------------|-----------|
-| USR-UT-01 | Validate Password Hash matching | Input correct plaintext password against stored hash | Validation passes, true returned | [ ] | [ ] |
-| USR-UT-02 | Validate JWT Token Generation | Provide User entity with 3 specific claims | JWT token generated containing exactly those 3 claims | [ ] | [ ] |
+#### 🧠 Domain Context for Junior Testers
+Users must securely log into the system to perform any action. Their session is managed by a temporary digital 'token'.
 
-## 4. Integration Tests (White-Box / Black-Box)
-*Verifies interaction between API Controllers, MediatR Handlers, EF Core Repositories, and the underlying Database.*
+#### 🛠 Preconditions
+- Frontend running at `http://localhost:4200`.
+- Valid user exists: `admin@testmart.com`.
 
-| Test ID | Objective | Steps | Expected Result | Actual Result | Pass/Fail |
-|---------|-----------|-------|-----------------|---------------|-----------|
-| USR-IT-01 | Verify Role Permission assignment | Assign 'View Products' permission to 'Cashier' role, authenticate as Cashier | API allows access to GET /products, denies POST /products | [ ] | [ ] |
-| USR-IT-02 | Verify Login API | Send POST /login with valid seeded credentials | 200 OK with valid Bearer Token and User Profile | [ ] | [ ] |
+#### 📦 Test Data (Concrete Input Values)
+- **Email:** `admin@testmart.com`
+- **Password:** `Password123!`
 
-## 5. System Tests (Black-Box / End-to-End)
-*Examines application flows from a strictly end-user perspective via the Angular Frontend or Postman API calls.*
+#### 🚀 Step-by-Step Execution
+1. Open browser to `/login`.
+2. Enter the Email and Password exactly.
+3. Click 'Login'.
 
-| Test ID | Objective | Steps | Expected Result | Actual Result | Pass/Fail |
-|---------|-----------|-------|-----------------|---------------|-----------|
-| USR-BB-01 | UI Login Flow | Enter valid email and password on /login, click Login | Redirect to /dashboard, User name displayed in top right | [ ] | [ ] |
-| USR-BB-02 | UI Role Creation | Navigate to Roles -> Add, select 5 permissions, save | Role appears in table, permissions correctly assigned in DB | [ ] | [ ] |
+#### ✅ Expected Results
+- Redirects to the `/dashboard`.
+- The user's name is visible in the top-right header menu.
 
-## 6. Internal Logic Tests (White-Box)
-*Deep-dive validation of transaction scopes, concurrency, security policies, and architectural constraints.*
+#### 🔍 Post-Execution Verification Criteria
+- Open Chrome DevTools (F12) -> Application -> Local Storage. Verify a `bearerToken` string is present.
 
-| Test ID | Objective | Steps | Expected Result | Actual Result | Pass/Fail |
-|---------|-----------|-------|-----------------|---------------|-----------|
-| USR-WB-01 | Validate API Authorization Middleware | Hit an [Authorize] endpoint without a token | Middleware intercepts and returns 401 Unauthorized before Controller execution | [ ] | [ ] |
-| USR-WB-02 | Validate TenantId filtering on Users | Query Users table as Tenant A | Global query filter automatically excludes Tenant B users | [ ] | [ ] |
+### Test Case: USR-BB-02 - UI Role Creation
+**Test Type:** System Test (Black-Box)
+
+#### 🧠 Domain Context for Junior Testers
+Role-Based Access Control (RBAC) allows Admins to create custom job titles (like 'Junior Cashier') and restrict what screens they can see.
+
+#### 🛠 Preconditions
+- Logged in as Admin.
+
+#### 📦 Test Data (Concrete Input Values)
+- **Role Name:** `Junior Cashier`
+- **Permissions:** `View POS`, `Add POS Sale` (Only 2 checkboxes).
+
+#### 🚀 Step-by-Step Execution
+1. Navigate to 'Settings -> Roles'.
+2. Click 'Add Role'.
+3. Enter `Junior Cashier` as the name.
+4. Check ONLY the `View POS` and `Add POS Sale` boxes.
+5. Click 'Save'.
+
+#### ✅ Expected Results
+- The new role appears in the list.
+
+#### 🔍 Post-Execution Verification Criteria
+- Create a new user, assign them this role, and log in as them. Verify they cannot see the 'Settings' or 'Reports' menus.
+
+### Test Case: USR-IT-01 - Verify Role Permission assignment in API
+**Test Type:** Integration Test
+
+#### 🧠 Domain Context for Junior Testers
+Even if a user hacks the frontend to show a hidden button, the backend API must physically block them from accessing unauthorized data.
+
+#### 🛠 Preconditions
+- A user exists with a role that LACKS the `Delete Product` permission.
+
+#### 📦 Test Data (Concrete Input Values)
+- **Action:** DELETE `/api/products/GUID-123`
+
+#### 🚀 Step-by-Step Execution
+1. Run `Verify_UnauthorizedUser_Gets403`.
+2. Inject the user's JWT token.
+3. Send the DELETE request.
+
+#### ✅ Expected Results
+- The API returns a `403 Forbidden` status code.
+
+#### 🔍 Post-Execution Verification Criteria
+- Query the DB to ensure the product was NOT deleted.
+
+### Test Case: USR-IT-02 - Verify Login API
+**Test Type:** Integration Test
+
+#### 🧠 Domain Context for Junior Testers
+The `/api/auth/login` endpoint is the gateway to the app. It must return a valid token if credentials match.
+
+#### 🛠 Preconditions
+- Test database running.
+
+#### 📦 Test Data (Concrete Input Values)
+- **Payload:** Valid seeded email and password.
+
+#### 🚀 Step-by-Step Execution
+1. Run `Verify_Login_ReturnsJwtToken`.
+2. Send POST to `/api/auth/login`.
+
+#### ✅ Expected Results
+- 200 OK. The JSON body contains a `token` string and the user's profile details.
+
+#### 🔍 Post-Execution Verification Criteria
+- Ensure the returned token can successfully authorize a subsequent GET request to `/api/dashboard`.
+
+### Test Case: USR-UT-01 - Validate Password Hash matching
+**Test Type:** Unit Test (White-Box)
+
+#### 🧠 Domain Context for Junior Testers
+We never store plain-text passwords. We store encrypted 'hashes'. The system must correctly verify if an inputted password matches the stored hash.
+
+#### 🛠 Preconditions
+- Mocked `UserManager` with a pre-hashed version of 'Password123!'.
+
+#### 📦 Test Data (Concrete Input Values)
+- **Input Password:** `Password123!`
+
+#### 🚀 Step-by-Step Execution
+1. Run `Validate_PasswordHasher_ReturnsTrueOnMatch`.
+2. Call the hasher's verification method.
+
+#### ✅ Expected Results
+- The method returns `PasswordVerificationResult.Success`.
+
+#### 🔍 Post-Execution Verification Criteria
+- Run a secondary test with 'password123!' (lowercase). Verify it strictly returns `Failed`.
+
+### Test Case: USR-UT-02 - Validate JWT Token Generation
+**Test Type:** Unit Test (White-Box)
+
+#### 🧠 Domain Context for Junior Testers
+The JWT Token acts as a digital ID card. It must contain 'claims' like the user's ID, their Tenant ID, and their permissions.
+
+#### 🛠 Preconditions
+- JWT secret key configured in test appsettings.
+
+#### 📦 Test Data (Concrete Input Values)
+- **User Claims:** UserId, TenantId, Email
+
+#### 🚀 Step-by-Step Execution
+1. Run `Validate_JwtService_EmbedsClaims`.
+2. Call `GenerateTokenAsync`.
+
+#### ✅ Expected Results
+- A long encoded string is returned.
+
+#### 🔍 Post-Execution Verification Criteria
+- Decode the string in the test. Assert that the `TenantId` claim is present and matches the user's real TenantId.
+
+### Test Case: USR-WB-01 - Validate API Authorization Middleware
+**Test Type:** Internal Logic Test (White-Box)
+
+#### 🧠 Domain Context for Junior Testers
+Any endpoint marked with `[Authorize]` must bounce unauthenticated users immediately, before running any expensive database queries.
+
+#### 🛠 Preconditions
+- Controller endpoint marked with `[Authorize]`.
+
+#### 📦 Test Data (Concrete Input Values)
+- **Header:** No `Authorization` header provided.
+
+#### 🚀 Step-by-Step Execution
+1. Run `Validate_NoToken_Returns401`.
+2. Hit the endpoint.
+
+#### ✅ Expected Results
+- The request is intercepted by the ASP.NET pipeline and returns `401 Unauthorized`.
+
+#### 🔍 Post-Execution Verification Criteria
+- Assert that the Controller's internal code was never executed (using a mock counter).
+
+### Test Case: USR-WB-02 - Validate TenantId filtering on Users
+**Test Type:** Internal Logic Test (White-Box)
+
+#### 🧠 Domain Context for Junior Testers
+A tenant admin should only be able to see the cashiers and managers working for THEIR specific company, not globally.
+
+#### 🛠 Preconditions
+- EF Core Interceptors active.
+
+#### 📦 Test Data (Concrete Input Values)
+- **Query:** `context.Users.ToList()`
+
+#### 🚀 Step-by-Step Execution
+1. Run `Validate_UserQuery_AppliesTenantFilter`.
+2. Authenticate as Tenant A.
+
+#### ✅ Expected Results
+- The intercepted SQL contains `WHERE TenantId = @__tenantId`.
+
+#### 🔍 Post-Execution Verification Criteria
+- Assert that users belonging to Tenant B are mathematically excluded from the result set.
+

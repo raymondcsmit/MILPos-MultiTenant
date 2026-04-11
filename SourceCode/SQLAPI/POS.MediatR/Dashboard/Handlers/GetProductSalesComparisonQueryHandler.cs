@@ -33,9 +33,15 @@ namespace POS.MediatR.Dashboard.Handlers
             var currentYear = DateTime.Now.Year;
             var lastYear = currentYear - 1;
 
+            var startOfCurrentYear = new DateTime(currentYear, 1, 1);
+            var endOfCurrentYear = new DateTime(currentYear + 1, 1, 1);
+            
+            var startOfLastYear = new DateTime(lastYear, 1, 1);
+            var endOfLastYear = new DateTime(lastYear + 1, 1, 1);
+
             // 1. Get Top Products for Current Year
-            var currentYearSales = await _salesOrderItemRepository.AllIncluding(c => c.SalesOrder, cs => cs.Product)
-                .Where(c => c.SalesOrder.SOCreatedDate.Year == currentYear
+            var currentYearSales = await _salesOrderItemRepository.AllIncluding(c => c.SalesOrder, cs => cs.Product).AsNoTracking()
+                .Where(c => c.SalesOrder.SOCreatedDate >= startOfCurrentYear && c.SalesOrder.SOCreatedDate < endOfCurrentYear
                         && locationIds.Contains(c.SalesOrder.LocationId)
                         && c.Status != PurchaseSaleItemStatusEnum.Return) // Exclude returns for simplicity or handle them? Requirement said "Sales"
                 .GroupBy(c => new { c.ProductId, c.Product.Name })
@@ -53,8 +59,8 @@ namespace POS.MediatR.Dashboard.Handlers
             var topProductIds = currentYearSales.Select(x => x.ProductId).ToList();
 
             // 2. Get Statistics for these products for Last Year
-            var lastYearSales = await _salesOrderItemRepository.AllIncluding(c => c.SalesOrder)
-                .Where(c => c.SalesOrder.SOCreatedDate.Year == lastYear
+            var lastYearSales = await _salesOrderItemRepository.AllIncluding(c => c.SalesOrder).AsNoTracking()
+                .Where(c => c.SalesOrder.SOCreatedDate >= startOfLastYear && c.SalesOrder.SOCreatedDate < endOfLastYear
                         && locationIds.Contains(c.SalesOrder.LocationId)
                         && topProductIds.Contains(c.ProductId)
                         && c.Status != PurchaseSaleItemStatusEnum.Return)

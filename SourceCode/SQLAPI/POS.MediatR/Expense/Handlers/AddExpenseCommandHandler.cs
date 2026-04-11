@@ -1,4 +1,4 @@
-﻿using AutoMapper;
+using AutoMapper;
 using MediatR;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.EntityFrameworkCore;
@@ -89,7 +89,7 @@ namespace POS.MediatR.Handlers
 
             var requestTaxIds = request.ExpenseTaxIds?.ToList() ?? new List<Guid>();
 
-            if (entity.ExpenseTaxes != null & entity.ExpenseTaxes.Count() > 0)
+            if (entity.ExpenseTaxes != null && entity.ExpenseTaxes.Any())
             {
                 entity.ExpenseTaxes.ForEach(x => x.Tax = null);
             }

@@ -1,4 +1,4 @@
-﻿using AutoMapper;
+using AutoMapper;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
@@ -30,6 +30,7 @@ namespace POS.MediatR.Handlers
         private readonly ITaxRepository _taxRepository;
         private readonly IProductRepository _productRepository;
         private readonly IProductStockRepository _productStockRepository;
+        private readonly UserInfoToken _userInfoToken;
 
         public AddPurchaseOrderCommandHandler(
             IPurchaseOrderRepository purchaseOrderRepository,
@@ -40,8 +41,8 @@ namespace POS.MediatR.Handlers
             IUnitConversationRepository unitConversationRepository,
             ITaxRepository taxRepository,
             IProductRepository productRepository,
-            IProductStockRepository productStockRepository
-            )
+            IProductStockRepository productStockRepository,
+            UserInfoToken userInfoToken)
         {
             _purchaseOrderRepository = purchaseOrderRepository;
             _uow = uow;
@@ -52,7 +53,7 @@ namespace POS.MediatR.Handlers
             _taxRepository = taxRepository;
             _productRepository = productRepository;
             _productStockRepository = productStockRepository;
-
+            _userInfoToken = userInfoToken;
         }
 
         public async Task<ServiceResponse<PurchaseOrderDto>> Handle(AddPurchaseOrderCommand request, CancellationToken cancellationToken)
@@ -66,6 +67,20 @@ namespace POS.MediatR.Handlers
 
             var purchaseOrder = _mapper.Map<POS.Data.PurchaseOrder>(request);
             purchaseOrder.PaymentStatus = PaymentStatus.Pending;
+
+            // Handle Sales Person Attribution
+            var isRestrictedUser = _userInfoToken.LocationIds != null && _userInfoToken.LocationIds.Any();
+            if (isRestrictedUser)
+            {
+                // Force attribution to the logged-in sales person to prevent spoofing
+                purchaseOrder.SalesPersonId = _userInfoToken.Id;
+            }
+            else
+            {
+                // Allow admin/manager to attribute the purchase "on behalf of"
+                purchaseOrder.SalesPersonId = request.SalesPersonId;
+            }
+
             purchaseOrder.PurchaseOrderItems.ForEach(item =>
             {
                 item.Product = null;

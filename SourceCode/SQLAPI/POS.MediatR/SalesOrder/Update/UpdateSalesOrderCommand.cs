@@ -1,4 +1,4 @@
-﻿using MediatR;
+using MediatR;
 using POS.Data;
 using POS.Data.Dto;
 using POS.Helper;
@@ -26,5 +26,7 @@ namespace POS.MediatR.SalesOrder.Commands
         public List<SalesOrderItemDto> SalesOrderItems { get; set; }
         public Guid LocationId { get; set; }
         public decimal TotalRoundOff { get; set; } = 0;
+        
+        public Guid? SalesPersonId { get; set; }
     }
 }

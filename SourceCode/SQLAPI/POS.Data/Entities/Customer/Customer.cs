@@ -1,4 +1,4 @@
-﻿using POS.Data.Entities;
+using POS.Data.Entities;
 using System;
 using System.ComponentModel.DataAnnotations.Schema;
 
@@ -24,6 +24,16 @@ namespace POS.Data
         public ContactAddress ShippingAddress { get; set; }
         public bool IsWalkIn { get; set; }
         public string TaxNumber { get; set; }
+        
+        // Sales Person & Region attribution
+        public Guid? SalesPersonId { get; set; }
+        [ForeignKey("SalesPersonId")]
+        public User SalesPerson { get; set; }
+        
+        public Guid? LocationId { get; set; }
+        [ForeignKey("LocationId")]
+        public Entities.Location Location { get; set; }
+
         [NotMapped]
         public string ImageUrl { get; set; }
 
