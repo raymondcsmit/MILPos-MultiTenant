@@ -42,7 +42,7 @@
                 </div>
               </div>
               <div class="d-flex flex-wrap gap-1 p-1 mt-2 product-list">
-                @for (a of filterProducts; let i = $index; track $index) {
+                @for (a of filterProducts; let i = $index; track a.id) {
                 <!-- <div class="col-sm-4"> -->
                 <div class="card card-pos cursor-pointer " (click)="onProductSelect(a)">
                   <div class="text-center card-text">{{ a.name }}</div>
@@ -78,7 +78,7 @@
                       <input class="form-control form-control-sm" formControlName="filerCustomer" focused="'true'"
                         type="text" autocomplete="off" placeholder="{{ 'SEARCH_OTHER_CUSTOMERS' | translate }} " />
                       <mat-divider></mat-divider>
-                      @for (customer of customers; track $index) {
+                      @for (customer of customers; track customer.id) {
                       <mat-option [value]="customer.id">
                         {{ customer.customerName }}
                       </mat-option>
@@ -109,7 +109,7 @@
                       <mat-select [dir]="langDir" formControlName="locationId"
                         placeholder="{{ 'BUSINESS_LOCATION' | translate }}" class="form-control form-control-sm"
                         panelClass="mat-select-control">
-                        @for (location of locations; track $index) {
+                        @for (location of locations; track location.id) {
                         <mat-option [value]="location.id">
                           {{ location.name }}
                         </mat-option>
@@ -136,7 +136,7 @@
                       <mat-select [dir]="langDir" formControlName="deliveryStatus"
                         placeholder="{{ 'DELIVERY_STATUS' | translate }}" class="form-control form-control-sm"
                         panelClass="mat-select-control">
-                        @for (deliveryStatus of salesDeliveryStatus; track $index) {
+                        @for (deliveryStatus of salesDeliveryStatus; track deliveryStatus.id) {
                         <mat-option [value]="deliveryStatus.id">
                           {{ deliveryStatus.name | translate }}
                         </mat-option>
@@ -172,7 +172,7 @@
                                 </tr>
                               </thead>
                               <tbody>
-                                @for (salesOrderItem of salesOrderItemsArray.controls; track $index;
+                                @for (salesOrderItem of salesOrderItemsArray.controls; track salesOrderItem;
                                 let i = $index) {
                                 <tr [ngClass]="{ 'odd-row': i % 2 === 0, 'even-row': i % 2 !== 0 }" [formGroupName]="i">
                                   <td>

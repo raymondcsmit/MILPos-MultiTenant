@@ -1,4 +1,4 @@
-import { ApplicationConfig, importProvidersFrom, inject, provideAppInitializer, provideBrowserGlobalErrorListeners, provideZoneChangeDetection, } from '@angular/core';
+import { ApplicationConfig, importProvidersFrom, inject, isDevMode, provideAppInitializer, provideBrowserGlobalErrorListeners, provideZoneChangeDetection, } from '@angular/core';
 import { provideRouter, withHashLocation } from '@angular/router';
 import { routes } from './app.routes';
 import { provideTranslateService } from '@ngx-translate/core';
@@ -8,8 +8,6 @@ import { HttpRequestInterceptor } from './http-request-interceptor';
 import { CacheInterceptor } from '@core/interceptors/cache.interceptor';
 import { provideNativeDateAdapter } from '@angular/material/core';
 import { provideStoreDevtools } from '@ngrx/store-devtools';
-import { FeatherModule } from 'angular-feather';
-import { allIcons } from 'angular-feather/icons';
 import { JWT_OPTIONS, JwtHelperService, JwtModule } from '@auth0/angular-jwt';
 import { CurrencyPipe } from '@angular/common';
 import { MatSnackBarModule } from '@angular/material/snack-bar';
@@ -29,7 +27,7 @@ export const appConfig: ApplicationConfig = {
     }),
     CurrencyPipe,
     provideHttpClient(
-      withInterceptors([CacheInterceptor, HttpRequestInterceptor]),
+      withInterceptors([CacheInterceptor, loadingInterceptor, HttpRequestInterceptor]),
     ),
     importProvidersFrom(
       JwtModule.forRoot({
@@ -48,12 +46,12 @@ export const appConfig: ApplicationConfig = {
     provideNativeDateAdapter(),
     provideStoreDevtools({
       connectInZone: true,
-      maxAge: 25
+      maxAge: 25,
+      logOnly: !isDevMode()
     }),
     importProvidersFrom(
       JwtModule,
-      MatSnackBarModule,
-      FeatherModule.pick(allIcons)
+      MatSnackBarModule
     ),
     provideRouter(routes, withHashLocation()),
 

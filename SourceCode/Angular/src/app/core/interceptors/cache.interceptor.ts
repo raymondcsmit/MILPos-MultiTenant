@@ -1,4 +1,4 @@
-import { inject } from '@angular/core';
+import { inject, isDevMode } from '@angular/core';
 import {
   HttpRequest,
   HttpHandlerFn,
@@ -50,10 +50,10 @@ export const CacheInterceptor: HttpInterceptorFn = (req: HttpRequest<unknown>, n
     // 6. Check Whitelist for Lookups
     const isWhitelisted = CACHE_CONFIG.whitelist.some(url => req.url.includes(url));
     if (isWhitelisted) {
-        console.log(`[CacheInterceptor] Whitelist Matched: ${req.url}`);
+        if (isDevMode()) console.log(`[CacheInterceptor] Whitelist Matched: ${req.url}`);
         return handleLookupCache(req, next, idbService);
     } else {
-         console.log(`[CacheInterceptor] Not Whitelisted: ${req.url}`);
+         if (isDevMode()) console.log(`[CacheInterceptor] Not Whitelisted: ${req.url}`);
     }
 
     // Default: Pass through
@@ -89,7 +89,7 @@ const handleWriteInvalidation = (req: HttpRequest<unknown>, idbService: IndexedD
         }
 
         if (resourceName) {
-            console.log(`Cache Invalidation Triggered for: ${resourceName}`);
+            if (isDevMode()) console.log(`Cache Invalidation Triggered for: ${resourceName}`);
             
             // 1. Universal Lookup Clean
             // Delete ANY lookup key that contains this resource name
@@ -129,16 +129,16 @@ const handleLookupCache = (req: HttpRequest<unknown>, next: HttpHandlerFn, idbSe
       return idbService.get('lookups', cacheKey).pipe(
           switchMap(cachedData => {
               if (cachedData) {
-                  console.log(`[CacheInterceptor] Serving from Cache: ${cacheKey}`);
+                  if (isDevMode()) console.log(`[CacheInterceptor] Serving from Cache: ${cacheKey}`);
                   return of(new HttpResponse({ body: cachedData, status: 200 }));
               }
-              console.log(`[CacheInterceptor] Cache Miss - Fetching: ${cacheKey}`);
+              if (isDevMode()) console.log(`[CacheInterceptor] Cache Miss - Fetching: ${cacheKey}`);
               return next(req).pipe(
                   tap(event => {
                       if (event instanceof HttpResponse) {
-                          console.log(`[CacheInterceptor] Caching Response for: ${cacheKey}`);
+                          if (isDevMode()) console.log(`[CacheInterceptor] Caching Response for: ${cacheKey}`);
                           idbService.put('lookups', cacheKey, event.body).subscribe({
-                              next: () => console.log(`[CacheInterceptor] Put Success: ${cacheKey}`),
+                              next: () => { if (isDevMode()) console.log(`[CacheInterceptor] Put Success: ${cacheKey}`); },
                               error: (err) => console.error(`[CacheInterceptor] Put Failed: ${cacheKey}`, err)
                           });
                       }

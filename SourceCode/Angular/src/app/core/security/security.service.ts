@@ -383,10 +383,18 @@ export class SecurityService {
       // Either get the claim value, or assume 'true'
       claimValue = claimValue ? claimValue : 'true';
     }
-    const token = this.wrLicenseService.getJWtToken();
+    const token = this.Token;
     if (token) {
-      const claims = Object.keys(token).filter((key) => token[key]);
-      ret = claims?.find((c: any) => c.toLowerCase() == claimType) != null;
+      const tokenRecord = token as Record<string, any>;
+      // For specific value checks, evaluate the exact token property
+      if (claimValue && claimValue !== 'true') {
+        ret = Object.keys(tokenRecord).some(
+          (key) => key.toLowerCase() === claimType && tokenRecord[key] === claimValue
+        );
+      } else {
+        // For standard permission checks, use the pre-cached Claims array
+        ret = this.Claims.some((c: string) => c.toLowerCase() === claimType);
+      }
     }
 
     return ret;

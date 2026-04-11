@@ -1,4 +1,4 @@
-import { Injectable } from '@angular/core';
+import { Injectable, isDevMode } from '@angular/core';
 import { openDB, DBSchema, IDBPDatabase } from 'idb';
 import { from, Observable, of } from 'rxjs';
 import { catchError, map } from 'rxjs/operators';
@@ -104,7 +104,7 @@ export class IndexedDbService {
               }
           }
           await tx.done;
-          console.log(`IDB: Deleted ${deletedCount} keys matching '${pattern}' from ${storeName}`);
+          if (isDevMode()) console.log(`IDB: Deleted ${deletedCount} keys matching '${pattern}' from ${storeName}`);
       })).pipe(
           catchError(err => {
               console.error('IDB Delete Pattern Error', err);

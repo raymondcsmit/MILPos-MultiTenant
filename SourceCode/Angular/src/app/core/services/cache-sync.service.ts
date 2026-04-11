@@ -1,4 +1,4 @@
-import { Injectable } from '@angular/core';
+import { Injectable, isDevMode } from '@angular/core';
 import { ProductService } from '../../product/product.service';
 import { SupplierService } from '../../supplier/supplier.service';
 import { CustomerService } from '../../customer/customer.service';
@@ -45,7 +45,7 @@ export class CacheSyncService {
       const products = await firstValueFrom(this.productService.getProductsDropdown(params));
       if (products) {
         await firstValueFrom(this.idbService.put('master_data', CACHE_CONFIG.masterDataKeys.products, products));
-        console.log('Master Data (Products) Synced:', products.length);
+        if (isDevMode()) console.log('Master Data (Products) Synced:', products.length);
       }
     } catch (error) {
       console.error('Failed to sync products', error);
@@ -61,7 +61,7 @@ export class CacheSyncService {
           const resp = await firstValueFrom(this.supplierService.getSuppliers(params)) as HttpResponse<Supplier[]>;
           if (resp && resp.body) {
               await firstValueFrom(this.idbService.put('master_data', CACHE_CONFIG.masterDataKeys.suppliers, resp.body));
-              console.log('Master Data (Suppliers) Synced:', resp.body.length);
+              if (isDevMode()) console.log('Master Data (Suppliers) Synced:', resp.body.length);
           }
       } catch (error) {
           console.error('Failed to sync suppliers', error);
@@ -76,7 +76,7 @@ export class CacheSyncService {
           const resp = await firstValueFrom(this.customerService.getCustomers(params)) as HttpResponse<Customer[]>;
           if (resp && resp.body) {
               await firstValueFrom(this.idbService.put('master_data', CACHE_CONFIG.masterDataKeys.customers, resp.body));
-              console.log('Master Data (Customers) Synced:', resp.body.length);
+              if (isDevMode()) console.log('Master Data (Customers) Synced:', resp.body.length);
           }
       } catch (error) {
           console.error('Failed to sync customers', error);
@@ -85,7 +85,7 @@ export class CacheSyncService {
 
   async clearCache() {
       await firstValueFrom(this.idbService.clearDatabase());
-      console.log('Cache Cleared');
+      if (isDevMode()) console.log('Cache Cleared');
   }
 
   private async syncLocations() {
@@ -95,7 +95,7 @@ export class CacheSyncService {
       // response so only ONE actual network request is made.
       const locations = await firstValueFrom(this.businessLocationService.getLocations());
       if (locations && locations.length > 0) {
-        console.log('Master Data (Locations) Synced:', locations.length);
+        if (isDevMode()) console.log('Master Data (Locations) Synced:', locations.length);
       }
     } catch (error) {
       console.error('Failed to sync locations', error);

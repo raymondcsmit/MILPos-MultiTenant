@@ -50,7 +50,23 @@ export class SignalrService {
     return new Promise((resolve, reject) => {
       this.hubConnection = new signalR.HubConnectionBuilder()
         .withUrl(`${environment.apiUrl}userHub`)
+        .withAutomaticReconnect([0, 2000, 10000, 30000])
         .build();
+        
+      this.hubConnection.onreconnected(() => {
+        const user = this.securityService.getUserDetail();
+        if (user) {
+          this.addUser({
+            id: user.id,
+            connectionId: this.connectionId
+          } as OnlineUser);
+        }
+      });
+      
+      this.hubConnection.onclose(() => {
+        console.warn('[SignalR] Connection closed');
+      });
+
       this.hubConnection
         .start()
         .then(() => {
