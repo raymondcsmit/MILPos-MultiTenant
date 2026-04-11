@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -8,6 +8,7 @@ using AutoMapper;
 using MediatR;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Logging;
 using POS.Common.UnitOfWork;
 using POS.Data;
@@ -37,6 +38,8 @@ namespace POS.MediatR.Handlers
         private readonly IFinancialYearRepository _financialYearRepository;
         private readonly IMediator _mediator;
         private readonly IFileStorageService _fileStorageService;
+        private readonly IMemoryCache _cache;
+        private readonly ITenantProvider _tenantProvider;
 
         public UpdateCompanyProfileCommandHandler(
             ICompanyProfileRepository companyProfileRepository,
@@ -49,7 +52,9 @@ namespace POS.MediatR.Handlers
             ILocationRepository locationRepository,
             IFinancialYearRepository financialYearRepository,
             IMediator mediator,
-            IFileStorageService fileStorageService)
+            IFileStorageService fileStorageService,
+            IMemoryCache cache,
+            ITenantProvider tenantProvider)
         {
             _companyProfileRepository = companyProfileRepository;
             _mapper = mapper;
@@ -62,6 +67,8 @@ namespace POS.MediatR.Handlers
             _financialYearRepository = financialYearRepository;
             _mediator = mediator;
             _fileStorageService = fileStorageService;
+            _cache = cache;
+            _tenantProvider = tenantProvider;
         }
         public async Task<ServiceResponse<CompanyProfileDto>> Handle(UpdateCompanyProfileCommand request, CancellationToken cancellationToken)
         {
@@ -144,6 +151,10 @@ namespace POS.MediatR.Handlers
             result.Locations = _mapper.Map<List<LocationDto>>(locations);
             var financialYears = await _financialYearRepository.All.ToListAsync();
             result.FinancialYears = _mapper.Map<List<FinancialYearDto>>(financialYears);
+
+            var tenantId = _tenantProvider.GetTenantId();
+            _cache.Remove($"CompanyProfile_{tenantId}");
+
             return ServiceResponse<CompanyProfileDto>.ReturnResultWith200(result);
         }
     }

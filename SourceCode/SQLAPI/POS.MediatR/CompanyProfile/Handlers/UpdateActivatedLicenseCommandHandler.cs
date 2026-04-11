@@ -58,6 +58,7 @@ internal class UpdateActivatedLicenseCommandHandler(ICompanyProfileRepository co
         {
             cache.Remove($"CompanyProfile_License:{tenantId.Value}");
             cache.Remove($"Tenant_Subscription:{tenantId.Value}");
+            cache.Remove($"CompanyProfile_{tenantId.Value}");
         }
         cache.Remove("CompanyProfile_License:global");
         cache.Remove("CompanyProfile_License");
