@@ -1,0 +1,184 @@
+"Id","CorrelationId","CommandText","Parameters","DurationMs","Timestamp"
+"1b0ee809-3b5e-401b-aef1-3bd082ef8b88","66dea4fa6a5647f39c64df6936347c44","SELECT s1.""Id"" AS ""SalesOrderId"", s1.""OrderNumber"" AS ""SalesOrderNumber"", s1.""DeliveryDate"" AS ""ExpectedShipmentDate"", (
+    SELECT COALESCE(sum(CASE
+        WHEN s2.""Status"" = 0 THEN s2.""Quantity""
+        ELSE -s2.""Quantity""
+    END), 0.0)
+    FROM ""SalesOrderItems"" AS s2
+    WHERE s1.""Id"" = s2.""SalesOrderId"") AS ""Quantity"", s1.""CustomerId"", c0.""CustomerName""
+FROM (
+    SELECT s.""Id"", s.""CustomerId"", s.""DeliveryDate"", s.""OrderNumber""
+    FROM ""SalesOrders"" AS s
+    WHERE s.""TenantId"" = @ef_filter__CurrentTenantId AND NOT (s.""IsDeleted"") AND NOT (s.""IsSalesOrderRequest"") AND s.""DeliveryStatus"" = 1 AND s.""LocationId"" = ANY (@_userInfoToken_LocationIds) AND (
+        SELECT COALESCE(sum(CASE
+            WHEN s0.""Status"" = 0 THEN s0.""Quantity""
+            ELSE -s0.""Quantity""
+        END), 0.0)
+        FROM ""SalesOrderItems"" AS s0
+        WHERE s.""Id"" = s0.""SalesOrderId"") > 0.0
+    ORDER BY s.""DeliveryDate"" DESC
+    LIMIT @p
+) AS s1
+INNER JOIN (
+    SELECT c.""Id"", c.""CustomerName""
+    FROM ""Customers"" AS c
+    WHERE c.""TenantId"" = @ef_filter__CurrentTenantId AND NOT (c.""IsDeleted"")
+) AS c0 ON s1.""CustomerId"" = c0.""Id""
+ORDER BY s1.""DeliveryDate"" DESC","@ef_filter__CurrentTenantId=10000000-0000-0000-0000-000000000001;@_userInfoToken_LocationIds=System.Collections.Generic.List`1[System.Guid];@p=10;","64","2026-04-12 14:47:38.314016"
+"3320d21f-2206-4845-ac64-07893bf07d02","3487caeefd9a42a9b3e58e2bd7237199","SELECT count(*)::int
+FROM ""ReminderSchedulers"" AS r
+WHERE r.""TenantId"" = @ef_filter__CurrentTenantId AND NOT (r.""IsDeleted"") AND NOT (r.""IsActive"") AND r.""UserId"" = @_userInfoToken_Id AND NOT (r.""IsRead"")","@ef_filter__CurrentTenantId=10000000-0000-0000-0000-000000000001;@_userInfoToken_Id=a29de04b-8668-4510-8107-13b7d5869736;","147","2026-04-12 14:47:38.296524"
+"fbdd5232-ea2f-498e-9a05-bd22fc8cfba5","cf55ccdfadc54e82a83b7bd6ab9622b3","SELECT t0.""TransactionType"", t0.""IsPayment"", COALESCE(sum(t0.""TotalAmount""), 0.0) AS ""TotalAmount""
+FROM (
+    SELECT t.""TotalAmount"", t.""TransactionType"", upper(t.""Narration"") LIKE '%PAYMENT%' AND t.""Narration"" IS NOT NULL AS ""IsPayment""
+    FROM ""Transactions"" AS t
+    WHERE t.""TenantId"" = @ef_filter__CurrentTenantId AND NOT (t.""IsDeleted"") AND t.""TransactionDate"" >= @fromDate AND t.""TransactionDate"" < @toDate AND t.""TransactionType"" IN (1, 2, 3, 4)
+) AS t0
+GROUP BY t0.""TransactionType"", t0.""IsPayment""","@ef_filter__CurrentTenantId=10000000-0000-0000-0000-000000000001;@fromDate=3/12/2026 7:00:00 PM;@toDate=4/12/2026 7:00:00 PM;","77","2026-04-12 14:47:38.341498"
+"509d2b15-3096-418e-a6bf-41c3055e2858","ab1461bd7f2f490790db6397ed6066c1","SELECT s1.""Id"", s1.""ContactPerson"", s1.""Description"", s1.""Fax"", s1.""SupplierName"", s1.""Website"", s1.""MobileNo"", s1.""PhoneNo"", s1.""Email"", s2.""CountryName"" AS ""Country""
+FROM (
+    SELECT s.""Id"", s.""BillingAddressId"", s.""ContactPerson"", s.""Description"", s.""Email"", s.""Fax"", s.""MobileNo"", s.""PhoneNo"", s.""SupplierName"", s.""Website""
+    FROM ""Suppliers"" AS s
+    WHERE s.""TenantId"" = @ef_filter__CurrentTenantId AND NOT (s.""IsDeleted"")
+    ORDER BY s.""SupplierName""
+    LIMIT @p1 OFFSET @p
+) AS s1
+INNER JOIN (
+    SELECT s0.""Id"", s0.""CountryName""
+    FROM ""SupplierAddresses"" AS s0
+    WHERE s0.""TenantId"" = @ef_filter__CurrentTenantId AND NOT (s0.""IsDeleted"")
+) AS s2 ON s1.""BillingAddressId"" = s2.""Id""
+ORDER BY s1.""SupplierName""","@ef_filter__CurrentTenantId=10000000-0000-0000-0000-000000000001;@p1=100;@p=0;","7","2026-04-12 14:47:39.298287"
+"6c0d69b6-f8e3-4e0f-9c6c-fc8c4fe32386","6c1775a9c6a94715b8013258656f1ef2","SELECT s0.""Key"" AS ""Month"", COALESCE(sum(s0.""TotalAmount""), 0.0) AS ""Total""
+FROM (
+    SELECT s.""TotalAmount"", date_part('month', s.""SOCreatedDate"")::int AS ""Key""
+    FROM ""SalesOrders"" AS s
+    WHERE s.""TenantId"" = @ef_filter__CurrentTenantId AND NOT (s.""IsDeleted"") AND date_part('year', s.""SOCreatedDate"")::int = @currentYear AND s.""LocationId"" = ANY (@locationIds) AND NOT (s.""IsSalesOrderRequest"")
+) AS s0
+GROUP BY s0.""Key""","@ef_filter__CurrentTenantId=10000000-0000-0000-0000-000000000001;@currentYear=2026;@locationIds=System.Collections.Generic.List`1[System.Guid];","5","2026-04-12 14:47:39.357257"
+"6ee69291-1bff-4550-a311-1077b9330bab","398de6f4fd294256b789b1136d6ddb64","SELECT count(*)::int
+FROM ""Customers"" AS c
+WHERE c.""TenantId"" = @ef_filter__CurrentTenantId AND NOT (c.""IsDeleted"") AND (c.""SalesPersonId"" = @userId OR (c.""LocationId"" IS NOT NULL AND c.""LocationId"" = ANY (@allowedLocations)))","@ef_filter__CurrentTenantId=10000000-0000-0000-0000-000000000001;@userId=a29de04b-8668-4510-8107-13b7d5869736;@allowedLocations=System.Collections.Generic.List`1[System.Guid];","14","2026-04-12 14:47:39.152904"
+"8313ee7d-05a6-461a-8d66-a10473b6be87","398de6f4fd294256b789b1136d6ddb64","SELECT c.""Id"", c.""CustomerName"", c.""Email"", c.""ContactPerson"", c.""MobileNo"", c.""Website"", c.""IsWalkIn""
+FROM ""Customers"" AS c
+WHERE c.""TenantId"" = @ef_filter__CurrentTenantId AND NOT (c.""IsDeleted"") AND (c.""SalesPersonId"" = @userId OR (c.""LocationId"" IS NOT NULL AND c.""LocationId"" = ANY (@allowedLocations)))
+ORDER BY c.""CustomerName""
+LIMIT @p3 OFFSET @p","@ef_filter__CurrentTenantId=10000000-0000-0000-0000-000000000001;@userId=a29de04b-8668-4510-8107-13b7d5869736;@allowedLocations=System.Collections.Generic.List`1[System.Guid];@p3=100;@p=0;","3","2026-04-12 14:47:39.232992"
+"973b75ef-ccdc-4757-8b6d-6f5fb14d305c","97d9fea263d048baa9b4e169b67ea8ed","SELECT s0.""Key"" AS ""Month"", COALESCE(sum(s0.""TotalAmount""), 0.0) AS ""Total""
+FROM (
+    SELECT s.""TotalAmount"", date_part('month', s.""SOCreatedDate"")::int AS ""Key""
+    FROM ""SalesOrders"" AS s
+    WHERE s.""TenantId"" = @ef_filter__CurrentTenantId AND NOT (s.""IsDeleted"") AND date_part('year', s.""SOCreatedDate"")::int = @currentYear AND s.""LocationId"" = ANY (@locationIds) AND NOT (s.""IsSalesOrderRequest"")
+) AS s0
+GROUP BY s0.""Key""","@ef_filter__CurrentTenantId=10000000-0000-0000-0000-000000000001;@currentYear=2026;@locationIds=System.Collections.Generic.List`1[System.Guid];","31","2026-04-12 14:47:39.336244"
+"a6295dca-2664-429c-a566-cd63241e6c77","50cb00c364944e08a60ef3ae9a80e7a9","SELECT count(*)::int
+FROM ""ProductStocks"" AS p
+INNER JOIN (
+    SELECT p0.""Id"", p0.""AlertQuantity""
+    FROM ""Products"" AS p0
+    WHERE p0.""TenantId"" = @ef_filter__CurrentTenantId AND NOT (p0.""IsDeleted"")
+) AS p1 ON p.""ProductId"" = p1.""Id""
+WHERE p.""TenantId"" = @ef_filter__CurrentTenantId AND NOT (p.""IsDeleted"") AND p1.""AlertQuantity"" IS NOT NULL AND p.""CurrentStock"" <= p1.""AlertQuantity"" AND p.""LocationId"" = ANY (@P_LocationIds)","@ef_filter__CurrentTenantId=10000000-0000-0000-0000-000000000001;@P_LocationIds=System.Collections.Generic.List`1[System.Guid];","70","2026-04-12 14:47:39.244182"
+"db0fc96c-37ce-4999-8d75-d9e5b74883a3","ab1461bd7f2f490790db6397ed6066c1","SELECT count(*)::int
+FROM ""Suppliers"" AS s
+WHERE s.""TenantId"" = @ef_filter__CurrentTenantId AND NOT (s.""IsDeleted"")","@ef_filter__CurrentTenantId=10000000-0000-0000-0000-000000000001;","14","2026-04-12 14:47:39.15719"
+"452f2787-388e-4428-a788-91f7f3bf34b6","6c1775a9c6a94715b8013258656f1ef2","SELECT s0.""Key"" AS ""Month"", COALESCE(sum(s0.""TotalAmount""), 0.0) AS ""Total""
+FROM (
+    SELECT s.""TotalAmount"", date_part('month', s.""SOCreatedDate"")::int AS ""Key""
+    FROM ""SalesOrders"" AS s
+    WHERE s.""TenantId"" = @ef_filter__CurrentTenantId AND NOT (s.""IsDeleted"") AND date_part('year', s.""SOCreatedDate"")::int = @lastYear AND s.""LocationId"" = ANY (@locationIds) AND NOT (s.""IsSalesOrderRequest"")
+) AS s0
+GROUP BY s0.""Key""","@ef_filter__CurrentTenantId=10000000-0000-0000-0000-000000000001;@lastYear=2025;@locationIds=System.Collections.Generic.List`1[System.Guid];","4","2026-04-12 14:47:39.385341"
+"75ea2f8e-9c75-4a98-8db3-4ec2b3fa4064","7c8b0598439141029f70fb000926f5f8","SELECT u.""Id"", u.""Name"", u.""ParentId"", CASE
+    WHEN u1.""Id"" IS NOT NULL THEN COALESCE(u1.""Name"", '') || '(' || COALESCE(u1.""Code"", '') || ')'
+    ELSE ''
+END AS ""BaseUnitName"", u.""Value"", u.""Operator"", u.""Code""
+FROM ""UnitConversations"" AS u
+LEFT JOIN (
+    SELECT u0.""Id"", u0.""Code"", u0.""Name""
+    FROM ""UnitConversations"" AS u0
+    WHERE u0.""TenantId"" = @ef_filter__CurrentTenantId AND NOT (u0.""IsDeleted"")
+) AS u1 ON u.""ParentId"" = u1.""Id""
+WHERE u.""TenantId"" = @ef_filter__CurrentTenantId AND NOT (u.""IsDeleted"")
+ORDER BY u.""Name""","@ef_filter__CurrentTenantId=10000000-0000-0000-0000-000000000001;","3","2026-04-12 14:47:55.921527"
+"55f3e779-1700-4772-af34-6c7aa4c0f2d6","5dd407d9dcd448f0b0a6429fb6d21cd7","SELECT c.""Id"", c.""Address"", c.""BusinessType"", c.""CreatedBy"", c.""CreatedDate"", c.""CurrencyCode"", c.""DeletedBy"", c.""DeletedDate"", c.""Email"", c.""IsDeleted"", c.""LastSyncedAt"", c.""LicenseKey"", c.""LogoUrl"", c.""ModifiedBy"", c.""ModifiedDate"", c.""Phone"", c.""PurchaseCode"", c.""SyncVersion"", c.""TaxName"", c.""TaxNumber"", c.""TenantId"", c.""Title""
+FROM ""CompanyProfiles"" AS c
+WHERE FALSE
+LIMIT 1","","2","2026-04-12 14:48:41.882391"
+"66047d6c-db21-421e-8645-535787c58dbc","2bf41fcfef714ae29e8daada5b9d96fe","SELECT c.""Id"", c.""Address"", c.""BusinessType"", c.""CreatedBy"", c.""CreatedDate"", c.""CurrencyCode"", c.""DeletedBy"", c.""DeletedDate"", c.""Email"", c.""IsDeleted"", c.""LastSyncedAt"", c.""LicenseKey"", c.""LogoUrl"", c.""ModifiedBy"", c.""ModifiedDate"", c.""Phone"", c.""PurchaseCode"", c.""SyncVersion"", c.""TaxName"", c.""TaxNumber"", c.""TenantId"", c.""Title""
+FROM ""CompanyProfiles"" AS c
+WHERE FALSE
+LIMIT 1","","5","2026-04-12 14:48:41.881856"
+"96a94dbb-34a9-437f-9660-f3aae374e963","6313156974214da5918dadb414370161","SELECT c.""Id"", c.""Address"", c.""BusinessType"", c.""CreatedBy"", c.""CreatedDate"", c.""CurrencyCode"", c.""DeletedBy"", c.""DeletedDate"", c.""Email"", c.""IsDeleted"", c.""LastSyncedAt"", c.""LicenseKey"", c.""LogoUrl"", c.""ModifiedBy"", c.""ModifiedDate"", c.""Phone"", c.""PurchaseCode"", c.""SyncVersion"", c.""TaxName"", c.""TaxNumber"", c.""TenantId"", c.""Title""
+FROM ""CompanyProfiles"" AS c
+WHERE FALSE
+LIMIT 1","","9","2026-04-12 14:48:41.881749"
+"ba25c9f4-57a3-4761-a77d-e15e64997134","67f992e1e486494ea8a03cedfb6be40c","SELECT c.""Id"", c.""Address"", c.""BusinessType"", c.""CreatedBy"", c.""CreatedDate"", c.""CurrencyCode"", c.""DeletedBy"", c.""DeletedDate"", c.""Email"", c.""IsDeleted"", c.""LastSyncedAt"", c.""LicenseKey"", c.""LogoUrl"", c.""ModifiedBy"", c.""ModifiedDate"", c.""Phone"", c.""PurchaseCode"", c.""SyncVersion"", c.""TaxName"", c.""TaxNumber"", c.""TenantId"", c.""Title""
+FROM ""CompanyProfiles"" AS c
+WHERE FALSE
+LIMIT 1","","4","2026-04-12 14:48:41.882262"
+"d362ab61-cff4-45fd-ad0e-19275da48a08","fed63f3305a34a5da1c414877691e798","SELECT c.""Id"", c.""Address"", c.""BusinessType"", c.""CreatedBy"", c.""CreatedDate"", c.""CurrencyCode"", c.""DeletedBy"", c.""DeletedDate"", c.""Email"", c.""IsDeleted"", c.""LastSyncedAt"", c.""LicenseKey"", c.""LogoUrl"", c.""ModifiedBy"", c.""ModifiedDate"", c.""Phone"", c.""PurchaseCode"", c.""SyncVersion"", c.""TaxName"", c.""TaxNumber"", c.""TenantId"", c.""Title""
+FROM ""CompanyProfiles"" AS c
+WHERE FALSE
+LIMIT 1","","9","2026-04-12 14:48:41.881787"
+"787e3992-0caa-44f1-a0ce-23567a7fecff","a98ccec9fbb4474e85d4caa1ad100087","SELECT c.""Id"", c.""Address"", c.""BusinessType"", c.""CreatedBy"", c.""CreatedDate"", c.""CurrencyCode"", c.""DeletedBy"", c.""DeletedDate"", c.""Email"", c.""IsDeleted"", c.""LastSyncedAt"", c.""LicenseKey"", c.""LogoUrl"", c.""ModifiedBy"", c.""ModifiedDate"", c.""Phone"", c.""PurchaseCode"", c.""SyncVersion"", c.""TaxName"", c.""TaxNumber"", c.""TenantId"", c.""Title""
+FROM ""CompanyProfiles"" AS c
+WHERE FALSE
+LIMIT 1","","1","2026-04-12 14:48:54.266064"
+"faa047a0-2ddf-47cc-8ad4-2f0915c25a83","ee4302bc3de848d7a381a1c981f616c0","SELECT c.""Id"", c.""Address"", c.""BusinessType"", c.""CreatedBy"", c.""CreatedDate"", c.""CurrencyCode"", c.""DeletedBy"", c.""DeletedDate"", c.""Email"", c.""IsDeleted"", c.""LastSyncedAt"", c.""LicenseKey"", c.""LogoUrl"", c.""ModifiedBy"", c.""ModifiedDate"", c.""Phone"", c.""PurchaseCode"", c.""SyncVersion"", c.""TaxName"", c.""TaxNumber"", c.""TenantId"", c.""Title""
+FROM ""CompanyProfiles"" AS c
+WHERE FALSE
+LIMIT 1","","1","2026-04-12 14:48:54.265136"
+"721e0ddc-c837-4f04-b290-b56a85b8f2ee","92dba92c045b4f7fbadb92ce6ab38d4a","SELECT c.""Id"", c.""Address"", c.""BusinessType"", c.""CreatedBy"", c.""CreatedDate"", c.""CurrencyCode"", c.""DeletedBy"", c.""DeletedDate"", c.""Email"", c.""IsDeleted"", c.""LastSyncedAt"", c.""LicenseKey"", c.""LogoUrl"", c.""ModifiedBy"", c.""ModifiedDate"", c.""Phone"", c.""PurchaseCode"", c.""SyncVersion"", c.""TaxName"", c.""TaxNumber"", c.""TenantId"", c.""Title""
+FROM ""CompanyProfiles"" AS c
+WHERE FALSE
+LIMIT 1","","0","2026-04-12 14:49:13.798606"
+"b9410c27-d105-426f-9e1b-b9f1a772e590","89dcf3da806449a3aa7c65a0db090e77","SELECT c.""Id"", c.""Address"", c.""BusinessType"", c.""CreatedBy"", c.""CreatedDate"", c.""CurrencyCode"", c.""DeletedBy"", c.""DeletedDate"", c.""Email"", c.""IsDeleted"", c.""LastSyncedAt"", c.""LicenseKey"", c.""LogoUrl"", c.""ModifiedBy"", c.""ModifiedDate"", c.""Phone"", c.""PurchaseCode"", c.""SyncVersion"", c.""TaxName"", c.""TaxNumber"", c.""TenantId"", c.""Title""
+FROM ""CompanyProfiles"" AS c
+WHERE FALSE
+LIMIT 1","","1","2026-04-12 14:49:13.517611"
+"f195659c-97c1-4a7e-a866-b981b89ec264","0c6e5530f32d4618a3b8cedf0386939a","SELECT c.""Id"", c.""Address"", c.""BusinessType"", c.""CreatedBy"", c.""CreatedDate"", c.""CurrencyCode"", c.""DeletedBy"", c.""DeletedDate"", c.""Email"", c.""IsDeleted"", c.""LastSyncedAt"", c.""LicenseKey"", c.""LogoUrl"", c.""ModifiedBy"", c.""ModifiedDate"", c.""Phone"", c.""PurchaseCode"", c.""SyncVersion"", c.""TaxName"", c.""TaxNumber"", c.""TenantId"", c.""Title""
+FROM ""CompanyProfiles"" AS c
+WHERE FALSE
+LIMIT 1","","3","2026-04-12 14:49:13.521024"
+"759b7dbb-bf54-4b98-b2f3-480fe80e24e9","1935fca2e17a4d498cdddb60c1f9d577","SELECT e.""Id"", e.""CreatedBy"", e.""CreatedDate"", e.""DeletedBy"", e.""DeletedDate"", e.""IsDeleted"", e.""LastSyncedAt"", e.""ModifiedBy"", e.""ModifiedDate"", e.""Name"", e.""SyncVersion"", e.""TenantId""
+FROM ""ExpenseCategories"" AS e
+WHERE e.""TenantId"" = @ef_filter__CurrentTenantId AND NOT (e.""IsDeleted"")","@ef_filter__CurrentTenantId=10000000-0000-0000-0000-000000000001;","10","2026-04-12 14:50:36.564108"
+"5e1eabf6-b08b-4192-823d-1d071addefdb","71eeab07fd2a41cb95889113cd2ee295","SELECT c.""Id"", c.""Address"", c.""BusinessType"", c.""CreatedBy"", c.""CreatedDate"", c.""CurrencyCode"", c.""DeletedBy"", c.""DeletedDate"", c.""Email"", c.""IsDeleted"", c.""LastSyncedAt"", c.""LicenseKey"", c.""LogoUrl"", c.""ModifiedBy"", c.""ModifiedDate"", c.""Phone"", c.""PurchaseCode"", c.""SyncVersion"", c.""TaxName"", c.""TaxNumber"", c.""TenantId"", c.""Title""
+FROM ""CompanyProfiles"" AS c
+WHERE FALSE
+LIMIT 1","","1","2026-04-12 14:49:13.532103"
+"ef04445b-017f-4bce-8e76-2dc49ff01331","369c7422d16e4e33a07ba3b2c306b370","SELECT c.""Id"", c.""Address"", c.""BusinessType"", c.""CreatedBy"", c.""CreatedDate"", c.""CurrencyCode"", c.""DeletedBy"", c.""DeletedDate"", c.""Email"", c.""IsDeleted"", c.""LastSyncedAt"", c.""LicenseKey"", c.""LogoUrl"", c.""ModifiedBy"", c.""ModifiedDate"", c.""Phone"", c.""PurchaseCode"", c.""SyncVersion"", c.""TaxName"", c.""TaxNumber"", c.""TenantId"", c.""Title""
+FROM ""CompanyProfiles"" AS c
+WHERE FALSE
+LIMIT 1","","1","2026-04-12 14:49:13.531473"
+"c2e15825-73a5-40da-8a76-a72e81f7e548","17fc9d3dbcb14e359d9cff973cec6452","SELECT c.""Id"", c.""Address"", c.""BusinessType"", c.""CreatedBy"", c.""CreatedDate"", c.""CurrencyCode"", c.""DeletedBy"", c.""DeletedDate"", c.""Email"", c.""IsDeleted"", c.""LastSyncedAt"", c.""LicenseKey"", c.""LogoUrl"", c.""ModifiedBy"", c.""ModifiedDate"", c.""Phone"", c.""PurchaseCode"", c.""SyncVersion"", c.""TaxName"", c.""TaxNumber"", c.""TenantId"", c.""Title""
+FROM ""CompanyProfiles"" AS c
+WHERE FALSE
+LIMIT 1","","0","2026-04-12 14:49:28.010943"
+"3b108284-9fd2-471a-8a4b-f86d748920e2","242df635f55540db8de9ead560d86adc","SELECT c.""Id"", c.""Address"", c.""BusinessType"", c.""CreatedBy"", c.""CreatedDate"", c.""CurrencyCode"", c.""DeletedBy"", c.""DeletedDate"", c.""Email"", c.""IsDeleted"", c.""LastSyncedAt"", c.""LicenseKey"", c.""LogoUrl"", c.""ModifiedBy"", c.""ModifiedDate"", c.""Phone"", c.""PurchaseCode"", c.""SyncVersion"", c.""TaxName"", c.""TaxNumber"", c.""TenantId"", c.""Title""
+FROM ""CompanyProfiles"" AS c
+WHERE FALSE
+LIMIT 1","","0","2026-04-12 14:49:19.965047"
+"a6d0fdbb-a6b8-4182-8c28-793c759a30a0","af2b6d6981d34d0ab5e43d29a705f887","SELECT c.""Id"", c.""Address"", c.""BusinessType"", c.""CreatedBy"", c.""CreatedDate"", c.""CurrencyCode"", c.""DeletedBy"", c.""DeletedDate"", c.""Email"", c.""IsDeleted"", c.""LastSyncedAt"", c.""LicenseKey"", c.""LogoUrl"", c.""ModifiedBy"", c.""ModifiedDate"", c.""Phone"", c.""PurchaseCode"", c.""SyncVersion"", c.""TaxName"", c.""TaxNumber"", c.""TenantId"", c.""Title""
+FROM ""CompanyProfiles"" AS c
+WHERE FALSE
+LIMIT 1","","0","2026-04-12 14:49:28.016179"
+"9a633d7d-48a5-4ffd-8318-da76ea87e8a5","6e718716d1084b408666d2bc6dacca17","SELECT c.""Id"", c.""Address"", c.""BusinessType"", c.""CreatedBy"", c.""CreatedDate"", c.""CurrencyCode"", c.""DeletedBy"", c.""DeletedDate"", c.""Email"", c.""IsDeleted"", c.""LastSyncedAt"", c.""LicenseKey"", c.""LogoUrl"", c.""ModifiedBy"", c.""ModifiedDate"", c.""Phone"", c.""PurchaseCode"", c.""SyncVersion"", c.""TaxName"", c.""TaxNumber"", c.""TenantId"", c.""Title""
+FROM ""CompanyProfiles"" AS c
+WHERE FALSE
+LIMIT 1","","1","2026-04-12 14:50:36.188861"
+"a6122bc5-8a70-4e04-9647-ecf6ec8636b7","1bd63036c0f04f1d83ae2092577757f0","SELECT c.""Id"", c.""Address"", c.""BusinessType"", c.""CreatedBy"", c.""CreatedDate"", c.""CurrencyCode"", c.""DeletedBy"", c.""DeletedDate"", c.""Email"", c.""IsDeleted"", c.""LastSyncedAt"", c.""LicenseKey"", c.""LogoUrl"", c.""ModifiedBy"", c.""ModifiedDate"", c.""Phone"", c.""PurchaseCode"", c.""SyncVersion"", c.""TaxName"", c.""TaxNumber"", c.""TenantId"", c.""Title""
+FROM ""CompanyProfiles"" AS c
+WHERE FALSE
+LIMIT 1","","3","2026-04-12 14:50:36.18887"
+"cf4ed3b9-5ece-4793-b665-8acff463c891","54ec47edc62743cf9cd20cc931af1862","SELECT i.""Id"", i.""CreatedBy"", i.""CreatedDate"", i.""DeletedBy"", i.""DeletedDate"", i.""IsDeleted"", i.""LastSyncedAt"", i.""ModifiedBy"", i.""ModifiedDate"", i.""Name"", i.""SyncVersion"", i.""TenantId""
+FROM ""InquirySources"" AS i
+WHERE i.""TenantId"" = @ef_filter__CurrentTenantId AND NOT (i.""IsDeleted"")","@ef_filter__CurrentTenantId=10000000-0000-0000-0000-000000000001;","2","2026-04-12 14:51:22.501956"
+"5cb5e8b1-f057-47fb-9180-47f109125818","03554cd3b572446ea628cc618582cb5c","SELECT c.""Id"", c.""Address"", c.""BusinessType"", c.""CreatedBy"", c.""CreatedDate"", c.""CurrencyCode"", c.""DeletedBy"", c.""DeletedDate"", c.""Email"", c.""IsDeleted"", c.""LastSyncedAt"", c.""LicenseKey"", c.""LogoUrl"", c.""ModifiedBy"", c.""ModifiedDate"", c.""Phone"", c.""PurchaseCode"", c.""SyncVersion"", c.""TaxName"", c.""TaxNumber"", c.""TenantId"", c.""Title""
+FROM ""CompanyProfiles"" AS c
+WHERE FALSE
+LIMIT 1","","1","2026-04-12 14:49:40.125075"
+"0f05e4ba-b44c-4354-93d4-4ff078ec965b","93126089513d47878b0e10e07a2ebb5a","SELECT u.""Id"", u.""FirstName"", u.""LastName"", u.""Email"", u.""PhoneNumber"", u.""UserName"", u.""ProfilePhoto""
+FROM ""Users"" AS u
+WHERE u.""TenantId"" = @ef_filter__CurrentTenantId AND NOT (u.""IsDeleted"")","@ef_filter__CurrentTenantId=10000000-0000-0000-0000-000000000001;","0","2026-04-12 14:50:55.764113"

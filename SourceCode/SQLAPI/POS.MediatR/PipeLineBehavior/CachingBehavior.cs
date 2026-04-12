@@ -1,6 +1,7 @@
 using MediatR;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Logging;
+using POS.Domain;
 using System;
 using System.Threading;
 using System.Threading.Tasks;
@@ -12,11 +13,13 @@ namespace POS.MediatR.PipeLineBehavior
     {
         private readonly IMemoryCache _cache;
         private readonly ILogger<CachingBehavior<TRequest, TResponse>> _logger;
+        private readonly ITenantProvider _tenantProvider;
 
-        public CachingBehavior(IMemoryCache cache, ILogger<CachingBehavior<TRequest, TResponse>> logger)
+        public CachingBehavior(IMemoryCache cache, ILogger<CachingBehavior<TRequest, TResponse>> logger, ITenantProvider tenantProvider)
         {
             _cache = cache;
             _logger = logger;
+            _tenantProvider = tenantProvider;
         }
 
         public async Task<TResponse> Handle(TRequest request, RequestHandlerDelegate<TResponse> next, CancellationToken cancellationToken)
@@ -28,7 +31,8 @@ namespace POS.MediatR.PipeLineBehavior
                     return await next();
                 }
 
-                var cacheKey = cacheableQuery.CacheKey;
+                var tenantId = _tenantProvider.GetTenantId()?.ToString() ?? "Global";
+                var cacheKey = $"{cacheableQuery.CacheKey}_{tenantId}";
 
                 if (_cache.TryGetValue(cacheKey, out TResponse cachedResponse))
                 {
