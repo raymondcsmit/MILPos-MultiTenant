@@ -9,6 +9,9 @@ using POS.Common.GenericRepository;
 using POS.Data.Entities;
 using POS.Domain;
 
+using POS.Common.DapperInfrastructure;
+using POS.Domain.DapperInfrastructure;
+
 namespace POS.API.Helpers
 {
     public static class DependencyInjectionExtension
@@ -16,6 +19,7 @@ namespace POS.API.Helpers
         public static void AddDependencyInjection(this IServiceCollection services)
         {
             services.AddScoped(typeof(IUnitOfWork<>), typeof(UnitOfWork<>));
+            services.AddScoped<ISqlConnectionAccessor, SqlConnectionAccessor>();
             services.AddScoped<IGenericRepository<Tenant>, GenericRepository<Tenant, POSDbContext>>();
             services.AddScoped<IPropertyMappingService, PropertyMappingService>();
             services.AddScoped<IPageRepository, PageRepository>();

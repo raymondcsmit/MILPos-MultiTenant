@@ -36,4 +36,6 @@ Before opening a PR, follow the verification checklist in:
 
 - Strategy and process: `Documentation/Strategy`
 - Testing docs: `SourceCode/Documents/Testing`
+- API Performance Profiling & Dapper Hybrid Strategy: `SourceCode/Documents/Api Performance Issues/SlowRunningApiFindings/DapperIntegration`
+  - To migrate a slow EF Core QueryHandler to Dapper, type `// MIGRATE-TO-DAPPER` and use the [DapperMigration.snippet](file:///f:/MIllyass/pos-with-inventory-management/SourceCode/Documents/Api%20Performance%20Issues/SlowRunningApiFindings/DapperIntegration/DapperMigration.snippet).
 
