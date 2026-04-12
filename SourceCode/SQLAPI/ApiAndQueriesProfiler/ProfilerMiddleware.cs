@@ -18,6 +18,16 @@ namespace ApiAndQueriesProfiler
 
         public async Task InvokeAsync(HttpContext context)
         {
+            var path = context.Request.Path.Value ?? string.Empty;
+            var isWebSocket = context.WebSockets.IsWebSocketRequest || context.Request.Headers["Upgrade"] == "websocket";
+            
+            // Ignore SignalR endpoints and WebSockets to avoid massive "latency" spikes from long-running connections
+            if (path.StartsWith("/userHub", StringComparison.OrdinalIgnoreCase) || isWebSocket)
+            {
+                await _next(context);
+                return;
+            }
+
             var correlationId = Guid.NewGuid().ToString("N");
             ProfilerContext.CurrentCorrelationId = correlationId;
 
