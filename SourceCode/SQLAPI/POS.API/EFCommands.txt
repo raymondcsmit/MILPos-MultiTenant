@@ -89,6 +89,9 @@ dotnet ef database update IndexPostgreSQL -c POSDbContext -p POS.Migrations.Post
 dotnet ef migrations add OptimizationPostgreSQL -p POS.Migrations.PostgreSQL/POS.Migrations.PostgreSQL.csproj -s POS.API/POS.API.csproj -o Migrations -- --DatabaseProvider=PostgreSql 
 dotnet ef database update OptimizationPostgreSQL -c POSDbContext -p POS.Migrations.PostgreSQL/POS.Migrations.PostgreSQL.csproj --startup-project POS.API/POS.API.csproj -- --DatabaseProvider=PostgreSql
 
+dotnet ef migrations add API-Optimization01-PostgreSQL -p POS.Migrations.PostgreSQL/POS.Migrations.PostgreSQL.csproj -s POS.API/POS.API.csproj -o Migrations -- --DatabaseProvider=PostgreSql 
+dotnet ef database update API-Optimization01-PostgreSQL -c POSDbContext -p POS.Migrations.PostgreSQL/POS.Migrations.PostgreSQL.csproj --startup-project POS.API/POS.API.csproj -- --DatabaseProvider=PostgreSql
+
 
 $env:DatabaseProvider="PostgreSQL"
 dotnet ef database update MainInitPostgreSQL -c POSDbContext -p POS.Migrations.PostgreSQL/POS.Migrations.PostgreSQL.csproj --startup-project POS.API/POS.API.csproj -- --DatabaseProvider=PostgreSql

@@ -2736,10 +2736,10 @@ namespace POS.Migrations.PostgreSQL.Migrations
 
                     b.HasIndex("CreatedBy");
 
-                    b.HasIndex("TenantId")
-                        .HasDatabaseName("IX_ReminderScheduler_TenantId");
-
                     b.HasIndex("UserId");
+
+                    b.HasIndex("TenantId", "UserId", "IsRead", "IsActive")
+                        .HasDatabaseName("IX_ReminderScheduler_User_Read_Active");
 
                     b.ToTable("ReminderSchedulers");
                 });
@@ -3221,6 +3221,9 @@ namespace POS.Migrations.PostgreSQL.Migrations
 
                     b.HasIndex("TenantId", "TransactionDate")
                         .HasDatabaseName("IX_Transaction_Tenant_Date");
+
+                    b.HasIndex("TenantId", "TransactionDate", "TransactionType", "BranchId")
+                        .HasDatabaseName("IX_Transaction_Date_Type_Branch");
 
                     b.ToTable("Transactions");
                 });
@@ -4225,8 +4228,14 @@ namespace POS.Migrations.PostgreSQL.Migrations
                     b.HasIndex("TenantId", "SupplierId")
                         .HasDatabaseName("IX_PurchaseOrder_Tenant_Supplier");
 
+                    b.HasIndex("TenantId", "DeliveryDate", "DeliveryStatus")
+                        .HasDatabaseName("IX_PurchaseOrder_DeliveryDate_Status");
+
                     b.HasIndex("TenantId", "IsDeleted", "POCreatedDate")
                         .HasDatabaseName("IX_PurchaseOrder_Tenant_IsDeleted_Date");
+
+                    b.HasIndex("TenantId", "POCreatedDate", "LocationId", "IsPurchaseOrderRequest")
+                        .HasDatabaseName("IX_PurchaseOrder_Date_Location_IsRequest");
 
                     b.ToTable("PurchaseOrders");
                 });
@@ -4285,6 +4294,9 @@ namespace POS.Migrations.PostgreSQL.Migrations
                         .HasDatabaseName("IX_PurchaseOrderItem_PurchaseOrder");
 
                     b.HasIndex("UnitId");
+
+                    b.HasIndex("ProductId", "Status")
+                        .HasDatabaseName("IX_PurchaseOrderItem_Product_Status");
 
                     b.ToTable("PurchaseOrderItems");
                 });
@@ -4870,8 +4882,14 @@ namespace POS.Migrations.PostgreSQL.Migrations
                     b.HasIndex("TenantId", "Status")
                         .HasDatabaseName("IX_SalesOrder_Tenant_Status");
 
+                    b.HasIndex("TenantId", "DeliveryDate", "DeliveryStatus")
+                        .HasDatabaseName("IX_SalesOrder_DeliveryDate_Status");
+
                     b.HasIndex("TenantId", "IsDeleted", "SOCreatedDate")
                         .HasDatabaseName("IX_SalesOrder_Tenant_IsDeleted_Date");
+
+                    b.HasIndex("TenantId", "SOCreatedDate", "LocationId", "IsSalesOrderRequest")
+                        .HasDatabaseName("IX_SalesOrder_Date_Location_IsRequest");
 
                     b.ToTable("SalesOrders");
                 });
@@ -4942,6 +4960,9 @@ namespace POS.Migrations.PostgreSQL.Migrations
                         .HasDatabaseName("IX_SalesOrderItem_SalesOrder");
 
                     b.HasIndex("UnitId");
+
+                    b.HasIndex("ProductId", "Status")
+                        .HasDatabaseName("IX_SalesOrderItem_Product_Status");
 
                     b.ToTable("SalesOrderItems");
                 });

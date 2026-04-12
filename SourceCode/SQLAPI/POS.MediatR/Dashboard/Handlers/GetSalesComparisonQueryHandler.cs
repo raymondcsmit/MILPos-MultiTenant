@@ -32,19 +32,22 @@ namespace POS.MediatR.Dashboard.Handlers
             var currentYear = DateTime.Now.Year;
             var lastYear = currentYear - 1;
 
-            async Task<Dictionary<int, decimal>> GetMonthlySales(int year)
-            {
-                return await _salesOrderRepository.All
-                    .Where(c => c.SOCreatedDate.Year == year
-                            && locationIds.Contains(c.LocationId)
-                            && !c.IsSalesOrderRequest)
-                    .GroupBy(c => c.SOCreatedDate.Month)
-                    .Select(g => new { Month = g.Key, Total = g.Sum(c => c.TotalAmount) })
-                    .ToDictionaryAsync(x => x.Month, x => x.Total, cancellationToken);
-            }
+            var currentYearSalesQuery = _salesOrderRepository.All.AsNoTracking()
+                .Where(c => c.SOCreatedDate.Year == currentYear
+                        && locationIds.Contains(c.LocationId)
+                        && !c.IsSalesOrderRequest)
+                .GroupBy(c => c.SOCreatedDate.Month)
+                .Select(g => new { Month = g.Key, Total = g.Sum(c => c.TotalAmount) });
 
-            var currentYearSales = await GetMonthlySales(currentYear);
-            var lastYearSales = await GetMonthlySales(lastYear);
+            var lastYearSalesQuery = _salesOrderRepository.All.AsNoTracking()
+                .Where(c => c.SOCreatedDate.Year == lastYear
+                        && locationIds.Contains(c.LocationId)
+                        && !c.IsSalesOrderRequest)
+                .GroupBy(c => c.SOCreatedDate.Month)
+                .Select(g => new { Month = g.Key, Total = g.Sum(c => c.TotalAmount) });
+
+            var currentYearSales = await currentYearSalesQuery.ToDictionaryAsync(x => x.Month, x => x.Total, cancellationToken);
+            var lastYearSales = await lastYearSalesQuery.ToDictionaryAsync(x => x.Month, x => x.Total, cancellationToken);
 
             var result = new List<SalesComparisonDto>();
 

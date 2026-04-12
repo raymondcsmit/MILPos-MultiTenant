@@ -37,7 +37,7 @@ namespace POS.Repository
         public async Task<CustomerList> GetCustomers(CustomerResource customerResource)
         {
             var collectionBeforePaging =
-                All.ApplySort(customerResource.OrderBy,
+                All.AsNoTracking().ApplySort(customerResource.OrderBy,
                 _propertyMappingService.GetPropertyMapping<CustomerDto, Customer>());
 
             // Data Isolation: Enforce Region/Sales Person constraints

@@ -36,6 +36,7 @@ using POS.Repository;
 using POS.Repository.Tenant;
 using POS.Common.Services;
 using Microsoft.OpenApi.Models;
+using ApiAndQueriesProfiler;
 
 namespace POS.API
 {
@@ -111,10 +112,26 @@ namespace POS.API
 
             var isDevelopment = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT") == "Development";
 
+            services.AddApiAndQueriesProfiler(options =>
+            {
+                options.DatabaseProvider = Configuration.GetValue<string>("DatabaseProvider") ?? "Sqlite";
+                if (options.DatabaseProvider == "Sqlite")
+                    options.ConnectionString = Configuration.GetConnectionString("SqliteConnectionString");
+                else if (options.DatabaseProvider == "PostgreSql")
+                    options.ConnectionString = Configuration.GetConnectionString("PostgresConnectionString");
+                else
+                    options.ConnectionString = Configuration.GetConnectionString("DbConnectionString");
+            });
+
             // Configure DbContext - Scoped lifetime
             services.AddDbContext<POSDbContext>((serviceProvider, options) =>
             {
                 var provider = Configuration.GetValue<string>("DatabaseProvider") ?? "Sqlite";
+                
+                // Add profiler interceptor
+                var profilerInterceptor = serviceProvider.GetRequiredService<ProfilerCommandInterceptor>();
+                options.AddInterceptors(profilerInterceptor);
+
                 if (provider == "Sqlite")
                 {
                     options.UseSqlite(Configuration.GetConnectionString("SqliteConnectionString"),
@@ -324,6 +341,8 @@ namespace POS.API
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env, ILoggerFactory loggerFactory)
         {
+            app.UseApiAndQueriesProfiler();
+            
             // if (env.IsDevelopment())
             // {
                 app.UseDeveloperExceptionPage();

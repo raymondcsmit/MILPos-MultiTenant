@@ -1,4 +1,4 @@
-﻿using AutoMapper;
+using AutoMapper;
 using POS.Common.GenericRepository;
 using POS.Common.UnitOfWork;
 using POS.Data;
@@ -39,7 +39,7 @@ namespace POS.Repository
         public async Task<SupplierList> GetSuppliers(SupplierResource supplierResource)
         {
             var collectionBeforePaging =
-                All.Include(c=>c.BillingAddress).ApplySort(supplierResource.OrderBy,
+                All.AsNoTracking().Include(c=>c.BillingAddress).ApplySort(supplierResource.OrderBy,
                 _propertyMappingService.GetPropertyMapping<SupplierDto, Supplier>());
 
             if (supplierResource.Id != null)

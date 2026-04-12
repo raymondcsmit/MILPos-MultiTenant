@@ -1,4 +1,4 @@
-﻿using MediatR;
+using MediatR;
 using Microsoft.EntityFrameworkCore;
 using POS.Data;
 using POS.Data.Dto;
@@ -33,23 +33,30 @@ namespace POS.MediatR.SalesOrder.Handlers
         public async Task<List<SalesOrderRecentShipmentDate>> Handle(GetSalesOrderRecentShipmentDateQuery request, CancellationToken cancellationToken)
         {
             var entities = await _salesOrderRepository
-                .AllIncluding(c => c.Customer, cs => cs.SalesOrderItems)
+                .All.AsNoTracking()
+                .Include(c => c.Customer)
                 .Where(d => !d.IsSalesOrderRequest
-                && d.DeliveryStatus == SalesDeliveryStatus.PENDING
-                && d.SalesOrderItems.Sum(c => c.Status == PurchaseSaleItemStatusEnum.Not_Return ? c.Quantity : -1 * (c.Quantity)) > 0
-                && _userInfoToken.LocationIds.Contains(d.LocationId))
-                .OrderByDescending(c => c.DeliveryDate)
-                         .Take(10)
-                         .Select(c => new SalesOrderRecentShipmentDate
-                         {
-                             SalesOrderId = c.Id,
-                             SalesOrderNumber = c.OrderNumber,
-                             ExpectedShipmentDate = c.DeliveryDate,
-                             Quantity = c.SalesOrderItems.Sum(d => d.Status == PurchaseSaleItemStatusEnum.Not_Return ? d.Quantity : -1 * (d.Quantity)),
-                             CustomerId = c.CustomerId,
-                             CustomerName = c.Customer.CustomerName,
-                         })
-                     .ToListAsync();
+                    && d.DeliveryStatus == SalesDeliveryStatus.PENDING
+                    && _userInfoToken.LocationIds.Contains(d.LocationId))
+                .Select(d => new 
+                {
+                    Order = d,
+                    CustomerName = d.Customer.CustomerName,
+                    TotalQuantity = d.SalesOrderItems.Sum(c => c.Status == PurchaseSaleItemStatusEnum.Not_Return ? c.Quantity : -c.Quantity)
+                })
+                .Where(x => x.TotalQuantity > 0)
+                .OrderByDescending(x => x.Order.DeliveryDate)
+                .Take(10)
+                .Select(x => new SalesOrderRecentShipmentDate
+                {
+                    SalesOrderId = x.Order.Id,
+                    SalesOrderNumber = x.Order.OrderNumber,
+                    ExpectedShipmentDate = x.Order.DeliveryDate,
+                    Quantity = x.TotalQuantity,
+                    CustomerId = x.Order.CustomerId,
+                    CustomerName = x.CustomerName
+                })
+                .ToListAsync(cancellationToken);
 
             return entities;
         }

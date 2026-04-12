@@ -175,6 +175,38 @@ namespace POS.Domain
                 b.Property(l => l.TokenHash).HasMaxLength(200);
             });
 
+            builder.Entity<Transaction>(b =>
+            {
+                b.HasIndex(t => new { t.TenantId, t.TransactionDate, t.TransactionType, t.BranchId }).HasDatabaseName("IX_Transaction_Date_Type_Branch");
+            });
+
+            builder.Entity<SalesOrder>(b =>
+            {
+                b.HasIndex(so => new { so.TenantId, so.SOCreatedDate, so.LocationId, so.IsSalesOrderRequest }).HasDatabaseName("IX_SalesOrder_Date_Location_IsRequest");
+                b.HasIndex(so => new { so.TenantId, so.DeliveryDate, so.DeliveryStatus }).HasDatabaseName("IX_SalesOrder_DeliveryDate_Status");
+            });
+
+            builder.Entity<PurchaseOrder>(b =>
+            {
+                b.HasIndex(po => new { po.TenantId, po.POCreatedDate, po.LocationId, po.IsPurchaseOrderRequest }).HasDatabaseName("IX_PurchaseOrder_Date_Location_IsRequest");
+                b.HasIndex(po => new { po.TenantId, po.DeliveryDate, po.DeliveryStatus }).HasDatabaseName("IX_PurchaseOrder_DeliveryDate_Status");
+            });
+
+            builder.Entity<ReminderScheduler>(b =>
+            {
+                b.HasIndex(rs => new { rs.TenantId, rs.UserId, rs.IsRead, rs.IsActive }).HasDatabaseName("IX_ReminderScheduler_User_Read_Active");
+            });
+
+            builder.Entity<SalesOrderItem>(b =>
+            {
+                b.HasIndex(soi => new { soi.ProductId, soi.Status }).HasDatabaseName("IX_SalesOrderItem_Product_Status");
+            });
+
+            builder.Entity<PurchaseOrderItem>(b =>
+            {
+                b.HasIndex(poi => new { poi.ProductId, poi.Status }).HasDatabaseName("IX_PurchaseOrderItem_Product_Status");
+            });
+
             // Master Data Indexes
             builder.Entity<Product>(b =>
             {
@@ -185,8 +217,23 @@ namespace POS.Domain
                 b.HasIndex(p => new { p.TenantId, p.IsDeleted }).HasDatabaseName("IX_Product_Tenant_IsDeleted");
             });
 
+            builder.Entity<Customer>(b =>
+            {
+                b.HasIndex(c => new { c.TenantId, c.CustomerName }).HasDatabaseName("IX_Customer_Name");
+                b.HasIndex(c => new { c.TenantId, c.Email }).HasDatabaseName("IX_Customer_Email");
+                b.HasIndex(c => new { c.TenantId, c.MobileNo }).HasDatabaseName("IX_Customer_MobileNo");
+            });
+
+            builder.Entity<Supplier>(b =>
+            {
+                b.HasIndex(s => new { s.TenantId, s.SupplierName }).HasDatabaseName("IX_Supplier_Name");
+                b.HasIndex(s => new { s.TenantId, s.Email }).HasDatabaseName("IX_Supplier_Email");
+                b.HasIndex(s => new { s.TenantId, s.MobileNo }).HasDatabaseName("IX_Supplier_MobileNo");
+            });
+
             builder.Entity<ProductCategory>(b =>
             {
+                b.HasIndex(c => new { c.TenantId, c.ParentId }).HasDatabaseName("IX_ProductCategory_ParentId");
                 b.HasIndex(c => new { c.TenantId, c.Name }).HasDatabaseName("IX_ProductCategory_Tenant_Name");
                 b.HasIndex(c => new { c.TenantId, c.IsDeleted }).HasDatabaseName("IX_ProductCategory_Tenant_IsDeleted");
             });

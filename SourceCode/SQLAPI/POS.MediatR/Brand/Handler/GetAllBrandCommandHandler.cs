@@ -1,4 +1,4 @@
-﻿using AutoMapper;
+using AutoMapper;
 using AutoMapper.QueryableExtensions;
 using MediatR;
 using Microsoft.AspNetCore.Hosting;
@@ -37,13 +37,13 @@ namespace POS.MediatR.Brand.Handler
 
         public async Task<List<BrandDto>> Handle(GetAllBrandCommand request, CancellationToken cancellationToken)
         {
-            var entities = await _brandRepository.All
+            var entities = await _brandRepository.All.AsNoTracking()
                 .Select(c => new BrandDto
                 {
                     Id = c.Id,
                     Name = c.Name,
                     ImageUrl = !string.IsNullOrWhiteSpace(c.ImageUrl) ? Path.Combine(_pathHelper.BrandImagePath, c.ImageUrl) : ""
-                }).ToListAsync();
+                }).ToListAsync(cancellationToken);
             return entities;
         }
     }

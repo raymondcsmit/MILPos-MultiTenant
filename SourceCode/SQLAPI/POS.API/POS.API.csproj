@@ -79,6 +79,7 @@
 		<ProjectReference Include="..\POS.Migrations.Sqlite\POS.Migrations.Sqlite.csproj" />
 		<ProjectReference Include="..\POS.Migrations.SqlServer\POS.Migrations.SqlServer.csproj" />
 		<ProjectReference Include="..\POS.Domain\POS.Domain.csproj" />
+		<ProjectReference Include="..\ApiAndQueriesProfiler\ApiAndQueriesProfiler.csproj" />
 	</ItemGroup>
 
 	<ItemGroup>

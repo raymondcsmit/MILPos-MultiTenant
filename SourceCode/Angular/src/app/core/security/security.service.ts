@@ -147,10 +147,19 @@ export class SecurityService {
             const companyProfile = c as CompanyProfile;
             const userLocations = companyProfile.locations?.filter((l: BusinessLocation) =>
               this.Token ? this.Token['locationIds'].split(',')?.indexOf(l?.id ?? '') >= 0 : false
-            );
+            ) ?? [];
+
+            let selectedLoc = this.SelectedLocation;
+            if (!selectedLoc && userLocations.length > 0) {
+              selectedLoc = userLocations[0].id ?? '';
+              if (selectedLoc) {
+                setTimeout(() => this.updateSelectedLocation(selectedLoc), 0);
+              }
+            }
+
             return {
               locations: userLocations,
-              selectedLocation: this.SelectedLocation,
+              selectedLocation: selectedLoc,
             } as UserLocations;
           }
         }
@@ -193,9 +202,18 @@ export class SecurityService {
                 name: this.translationService.getValue('ALL_LOCATIONS'),
               });
             }
+
+            let selectedLoc = this.SelectedLocation;
+            if (!selectedLoc && userLocations.length > 0) {
+              selectedLoc = userLocations[0].id ?? '';
+              if (selectedLoc || selectedLoc === '') {
+                setTimeout(() => this.updateSelectedLocation(selectedLoc), 0);
+              }
+            }
+
             return {
               locations: userLocations,
-              selectedLocation: this.SelectedLocation,
+              selectedLocation: selectedLoc,
             };
           }
         }

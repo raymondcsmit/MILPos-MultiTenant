@@ -22,12 +22,14 @@ using POS.Repository.Accouting;
 namespace POS.MediatR.Handlers;
 
 public class GetCompanyProfileQueryHandler(
-    IServiceScopeFactory scopeFactory,
     IMemoryCache cache,
     ITenantProvider tenantProvider,
     IMediator mediator,
     IMapper mapper,
-    PathHelper pathHelper)
+    PathHelper pathHelper,
+    ILocationRepository locationRepository,
+    IFinancialYearRepository financialYearRepository,
+    ICompanyProfileRepository companyProfileRepository)
     : IRequestHandler<GetCompanyProfileQuery, CompanyProfileDto>
 {
 
@@ -41,41 +43,11 @@ public class GetCompanyProfileQueryHandler(
             return cachedResponse;
         }
 
-        // Parallelize database queries using separate scopes to avoid DbContext concurrency issues
-        var locationsTask = Task.Run(async () =>
-        {
-            using var scope = scopeFactory.CreateScope();
-            var repo = scope.ServiceProvider.GetRequiredService<ILocationRepository>();
-            return await repo.All.AsNoTracking().ToListAsync(cancellationToken);
-        }, cancellationToken);
-
-        var financialYearsTask = Task.Run(async () =>
-        {
-            using var scope = scopeFactory.CreateScope();
-            var repo = scope.ServiceProvider.GetRequiredService<IFinancialYearRepository>();
-            return await repo.All.AsNoTracking().ToListAsync(cancellationToken);
-        }, cancellationToken);
-
-        var languagesTask = Task.Run(async () =>
-        {
-            using var scope = scopeFactory.CreateScope();
-            var scopedMediator = scope.ServiceProvider.GetRequiredService<IMediator>();
-            return await scopedMediator.Send(new GetAllLanguageCommand(), cancellationToken);
-        }, cancellationToken);
-
-        var companyProfileTask = Task.Run(async () =>
-        {
-            using var scope = scopeFactory.CreateScope();
-            var repo = scope.ServiceProvider.GetRequiredService<ICompanyProfileRepository>();
-            return await repo.All.AsNoTracking().FirstOrDefaultAsync(cancellationToken);
-        }, cancellationToken);
-
-        await Task.WhenAll(locationsTask, financialYearsTask, languagesTask, companyProfileTask);
-
-        var locations = await locationsTask;
-        var financialYears = await financialYearsTask;
-        var languages = await languagesTask;
-        var companyProfile = await companyProfileTask;
+        // Execute queries sequentially with AsNoTracking to avoid DbContext concurrency issues and thread overhead
+        var locations = await locationRepository.All.AsNoTracking().ToListAsync(cancellationToken);
+        var financialYears = await financialYearRepository.All.AsNoTracking().ToListAsync(cancellationToken);
+        var languages = await mediator.Send(new GetAllLanguageCommand(), cancellationToken);
+        var companyProfile = await companyProfileRepository.All.AsNoTracking().FirstOrDefaultAsync(cancellationToken);
 
         if (companyProfile == null)
         {

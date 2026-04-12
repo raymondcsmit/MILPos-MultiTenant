@@ -1,4 +1,4 @@
-﻿using AutoMapper;
+using AutoMapper;
 using POS.Data.Entities;
 using POS.MediatR.CommandAndQuery;
 using POS.Repository;
@@ -42,22 +42,29 @@ namespace POS.MediatR.PurchaseOrder.Handlers
             try
             {
                 var entities = await _purchaseOrderRepository
-                    .AllIncluding(c => c.Supplier, c => c.PurchaseOrderItems)
+                    .All.AsNoTracking()
+                    .Include(c => c.Supplier)
                     .Where(d => !d.IsPurchaseOrderRequest
                         && d.DeliveryStatus == Data.PurchaseDeliveryStatus.PENDING
-                        && _userInfoToken.LocationIds.Contains(d.LocationId)
-                        && d.PurchaseOrderItems.Sum(c => c.Status == PurchaseSaleItemStatusEnum.Not_Return ? c.Quantity : -1 * (c.Quantity)) > 0)
-                    .OrderByDescending(c => c.DeliveryDate)
-                    .Take(10)
-                    .Select(c => new PurchaseOrderRecentDeliverySchedule
+                        && _userInfoToken.LocationIds.Contains(d.LocationId))
+                    .Select(d => new
                     {
-                        PurchaseOrderId = c.Id,
-                        PurchaseOrderNumber = c.OrderNumber,
-                        ExpectedDispatchDate = c.DeliveryDate,
-                        SupplierName = c.Supplier.SupplierName,
-                        SupplierId = c.SupplierId,
-                        TotalQuantity = c.PurchaseOrderItems.Sum(d => d.Status == PurchaseSaleItemStatusEnum.Not_Return ? d.Quantity : -1 * (d.Quantity)),
-                    }).ToListAsync();
+                        Order = d,
+                        SupplierName = d.Supplier.SupplierName,
+                        TotalQuantity = d.PurchaseOrderItems.Sum(c => c.Status == PurchaseSaleItemStatusEnum.Not_Return ? c.Quantity : -c.Quantity)
+                    })
+                    .Where(x => x.TotalQuantity > 0)
+                    .OrderByDescending(x => x.Order.DeliveryDate)
+                    .Take(10)
+                    .Select(x => new PurchaseOrderRecentDeliverySchedule
+                    {
+                        PurchaseOrderId = x.Order.Id,
+                        PurchaseOrderNumber = x.Order.OrderNumber,
+                        ExpectedDispatchDate = x.Order.DeliveryDate,
+                        SupplierName = x.SupplierName,
+                        SupplierId = x.Order.SupplierId,
+                        TotalQuantity = x.TotalQuantity,
+                    }).ToListAsync(cancellationToken);
 
                 return entities;
             }
