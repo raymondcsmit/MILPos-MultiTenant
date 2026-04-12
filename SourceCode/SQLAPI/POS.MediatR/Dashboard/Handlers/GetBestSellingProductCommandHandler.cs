@@ -87,7 +87,7 @@ namespace POS.MediatR.Dashboard.Handlers
                         GROUP BY p.Id, p.Name
                         ORDER BY Count DESC";
 
-                    using var connection = _sqlAccessor.GetOpenConnection();
+                    var connection = _sqlAccessor.GetOpenConnection();
                     var currentTransaction = _sqlAccessor.GetCurrentTransaction();
 
                     var parameters = new 

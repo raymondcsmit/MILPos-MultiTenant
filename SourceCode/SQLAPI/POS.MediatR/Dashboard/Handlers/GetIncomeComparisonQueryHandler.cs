@@ -99,7 +99,7 @@ namespace POS.MediatR.Dashboard.Handlers
                           AND POCreatedDate <= @EndDate 
                           AND LocationId IN @LocationIds";
 
-                    using var connection = _sqlAccessor.GetOpenConnection();
+                    var connection = _sqlAccessor.GetOpenConnection();
                     var currentTransaction = _sqlAccessor.GetCurrentTransaction();
 
                     // Current Year Sales

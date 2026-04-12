@@ -80,7 +80,7 @@ namespace POS.MediatR.Dashboard.Handlers
                           AND SOCreatedDate <= @EndDate 
                           AND LocationId IN @LocationIds";
 
-                    using var connection = _sqlAccessor.GetOpenConnection();
+                    var connection = _sqlAccessor.GetOpenConnection();
                     var currentTransaction = _sqlAccessor.GetCurrentTransaction();
 
                     var currentParams = new { TenantId = tenantId, IsDeleted = false, IsSalesOrderRequest = false, StartDate = currentYearStart, EndDate = currentYearEnd, LocationIds = locationIds };

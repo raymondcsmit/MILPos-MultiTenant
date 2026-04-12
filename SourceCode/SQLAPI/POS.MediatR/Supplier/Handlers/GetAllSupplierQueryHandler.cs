@@ -120,7 +120,7 @@ namespace POS.MediatR.Handlers
                     parameters.Add("PageSize", resource.PageSize);
                     parameters.Add("Skip", resource.Skip);
 
-                    using var connection = _sqlAccessor.GetOpenConnection();
+                    var connection = _sqlAccessor.GetOpenConnection();
                     var currentTransaction = _sqlAccessor.GetCurrentTransaction();
 
                     // Execute both queries in a single batch (QueryMultiple)

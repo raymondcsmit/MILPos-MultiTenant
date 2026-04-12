@@ -69,7 +69,7 @@ namespace POS.MediatR.Brand.Handler
                         WHERE TenantId = @TenantId AND IsDeleted = @IsDeleted
                         ORDER BY Name";
 
-                    using var connection = _sqlAccessor.GetOpenConnection();
+                    var connection = _sqlAccessor.GetOpenConnection();
                     var currentTransaction = _sqlAccessor.GetCurrentTransaction();
 
                     var parameters = new { TenantId = tenantId, IsDeleted = false };

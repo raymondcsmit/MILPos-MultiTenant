@@ -77,7 +77,7 @@ namespace POS.MediatR.Handlers
                         SELECT COALESCE(SUM((poi.UnitPrice * poi.Quantity) + poi.TaxValue - poi.Discount), 0) FROM {poiTable} poi INNER JOIN {poTable} po ON poi.PurchaseOrderId = po.Id WHERE po.TenantId = @TenantId AND po.IsDeleted = @IsDeleted AND poi.Status = @ReturnStatus AND po.POCreatedDate >= @FromDate AND po.POCreatedDate < @ToDate AND po.LocationId IN @LocationIds;
                     ";
 
-                    using var connection = _sqlAccessor.GetOpenConnection();
+                    var connection = _sqlAccessor.GetOpenConnection();
                     var currentTransaction = _sqlAccessor.GetCurrentTransaction();
 
                     var parameters = new 

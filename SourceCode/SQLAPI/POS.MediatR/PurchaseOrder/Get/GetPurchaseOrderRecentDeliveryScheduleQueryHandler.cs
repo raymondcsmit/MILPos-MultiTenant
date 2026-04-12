@@ -87,7 +87,7 @@ namespace POS.MediatR.PurchaseOrder.Handlers
                         HAVING SUM(CASE WHEN poi.Status = @NotReturnStatus THEN poi.Quantity ELSE -poi.Quantity END) > 0
                         ORDER BY po.DeliveryDate DESC";
 
-                    using var connection = _sqlAccessor.GetOpenConnection();
+                    var connection = _sqlAccessor.GetOpenConnection();
                     var currentTransaction = _sqlAccessor.GetCurrentTransaction();
 
                     var parameters = new 
