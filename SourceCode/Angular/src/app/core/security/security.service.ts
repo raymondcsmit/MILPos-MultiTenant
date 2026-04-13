@@ -1,7 +1,7 @@
 import { inject, Injectable } from '@angular/core';
-import { Observable, BehaviorSubject } from 'rxjs';
+import { Observable, BehaviorSubject, of, forkJoin } from 'rxjs';
 import { HttpClient } from '@angular/common/http';
-import { tap, map } from 'rxjs/operators';
+import { tap, map, switchMap, catchError } from 'rxjs/operators';
 import { AuthToken, UserAuth } from '../domain-classes/user-auth';
 import { User } from '@core/domain-classes/user';
 import { Router } from '@angular/router';
@@ -19,6 +19,7 @@ import { WrLicenseService } from '@core/services/wr-license.service';
 import { FinancialYear } from '../../accounting/financial-year/financial-year';
 import { CacheSyncService } from '../services/cache-sync.service';
 import { BusinessLocationService } from '../../business-location/business-location.service';
+import { CompanyProfileService } from '../../company-profile/company-profile.service';
 
 @Injectable({ providedIn: 'root' })
 export class SecurityService {
@@ -73,6 +74,8 @@ export class SecurityService {
     const current = this._companyProfile$.value;
     if (current) {
       this._companyProfile$.next({ ...current, locations });
+    } else {
+      this._companyProfile$.next({ locations } as CompanyProfile);
     }
   }
 
@@ -269,14 +272,15 @@ export class SecurityService {
     private clonerService: ClonerService,
     private translationService: TranslationService,
     private cacheSyncService: CacheSyncService,
-    private businessLocationService: BusinessLocationService
+    private businessLocationService: BusinessLocationService,
+    private companyProfileService: CompanyProfileService
   ) { }
 
   login(entity: User): Observable<UserAuth> {
     // Initialize security object
     this.resetSecurityObject();
     return this.http.post<UserAuth>('authentication', entity).pipe(
-      tap((resp: any) => {
+      switchMap((resp: any) => {
         this.securityObject = this.clonerService.deepClone<UserAuth>(resp);
         this.wrLicenseService.setTokenValue(this.securityObject);
         if (this.Token) {
@@ -291,12 +295,30 @@ export class SecurityService {
             localStorage.setItem('userMenus', JSON.stringify(resp.menus));
         }
         this._securityObject$.next(resp.user);
-        // Pre-load locations immediately at login so all components read from cache
-        this.businessLocationService.getLocations().subscribe({
-          next: (locations) => this.setLocationsCache(locations),
-          error: (err) => console.error('Could not pre-load locations:', err)
-        });
-        this.cacheSyncService.syncMasterData();
+        
+        // Pre-load locations and company profile immediately at login so all components read from cache
+        // Wait for it to complete before emitting so that components get locations synchronously on load
+        return forkJoin({
+          locations: this.businessLocationService.getLocations().pipe(catchError(() => of([]))),
+          profile: this.companyProfileService.getCompanyProfile().pipe(catchError(() => of(null)))
+        }).pipe(
+          tap((result) => {
+            // Update profile first, which ensures it's not null
+            if (result.profile) {
+              this.updateProfile(result.profile);
+            }
+            if (result.locations && result.locations.length > 0) {
+              this.setLocationsCache(result.locations);
+            }
+            this.cacheSyncService.syncMasterData();
+          }),
+          map(() => resp),
+          catchError((err) => {
+            console.error('Could not pre-load profile and locations:', err);
+            this.cacheSyncService.syncMasterData();
+            return of(resp);
+          })
+        );
       })
     );
   }
@@ -316,7 +338,15 @@ export class SecurityService {
     localStorage.removeItem('userMenus');
     sessionStorage.removeItem(this.wrLicenseService.keyValues.LOCATION_CACHE);
     this.cacheSyncService.clearCache(); // Ensure IndexedDB is cleared on reset
-    this._companyProfile$.next(null);
+    
+    // Instead of nulling the entire profile, just clear the user-specific/tenant-specific parts
+    const currentProfile = this._companyProfile$.value;
+    if (currentProfile) {
+      this._companyProfile$.next({ ...currentProfile, locations: [], financialYears: [] });
+    } else {
+      this._companyProfile$.next(null);
+    }
+    
     this._securityObject$.next(null);
     this._token = null;
     this._claims = [];

@@ -63,24 +63,25 @@ namespace POS.MediatR.SalesOrder.Handlers
 
                     var sql = $@"
                         SELECT 
-                            so.Id AS SalesOrderId,
-                            so.OrderNumber AS SalesOrderNumber,
-                            so.DeliveryDate AS ExpectedShipmentDate,
-                            so.CustomerId,
-                            c.CustomerName,
-                            SUM(CASE WHEN soi.Status = @NotReturnStatus THEN soi.Quantity ELSE -soi.Quantity END) AS Quantity
+                            so.""Id"" AS ""SalesOrderId"",
+                            so.""OrderNumber"" AS ""SalesOrderNumber"",
+                            so.""DeliveryDate"" AS ""ExpectedShipmentDate"",
+                            so.""CustomerId"",
+                            c.""CustomerName"",
+                            SUM(CASE WHEN soi.""Status"" = @NotReturnStatus THEN soi.""Quantity"" ELSE -soi.""Quantity"" END) AS ""Quantity""
                         FROM {salesOrderTable} so
-                        INNER JOIN {customerTable} c ON so.CustomerId = c.Id
-                        INNER JOIN {salesOrderItemTable} soi ON so.Id = soi.SalesOrderId
-                        WHERE so.TenantId = @TenantId 
-                          AND so.IsDeleted = @IsDeleted
-                          AND so.IsSalesOrderRequest = @IsSalesOrderRequest
-                          AND so.DeliveryStatus = @PendingStatus
-                          AND so.LocationId IN @LocationIds
+                        INNER JOIN {customerTable} c ON so.""CustomerId"" = c.""Id""
+                        INNER JOIN {salesOrderItemTable} soi ON so.""Id"" = soi.""SalesOrderId""
+                        WHERE so.""TenantId"" = @TenantId 
+                          AND so.""IsDeleted"" = @IsDeleted
+                          AND so.""IsSalesOrderRequest"" = @IsSalesOrderRequest
+                          AND so.""DeliveryStatus"" = @PendingStatus
+                          AND so.""LocationId"" IN @LocationIds
                         GROUP BY 
-                            so.Id, so.OrderNumber, so.DeliveryDate, so.CustomerId, c.CustomerName
-                        HAVING SUM(CASE WHEN soi.Status = @NotReturnStatus THEN soi.Quantity ELSE -soi.Quantity END) > 0
-                        ORDER BY so.DeliveryDate DESC";
+                            so.""Id"", so.""OrderNumber"", so.""DeliveryDate"", so.""CustomerId"", c.""CustomerName""
+                        HAVING SUM(CASE WHEN soi.""Status"" = @NotReturnStatus THEN soi.""Quantity"" ELSE -soi.""Quantity"" END) > 0
+                        ORDER BY so.""DeliveryDate"" DESC
+                        LIMIT 10";
 
                     var connection = _sqlAccessor.GetOpenConnection();
                     var currentTransaction = _sqlAccessor.GetCurrentTransaction();
@@ -98,7 +99,7 @@ namespace POS.MediatR.SalesOrder.Handlers
                     var command = new CommandDefinition(sql, parameters, currentTransaction, commandTimeout: 60, cancellationToken: cancellationToken);
                     var result = await connection.QueryAsync<SalesOrderRecentShipmentDate>(command);
 
-                    return result.Take(10).ToList();
+                    return result.ToList();
                 }
                 catch (Exception ex)
                 {

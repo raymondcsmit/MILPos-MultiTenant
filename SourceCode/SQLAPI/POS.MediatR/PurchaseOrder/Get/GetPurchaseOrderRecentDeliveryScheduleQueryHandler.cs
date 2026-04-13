@@ -68,24 +68,25 @@ namespace POS.MediatR.PurchaseOrder.Handlers
 
                     var sql = $@"
                         SELECT 
-                            po.Id AS PurchaseOrderId,
-                            po.OrderNumber AS PurchaseOrderNumber,
-                            po.DeliveryDate AS ExpectedDispatchDate,
-                            po.SupplierId,
-                            s.SupplierName,
-                            SUM(CASE WHEN poi.Status = @NotReturnStatus THEN poi.Quantity ELSE -poi.Quantity END) AS TotalQuantity
+                            po.""Id"" AS ""PurchaseOrderId"",
+                            po.""OrderNumber"" AS ""PurchaseOrderNumber"",
+                            po.""DeliveryDate"" AS ""ExpectedDispatchDate"",
+                            po.""SupplierId"",
+                            s.""SupplierName"",
+                            SUM(CASE WHEN poi.""Status"" = @NotReturnStatus THEN poi.""Quantity"" ELSE -poi.""Quantity"" END) AS ""TotalQuantity""
                         FROM {purchaseOrderTable} po
-                        INNER JOIN {supplierTable} s ON po.SupplierId = s.Id
-                        INNER JOIN {purchaseOrderItemTable} poi ON po.Id = poi.PurchaseOrderId
-                        WHERE po.TenantId = @TenantId 
-                          AND po.IsDeleted = @IsDeleted
-                          AND po.IsPurchaseOrderRequest = @IsPurchaseOrderRequest
-                          AND po.DeliveryStatus = @PendingStatus
-                          AND po.LocationId IN @LocationIds
+                        INNER JOIN {supplierTable} s ON po.""SupplierId"" = s.""Id""
+                        INNER JOIN {purchaseOrderItemTable} poi ON po.""Id"" = poi.""PurchaseOrderId""
+                        WHERE po.""TenantId"" = @TenantId 
+                          AND po.""IsDeleted"" = @IsDeleted
+                          AND po.""IsPurchaseOrderRequest"" = @IsPurchaseOrderRequest
+                          AND po.""DeliveryStatus"" = @PendingStatus
+                          AND po.""LocationId"" IN @LocationIds
                         GROUP BY 
-                            po.Id, po.OrderNumber, po.DeliveryDate, po.SupplierId, s.SupplierName
-                        HAVING SUM(CASE WHEN poi.Status = @NotReturnStatus THEN poi.Quantity ELSE -poi.Quantity END) > 0
-                        ORDER BY po.DeliveryDate DESC";
+                            po.""Id"", po.""OrderNumber"", po.""DeliveryDate"", po.""SupplierId"", s.""SupplierName""
+                        HAVING SUM(CASE WHEN poi.""Status"" = @NotReturnStatus THEN poi.""Quantity"" ELSE -poi.""Quantity"" END) > 0
+                        ORDER BY po.""DeliveryDate"" DESC
+                        LIMIT 10";
 
                     var connection = _sqlAccessor.GetOpenConnection();
                     var currentTransaction = _sqlAccessor.GetCurrentTransaction();
@@ -103,7 +104,7 @@ namespace POS.MediatR.PurchaseOrder.Handlers
                     var command = new CommandDefinition(sql, parameters, currentTransaction, commandTimeout: 60, cancellationToken: cancellationToken);
                     var result = await connection.QueryAsync<PurchaseOrderRecentDeliverySchedule>(command);
 
-                    return result.Take(10).ToList();
+                    return result.ToList();
                 }
                 catch (Exception ex)
                 {

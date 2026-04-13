@@ -55,7 +55,7 @@ namespace POS.MediatR.Handlers
 
                     var sqlBuilder = new StringBuilder($@"
                         FROM {customerTable}
-                        WHERE TenantId = @TenantId AND IsDeleted = @IsDeleted
+                        WHERE ""TenantId"" = @TenantId AND ""IsDeleted"" = @IsDeleted
                     ");
 
                     var parameters = new DynamicParameters();
@@ -67,7 +67,7 @@ namespace POS.MediatR.Handlers
                     if (isSalesPerson)
                     {
                         var allowedLocations = _userInfoToken.LocationIds ?? new List<Guid>();
-                        sqlBuilder.Append(" AND (SalesPersonId = @UserId OR LocationId IN @AllowedLocations)");
+                        sqlBuilder.Append(@" AND (""SalesPersonId"" = @UserId OR ""LocationId"" IN @AllowedLocations)");
                         parameters.Add("UserId", _userInfoToken.Id);
                         parameters.Add("AllowedLocations", allowedLocations);
                     }
@@ -75,64 +75,64 @@ namespace POS.MediatR.Handlers
                     if (!string.IsNullOrWhiteSpace(resource.CustomerName))
                     {
                         parameters.Add("CustomerName", $"{resource.CustomerName.Trim().ToLowerInvariant()}%");
-                        sqlBuilder.Append(" AND LOWER(CustomerName) LIKE @CustomerName");
+                        sqlBuilder.Append(@" AND LOWER(""CustomerName"") LIKE @CustomerName");
                     }
 
                     if (!string.IsNullOrWhiteSpace(resource.ContactPerson))
                     {
                         parameters.Add("ContactPerson", $"{resource.ContactPerson.Trim().ToLowerInvariant()}%");
-                        sqlBuilder.Append(" AND LOWER(ContactPerson) LIKE @ContactPerson");
+                        sqlBuilder.Append(@" AND LOWER(""ContactPerson"") LIKE @ContactPerson");
                     }
 
                     if (!string.IsNullOrWhiteSpace(resource.PhoneNo))
                     {
                         parameters.Add("PhoneNo", $"{resource.PhoneNo.Trim().ToLowerInvariant()}%");
-                        sqlBuilder.Append(" AND PhoneNo IS NOT NULL AND LOWER(PhoneNo) LIKE @PhoneNo");
+                        sqlBuilder.Append(@" AND ""PhoneNo"" IS NOT NULL AND LOWER(""PhoneNo"") LIKE @PhoneNo");
                     }
 
                     if (!string.IsNullOrWhiteSpace(resource.MobileNo))
                     {
                         parameters.Add("MobileNo", $"{resource.MobileNo.Trim().ToLowerInvariant()}%");
-                        sqlBuilder.Append(" AND MobileNo IS NOT NULL AND LOWER(MobileNo) LIKE @MobileNo");
+                        sqlBuilder.Append(@" AND ""MobileNo"" IS NOT NULL AND LOWER(""MobileNo"") LIKE @MobileNo");
                     }
 
                     if (!string.IsNullOrWhiteSpace(resource.Email))
                     {
                         parameters.Add("Email", $"{resource.Email.Trim().ToLowerInvariant()}%");
-                        sqlBuilder.Append(" AND Email IS NOT NULL AND LOWER(Email) LIKE @Email");
+                        sqlBuilder.Append(@" AND ""Email"" IS NOT NULL AND LOWER(""Email"") LIKE @Email");
                     }
 
                     if (!string.IsNullOrWhiteSpace(resource.Website))
                     {
                         parameters.Add("Website", $"{resource.Website.Trim().ToLowerInvariant()}%");
-                        sqlBuilder.Append(" AND Website IS NOT NULL AND LOWER(Website) LIKE @Website");
+                        sqlBuilder.Append(@" AND ""Website"" IS NOT NULL AND LOWER(""Website"") LIKE @Website");
                     }
 
                     if (!string.IsNullOrWhiteSpace(resource.SearchQuery))
                     {
                         parameters.Add("SearchQuery", $"%{resource.SearchQuery.Trim().ToLowerInvariant()}%");
                         sqlBuilder.Append(@" AND (
-                            (Email IS NOT NULL AND LOWER(Email) LIKE @SearchQuery) OR
-                            LOWER(CustomerName) LIKE @SearchQuery OR
-                            (MobileNo IS NOT NULL AND LOWER(MobileNo) LIKE @SearchQuery) OR
-                            (PhoneNo IS NOT NULL AND LOWER(PhoneNo) LIKE @SearchQuery)
+                            (""Email"" IS NOT NULL AND LOWER(""Email"") LIKE @SearchQuery) OR
+                            LOWER(""CustomerName"") LIKE @SearchQuery OR
+                            (""MobileNo"" IS NOT NULL AND LOWER(""MobileNo"") LIKE @SearchQuery) OR
+                            (""PhoneNo"" IS NOT NULL AND LOWER(""PhoneNo"") LIKE @SearchQuery)
                         )");
                     }
 
                     var countSql = $"SELECT COUNT(*) {sqlBuilder.ToString()}";
 
                     // Default order by CustomerName
-                    var orderBy = "ORDER BY CustomerName ASC";
+                    var orderBy = @"ORDER BY ""CustomerName"" ASC";
                     if (!string.IsNullOrWhiteSpace(resource.OrderBy))
                     {
                         var sort = resource.OrderBy.ToLower();
-                        if (sort.Contains("customername")) orderBy = sort.EndsWith("desc") ? "ORDER BY CustomerName DESC" : "ORDER BY CustomerName ASC";
-                        else if (sort.Contains("email")) orderBy = sort.EndsWith("desc") ? "ORDER BY Email DESC" : "ORDER BY Email ASC";
-                        else if (sort.Contains("mobileno")) orderBy = sort.EndsWith("desc") ? "ORDER BY MobileNo DESC" : "ORDER BY MobileNo ASC";
+                        if (sort.Contains("customername")) orderBy = sort.EndsWith("desc") ? @"ORDER BY ""CustomerName"" DESC" : @"ORDER BY ""CustomerName"" ASC";
+                        else if (sort.Contains("email")) orderBy = sort.EndsWith("desc") ? @"ORDER BY ""Email"" DESC" : @"ORDER BY ""Email"" ASC";
+                        else if (sort.Contains("mobileno")) orderBy = sort.EndsWith("desc") ? @"ORDER BY ""MobileNo"" DESC" : @"ORDER BY ""MobileNo"" ASC";
                     }
 
                     var dataSql = $@"
-                        SELECT Id, CustomerName, Email, ContactPerson, MobileNo, Website, IsWalkIn
+                        SELECT ""Id"", ""CustomerName"", ""Email"", ""ContactPerson"", ""MobileNo"", ""Website"", ""IsWalkIn""
                         {sqlBuilder.ToString()}
                         {orderBy}
                         LIMIT @PageSize OFFSET @Skip
