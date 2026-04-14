@@ -1,4 +1,4 @@
-﻿using POS.Helper;
+﻿using POS.Data.Resources;
 using System;
 
 namespace POS.Data

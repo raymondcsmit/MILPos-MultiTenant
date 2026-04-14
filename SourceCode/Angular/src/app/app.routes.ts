@@ -16,6 +16,11 @@ export const routes: Routes = [
     resolve: { profile: CompanyProfileResolver },
     children: [
       {
+        path: 'register',
+        loadComponent: () =>
+          import('./register-tenant/register-tenant.component').then((m) => m.RegisterTenantComponent),
+      },
+      {
         path: 'login',
         loadComponent: () =>
           import('./login/login.component').then((m) => m.LoginComponent),
@@ -24,6 +29,11 @@ export const routes: Routes = [
         path: 'activate-license',
         loadComponent: () =>
           import('./activate-license/activate-license.component').then((m) => m.ActivateLicenseComponent),
+      },
+      {
+        path: 'subscription',
+        loadComponent: () =>
+          import('./subscription/subscription.component').then((m) => m.SubscriptionComponent),
       },
       {
         path: 'forgot-password',
@@ -280,6 +290,11 @@ export const routes: Routes = [
             canActivate: [AuthGuard]
           },
           {
+            path: 'daily-price-manager',
+            loadChildren: () =>
+              import('./daily-price-manager/daily-price-routes').then((m) => m.DAILY_PRICE_ROUTES),
+          },
+          {
             path: 'variants',
             data: { claimType: 'PRO_MANAGE_VARIANTS' },
             canActivate: [AuthGuard],
@@ -323,6 +338,24 @@ export const routes: Routes = [
             loadComponent: () =>
               import('./inventory/inventory-list/inventory-list.component').then(
                 (m) => m.InventoryListComponent
+              ),
+          },
+          {
+            path: 'inventory/bulk-update',
+            data: { claimType: 'INVE_MANAGE_INVENTORY' },
+            canActivate: [AuthGuard],
+            loadComponent: () =>
+              import('./inventory/product-stock-bulk-update/product-stock-bulk-update.component').then(
+                (m) => m.ProductStockBulkUpdateComponent
+              ),
+          },
+          {
+            path: 'inventory/bulk-adjust',
+            data: { claimType: 'INVE_MANAGE_INVENTORY' },
+            canActivate: [AuthGuard],
+            loadComponent: () =>
+              import('./inventory/product-stock-bulk-adjust/product-stock-bulk-adjust.component').then(
+                (m) => m.ProductStockBulkAdjustComponent
               ),
           },
           {
@@ -451,6 +484,33 @@ export const routes: Routes = [
             canActivate: [AuthGuard]
           },
           {
+            path: 'reports/product-sales-compare',
+            data: { claimType: 'DB_BEST_SELLING_PROS' },
+            canActivate: [AuthGuard],
+            loadComponent: () =>
+              import('./dashboard/product-sales-comparison/product-sales-comparison.component').then(
+                (m) => m.ProductSalesComparisonComponent
+              ),
+          },
+          {
+            path: 'reports/income-compare',
+            data: { claimType: 'DB_STATISTICS' },
+            canActivate: [AuthGuard],
+            loadComponent: () =>
+              import('./dashboard/income-comparison/income-comparison.component').then(
+                (m) => m.IncomeComparisonComponent
+              ),
+          },
+          {
+            path: 'reports/sales-compare',
+            data: { claimType: 'DB_STATISTICS' },
+            canActivate: [AuthGuard],
+            loadComponent: () =>
+              import('./dashboard/sales-comparison/sales-comparison.component').then(
+                (m) => m.SalesComparisonComponent
+              ),
+          },
+          {
             path: 'unitConversation',
             canActivate: [AuthGuard],
             data: { claimType: 'PRO_MANAGE_UNIT' },
@@ -556,6 +616,19 @@ export const routes: Routes = [
               import('./calendar-view/calendar-view').then(
                 (m) => m.CalendarView
               )
+          },
+          {
+            path: 'tenants',
+            loadChildren: () =>
+              import('./tenant/tenant-module').then((m) => m.TenantModule),
+            // canActivate: [AuthGuard] // AuthGuard is good, but maybe a specific SuperAdmin guard? Authorization is handled in Controller mostly.
+            // Using AuthGuard for now.
+             canLoad: [AuthGuard]
+          },
+          {
+            path: 'menus',
+            canLoad: [AuthGuard],
+            loadChildren: () => import('./menu/menu.routes').then(m => m.MENU_ROUTES)
           },
           {
             path: '**',

@@ -17,6 +17,8 @@ export interface PurchaseOrder {
   deliveryDate: Date;
   deliveryStatus: PurchaseDeliveryStatusEnum;
   supplierId: string;
+  salesPersonId?: string;
+  salesPersonName?: string;
   totalAmount: number;
   totalTax: number;
   totalQuantity?: number;

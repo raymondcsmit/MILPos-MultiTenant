@@ -5,3 +5,130 @@
 @use "utilities/navbar";
 @use "utilities/card";
 @use "theme/theme.scss";
+@use "theme/glassmorphism" as glass;
+
+// Apply Glassmorphism
+body {
+    background: var(--background-color) !important;
+    background-attachment: fixed !important; // Ensure gradient stays fixed on scroll
+    min-height: 100vh;
+    margin: 0;
+    color: var(--text-color);
+}
+
+.sidebar, .right-sidebar {
+  @include glass.glass-panel();
+  background: var(--glass-bg) !important; // Force glass background
+  top: 85px !important; // Create gap below floating navbar
+  height: calc(100vh - 100px) !important; // Adjust height to avoid overflow
+  margin-left: 10px; // Optional: Adds "floating" feel if desired, consistent with navbar margin
+  border-radius: 16px;
+
+  // Ensure text visibility on glass
+  .menu .list a, 
+  .user-info .info-container .name,
+  .user-info .info-container .email,
+  .menu .list .header {
+      color: #ffffff !important;
+      text-shadow: 0 1px 2px rgba(0,0,0,0.3); // Enhance contrast
+  }
+
+  .menu .list i.material-icons,
+  .menu .list .menu-toggle:before,
+  .menu .list .menu-toggle:after {
+      color: #ffffff !important;
+  }
+}
+
+.navbar, .navbar.active {
+  @include glass.glass-panel($opacity: 0.25, $blur: 15px);
+  margin: 10px;
+  width: calc(100% - 20px);
+  border-radius: 16px;
+  background-color: var(--glass-bg) !important; // Force glass bg overriding theme.scss
+}
+
+.card, .mat-mdc-card {
+  @include glass.glass-panel(); 
+  background-color: var(--card-bg) !important;
+}
+
+// Ensure Material Sidenav/Drawer is also glass
+.mat-drawer, .mat-sidenav {
+    background-color: transparent !important;
+    border-right: none !important;
+}
+
+.mat-drawer-container {
+    background-color: transparent !important;
+}
+
+.mat-toolbar {
+    background: transparent !important;
+}
+
+// Dialogs & Menus
+.mat-mdc-dialog-container {
+    @include glass.glass-panel($opacity: 0.15, $blur: 20px); // Reduced opacity to default
+    background: var(--glass-bg) !important; // Use theme-defined glass color
+    border: 1px solid var(--glass-border) !important; // Use theme-defined border
+    .mdc-dialog__surface { 
+        background: transparent !important;
+        box-shadow: none !important;
+    }
+}
+
+.mat-mdc-menu-panel {
+    @include glass.glass-dropdown();
+}
+
+// Form Inputs
+.mat-mdc-form-field {
+    .mdc-text-field--filled {
+       @include glass.glass-input();
+       border-radius: 8px 8px 0 0;
+    }
+}
+
+// Global Custom Scrollbar
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+::-webkit-scrollbar-track {
+  background: rgba(255, 255, 255, 0.1); 
+}
+::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.3); 
+  border-radius: 4px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.5); 
+}
+
+// Third Party Libraries
+
+// FullCalendar
+.fc-theme-standard {
+    .fc-scrollgrid, .fc-day, .fc-col-header-cell {
+        background: transparent !important;
+    }
+    .fc-scrollgrid {
+        border-color: rgba(255,255,255,0.1) !important;
+    }
+    th, td {
+        border-color: rgba(255,255,255,0.1) !important;
+    }
+}
+
+// NgxEditor
+.NgxEditor, .NgxEditor__MenuBar {
+    @include glass.glass-panel($opacity: 0.1, $blur: 5px);
+    border: 1px solid rgba(255,255,255,0.2) !important;
+}
+
+// Generic Charts Container
+.chart-container {
+    @include glass.glass-panel();
+    padding: 15px;
+}

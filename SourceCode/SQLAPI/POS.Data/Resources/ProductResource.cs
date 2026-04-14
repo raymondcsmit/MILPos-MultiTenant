@@ -1,5 +1,5 @@
 ﻿using POS.Data.Enums;
-using POS.Helper;
+using POS.Data.Resources;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -23,5 +23,6 @@ namespace POS.Data.Resources
         public Guid? ParentId { get; set; }
         public Guid? LocationId { get; set; }
         public bool IsBarcodeGenerated { get; set; }
+        public bool IgnoreTenantFilter { get; set; }
     }
 }

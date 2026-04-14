@@ -1,0 +1,36 @@
+# Role
+Act as a Senior .NET Architect specializing in Entity Framework Core and Clean Architecture.
+
+# Task
+I need to set up a .NET solution that supports multiple database providers (SQL Server, SQLite, PostgreSQL) for the same DbContext, but with migrations stored in separate projects to keep the solution clean.
+
+# Requirements
+
+1.  **Project Structure**:
+    *   `[SolutionName].Domain`: Contains the `DbContext` and Entities.
+    *   `[SolutionName].API`: The main Web API project.
+    *   `[SolutionName].Migrations.SqlServer`: Class library for SQL Server migrations.
+    *   `[SolutionName].Migrations.Sqlite`: Class library for SQLite migrations.
+    *   `[SolutionName].Migrations.PostgreSQL`: Class library for PostgreSQL migrations.
+
+2.  **Dependencies**:
+    *   Migration projects should reference `[SolutionName].Domain`.
+    *   API project should reference `[SolutionName].Domain` and ALL Migration projects.
+
+3.  **DbContext Configuration**:
+    *   In `[SolutionName].API`, implement `IDesignTimeDbContextFactory<MyDbContext>`.
+    *   The factory should read a `DatabaseProvider` setting from `appsettings.json` or Environment Variables.
+    *   Based on the provider, it should configure the `DbContextOptions` to use the correct provider (UseSqlServer, UseSqlite, UseNpgsql).
+    *   **CRITICAL**: It must set the `MigrationsAssembly` to the corresponding migration project (e.g., `b => b.MigrationsAssembly("[SolutionName].Migrations.SqlServer")`).
+
+4.  **Output**:
+    *   Provide the `.csproj` content for the Migration projects showing necessary NuGet packages.
+    *   Provide the `IDesignTimeDbContextFactory` implementation code.
+    *   Provide the `DbContext` `OnModelCreating` method showing how to handle SQLite specific limitations (like collation) if needed.
+    *   Provide a `EFCommands.txt` cheat sheet with the `dotnet ef` commands to add migrations and update the database for each provider, specifically showing how to target the correct project (`-p`) and startup project (`-s`) and setting the environment variable.
+
+5.  **Context**:
+    *   Solution Name: [YourSolutionName]
+    *   DbContext Name: [YourDbContextName]
+
+Please generate the code and project configuration to achieve this multi-database migration architecture.

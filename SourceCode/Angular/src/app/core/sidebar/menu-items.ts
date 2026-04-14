@@ -29,6 +29,7 @@ export const ROUTES: MenuInfo[] = [
       'PRO_MANAGE_BRAND',
       'PRO_MANAGE_VARIANTS',
       'PRO_PRINT_LABELS',
+      'PRO_MANAGE_DAILY_PRICES',
     ],
     submenu: [
       {
@@ -94,6 +95,14 @@ export const ROUTES: MenuInfo[] = [
         class: 'ml-menu',
         submenu: [],
         hasClaims: ['PRO_PRINT_LABELS'],
+      },
+      {
+        path: 'daily-price-manager',
+        title: 'DAILY_PRICE_MANAGER',
+        icon: 'target',
+        class: 'ml-menu',
+        submenu: [],
+        hasClaims: ['PRO_MANAGE_DAILY_PRICES'],
       },
     ],
   },
@@ -907,7 +916,8 @@ export const ROUTES: MenuInfo[] = [
       'SETT_MANAGE_COUNTRY',
       'SETT_MANAGE_CITY',
       'SETT_MANAGE_LAN',
-      'SETT_MANAGE_PAGE_HELPER',
+      'SETT_MANAGE_LAN',
+      'SETT_MANAGE_PAGE_HELPER'
     ],
     submenu: [
       {

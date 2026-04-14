@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Add Product - Glassmorphic Mockup</title>
+    <link rel="stylesheet" href="mockup-styles.css">
+</head>
+<body>
+    <div class="app-container">
+        <!-- Sidebar -->
+        <aside class="sidebar glass-panel">
+            <div class="brand">
+                <span class="material-icons">inventory_2</span>
+                POS System
+            </div>
+            <nav class="nav-links">
+                <a href="01_Dashboard.html" class="nav-item">
+                    <span class="material-icons">dashboard</span> Dashboard
+                </a>
+                <a href="02_UserProfile.html" class="nav-item">
+                    <span class="material-icons">person</span> Profile
+                </a>
+                <a href="03_DataEntry.html" class="nav-item active">
+                    <span class="material-icons">add_box</span> Add Product
+                </a>
+                <a href="05_SearchResults.html" class="nav-item">
+                    <span class="material-icons">search</span> Search
+                </a>
+                <a href="04_Settings.html" class="nav-item">
+                    <span class="material-icons">settings</span> Settings
+                </a>
+            </nav>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- Navbar -->
+            <header class="navbar glass-panel">
+                <h2 style="margin: 0; font-weight: 500;">New Inventory Item</h2>
+                <div class="user-menu">
+                    <span class="avatar">JD</span>
+                    <span>John Doe</span>
+                    <span class="material-icons">expand_more</span>
+                </div>
+            </header>
+
+            <div class="content-scroll">
+                <div style="display: grid; grid-template-columns: 2fr 1fr; gap: 24px;">
+                    
+                    <!-- Main Form -->
+                    <div class="card glass-panel">
+                        <div class="card-header">
+                            <h3 class="card-title">Product Details</h3>
+                        </div>
+                        
+                        <form>
+                            <div class="form-group">
+                                <label>Product Name</label>
+                                <input type="text" placeholder="e.g. Wireless Headphones">
+                            </div>
+
+                            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+                                <div class="form-group">
+                                    <label>SKU</label>
+                                    <input type="text" placeholder="SKU-12345">
+                                </div>
+                                <div class="form-group">
+                                    <label>Barcode</label>
+                                    <div style="display: flex; gap: 10px;">
+                                        <input type="text" placeholder="Scan or enter...">
+                                        <button class="btn btn-secondary" type="button"><span class="material-icons">qr_code_scanner</span></button>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 20px;">
+                                <div class="form-group">
+                                    <label>Category</label>
+                                    <select>
+                                        <option>Electronics</option>
+                                        <option>Clothing</option>
+                                        <option>Home & Garden</option>
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <label>Brand</label>
+                                    <select>
+                                        <option>Sony</option>
+                                        <option>Samsung</option>
+                                        <option>Apple</option>
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <label>Unit</label>
+                                    <select>
+                                        <option>Piece</option>
+                                        <option>Kg</option>
+                                        <option>Box</option>
+                                    </select>
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <label>Description</label>
+                                <div class="glass-panel" style="padding: 0; overflow: hidden; border: 1px solid rgba(255,255,255,0.2);">
+                                    <!-- Toolbar Simulation -->
+                                    <div style="background: rgba(255,255,255,0.1); padding: 8px; border-bottom: 1px solid rgba(255,255,255,0.1); display: flex; gap: 8px;">
+                                        <span class="material-icons" style="font-size: 18px; opacity: 0.7;">format_bold</span>
+                                        <span class="material-icons" style="font-size: 18px; opacity: 0.7;">format_italic</span>
+                                        <span class="material-icons" style="font-size: 18px; opacity: 0.7;">format_underlined</span>
+                                        <div style="width: 1px; height: 18px; background: rgba(255,255,255,0.2); margin: 0 4px;"></div>
+                                        <span class="material-icons" style="font-size: 18px; opacity: 0.7;">format_list_bulleted</span>
+                                    </div>
+                                    <textarea style="background: transparent; border: none; border-radius: 0; min-height: 120px;" placeholder="Enter product description..."></textarea>
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <label>Product Images</label>
+                                <div style="border: 2px dashed rgba(255,255,255,0.3); border-radius: 12px; padding: 30px; text-align: center; cursor: pointer; transition: background 0.2s;">
+                                    <span class="material-icons" style="font-size: 40px; color: var(--text-secondary);">cloud_upload</span>
+                                    <p style="margin: 10px 0 0 0; color: var(--text-secondary);">Drag & Drop files here or click to browse</p>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+
+                    <!-- Side Panel: Pricing & Stock -->
+                    <div style="display: flex; flex-direction: column; gap: 24px;">
+                        <div class="card glass-panel">
+                            <div class="card-header">
+                                <h3 class="card-title">Pricing</h3>
+                            </div>
+                            <div class="form-group">
+                                <label>Purchase Price</label>
+                                <div style="position: relative;">
+                                    <span style="position: absolute; left: 12px; top: 12px; color: var(--text-secondary);">$</span>
+                                    <input type="number" style="padding-left: 25px;" placeholder="0.00">
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label>Selling Price</label>
+                                <div style="position: relative;">
+                                    <span style="position: absolute; left: 12px; top: 12px; color: var(--text-secondary);">$</span>
+                                    <input type="number" style="padding-left: 25px;" placeholder="0.00">
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label>Tax (%)</label>
+                                <input type="number" value="15">
+                            </div>
+                        </div>
+
+                        <div class="card glass-panel">
+                            <div class="card-header">
+                                <h3 class="card-title">Initial Stock</h3>
+                            </div>
+                            <div class="form-group">
+                                <label>Quantity</label>
+                                <input type="number" value="0">
+                            </div>
+                            <div class="form-group">
+                                <label>Low Stock Alert Limit</label>
+                                <input type="number" value="10">
+                            </div>
+                        </div>
+
+                        <div style="display: flex; gap: 12px;">
+                            <button class="btn btn-secondary" style="flex: 1;">Cancel</button>
+                            <button class="btn" style="flex: 1;">Save Product</button>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </main>
+    </div>
+</body>
+</html>

@@ -3,9 +3,8 @@ using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
 namespace POS.Data.Entities.Accounts;
-public class PaymentEntry
+public class PaymentEntry : BaseEntity
 {
-    public Guid Id { get; set; }
     public Guid TransactionId { get; set; }
     public Guid BranchId { get; set; }
     public ACCPaymentMethod PaymentMethod { get; set; }
@@ -17,7 +16,6 @@ public class PaymentEntry
     [MaxLength(500)]
     public string Narration { get; set; } = string.Empty;
     public ACCPaymentStatus Status { get; set; } = ACCPaymentStatus.Completed;
-    public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
     // Navigation Properties
     [ForeignKey("TransactionId")]
     public virtual Transaction Transaction { get; set; } = null!;

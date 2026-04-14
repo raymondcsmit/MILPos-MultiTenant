@@ -1,5 +1,6 @@
 using System;
 using System.IO;
+using Microsoft.Extensions.FileProviders;
 using System.Linq;
 using System.Reflection;
 using FluentValidation;
@@ -18,16 +19,24 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.OpenApi;
-using Microsoft.OpenApi.Models;
 using Newtonsoft.Json;
 using POS.API.Helpers;
+using POS.API.Services;
 using POS.API.Helpers.Mapping;
 using POS.Data;
 using POS.Data.Dto;
+using POS.Data.Entities;
 using POS.Domain;
+using POS.Domain.Sync;
+using POS.Domain.ImportExport;
 using POS.Helper;
+using POS.Helper.Services;
 using POS.MediatR.PipeLineBehavior;
 using POS.Repository;
+using POS.Repository.Tenant;
+using POS.Common.Services;
+using Microsoft.OpenApi.Models;
+using ApiAndQueriesProfiler;
 
 namespace POS.API
 {
@@ -50,13 +59,46 @@ namespace POS.API
 
             services.AddMediatR(cfg => cfg.RegisterServicesFromAssemblies(assembly));
 
+            services.AddTransient(typeof(IPipelineBehavior<,>), typeof(CachingBehavior<,>));
             services.AddTransient(typeof(IPipelineBehavior<,>), typeof(ValidationBehavior<,>));
             services.AddValidatorsFromAssemblies(Enumerable.Repeat(assembly, 1));
 
             services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
+            services.AddDistributedMemoryCache();
             
-            // Register tenant provider for multi-tenancy
-            services.AddScoped<ITenantProvider, TenantProvider>();
+            // Configure deployment settings
+            services.Configure<DeploymentSettings>(Configuration);
+            var deploymentSettings = Configuration.Get<DeploymentSettings>();
+            
+            // Register Master Tenant Settings
+            services.Configure<MasterTenantSettings>(Configuration.GetSection("MasterTenant"));
+            
+            // Register tenant provider based on deployment mode
+            if (deploymentSettings?.MultiTenancy?.Enabled == true)
+            {
+                // Cloud mode: Full multi-tenant support
+                services.AddScoped<ITenantProvider, TenantProvider>();
+            }
+            else
+            {
+                // Desktop mode: Single-tenant support
+                services.AddScoped<ITenantProvider, SingleTenantProvider>();
+            }
+            
+            // Register sync services
+            services.AddSingleton<IDeviceIdentifier, DeviceIdentifier>();
+            services.AddScoped<ChangeTrackingService>();
+            services.AddScoped<ConflictResolutionService>();
+            services.AddHttpClient<CloudApiClient>();
+            services.AddScoped<SyncEngine>();
+            
+            // Register scheduled sync service (Desktop only)
+            if (deploymentSettings?.DeploymentMode == "Desktop")
+            {
+                services.AddHostedService<POS.API.Services.ScheduledSyncService>();
+            }
+            // Register FBR Sync Background Service
+            services.AddHostedService<POS.API.BackgroundServices.FBRSyncBackgroundService>();
             
             JwtSettings settings;
             settings = GetJwtSettings();
@@ -65,31 +107,80 @@ namespace POS.API
             services.AddSingleton(new PathHelper(Configuration));
             services.AddSingleton<IConnectionMappingRepository, ConnectionMappingRepository>();
             services.AddScoped(c => new UserInfoToken() { Id = Guid.Parse(defaultUserId) });
-            services.AddDbContextPool<POSDbContext>((serviceProvider, options) =>
+
+            services.AddMemoryCache();
+
+            var isDevelopment = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT") == "Development";
+            var databaseProvider = Configuration.GetValue<string>("DatabaseProvider") ?? "Sqlite";
+
+            if (databaseProvider == "PostgreSql")
             {
-                var tenantProvider = serviceProvider.GetService<ITenantProvider>();
-                var provider = "Sqlite"; // Configuration.GetValue<string>("DatabaseProvider");
+                services.AddTransient<SqlKata.Compilers.Compiler, SqlKata.Compilers.PostgresCompiler>();
+            }
+            else if (databaseProvider == "SqlServer")
+            {
+                services.AddTransient<SqlKata.Compilers.Compiler, SqlKata.Compilers.SqlServerCompiler>();
+            }
+            else
+            {
+                services.AddTransient<SqlKata.Compilers.Compiler, SqlKata.Compilers.SqliteCompiler>();
+            }
+
+            services.AddApiAndQueriesProfiler(options =>
+            {
+                options.DatabaseProvider = Configuration.GetValue<string>("DatabaseProvider") ?? "Sqlite";
+                if (options.DatabaseProvider == "Sqlite")
+                    options.ConnectionString = Configuration.GetConnectionString("SqliteConnectionString");
+                else if (options.DatabaseProvider == "PostgreSql")
+                    options.ConnectionString = Configuration.GetConnectionString("PostgresConnectionString");
+                else
+                    options.ConnectionString = Configuration.GetConnectionString("DbConnectionString");
+            });
+
+            // Configure DbContext - Scoped lifetime
+            services.AddDbContext<POSDbContext>((serviceProvider, options) =>
+            {
+                var provider = Configuration.GetValue<string>("DatabaseProvider") ?? "Sqlite";
+                
+                // Add profiler interceptor
+                var profilerInterceptor = serviceProvider.GetRequiredService<ProfilerCommandInterceptor>();
+                options.AddInterceptors(profilerInterceptor);
+
                 if (provider == "Sqlite")
                 {
-                    options.UseSqlite(Configuration.GetConnectionString("SqliteConnectionString"))
-                    .EnableSensitiveDataLogging();
+                    options.UseSqlite(Configuration.GetConnectionString("SqliteConnectionString"),
+                        b => b.MigrationsAssembly("POS.Migrations.Sqlite"));
+                    
+                    if (isDevelopment) options.EnableSensitiveDataLogging();
+                }
+                else if (provider == "PostgreSql")
+                {
+                    AppContext.SetSwitch("Npgsql.EnableLegacyTimestampBehavior", true);
+                    options.UseNpgsql(Configuration.GetConnectionString("PostgresConnectionString"),
+                        b => {
+                            b.MigrationsAssembly("POS.Migrations.PostgreSQL");
+                            b.CommandTimeout(300);
+                            b.EnableRetryOnFailure(5, TimeSpan.FromSeconds(10), null);
+                        });
+
+                    if (isDevelopment) options.EnableSensitiveDataLogging();
                 }
                 else
                 {
-                    options.UseSqlServer(Configuration.GetConnectionString("DbConnectionString"))
-                    .EnableSensitiveDataLogging();
+                    options.UseSqlServer(Configuration.GetConnectionString("DbConnectionString"),
+                        b => b.MigrationsAssembly("POS.Migrations.SqlServer"));
+
+                    if (isDevelopment) options.EnableSensitiveDataLogging();
                 }
 
                 options.UseQueryTrackingBehavior(QueryTrackingBehavior.NoTracking);
                 options.ConfigureWarnings(builder =>
                 {
                     builder.Ignore(CoreEventId.PossibleIncorrectRequiredNavigationWithQueryFilterInteractionWarning);
-                    if (provider == "Sqlite")
-                    {
-                        builder.Ignore(RelationalEventId.PendingModelChangesWarning);
-                    }
+                    builder.Ignore(RelationalEventId.PendingModelChangesWarning);
                 });
             });
+            
             services.AddIdentity<User, Role>()
              .AddEntityFrameworkStores<POSDbContext>()
              .AddDefaultTokenProviders();
@@ -102,13 +193,69 @@ namespace POS.API
                 options.Password.RequireUppercase = false;
                 options.Password.RequireLowercase = false;
             });
+            services.Configure<POS.Data.Dto.MasterTenantSettings>(Configuration.GetSection("MasterTenant")); 
             services.AddSingleton(MapperConfig.GetMapperConfigs());
             services.AddScoped<SeedingService>();
+            services.AddScoped<MenuItemSeedingService>();
+            services.AddScoped<ITenantRegistrationService, TenantRegistrationService>();
+            services.AddScoped<ITenantDataCloner, TenantDataCloner>();
             services.AddScoped<TenantDataMigrationService>();
+            services.AddScoped<POS.Common.Services.IFileStorageService, POS.Helper.Services.FileStorageService>();
+            
+            // Core Utility Services
+            services.AddScoped<ICsvParserService, CsvParserService>();
+            services.AddScoped<IDbUtilityService, DbUtilityService>();
+            services.AddScoped<ISecurityService, SecurityService>();
+            services.AddScoped<ILicenseTokenService, LicenseTokenService>();
+            
+            // Business Logic Services
+            services.AddScoped<ITenantInitializationService, TenantInitializationService>();
+            
+            // Import/Export Services
+            services.AddScoped<IImportExportService<POS.Data.Product>, ProductImportExportService>();
+            services.AddScoped<IImportExportService<POS.Data.Customer>, CustomerImportExportService>();
+            services.AddScoped<IImportExportService<POS.Data.Supplier>, SupplierImportExportService>();
+            
+            // FBR Integration Services
+            services.AddScoped<POS.Domain.FBR.IFBRQRCodeService, POS.Domain.FBR.FBRQRCodeService>();
+            services.AddHttpClient<POS.Domain.FBR.IFBRInvoiceService, POS.Domain.FBR.FBRInvoiceService>()
+                .SetHandlerLifetime(TimeSpan.FromMinutes(5)); // Prevent socket exhaustion
+            
             services.AddDependencyInjection();
             services.AddJwtAutheticationConfiguration(settings);
+            
+            // Configure CORS based on deployment mode
             services.AddCors(options =>
             {
+                if (deploymentSettings?.IsCloud == true)
+                {
+                    // Cloud mode: Restrict to specific origins
+                    var allowedOrigins = deploymentSettings.CloudSettings?.CorsOrigins?.ToArray() 
+                        ?? new[] { "https://app.yourcompany.com" };
+                    
+                    options.AddPolicy("CloudCorsPolicy", builder =>
+                    {
+                        builder.WithOrigins(allowedOrigins)
+                               .AllowAnyHeader()
+                               .AllowAnyMethod()
+                               .AllowCredentials()
+                               .WithExposedHeaders("X-Pagination", "X-Tenant-ID");
+                    });
+                }
+                else
+                {
+                    // Desktop mode: Allow all origins (embedded app)
+                    options.AddPolicy("DesktopCorsPolicy", builder =>
+                    {
+                        builder.SetIsOriginAllowed(origin => true)
+                               .AllowAnyHeader()
+                               .AllowAnyMethod()
+                               .AllowCredentials()
+                               .WithExposedHeaders("X-Pagination");
+                    });
+                }
+                
+                // Keep legacy policy for backward compatibility
                 options.AddPolicy("ExposeResponseHeaders",
                     builder =>
                     {
@@ -132,12 +279,35 @@ namespace POS.API
             {
                 options.Providers.Add<GzipCompressionProvider>();
             });
-            services.AddControllers()
-                .AddNewtonsoftJson(options =>
-                {
-                    options.SerializerSettings.ReferenceLoopHandling = ReferenceLoopHandling.Ignore;
-                    options.SerializerSettings.DateTimeZoneHandling = DateTimeZoneHandling.Utc;
-                });
+
+            // Conditionally register Controllers/Views based on deployment mode
+            if (deploymentSettings?.DeploymentMode == "Desktop")
+            {
+                // Desktop mode: Only API controllers, no Razor Views
+                services.AddControllers()
+                    .AddNewtonsoftJson(options =>
+                    {
+                        options.SerializerSettings.ReferenceLoopHandling = ReferenceLoopHandling.Ignore;
+                        options.SerializerSettings.DateTimeZoneHandling = DateTimeZoneHandling.Utc;
+                    });
+            }
+            else
+            {
+                // Cloud/Web mode: API controllers + Razor Views (MVC)
+                services.AddControllersWithViews()
+                    .AddNewtonsoftJson(options =>
+                    {
+                        options.SerializerSettings.ReferenceLoopHandling = ReferenceLoopHandling.Ignore;
+                        options.SerializerSettings.DateTimeZoneHandling = DateTimeZoneHandling.Utc;
+                    });
+            }
+
+            services.AddSession(options =>
+            {
+                options.IdleTimeout = TimeSpan.FromMinutes(30);
+                options.Cookie.HttpOnly = true;
+                options.Cookie.IsEssential = true;
+            });
             services.AddSwaggerGen(c =>
             {
                 c.SwaggerDoc("v1", new OpenApiInfo
@@ -171,40 +341,46 @@ namespace POS.API
                 //Set the comments path for the Swagger JSON and UI.
                 var xmlFile = $"{Assembly.GetExecutingAssembly().GetName().Name}.xml";
                 var xmlPath = Path.Combine(AppContext.BaseDirectory, xmlFile);
-                c.IncludeXmlComments(xmlPath);
+                if (File.Exists(xmlPath))
+                {
+                    c.IncludeXmlComments(xmlPath);
+                }
             });
 
             //var jobService = sp.GetService<JobService>();
             //jobService.StartScheduler();
-            SpaStartup.ConfigureServices(services);
+            SpaStartup.ConfigureServices(services, Configuration);
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env, ILoggerFactory loggerFactory)
         {
-            if (env.IsDevelopment())
-            {
+            app.UseApiAndQueriesProfiler();
+            
+            // if (env.IsDevelopment())
+            // {
                 app.UseDeveloperExceptionPage();
-            }
-            else
-            {
-                app.UseExceptionHandler(appBuilder =>
-                {
-                    appBuilder.Run(async context =>
-                    {
-                        var exceptionHandlerFeature = context.Features.Get<IExceptionHandlerFeature>();
-                        if (exceptionHandlerFeature != null)
-                        {
-                            var logger = loggerFactory.CreateLogger("Global exception logger");
-                            logger.LogError(500,
-                                exceptionHandlerFeature.Error,
-                                exceptionHandlerFeature.Error.Message);
-                        }
-                        context.Response.StatusCode = 500;
-                        await context.Response.WriteAsync("An unexpected fault happened. Try again later.");
-                    });
-                });
-            }
+            // }
+            // else
+            // {
+            //     app.UseExceptionHandler(appBuilder =>
+            //     {
+            //         appBuilder.Run(async context =>
+            //         {
+            //             var exceptionHandlerFeature = context.Features.Get<IExceptionHandlerFeature>();
+            //             if (exceptionHandlerFeature != null)
+            //             {
+            //                 var logger = loggerFactory.CreateLogger("Global exception logger");
+            //                 logger.LogError(500,
+            //                     exceptionHandlerFeature.Error,
+            //                     exceptionHandlerFeature.Error.Message);
+            //             }
+            //             context.Response.StatusCode = 500;
+            //             await context.Response.WriteAsync("An unexpected fault happened. Try again later.");
+            //         });
+            //     });
+            // }
+            app.UseMiddleware<POS.API.Middleware.GlobalExceptionHandlerMiddleware>();
             app.UseSwagger(c =>
             {
                 c.SerializeAsV2 = true;
@@ -216,20 +392,68 @@ namespace POS.API
                 c.RoutePrefix = "swagger";
             });
             app.UseStaticFiles();
-
-            app.UseCors("ExposeResponseHeaders");
-            app.UseHttpsRedirection();
             
-            // Add tenant resolution middleware BEFORE authentication
-            app.UseMiddleware<POS.API.Middleware.TenantResolutionMiddleware>();
+            // Get deployment settings first
+            var deploymentSettings = app.ApplicationServices.GetService<Microsoft.Extensions.Options.IOptions<DeploymentSettings>>()?.Value;
+
+            // Always serve files from ProgramData/MILPOS/wwwroot as a secondary file location.
+            // FileStorageService falls back to here when WebRoot is read-only.
+            // Without this, images saved to the fallback path return HTTP 404.
+            var appDataStaticPath = Path.Combine(
+                Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData),
+                "MILPOS", "wwwroot");
+            if (!Directory.Exists(appDataStaticPath))
+            {
+                Directory.CreateDirectory(appDataStaticPath);
+            }
+            app.UseStaticFiles(new StaticFileOptions
+            {
+                FileProvider = new PhysicalFileProvider(appDataStaticPath),
+                RequestPath = ""
+            });
+
+            
+            // Apply CORS based on deployment mode
+            if (deploymentSettings?.IsCloud == true)
+            {
+                app.UseCors("CloudCorsPolicy");
+            }
+            else
+            {
+                app.UseCors("DesktopCorsPolicy");
+            }
+            
+            if (deploymentSettings?.DeploymentMode != "Desktop")
+            {
+                app.UseHttpsRedirection();
+            }
+            
+
             
             app.UseAuthentication();
+            app.UseMiddleware<POS.API.Middleware.ApiKeyAuthenticationMiddleware>(); // ✅ Register API Key Middleware (Before Authorization)
+
+            // Add tenant resolution middleware only in cloud mode
+            if (deploymentSettings?.MultiTenancy?.Enabled == true)
+            {
+                app.UseMiddleware<POS.API.Middleware.TenantResolutionMiddleware>();
+            }
+            app.UseSession();
             app.UseRouting();
             app.UseAuthorization();
+            app.UseMiddleware<POS.API.Middleware.TrialEnforcementMiddleware>();
             app.UseResponseCompression();
 
             app.UseEndpoints(endpoints =>
             {
+                // Only map MVC routes if NOT in Desktop mode
+                if (deploymentSettings?.DeploymentMode != "Desktop")
+                {
+                    endpoints.MapControllerRoute(
+                        name: "default",
+                        pattern: "{controller=Home}/{action=Index}/{id?}");
+                }
+                
                 endpoints.MapControllers();
                 endpoints.MapHub<UserHub>("/userHub");
             });

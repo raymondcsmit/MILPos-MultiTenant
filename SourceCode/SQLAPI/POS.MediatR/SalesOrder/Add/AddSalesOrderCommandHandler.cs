@@ -1,4 +1,4 @@
-﻿using AutoMapper;
+using AutoMapper;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
@@ -33,6 +33,8 @@ namespace POS.MediatR.Handlers
         private readonly IProductRepository _productRepository;
         private readonly ISalesOrderItemRepository _salesOrderItemRepository;
         private readonly IMediator _mediator;
+        private readonly UserInfoToken _userInfoToken;
+
         public AddSalesOrderCommandHandler(
             ISalesOrderRepository salesOrderRepository,
             IUnitOfWork<POSDbContext> uow,
@@ -44,7 +46,8 @@ namespace POS.MediatR.Handlers
             IProductStockRepository productStockRepository,
             IProductRepository productRepository,
             ISalesOrderItemRepository salesOrderItemRepository,
-            IMediator mediator)
+            IMediator mediator,
+            UserInfoToken userInfoToken)
         {
             _salesOrderRepository = salesOrderRepository;
             _uow = uow;
@@ -57,6 +60,7 @@ namespace POS.MediatR.Handlers
             _productRepository = productRepository;
             _salesOrderItemRepository = salesOrderItemRepository;
             _mediator = mediator;
+            _userInfoToken = userInfoToken;
         }
 
         public async Task<ServiceResponse<SalesOrderDto>> Handle(AddSalesOrderCommand request, CancellationToken cancellationToken)
@@ -70,6 +74,20 @@ namespace POS.MediatR.Handlers
 
             var salesOrder = _mapper.Map<POS.Data.SalesOrder>(request);
             salesOrder.PaymentStatus = PaymentStatus.Pending;
+
+            // Handle Sales Person Attribution
+            var isRestrictedUser = _userInfoToken.LocationIds != null && _userInfoToken.LocationIds.Any();
+            if (isRestrictedUser)
+            {
+                // Force attribution to the logged-in sales person to prevent spoofing
+                salesOrder.SalesPersonId = _userInfoToken.Id;
+            }
+            else
+            {
+                // Allow admin/manager to attribute the sale "on behalf of"
+                salesOrder.SalesPersonId = request.SalesPersonId;
+            }
+
             salesOrder.SalesOrderItems.ForEach(item =>
             {
                 item.Product = null;
@@ -80,6 +98,31 @@ namespace POS.MediatR.Handlers
             {
                 salesOrder.PaymentStatus = PaymentStatus.Paid;
             }
+
+            // FBR Integration Logic
+            try 
+            {
+                var location = await _uow.Context.Set<POS.Data.Entities.Location>()
+                    .FirstOrDefaultAsync(l => l.Id == salesOrder.LocationId, cancellationToken);
+
+                if (location != null && location.IsFBREnabled && location.AutoSubmitInvoices)
+                {
+                    salesOrder.FBRStatus = POS.Data.Entities.FBR.FBRSubmissionStatus.Queued;
+                    salesOrder.BuyerNTN = request.BuyerNTN;
+                    salesOrder.BuyerCNIC = request.BuyerCNIC;
+                    salesOrder.BuyerName = !string.IsNullOrEmpty(request.BuyerName) ? request.BuyerName : "Walk-in Customer";
+                    salesOrder.BuyerPhoneNumber = request.BuyerPhoneNumber;
+                    salesOrder.BuyerAddress = request.BuyerAddress;
+                    salesOrder.SaleType = !string.IsNullOrEmpty(request.SaleType) ? request.SaleType : "Retail";
+                    
+                    _logger.LogInformation("Sales Order {OrderNumber} queued for FBR submission (Location: {LocationName})", salesOrder.OrderNumber, location.Name);
+                }
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error configuring FBR status for Sales Order {OrderNumber}", salesOrder.OrderNumber);
+            }
+
             _salesOrderRepository.Add(salesOrder);
 
             // Collect all productIds from salesOrder items

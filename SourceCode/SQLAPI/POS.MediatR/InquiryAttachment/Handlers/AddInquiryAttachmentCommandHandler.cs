@@ -10,10 +10,10 @@ using MediatR;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Logging;
 using System;
-using System.IO;
-using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using POS.Common.Services;
+using System.Threading;
 
 namespace POS.MediatR.Handlers
 {
@@ -25,14 +25,17 @@ namespace POS.MediatR.Handlers
         private readonly IWebHostEnvironment _webHostEnvironment;
         private readonly PathHelper _pathHelper;
         private readonly ILogger<AddInquiryAttachmentCommandHandler> _logger;
+        private readonly IFileStorageService _fileStorageService;
 
         public AddInquiryAttachmentCommandHandler(
             IInquiryAttachmentRepository inquiryAttachmentRepository,
             IUnitOfWork<POSDbContext> uow,
             IMapper mapper,
             IWebHostEnvironment webHostEnvironment,
+
             PathHelper pathHelper,
-            ILogger<AddInquiryAttachmentCommandHandler> logger)
+            ILogger<AddInquiryAttachmentCommandHandler> logger,
+            IFileStorageService fileStorageService)
         {
             _inquiryAttachmentRepository = inquiryAttachmentRepository;
             _uow = uow;
@@ -40,28 +43,16 @@ namespace POS.MediatR.Handlers
             _webHostEnvironment = webHostEnvironment;
             _pathHelper = pathHelper;
             _logger = logger;
+            _fileStorageService = fileStorageService;
         }
 
         public async Task<ServiceResponse<InquiryAttachmentDto>> Handle(AddInquiryAttachmentCommand request, CancellationToken cancellationToken)
         {
-            string contentRootPath = _webHostEnvironment.WebRootPath;
-            var pathToSave = Path.Combine(contentRootPath, _pathHelper.Attachments);
             var extension = request.Extension;
             var id = Guid.NewGuid();
             var path = $"{id}.{extension}";
-            var documentPath = Path.Combine(pathToSave, path);
 
-            if (!Directory.Exists(pathToSave))
-            {
-                Directory.CreateDirectory(pathToSave);
-            }
-
-            string base64 = request.Documents.Split(',').LastOrDefault();
-            if (!string.IsNullOrWhiteSpace(base64))
-            {
-                byte[] bytes = Convert.FromBase64String(base64);
-                await System.IO.File.WriteAllBytesAsync($"{documentPath}", bytes);
-            }
+            await _fileStorageService.SaveFileAsync(_pathHelper.Attachments, request.Documents, path);
             var inquiryAttachment = new InquiryAttachment
             {
                 Id = id,

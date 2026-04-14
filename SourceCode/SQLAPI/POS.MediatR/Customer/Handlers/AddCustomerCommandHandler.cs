@@ -13,6 +13,7 @@ using POS.Domain;
 using POS.Helper;
 using POS.MediatR.CommandAndQuery;
 using POS.Repository;
+using POS.Common.Services;
 
 namespace POS.MediatR.Handlers
 {
@@ -23,21 +24,27 @@ namespace POS.MediatR.Handlers
         private readonly IUnitOfWork<POSDbContext> _uow;
         private readonly ILogger<AddCustomerCommandHandler> _logger;
         private readonly IWebHostEnvironment _webHostEnvironment;
+
         private readonly PathHelper _pathHelper;
+        private readonly IFileStorageService _fileStorageService;
 
         public AddCustomerCommandHandler(ICustomerRepository customerRepository,
             IMapper mapper,
             IUnitOfWork<POSDbContext> uow,
             ILogger<AddCustomerCommandHandler> logger,
             IWebHostEnvironment webHostEnvironment,
-            PathHelper pathHelper)
+
+            PathHelper pathHelper,
+            IFileStorageService fileStorageService)
         {
             _customerRepository = customerRepository;
             _mapper = mapper;
             _uow = uow;
             _logger = logger;
             _webHostEnvironment = webHostEnvironment;
+
             _pathHelper = pathHelper;
+            _fileStorageService = fileStorageService;
         }
         public async Task<ServiceResponse<CustomerDto>> Handle(AddCustomerCommand request, CancellationToken cancellationToken)
         {
@@ -66,15 +73,7 @@ namespace POS.MediatR.Handlers
 
             if (request.IsImageUpload && !string.IsNullOrWhiteSpace(request.Url))
             {
-                string contentRootPath = _webHostEnvironment.WebRootPath;
-                string folderPath = Path.Combine(contentRootPath, _pathHelper.CustomerImagePath);
-                if (!Directory.Exists(folderPath))
-                {
-                    Directory.CreateDirectory(folderPath);
-                }
-
-                var pathToSave = Path.Combine(folderPath, request.Url);
-                await FileData.SaveFile(pathToSave, request.Logo);
+                await _fileStorageService.SaveFileAsync(_pathHelper.CustomerImagePath, request.Logo, request.Url);
             }
 
             return ServiceResponse<CustomerDto>.ReturnResultWith200(customerDtoData);

@@ -1,4 +1,4 @@
-﻿using AutoMapper;
+using AutoMapper;
 
 namespace POS.API.Helpers.Mapping
 {
@@ -61,6 +61,7 @@ namespace POS.API.Helpers.Mapping
                 mc.AddProfile(new ProductStockProfile());
                 mc.AddProfile(new LoanDetailProfile());
                 mc.AddProfile(new LedgerAccountProfile());
+                mc.AddProfile(new MenuItemProfile());
             });
             return mappingConfig.CreateMapper();
         }

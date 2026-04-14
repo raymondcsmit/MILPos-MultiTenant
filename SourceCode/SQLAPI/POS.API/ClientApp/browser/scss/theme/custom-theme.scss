@@ -1,147 +1,179 @@
 @use 'sass:map';
 @use '@angular/material' as mat;
 @use './theme-colors' as theme-colors;
+@use '../common/var-generator' as vars;
+@use '../common/standard-palettes' as palettes;
+@use './glass-themes'; // Import Glassmorphic Themes
 
-//mat.$cyan-palette,
-html {
-  @include mat.theme((color: mat.$cyan-palette,
-      typography: Roboto,
-      density: -2));
-}
+// --- 1. Define Palettes (Re-using existing ones) ---
+// We simply reuse what's imported from theme-colors
 
+// --- 2. Generate Default Theme Variables (:root) ---
 :root {
-  @include mat.card-overrides((title-text-size: 1.2rem,
-      title-text-line-height: 1.6rem));
+  @include vars.generate-theme-vars(palettes.$cyan-palette, 'primary');
+  @include vars.generate-theme-vars(palettes.$pink-palette, 'secondary');
+  @include vars.generate-theme-vars(palettes.$red-palette, 'warn');
+  
+  // Base Colors
+  --surface-color: #ffffff; // Keep solid fallback
+  --background-color: linear-gradient(135deg, #667eea 0%, #764ba2 100%); // Vibrant gradient
+  --text-color: #ffffff; // Updated to white for better contrast on dark gradient
+  --border-color: rgba(255, 255, 255, 0.2);
+  
+  // Glass Variables
+  --glass-bg: rgba(255, 255, 255, 0.15);
+  --glass-border: rgba(255, 255, 255, 0.2);
 
-  @include mat.tooltip-overrides((container-color: map.get(theme-colors.$primary-palette, 20),
-      container-shape: 16px,
-    ));
-
-  @include mat.table-overrides((header-headline-color: #fff,
-      // row-item-outline-color:#e5e7eb,
-      row-item-outline-color: #e5e7eb,
-      row-item-container-height:35px,
-      header-container-height:30px));
-
-  @include mat.datepicker-overrides((calendar-date-selected-state-background-color: map.get(theme-colors.$primary-palette, 30),
-      calendar-date-selected-state-text-color: map.get(theme-colors.$primary-palette, 100),
-      calendar-date-today-outline-color: map.get(theme-colors.$primary-palette, 30),
-      calendar-date-hover-state-background-color: map.get(theme-colors.$primary-palette, 30),
-      calendar-date-in-comparison-range-state-background-color : map.get(theme-colors.$primary-palette, 30),
-      calendar-date-in-overlap-range-selected-state-background-color : map.get(theme-colors.$primary-palette, 30),
-      calendar-date-in-overlap-range-state-background-color : map.get(theme-colors.$primary-palette, 30),
-      calendar-date-today-selected-state-outline-color : map.get(theme-colors.$primary-palette, 30),
-      calendar-date-in-range-state-background-color : map.get(theme-colors.$primary-palette, 30),
-      calendar-date-preview-state-outline-color : map.get(theme-colors.$primary-palette, 30)));
-
-  @include mat.option-overrides((selected-state-label-text-color: #f9faf4,
-      selected-state-layer-color: map.get(theme-colors.$primary-palette, 30),
-      hover-state-layer-color: #f9faf4,
-    ));
-
-  @include mat.pseudo-checkbox-overrides((full-selected-icon-color: map.get(theme-colors.$primary-palette, 30),
-    ));
-
-  @include mat.progress-bar-overrides((active-indicator-color: map.get(theme-colors.$primary-palette, 10),
-      track-color: map.get(theme-colors.$primary-palette, 90)));
-
+  // Specific Overrides for components mapped to vars
+  --card-bg: transparent;
+  --sidenav-bg: transparent;
 }
+
+// --- 3. Define Alternative Themes ---
+
+// Dark Theme
+.theme-dark {
+    @include vars.generate-theme-vars(palettes.$green-palette, 'primary');
+    @include vars.generate-theme-vars(palettes.$purple-palette, 'secondary');
+
+    --surface-color: #424242;
+    --background-color: #303030; // Consider a dark gradient here if desired
+    --text-color: #ffffff;
+    --border-color: #616161;
+    --card-bg: transparent;
+    --sidenav-bg: transparent;
+}
+
+
+// Ocean Theme
+.theme-ocean {
+    @include vars.generate-theme-vars(palettes.$indigo-palette, 'primary');
+    @include vars.generate-theme-vars(palettes.$light-blue-palette, 'secondary');
+    
+    // Light base
+    --surface-color: #ffffff;
+    --background-color: linear-gradient(135deg, #E3FDF5 0%, #FFE6FA 100%); // Light gradient
+    --text-color: rgba(0, 0, 0, 0.87);
+     --border-color: #b0bec5;
+     --card-bg: transparent;
+     --sidenav-bg: transparent;
+}
+
+
+// Crimson Theme
+.theme-crimson {
+    @include vars.generate-theme-vars(palettes.$red-palette, 'primary');
+    @include vars.generate-theme-vars(palettes.$amber-palette, 'secondary');
+    --background-color: linear-gradient(135deg, #ff9a9e 0%, #fecfef 99%, #fecfef 100%);
+    --card-bg: transparent;
+    --sidenav-bg: transparent;
+}
+
+// Sunset Theme
+.theme-sunset {
+    @include vars.generate-theme-vars(palettes.$orange-palette, 'primary');
+    @include vars.generate-theme-vars(palettes.$deep-orange-palette, 'secondary');
+    --background-color: linear-gradient(120deg, #f6d365 0%, #fda085 100%);
+    --card-bg: transparent;
+    --sidenav-bg: transparent;
+}
+
+// Forest Theme
+.theme-forest {
+    @include vars.generate-theme-vars(palettes.$teal-palette, 'primary');
+    @include vars.generate-theme-vars(palettes.$green-palette, 'secondary');
+    --background-color: linear-gradient(135deg, #d299c2 0%, #fef9d7 100%);
+    --card-bg: transparent;
+    --sidenav-bg: transparent;
+}
+
+// Berry Theme
+.theme-berry {
+    @include vars.generate-theme-vars(palettes.$pink-palette, 'primary');
+    @include vars.generate-theme-vars(palettes.$deep-purple-palette, 'secondary');
+    --background-color: linear-gradient(to top, #a18cd1 0%, #fbc2eb 100%);
+    --card-bg: transparent;
+    --sidenav-bg: transparent;
+}
+
+// Royal Theme
+.theme-royal {
+    @include vars.generate-theme-vars(palettes.$deep-purple-palette, 'primary');
+    @include vars.generate-theme-vars(palettes.$amber-palette, 'secondary');
+    --background-color: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    --card-bg: transparent;
+    --sidenav-bg: transparent;
+}
+
+// Slate Theme
+.theme-slate {
+    @include vars.generate-theme-vars(palettes.$blue-grey-palette, 'primary');
+    @include vars.generate-theme-vars(palettes.$light-blue-palette, 'secondary');
+    --background-color: linear-gradient(to top, #cfd9df 0%, #e2ebf0 100%);
+    --card-bg: transparent;
+    --sidenav-bg: transparent;
+}
+
+// Sky Theme
+.theme-sky {
+    @include vars.generate-theme-vars(palettes.$light-blue-palette, 'primary');
+    @include vars.generate-theme-vars(palettes.$cyan-palette, 'secondary');
+    --background-color: linear-gradient(120deg, #a1c4fd 0%, #c2e9fb 100%);
+    --card-bg: transparent;
+    --sidenav-bg: transparent;
+}
+
+// --- 4. Material Theme Configuration ---
+// but colors will eventually be driven by the override classes below.
+
+$my-primary: mat.m2-define-palette(palettes.$cyan-palette);
+$my-accent: mat.m2-define-palette(palettes.$pink-palette);
+$my-warn: mat.m2-define-palette(palettes.$red-palette);
+
+$my-theme: mat.m2-define-light-theme((
+  color: (
+    primary: $my-primary,
+    accent: $my-accent,
+    warn: $my-warn,
+  ),
+  typography: mat.m2-define-typography-config(),
+  density: -2
+));
+
+// Include the base theme styles
+@include mat.all-component-themes($my-theme);
+
+
+// --- 5. Component Overrides using CSS Variables ---
+// Note: MDC component overrides should be done via --mdc-* tokens or standard CSS classes.
+// The previous mixins were invalid and have been removed.
+
+// Example:
+// :root {
+//   --mdc-elevated-card-container-color: var(--surface-color);
+// }
 
 .primary {
-
-  @include mat.button-overrides((filled-container-color: map.get(theme-colors.$primary-palette, 20), // background
-      filled-label-text-color: map.get(theme-colors.$primary-palette, 100), // text
-      filled-container-shape: 4px));
-
-  @include mat.card-overrides(( // border color
-      elevated-container-color: #e7e8e4, // bg color
-    ));
-
-  @include mat.snack-bar-overrides((container-color: map.get(theme-colors.$primary-palette, 20), // background
-      supporting-text-color: map.get(theme-colors.$primary-palette, 100),
-      button-color : map.get(theme-colors.$primary-palette, 100)));
-
-  @include mat.datepicker-overrides((calendar-container-background-color: map.get(theme-colors.$primary-palette, 20),
-      calendar-body-label-text-color: map.get(theme-colors.$primary-palette, 100),
-    ));
-
-  @include mat.fab-overrides((small-container-color: map.get(theme-colors.$primary-palette, 20),
-      small-foreground-color: map.get(theme-colors.$primary-palette, 100)));
-}
-
-
-.tertiary {
-  @include mat.button-overrides((filled-container-color: map.get(theme-colors.$tertiary-palette, 20), // background
-      filled-label-text-color: map.get(theme-colors.$tertiary-palette, 100),
-      filled-container-shape: 4px // text
-    ));
-  @include mat.fab-overrides((small-container-color: map.get(theme-colors.$tertiary-palette, 20),
-      small-foreground-color: map.get(theme-colors.$tertiary-palette, 100)));
+    // Custom button overrides
+    --mdc-filled-button-container-color: var(--primary-500);
+    --mdc-filled-button-label-text-color: #ffffff;
+    background-color: var(--primary-500) !important;
+    color: #ffffff !important;
 }
 
 .secondary {
-  @include mat.button-overrides((filled-container-color: map.get(theme-colors.$secondary-palette, 20), // background
-      filled-label-text-color: map.get(theme-colors.$secondary-palette, 100),
-      filled-container-shape: 4px // text
-    ));
-  @include mat.card-overrides(( // border color
-      outlined-container-shape: 12px, // corner radius
-      elevated-container-color: #f9faf4, // bg color
-    ));
-  @include mat.fab-overrides((small-container-color: map.get(theme-colors.$secondary-palette, 20),
-      small-foreground-color: map.get(theme-colors.$secondary-palette, 100)));
-}
-
-.neutral {
-  @include mat.button-overrides((filled-container-color: map.get(theme-colors.$neutral-palette, 20), // background
-      filled-label-text-color: map.get(theme-colors.$neutral-palette, 100),
-      filled-container-shape: 4px // text
-    ));
-  @include mat.fab-overrides((small-container-color: map.get(theme-colors.$neutral-palette, 100),
-      small-foreground-color: map.get(theme-colors.$neutral-palette, 20)));
-}
-
-.warning {
-  @include mat.button-overrides((filled-container-color: map.get(mat.$yellow-palette, 60), // background
-      filled-label-text-color: map.get(mat.$yellow-palette, 100),
-      filled-container-shape: 4px // text
-    ));
-  @include mat.snack-bar-overrides((container-color: map.get(theme-colors.$warning-palette, 30), // background
-      supporting-text-color: map.get(theme-colors.$neutral-palette, 20),
-      button-color : map.get(mat.$yellow-palette, 100)));
-
-  @include mat.fab-overrides((small-container-color: map.get(theme-colors.$warning-palette, 30),
-      small-foreground-color: map.get(theme-colors.$neutral-palette, 20)));
-}
-
-.error {
-  @include mat.button-overrides((filled-container-color: map.get(mat.$red-palette, 30), // background
-      filled-label-text-color: map.get(mat.$red-palette, 100), // text
-      filled-container-shape: 4px));
-
-  @include mat.icon-button-overrides((icon-color: map.get(mat.$red-palette, 30),
-      // text
-    ));
-
-  @include mat.snack-bar-overrides((container-color: map.get(mat.$red-palette, 30), // background
-      supporting-text-color: map.get(mat.$yellow-palette, 100),
-      button-color : map.get(mat.$yellow-palette, 100)));
-
-
-  @include mat.fab-overrides((small-container-color: map.get(mat.$red-palette, 100),
-      small-foreground-color: map.get(mat.$red-palette, 30)));
-
+    --mdc-filled-button-container-color: var(--secondary-500);
+    --mdc-filled-button-label-text-color: #ffffff;
+    background-color: var(--secondary-500) !important;
+    color: #ffffff !important;
 }
 
 .success {
-  @include mat.button-overrides((filled-container-color: map.get(mat.$spring-green-palette, 50), // background
-      filled-label-text-color: map.get(mat.$spring-green-palette, 100), // text
-      filled-container-shape: 4px));
+    background-color: var(--primary-500) !important; // Or a specific success color if available
+    color: #ffffff !important;
+}
 
-  @include mat.snack-bar-overrides((container-color: map.get(mat.$spring-green-palette, 40), // background
-      supporting-text-color: map.get(mat.$spring-green-palette, 100),
-      button-color : map.get(mat.$spring-green-palette, 100))); // text
-
-  @include mat.fab-overrides((small-container-color: map.get(mat.$spring-green-palette, 50),
-      small-foreground-color: map.get(mat.$spring-green-palette, 100)));
+.error {
+    background-color: var(--warn-500) !important;
+    color: #ffffff !important;
 }

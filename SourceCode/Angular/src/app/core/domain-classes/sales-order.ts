@@ -18,6 +18,8 @@ export interface SalesOrder {
   deliveryStatus: SalesDeliveryStatusEnum;
   customerId: string;
   locationId: string;
+  salesPersonId?: string;
+  salesPersonName?: string;
   totalQuantity?: number;
   totalAmount: number;
   totalTax: number;

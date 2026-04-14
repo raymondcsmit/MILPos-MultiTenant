@@ -1,0 +1,25 @@
+@{
+    ViewData["Title"] = "Contact Us";
+}
+
+<div class="glass-panel" style="max-width: 800px; margin: 2rem auto;">
+    <h1>Contact Us</h1>
+    <p>We'd love to hear from you. Fill out the form below or reach us at <a href="mailto:support@nexuspos.com" style="color:var(--accent-color);">support@nexuspos.com</a>.</p>
+    
+    <form>
+        <div class="row">
+            <div class="col-md-6">
+                <label>Name</label>
+                <input type="text" class="glass-input" placeholder="Your Name" />
+            </div>
+            <div class="col-md-6">
+                <label>Email</label>
+                <input type="email" class="glass-input" placeholder="Your Email" />
+            </div>
+        </div>
+        <label>Message</label>
+        <textarea class="glass-input" rows="5" placeholder="How can we help?"></textarea>
+        
+        <button type="button" class="glass-btn glass-btn-primary">Send Message</button>
+    </form>
+</div>

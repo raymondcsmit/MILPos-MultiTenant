@@ -32,6 +32,9 @@ import { CustomCurrencyPipe } from '@shared/pipes/custome-currency.pipe';
 import { MatButtonModule } from '@angular/material/button';
 import { MatCardModule } from '@angular/material/card';
 import { ToastrService } from '@core/services/toastr.service';
+import { MatDialog } from '@angular/material/dialog';
+import { ImportExportService } from '@core/services/import-export.service';
+import { ImportExportDialogComponent } from '@shared/import-export-dialog/import-export-dialog.component';
 
 @Component({
   selector: 'app-product-list',
@@ -157,7 +160,9 @@ export class ProductListComponent extends BaseComponent implements OnInit {
     private unitConversationService: UnitConversationService,
     private commonDialogService: CommonDialogService,
     private router: Router,
-    private toastrService: ToastrService
+    private toastrService: ToastrService,
+    private dialog: MatDialog,
+    private importExportService: ImportExportService
   ) {
     super();
     this.getLangDir();
@@ -283,5 +288,36 @@ export class ProductListComponent extends BaseComponent implements OnInit {
 
   getDataIndex(row: any) {
     return this.productStore.products().indexOf(row);
+  }
+
+  openImportDialog(): void {
+    const dialogRef = this.dialog.open(ImportExportDialogComponent, {
+      width: '850px',
+      data: {
+        entityType: 'products',
+        entityName: 'Product'
+      }
+    });
+
+    dialogRef.afterClosed().subscribe(result => {
+      if (result) {
+        this.refresh();
+      }
+    });
+  }
+
+  exportData(format: 'csv' | 'excel'): void {
+    this.importExportService.exportData('products', format)
+      .subscribe({
+        next: (blob) => {
+          const date = new Date().toISOString().split('T')[0];
+          const fileName = `Products_${date}.${format === 'excel' ? 'xlsx' : 'csv'}`;
+          this.importExportService.downloadFile(blob, fileName);
+          this.toastrService.success('Data exported successfully');
+        },
+        error: (error) => {
+          this.toastrService.error('Export failed: ' + error.message);
+        }
+      });
   }
 }

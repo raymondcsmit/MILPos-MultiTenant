@@ -1,7 +1,7 @@
 ﻿@use "../common/variables.scss" as vars;
 
 .card {
-  background: #fff;
+  background: var(--card-bg);
   min-height: 50px;
   box-shadow: none;
   border: 0;
@@ -14,7 +14,7 @@
     margin-bottom: 15px;
     display: block;
     font-size: 15px;
-    color: #000;
+    color: var(--text-color);
 
     small {
       color: #999;
@@ -63,7 +63,7 @@
   }
 
   .header {
-    color: #555;
+    color: var(--text-color);
     padding: 15px 15px 0 15px;
     position: relative;
 
@@ -98,7 +98,7 @@
       margin: 0;
       font-size: 16px;
       font-weight: normal;
-      color: #5b626b;
+      color: var(--text-color);
       font-weight: 500;
 
       small {
@@ -124,7 +124,7 @@
 
   .body {
     font-size: 14px;
-    color: #555;
+    color: var(--text-color);
     padding: 15px;
 
     @for $i from 1 through 12 {
@@ -149,7 +149,7 @@
   -webkit-border-radius: 3px;
   -moz-border-radius: 3px;
   border-radius: 10px;
-  background: #fff;
+  background: var(--card-bg);
   overflow: hidden;
   margin-bottom: 26px;
   margin: 0.5rem 0 1rem 0;

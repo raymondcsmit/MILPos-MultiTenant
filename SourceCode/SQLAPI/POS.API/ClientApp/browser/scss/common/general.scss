@@ -21,12 +21,14 @@
 .odd-row {
   background-color: #f7faf9;
   /* light gray */
+  color: rgba(0, 0, 0, 0.87) !important;
 }
 
 /* stripe odd data rows, skip detail rows */
 .even-row {
-  background-color: #edf1ef !important;
+  background-color: var(--surface-color) !important;
   /* white */
+  color: rgba(0, 0, 0, 0.87) !important;
 }
 
 /* animation for entering */
@@ -94,6 +96,7 @@ ul li {
   text-overflow: ellipsis;
   white-space: nowrap;
   font-size: var.$font-size;
+  // color: var(--text-color);
 }
 
 img {
@@ -113,8 +116,8 @@ dl {
 
 section {
   &.content {
-    margin: 70px 15px 0 276px;
-    min-height: calc(100vh - 76px);
+    margin: 100px 15px 0 276px;
+    min-height: calc(100vh - 101px);
     @include var.transition(0.5s);
 
     .content-block {
@@ -170,37 +173,36 @@ table {
 
 /* Optional: top/bottom border for the whole table */
 .mat-mdc-table tr th:first-child {
-  border-top: 1px solid #e5e7eb;
-  border-left: 1px solid #e5e7eb !important;
+  border-top: 1px solid var(--border-color);
+  border-left: 1px solid var(--border-color) !important;
 }
 
 .mat-mdc-table tr td:first-child {
-  border-bottom: 1px solid #e5e7eb;
-  border-left: 1px solid #e5e7eb !important;
+  border-bottom: 1px solid var(--border-color);
+  border-left: 1px solid var(--border-color) !important;
 }
 
 .mat-mdc-table tr th:last-child {
-  border-top: 1px solid #e5e7eb;
-  border-right: 1px solid #e5e7eb !important;
+  border-top: 1px solid var(--border-color);
+  border-right: 1px solid var(--border-color) !important;
 }
 
 .mat-mdc-table tr td:last-child {
-  border-bottom: 1px solid #e5e7eb;
-  border-right: 1px solid #e5e7eb !important;
+  border-bottom: 1px solid var(--border-color);
+  border-right: 1px solid var(--border-color) !important;
 }
 
 .mat-mdc-table {
+  background: transparent !important;
 
   /* stripe even data rows, skip detail rows */
-  .odd-row {
-    background-color: #f7faf9;
-    /* light gray */
+  tr.mat-mdc-row:nth-child(odd) {
+    background-color: rgba(255, 255, 255, 0.05) !important;
   }
 
   /* stripe odd data rows, skip detail rows */
-  .even-row {
-    background-color: #edf1ef !important;
-    /* white */
+  tr.mat-mdc-row:nth-child(even) {
+    background-color: transparent !important;
   }
 }
 
@@ -232,7 +234,7 @@ table {
 .navbar-toggle,
 .bars:before,
 .bars:after {
-  color: #fff !important;
+  color: var(--text-color) !important;
 }
 
 .logo-black {
@@ -240,7 +242,7 @@ table {
   .navbar-toggle,
   .bars:before,
   .bars:after {
-    color: #fff !important;
+    color: var(--text-color) !important;
   }
 }
 
@@ -252,7 +254,7 @@ table {
   .nav {
     >li {
       >a {
-        color: #fff;
+        color: var(--text-color);
       }
     }
   }
@@ -319,26 +321,35 @@ textarea:-ms-input-placeholder {
 }
 
 tr.bg-warning1 td {
-  background-color: #f6ecec !important;
+  background-color: var(--warn-50) !important;
 }
 
 .grid-header-color {
-  background-color: #4B5563 !important;
+  background-color: var(--primary-700) !important;
   color: #fff !important;
 }
 
-.table-pos>thead>tr>th {
-  background-color: #4B5563 !important;
+.table-pos > thead > tr > th {
+  background-color: rgba(var(--primary-700-rgb), 0.8) !important; // Semi-transparent header
+  backdrop-filter: blur(5px);
   color: #fff !important;
 }
 
-.table-pos>tbody>tr>td {
-  background-color: #fff !important;
-  color: #000 !important;
+// Table body cells always have light/white backgrounds, so enforce dark readable text
+// regardless of the global --text-color (which can be white for glassmorphic themes)
+.table-pos > tbody > tr > td {
+  background-color: transparent !important;
+  color: rgba(0, 0, 0, 0.87) !important;
+}
+
+// Also ensure Bootstrap table inside mat-card uses dark text on light backgrounds
+.mat-mdc-card table td,
+.mat-mdc-card table th:not(.table-pos > thead > tr > th) {
+  color: rgba(0, 0, 0, 0.87);
 }
 
 .mat-sort-header-arrow {
-  color: #fff !important;
+  color: var(--text-color) !important;
 }
 
 @media screen and (max-width: 1169px) {
@@ -392,13 +403,13 @@ tr.bg-warning1 td {
   align-items: center;
   margin: 30px 0px;
   padding: 0px;
-  color: #555;
+  color: var(--text-color);
 }
 
 .page-title {
   font-size: 20px;
   font-weight: 500;
-  color: #444444;
+  color: var(--text-color);
 
   i {
     padding: 0px 5px;
@@ -413,7 +424,7 @@ tr.bg-warning1 td {
 .page-title-sub {
   font-size: 15px;
   font-weight: 500;
-  color: #444444;
+  color: var(--text-color);
 
   i {
     padding: 0px 5px;
@@ -440,11 +451,11 @@ tr.bg-warning1 td {
 }
 
 .mat-mdc-paginator {
-  background-color: #f5f5f5 !important;
+  background-color: var(--background-color) !important;
 }
 
 .mat-mdc-footer-row {
-  background-color: #f5f5f5 !important;
+  background-color: var(--background-color) !important;
 }
 
 .small-icon {
@@ -460,7 +471,7 @@ tr.bg-warning1 td {
 .dialog-title {
   font-size: 20px !important;
   font-weight: 500 !important;
-  color: #444444 !important;
+  color: var(--text-color) !important;
 }
 
 .calendar-button {
@@ -468,7 +479,7 @@ tr.bg-warning1 td {
 }
 
 .white-background {
-  background-color: #fff !important;
+  background-color: var(--surface-color) !important;
 }
 
 .doc-link {

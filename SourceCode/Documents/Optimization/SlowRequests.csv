@@ -1,0 +1,129 @@
+"Path","ApiRequestId","CorrelationId","Method","QueryString","ApiDurationMs","Timestamp","IpAddress","UserAgent","CommandText","Parameters","EfQueryDurationMs"
+"/","76344ab3-c9b5-4525-a80c-33b65cb3e555","ae0801dec4da4a6f814d8ce7ba958450","GET","","3577","2026-04-14 00:56:51.73821","66.132.172.183","Mozilla/5.0 (compatible; CensysInspect/1.1; +https://about.censys.io/)",NULL,NULL,NULL
+"/api/companyProfile","4d076e0f-3140-4773-a855-b217214bac5c","f6b32dd8099746458c99312179f854cd","GET","","254","2026-04-13 03:07:52.76591","192.140.149.56","Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/147.0.0.0 Safari/537.36","SELECT c.""Id"", c.""Address"", c.""BusinessType"", c.""CreatedBy"", c.""CreatedDate"", c.""CurrencyCode"", c.""DeletedBy"", c.""DeletedDate"", c.""Email"", c.""IsDeleted"", c.""LastSyncedAt"", c.""LicenseKey"", c.""LogoUrl"", c.""ModifiedBy"", c.""ModifiedDate"", c.""Phone"", c.""PurchaseCode"", c.""SyncVersion"", c.""TaxName"", c.""TaxNumber"", c.""TenantId"", c.""Title""
+FROM ""CompanyProfiles"" AS c
+WHERE c.""TenantId"" = @ef_filter__CurrentTenantId AND NOT (c.""IsDeleted"")
+LIMIT 1","@ef_filter__CurrentTenantId=10000000-0000-0000-0000-000000000001;","3"
+"/api/customer","c4a38608-831b-4e34-b030-929b2a3fd2dd","1fac0b8cb24a4a0993cc995218603de2","GET","?fields=&orderBy=customerName%20asc&pageSize=10000&skip=0&searchQuery=&customerName=&mobileNo=&phoneNo=&email=&contactPerson=&website=&id=","27963","2026-04-13 10:24:22.101466","169.197.85.170","Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36","SELECT c.""Id"", c.""CustomerName"", c.""Email"", c.""ContactPerson"", c.""MobileNo"", c.""Website"", c.""IsWalkIn""
+FROM ""Customers"" AS c
+WHERE c.""TenantId"" = @ef_filter__CurrentTenantId AND NOT (c.""IsDeleted"") AND (c.""SalesPersonId"" = @userId OR (c.""LocationId"" IS NOT NULL AND c.""LocationId"" = ANY (@allowedLocations)))
+ORDER BY c.""CustomerName""
+LIMIT @p3 OFFSET @p","@ef_filter__CurrentTenantId=10000000-0000-0000-0000-000000000001;@userId=a29de04b-8668-4510-8107-13b7d5869736;@allowedLocations=System.Collections.Generic.List`1[System.Guid];@p3=100;@p=0;","2"
+"/api/dashboard/bestsellingproduct","a1b92332-c6f2-4127-8737-0ed7a703c4f3","d6ac48b1563b4f5cba1300a42c957991","GET","?fromDate=2026-03-14T00:00:00.000Z&toDate=2026-04-12T23:00:00.000Z&locationId=52660493-133a-4116-b253-d4925c34842f","22571","2026-04-13 09:10:17.165089","185.237.63.103","Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/147.0.0.0 Safari/537.36","SELECT (
+    SELECT p0.""Name""
+    FROM ""SalesOrderItems"" AS s2
+    INNER JOIN (
+        SELECT s4.""Id"", s4.""LocationId"", s4.""SOCreatedDate""
+        FROM ""SalesOrders"" AS s4
+        WHERE s4.""TenantId"" = @ef_filter__CurrentTenantId AND NOT (s4.""IsDeleted"")
+    ) AS s3 ON s2.""SalesOrderId"" = s3.""Id""
+    INNER JOIN (
+        SELECT p.""Id"", p.""Name""
+        FROM ""Products"" AS p
+        WHERE p.""TenantId"" = @ef_filter__CurrentTenantId AND NOT (p.""IsDeleted"")
+    ) AS p0 ON s2.""ProductId"" = p0.""Id""
+    WHERE s3.""SOCreatedDate"" >= @fromDate AND s3.""SOCreatedDate"" < @toDate AND s3.""LocationId"" = ANY (@locationIds) AND s.""ProductId"" = s2.""ProductId""
+    LIMIT 1) AS ""Name"", COALESCE(sum(CASE
+    WHEN s.""Status"" = 1 THEN -1.0 * s.""Quantity""
+    ELSE s.""Quantity""
+END), 0.0) AS ""Count""
+FROM ""SalesOrderItems"" AS s
+INNER JOIN (
+    SELECT s0.""Id"", s0.""LocationId"", s0.""SOCreatedDate""
+    FROM ""SalesOrders"" AS s0
+    WHERE s0.""TenantId"" = @ef_filter__CurrentTenantId AND NOT (s0.""IsDeleted"")
+) AS s1 ON s.""SalesOrderId"" = s1.""Id""
+WHERE s1.""SOCreatedDate"" >= @fromDate AND s1.""SOCreatedDate"" < @toDate AND s1.""LocationId"" = ANY (@locationIds)
+GROUP BY s.""ProductId""
+ORDER BY COALESCE(sum(CASE
+    WHEN s.""Status"" = 1 THEN -1.0 * s.""Quantity""
+    ELSE s.""Quantity""
+END), 0.0) DESC
+LIMIT @p","@ef_filter__CurrentTenantId=10000000-0000-0000-0000-000000000001;@fromDate=3/14/2026 12:00:00 AM;@toDate=4/13/2026 11:00:00 PM;@locationIds=System.Collections.Generic.List`1[System.Guid];@p=10;","79"
+"/api/dashboard/income-comparison","d2446231-b4f8-4a45-8ce8-52ad2ef805f3","71f2449f23914c32ab700ee7fda568d5","GET","?locationId=52660493-133a-4116-b253-d4925c34842f","29324","2026-04-13 06:31:17.186153","169.197.85.170","Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36","SELECT s0.""Key"" AS ""Month"", COALESCE(sum(s0.""TotalAmount""), 0.0) AS ""Total""
+FROM (
+    SELECT s.""TotalAmount"", date_part('month', s.""SOCreatedDate"")::int AS ""Key""
+    FROM ""SalesOrders"" AS s
+    WHERE s.""TenantId"" = @ef_filter__CurrentTenantId AND NOT (s.""IsDeleted"") AND date_part('year', s.""SOCreatedDate"")::int = @lastYear AND s.""LocationId"" = ANY (@locationIds) AND NOT (s.""IsSalesOrderRequest"")
+) AS s0
+GROUP BY s0.""Key""","@ef_filter__CurrentTenantId=10000000-0000-0000-0000-000000000001;@lastYear=2025;@locationIds=System.Collections.Generic.List`1[System.Guid];","3"
+"/api/dashboard/product-sales-comparison","eaf30865-dfc1-4657-a14e-7ba5b64e2518","90441498c40f42898c0ac605f1e14437","GET","?locationId=52660493-133a-4116-b253-d4925c34842f","28727","2026-04-13 10:47:49.410054","169.197.85.170","Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36",NULL,NULL,NULL
+"/api/dashboard/sales-comparison","9cd6352c-3da1-408b-8f6c-a14a1720e6cc","8954f262e1aa403f8d98f5552fb0abb6","GET","?locationId=52660493-133a-4116-b253-d4925c34842f","29582","2026-04-13 10:47:49.419103","169.197.85.170","Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36","SELECT s0.""Key"" AS ""Month"", COALESCE(sum(s0.""TotalAmount""), 0.0) AS ""Total""
+FROM (
+    SELECT s.""TotalAmount"", date_part('month', s.""SOCreatedDate"")::int AS ""Key""
+    FROM ""SalesOrders"" AS s
+    WHERE s.""TenantId"" = @ef_filter__CurrentTenantId AND NOT (s.""IsDeleted"") AND date_part('year', s.""SOCreatedDate"")::int = @lastYear AND s.""LocationId"" = ANY (@locationIds) AND NOT (s.""IsSalesOrderRequest"")
+) AS s0
+GROUP BY s0.""Key""","@ef_filter__CurrentTenantId=10000000-0000-0000-0000-000000000001;@lastYear=2025;@locationIds=System.Collections.Generic.List`1[System.Guid];","3"
+"/api/dashboard/statistics","c01909f1-756c-4b2c-9b1c-75c56bf3d4c9","daa94ccafced47eca75477d7e81125cb","GET","?fromDate=2026-03-13T19:00:00.000Z&toDate=2026-04-12T19:00:00.000Z&locationId=52660493-133a-4116-b253-d4925c34842f","22225","2026-04-13 08:41:50.082921","169.197.85.170","Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36",NULL,NULL,NULL
+"/api/ProductStock/stock-alert","16792893-64c8-4df1-855a-e7aea76a5393","570a0924d1b04116962882385acf95ca","GET","?orderBy=stock%20desc&pageSize=15&skip=0&searchQuery=&name=&locationId=","339","2026-04-13 17:25:07.246229","185.237.63.103","Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/147.0.0.0 Safari/537.36",NULL,NULL,NULL
+"/api/purchaseOrder/recentdelivery","aa4bd1b4-88fd-432a-b669-239e299b53a1","131c8ee8e7b34bcf94a2b2b115693150","GET","","29738","2026-04-13 06:31:17.188185","169.197.85.170","Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36","SELECT p1.""Id"" AS ""PurchaseOrderId"", p1.""OrderNumber"" AS ""PurchaseOrderNumber"", p1.""DeliveryDate"" AS ""ExpectedDispatchDate"", s0.""SupplierName"", p1.""SupplierId"", (
+    SELECT COALESCE(sum(CASE
+        WHEN p2.""Status"" = 0 THEN p2.""Quantity""
+        ELSE -p2.""Quantity""
+    END), 0.0)
+    FROM ""PurchaseOrderItems"" AS p2
+    WHERE p1.""Id"" = p2.""PurchaseOrderId"") AS ""TotalQuantity""
+FROM (
+    SELECT p.""Id"", p.""DeliveryDate"", p.""OrderNumber"", p.""SupplierId""
+    FROM ""PurchaseOrders"" AS p
+    WHERE p.""TenantId"" = @ef_filter__CurrentTenantId AND NOT (p.""IsDeleted"") AND NOT (p.""IsPurchaseOrderRequest"") AND p.""DeliveryStatus"" = 0 AND p.""LocationId"" = ANY (@_userInfoToken_LocationIds) AND (
+        SELECT COALESCE(sum(CASE
+            WHEN p0.""Status"" = 0 THEN p0.""Quantity""
+            ELSE -p0.""Quantity""
+        END), 0.0)
+        FROM ""PurchaseOrderItems"" AS p0
+        WHERE p.""Id"" = p0.""PurchaseOrderId"") > 0.0
+    ORDER BY p.""DeliveryDate"" DESC
+    LIMIT @p
+) AS p1
+INNER JOIN (
+    SELECT s.""Id"", s.""SupplierName""
+    FROM ""Suppliers"" AS s
+    WHERE s.""TenantId"" = @ef_filter__CurrentTenantId AND NOT (s.""IsDeleted"")
+) AS s0 ON p1.""SupplierId"" = s0.""Id""
+ORDER BY p1.""DeliveryDate"" DESC","@ef_filter__CurrentTenantId=10000000-0000-0000-0000-000000000001;@_userInfoToken_LocationIds=System.Collections.Generic.List`1[System.Guid];@p=10;","18"
+"/api/Reports/trialbalancereport","16c0007b-e8db-4a2a-87e6-004f518d756c","f52be0c06a1a480d95357620f6307186","GET","?locationId=52660493-133a-4116-b253-d4925c34842f&fromDate=2026-03-13T19:00:00.000Z&toDate=2026-04-12T19:00:00.000Z","423","2026-04-13 10:24:22.134809","169.197.85.170","Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36","SELECT l.""Id"", l.""AccountName""
+FROM ""LedgerAccounts"" AS l
+WHERE l.""TenantId"" = @ef_filter__CurrentTenantId AND NOT (l.""IsDeleted"")","@ef_filter__CurrentTenantId=10000000-0000-0000-0000-000000000001;","19"
+"/api/salesOrder/recentshipment","03276e98-5b21-4cc3-aae5-56cc6fd5382b","50097a88b67d4fa89edccb4e1891d6f6","GET","","27959","2026-04-13 10:24:22.113854","169.197.85.170","Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36","SELECT s1.""Id"" AS ""SalesOrderId"", s1.""OrderNumber"" AS ""SalesOrderNumber"", s1.""DeliveryDate"" AS ""ExpectedShipmentDate"", (
+    SELECT COALESCE(sum(CASE
+        WHEN s2.""Status"" = 0 THEN s2.""Quantity""
+        ELSE -s2.""Quantity""
+    END), 0.0)
+    FROM ""SalesOrderItems"" AS s2
+    WHERE s1.""Id"" = s2.""SalesOrderId"") AS ""Quantity"", s1.""CustomerId"", c0.""CustomerName""
+FROM (
+    SELECT s.""Id"", s.""CustomerId"", s.""DeliveryDate"", s.""OrderNumber""
+    FROM ""SalesOrders"" AS s
+    WHERE s.""TenantId"" = @ef_filter__CurrentTenantId AND NOT (s.""IsDeleted"") AND NOT (s.""IsSalesOrderRequest"") AND s.""DeliveryStatus"" = 1 AND s.""LocationId"" = ANY (@_userInfoToken_LocationIds) AND (
+        SELECT COALESCE(sum(CASE
+            WHEN s0.""Status"" = 0 THEN s0.""Quantity""
+            ELSE -s0.""Quantity""
+        END), 0.0)
+        FROM ""SalesOrderItems"" AS s0
+        WHERE s.""Id"" = s0.""SalesOrderId"") > 0.0
+    ORDER BY s.""DeliveryDate"" DESC
+    LIMIT @p
+) AS s1
+INNER JOIN (
+    SELECT c.""Id"", c.""CustomerName""
+    FROM ""Customers"" AS c
+    WHERE c.""TenantId"" = @ef_filter__CurrentTenantId AND NOT (c.""IsDeleted"")
+) AS c0 ON s1.""CustomerId"" = c0.""Id""
+ORDER BY s1.""DeliveryDate"" DESC","@ef_filter__CurrentTenantId=10000000-0000-0000-0000-000000000001;@_userInfoToken_LocationIds=System.Collections.Generic.List`1[System.Guid];@p=10;","32"
+"/api/supplier","7699bbd1-62ef-4b9f-bfaa-8f50f75616ba","d2f2226e68cc4ad393f8c3cba49de4e4","GET","?fields=&orderBy=supplierName%20asc&pageSize=10000&skip=0&searchQuery=&supplierName=&mobileNo=&email=&country=&website=&id=","27994","2026-04-13 10:24:22.064495","169.197.85.170","Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36","SELECT s1.""Id"", s1.""ContactPerson"", s1.""Description"", s1.""Fax"", s1.""SupplierName"", s1.""Website"", s1.""MobileNo"", s1.""PhoneNo"", s1.""Email"", s2.""CountryName"" AS ""Country""
+FROM (
+    SELECT s.""Id"", s.""BillingAddressId"", s.""ContactPerson"", s.""Description"", s.""Email"", s.""Fax"", s.""MobileNo"", s.""PhoneNo"", s.""SupplierName"", s.""Website""
+    FROM ""Suppliers"" AS s
+    WHERE s.""TenantId"" = @ef_filter__CurrentTenantId AND NOT (s.""IsDeleted"")
+    ORDER BY s.""SupplierName""
+    LIMIT @p1 OFFSET @p
+) AS s1
+INNER JOIN (
+    SELECT s0.""Id"", s0.""CountryName""
+    FROM ""SupplierAddresses"" AS s0
+    WHERE s0.""TenantId"" = @ef_filter__CurrentTenantId AND NOT (s0.""IsDeleted"")
+) AS s2 ON s1.""BillingAddressId"" = s2.""Id""
+ORDER BY s1.""SupplierName""","@ef_filter__CurrentTenantId=10000000-0000-0000-0000-000000000001;@p1=100;@p=0;","9"
+"/index.html","0cf65caa-7c8a-4981-aa7c-66bccad75fa6","0a9765c0a2314a3384e47dfae20e3867","POST","","15056","2026-04-13 15:07:02.303432","45.205.1.3","Go-http-client/1.1",NULL,NULL,NULL

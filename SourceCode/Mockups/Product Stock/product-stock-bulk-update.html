@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Product Stock Manager - Split View</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        :root { --primary: #4e73df; --bg-light: #f8f9fc; }
+        body { background-color: var(--bg-light); height: 100vh; overflow: hidden; }
+        .sidebar { height: 100vh; overflow-y: auto; background: white; border-right: 1px solid #e3e6f0; }
+        .product-item.active { background-color: #f8f9fc; border-left: 4px solid var(--primary); }
+        .main-content { height: 100vh; overflow-y: auto; padding: 2rem; }
+    </style>
+</head>
+<body class="d-flex">
+    <!-- Left Sidebar: Product List -->
+    <div class="sidebar col-3 p-0">
+        <div class="p-3 border-bottom sticky-top bg-white">
+            <h5 class="mb-3">Stock Management</h5>
+            <input type="text" class="form-control mb-2" placeholder="Search products...">
+            <div class="d-flex gap-2">
+                <select class="form-select form-select-sm"><option>All Categories</option></select>
+                <select class="form-select form-select-sm"><option>All Brands</option></select>
+            </div>
+            <div class="mt-2 text-end">
+                <small class="text-muted">Showing 10 of 145 products</small>
+            </div>
+        </div>
+        <div class="list-group list-group-flush">
+            <a href="#" class="list-group-item list-group-item-action product-item active p-3">
+                <div class="d-flex justify-content-between align-items-center mb-1">
+                    <strong>Air Freshener</strong>
+                    <span class="badge bg-success">In Stock</span>
+                </div>
+                <div class="d-flex justify-content-between small text-muted">
+                    <span>Ref: AF-001</span>
+                    <span>145 Pieces</span>
+                </div>
+            </a>
+            <a href="#" class="list-group-item list-group-item-action product-item p-3">
+                <div class="d-flex justify-content-between align-items-center mb-1">
+                    <strong>Organic Milk 1L</strong>
+                    <span class="badge bg-danger">Low Stock</span>
+                </div>
+                <div class="d-flex justify-content-between small text-muted">
+                    <span>Ref: OM-100</span>
+                    <span>5 Pieces</span>
+                </div>
+            </a>
+            <a href="#" class="list-group-item list-group-item-action product-item p-3">
+                <div class="d-flex justify-content-between align-items-center mb-1">
+                    <strong>Premium Coffee</strong>
+                    <span class="badge bg-warning text-dark">Check</span>
+                </div>
+                <div class="d-flex justify-content-between small text-muted">
+                    <span>Ref: PC-500</span>
+                    <span>12 Packs</span>
+                </div>
+            </a>
+            <!-- More items... -->
+        </div>
+    </div>
+
+    <!-- Right Content: Detail Panel -->
+    <div class="main-content col-9 bg-light">
+        <div class="card shadow-sm mb-4">
+            <div class="card-body">
+                <!-- Header -->
+                <div class="d-flex justify-content-between align-items-start mb-4">
+                    <div>
+                        <h2 class="h3 mb-1">Air Freshener</h2>
+                        <span class="badge bg-secondary me-2">Home Care</span>
+                        <span class="badge bg-info">Glade</span>
+                        <small class="text-muted ms-2">SKU: AF-001-OCEAN</small>
+                    </div>
+                    <div class="text-end">
+                        <div class="text-muted small">Total Stock</div>
+                        <div class="h5 mb-0 text-success">145 Pieces</div>
+                        <small class="text-muted">2 Warehouses</small>
+                    </div>
+                </div>
+
+                <div class="row g-4">
+                    <!-- Stock Entry Form -->
+                    <div class="col-md-5">
+                        <div class="card bg-white border-primary h-100">
+                            <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
+                                <span>Update Stock</span>
+                                <i class="fas fa-boxes"></i>
+                            </div>
+                            <div class="card-body">
+                                <form>
+                                    <div class="row g-2 mb-3">
+                                        <div class="col-md-6">
+                                            <label class="form-label small fw-bold">Reference Number <span class="text-danger">*</span></label>
+                                            <input type="text" class="form-control" placeholder="Inv-001">
+                                        </div>
+                                        <div class="col-md-6">
+                                            <label class="form-label small fw-bold">Store/Location <span class="text-danger">*</span></label>
+                                            <select class="form-select">
+                                                <option selected>Park City Shop</option>
+                                                <option>Main Warehouse</option>
+                                            </select>
+                                        </div>
+                                    </div>
+
+                                    <div class="row g-2 mb-3">
+                                        <div class="col-md-4">
+                                            <label class="form-label small fw-bold">Operation</label>
+                                            <select class="form-select bg-light">
+                                                <option value="add">Add (+)</option>
+                                                <option value="remove">Remove (-)</option>
+                                            </select>
+                                        </div>
+                                        <div class="col-md-4">
+                                            <label class="form-label small fw-bold">Stock <span class="text-danger">*</span></label>
+                                            <input type="number" class="form-control fw-bold" placeholder="0">
+                                        </div>
+                                        <div class="col-md-4">
+                                            <label class="form-label small fw-bold">Unit <span class="text-danger">*</span></label>
+                                            <select class="form-select" readonly disabled>
+                                                <option selected>Piece</option>
+                                            </select>
+                                        </div>
+                                    </div>
+
+                                    <div class="mb-3">
+                                        <label class="form-label small fw-bold">Unit Price / Cost</label>
+                                        <div class="input-group">
+                                            <span class="input-group-text">$</span>
+                                            <input type="number" class="form-control" placeholder="0.00">
+                                        </div>
+                                    </div>
+
+                                    <div class="row g-2 mb-3">
+                                        <div class="col-md-6">
+                                            <label class="form-label small fw-bold">Tax</label>
+                                            <select class="form-select">
+                                                <option>None</option>
+                                                <option>VAT (5%)</option>
+                                            </select>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <label class="form-label small fw-bold">Payment Method</label>
+                                            <select class="form-select">
+                                                <option>Cash</option>
+                                                <option>Credit</option>
+                                                <option>Bank Transfer</option>
+                                            </select>
+                                        </div>
+                                    </div>
+
+                                    <div class="d-grid gap-2 mt-4">
+                                        <button class="btn btn-primary" type="button">
+                                            <i class="fas fa-save me-2"></i>Save Update
+                                        </button>
+                                        <button class="btn btn-outline-secondary btn-sm" type="button">Reset</button>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Stock History & Stats -->
+                    <div class="col-md-7">
+                        <h6 class="fw-bold mb-3">Stock Movement History</h6>
+                        <div class="card mb-3 p-2">
+                            <canvas id="stockChart" height="150"></canvas>
+                        </div>
+                        <div class="d-flex justify-content-between align-items-center mb-2">
+                             <h6 class="fw-bold mb-0">Recent Transactions</h6>
+                             <button class="btn btn-sm btn-link text-decoration-none">View All</button>
+                        </div>
+                        <table class="table table-hover table-sm small align-middle">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>Date</th>
+                                    <th>Ref</th>
+                                    <th>Type</th>
+                                    <th>Qty</th>
+                                    <th>Location</th>
+                                    <th>User</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>Feb 04, 10:30</td>
+                                    <td>PO-992</td>
+                                    <td><span class="badge bg-success bg-opacity-10 text-success">Add</span></td>
+                                    <td class="fw-bold">+50</td>
+                                    <td>Park City</td>
+                                    <td>Admin</td>
+                                </tr>
+                                <tr>
+                                    <td>Jan 28, 14:15</td>
+                                    <td>SAL-882</td>
+                                    <td><span class="badge bg-danger bg-opacity-10 text-danger">Sale</span></td>
+                                    <td class="fw-bold">-5</td>
+                                    <td>Park City</td>
+                                    <td>John D.</td>
+                                </tr>
+                                <tr>
+                                    <td>Jan 15, 09:00</td>
+                                    <td>TRF-101</td>
+                                    <td><span class="badge bg-warning bg-opacity-10 text-warning text-dark">Transfer</span></td>
+                                    <td class="fw-bold">-20</td>
+                                    <td>Main Warehouse</td>
+                                    <td>System</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        const ctx = document.getElementById('stockChart').getContext('2d');
+        new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: ['Jan 1', 'Jan 10', 'Jan 20', 'Jan 30', 'Feb 4'],
+                datasets: [{
+                    label: 'Stock Level',
+                    data: [100, 110, 90, 95, 145],
+                    backgroundColor: '#4e73df',
+                    borderRadius: 4
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: {
+                    y: { beginAtZero: true }
+                }
+            }
+        });
+    </script>
+</body>
+</html>

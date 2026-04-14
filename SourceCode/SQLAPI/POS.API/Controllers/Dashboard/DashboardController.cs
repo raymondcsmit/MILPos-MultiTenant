@@ -7,6 +7,7 @@ using POS.MediatR.Dashboard.Commands;
 using POS.API.Helpers;
 using System;
 using POS.Data.Entities;
+using System.Collections.Generic;
 
 namespace POS.API.Controllers.Dashboard
 {
@@ -172,6 +173,45 @@ namespace POS.API.Controllers.Dashboard
         public async Task<IActionResult> GetAccountDashboardStatistics([FromQuery] GetDashbordAccountQueryCommand dashboardStaticaticsQuery)
         {
             var result = await _mediator.Send(dashboardStaticaticsQuery);
+            return Ok(result);
+        }
+
+        /// <summary>
+        /// Gets product sales comparison (Current vs Last Year).
+        /// </summary>
+        /// <returns></returns>
+        [HttpGet("product-sales-comparison")]
+        [ClaimCheck("DB_BEST_SELLING_PROS")] // Reuse existing claim or create new? Using existing for now to avoid permission issues.
+        [Produces("application/json", "application/xml", Type = typeof(List<POS.Data.Dto.Dashboard.ProductSalesComparisonDto>))]
+        public async Task<IActionResult> GetProductSalesComparison([FromQuery] GetProductSalesComparisonQuery query)
+        {
+            var result = await _mediator.Send(query);
+            return Ok(result);
+        }
+
+        /// <summary>
+        /// Gets income comparison (Current vs Previous Year sales - purchase).
+        /// </summary>
+        /// <returns></returns>
+        [HttpGet("income-comparison")]
+        [ClaimCheck("DB_STATISTICS")] // Reuse statistics claim
+        [Produces("application/json", "application/xml", Type = typeof(List<POS.Data.Dto.Dashboard.IncomeComparisonDto>))]
+        public async Task<IActionResult> GetIncomeComparison([FromQuery] GetIncomeComparisonQuery query)
+        {
+            var result = await _mediator.Send(query);
+            return Ok(result);
+        }
+
+        /// <summary>
+        /// Gets sales comparison (Current vs Previous Year).
+        /// </summary>
+        /// <returns></returns>
+        [HttpGet("sales-comparison")]
+        [ClaimCheck("DB_STATISTICS")] // Reuse statistics claim
+        [Produces("application/json", "application/xml", Type = typeof(List<POS.Data.Dto.Dashboard.SalesComparisonDto>))]
+        public async Task<IActionResult> GetSalesComparison([FromQuery] GetSalesComparisonQuery query)
+        {
+            var result = await _mediator.Send(query);
             return Ok(result);
         }
 

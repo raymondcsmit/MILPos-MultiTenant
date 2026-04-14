@@ -1,0 +1,36 @@
+<div class="d-flex align-items-center justify-content-center h-100 w-100" style="min-height: 100vh;">
+    <mat-card class="p-4 text-center" style="max-width: 500px; width: 90%;">
+        <mat-card-header class="justify-content-center mb-3">
+            <mat-card-title class="text-danger">
+                <h1 class="m-0">⚠️ Trial Expired</h1>
+            </mat-card-title>
+        </mat-card-header>
+        
+        <mat-card-content>
+            <p class="mb-4" style="font-size: 1.1rem;">
+                Your 14-day free trial has expired. To continue using the full features of the application, please activate a valid license.
+            </p>
+            <p class="text-muted mb-4">
+                Write operations (Adding/Editing/Deleting data) are currently disabled.
+            </p>
+
+            <div class="d-grid gap-3">
+                <button mat-raised-button color="primary" class="p-4 fs-5" (click)="payOnline()">
+                    💳 Pay Online Now
+                </button>
+                
+                <button mat-stroked-button color="accent" (click)="contactSales()">
+                    📧 Contact Sales
+                </button>
+
+                <div class="mt-3">
+                    <span class="text-muted">Already have a key?</span>
+                    <br>
+                    <button mat-button color="primary" (click)="goToActivation()">
+                        Click here to Activate
+                    </button>
+                </div>
+            </div>
+        </mat-card-content>
+    </mat-card>
+</div>

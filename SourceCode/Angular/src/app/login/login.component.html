@@ -1,10 +1,14 @@
 <div class="login-container">
   <form [formGroup]="loginFormGroup" (submit)="onLoginSubmit()" class="login-form validate-form">
     <div class="row">
-      @if(logoImage){
-      <img class="login-logo mb-5" [src]="logoImage" alt="Logo">
-      }@else {
-      <img class="login-logo mb-5" src="/images/logo.png" alt="Logo">
+      @if(!logoLoadFailed){
+        @if(logoImage){
+        <img class="login-logo mb-5" [src]="logoImage" (error)="logoLoadFailed = true" alt="Logo">
+        }@else {
+        <img class="login-logo mb-5" src="/images/logo.png" (error)="logoLoadFailed = true" alt="MIL POS">
+        }
+      } @else {
+        <h1 class="text-center text-primary mb-5">MIL POS</h1>
       }
     </div>
     <div class="row">

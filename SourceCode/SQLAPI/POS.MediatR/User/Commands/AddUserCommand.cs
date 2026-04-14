@@ -21,6 +21,15 @@ namespace POS.MediatR.CommandAndQuery
         public bool IsAllLocations { get; set; }
         public List<Guid> RoleIds { get; set; } = [];
         public List<Guid> Locations { get; set; } = [];
+        
+        // Seeding / Advanced Properties
+        public Guid? Id { get; set; }
+        public bool IsSuperAdmin { get; set; }
+        public Guid? TenantId { get; set; }
+        public Guid? CreatedBy { get; set; }
+        // Optional override for pre-normalized data (e.g. from CSV)
+        public string NormalizedEmail { get; set; }
+        public string NormalizedUserName { get; set; }
 
     }
 }

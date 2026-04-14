@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>POS Checkout Overlay Mockup</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        body { background-color: #f3f4f6; font-family: 'Inter', sans-serif; display: flex; align-items: center; justify-content: center; min-height: 100vh; margin: 0; }
+        .overlay { background-color: rgba(0, 0, 0, 0.5); position: fixed; inset: 0; z-index: 40; }
+        .modal { position: relative; z-index: 50; }
+    </style>
+</head>
+<body>
+
+<!-- Background POS Screen (Blurred/Overlay) -->
+<div class="overlay"></div>
+
+<!-- Checkout Modal -->
+<div class="modal w-full max-w-3xl bg-white rounded-xl shadow-2xl overflow-hidden flex flex-col md:flex-row h-[600px]">
+    
+    <!-- Left Panel: Cart Summary -->
+    <div class="w-full md:w-1/2 bg-gray-50 border-r border-gray-200 p-6 flex flex-col h-full">
+        <h2 class="text-xl font-semibold text-gray-800 mb-4 border-b border-gray-300 pb-2"><i class="fas fa-shopping-cart mr-2"></i> Current Cart (3 items)</h2>
+        
+        <div class="flex-grow overflow-y-auto space-y-4">
+            <div class="flex justify-between items-center bg-white p-3 rounded shadow-sm">
+                <div>
+                    <h3 class="font-medium text-gray-900">Product A</h3>
+                    <p class="text-sm text-gray-500">1 x $15.00</p>
+                </div>
+                <span class="font-semibold text-gray-800">$15.00</span>
+            </div>
+            <div class="flex justify-between items-center bg-white p-3 rounded shadow-sm">
+                <div>
+                    <h3 class="font-medium text-gray-900">Product C</h3>
+                    <p class="text-sm text-gray-500">2 x $5.00</p>
+                </div>
+                <span class="font-semibold text-gray-800">$10.00</span>
+            </div>
+        </div>
+
+        <div class="mt-4 border-t border-gray-300 pt-4 space-y-2">
+            <div class="flex justify-between text-gray-600">
+                <span>Subtotal</span>
+                <span>$25.00</span>
+            </div>
+            <div class="flex justify-between text-gray-600">
+                <span>Tax (10%)</span>
+                <span>$2.50</span>
+            </div>
+            <div class="flex justify-between text-2xl font-bold text-gray-900 mt-2">
+                <span>Total</span>
+                <span>$27.50</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Right Panel: Attribution & Payment -->
+    <div class="w-full md:w-1/2 p-6 flex flex-col h-full bg-white">
+        <div class="flex justify-between items-center mb-6">
+            <h2 class="text-xl font-semibold text-gray-800">Checkout</h2>
+            <button class="text-gray-400 hover:text-gray-600"><i class="fas fa-times text-xl"></i></button>
+        </div>
+
+        <!-- Attribution Section (NEW) -->
+        <div class="bg-indigo-50 p-4 rounded-lg border border-indigo-200 mb-6 shadow-inner">
+            <div class="flex items-center mb-3 border-b border-indigo-200 pb-2">
+                <i class="fas fa-handshake text-indigo-600 mr-2"></i>
+                <h3 class="text-md font-medium text-indigo-900">Sale Attribution (New)</h3>
+            </div>
+            
+            <div class="space-y-4">
+                <div>
+                    <label class="block text-sm font-medium text-indigo-900 mb-1">Select Customer</label>
+                    <select class="w-full border border-indigo-300 rounded-md px-3 py-2 text-sm focus:ring-indigo-500 focus:border-indigo-500 bg-white">
+                        <option>Walk-in Customer</option>
+                        <option selected>John Doe (john.doe@example.com)</option>
+                        <option>Jane Smith (jane@example.com)</option>
+                    </select>
+                </div>
+
+                <div>
+                    <label class="block text-sm font-medium text-indigo-900 mb-1">Credit Sale To (Sales Person)</label>
+                    <div class="relative">
+                        <select class="w-full border border-indigo-300 rounded-md px-3 py-2 text-sm focus:ring-indigo-500 focus:border-indigo-500 bg-white appearance-none pr-8">
+                            <option>Admin Default</option>
+                            <option selected>Michael Scott (Assigned to John Doe)</option>
+                            <option>Jim Halpert</option>
+                        </select>
+                        <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-indigo-700">
+                            <i class="fas fa-chevron-down text-xs"></i>
+                        </div>
+                    </div>
+                    <p class="text-xs text-indigo-600 mt-1"><i class="fas fa-magic mr-1"></i> Auto-filled based on selected customer.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Payment Details -->
+        <div class="space-y-4 flex-grow">
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">Payment Method</label>
+                <div class="flex space-x-2">
+                    <button class="flex-1 bg-green-500 text-white py-2 rounded-md font-medium hover:bg-green-600 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2"><i class="fas fa-money-bill-wave mr-1"></i> Cash</button>
+                    <button class="flex-1 bg-blue-500 text-white py-2 rounded-md font-medium hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"><i class="fas fa-credit-card mr-1"></i> Card</button>
+                </div>
+            </div>
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">Amount Tendered</label>
+                <div class="relative">
+                    <span class="absolute inset-y-0 left-0 pl-3 flex items-center text-gray-500">$</span>
+                    <input type="number" value="30.00" class="w-full border border-gray-300 rounded-md pl-8 pr-3 py-2 text-lg font-semibold focus:ring-indigo-500 focus:border-indigo-500">
+                </div>
+            </div>
+            <div class="flex justify-between items-center text-red-600 font-medium">
+                <span>Change Due:</span>
+                <span class="text-xl">$2.50</span>
+            </div>
+        </div>
+
+        <!-- Actions -->
+        <div class="mt-6 flex space-x-3 pt-4 border-t border-gray-200">
+            <button class="flex-1 bg-gray-200 text-gray-800 py-3 rounded-lg font-semibold hover:bg-gray-300 transition-colors">Clear</button>
+            <button class="flex-[2] bg-indigo-600 text-white py-3 rounded-lg font-semibold text-lg hover:bg-indigo-700 transition-colors shadow-md">
+                <i class="fas fa-check-circle mr-2"></i> Complete Sale ($27.50)
+            </button>
+        </div>
+    </div>
+</div>
+
+</body>
+</html>

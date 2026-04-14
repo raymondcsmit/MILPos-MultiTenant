@@ -37,5 +37,7 @@ namespace POS.Data.Dto
         public Guid? FromLocationId { get; set; }
         public Guid? ToLocationId { get; set; }
         public Guid? DamagedStockId { get; set; }
+        public string CategoryName { get; set; }
+        public string BrandName { get; set; }
     }
 }

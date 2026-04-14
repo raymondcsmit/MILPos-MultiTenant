@@ -6,6 +6,7 @@ using POS.API.Helpers;
 using POS.Data;
 using POS.Data.Resources;
 using POS.MediatR;
+using POS.MediatR.ProductStock.Commands;
 
 namespace POS.API.Controllers.ProductStock
 {
@@ -24,6 +25,32 @@ namespace POS.API.Controllers.ProductStock
         //[ClaimCheck("INVE_MANAGE_INVENTORY")]
         //[Produces("application/json", "application/xml", Type = typeof(InventoryDto))]
         public async Task<IActionResult> AddProductStock(AddProductStockCommand command)
+        {
+            var result = await _mediator.Send(command);
+            return ReturnFormattedResponse(result);
+        }
+
+        /// <summary>
+        /// Bulk Update Product Stock
+        /// </summary>
+        /// <param name="command"></param>
+        /// <returns></returns>
+        [HttpPost("bulk-update")]
+        //[ClaimCheck("INVE_MANAGE_INVENTORY")]
+        public async Task<IActionResult> BulkUpdateProductStock(BulkUpdateProductStockCommand command)
+        {
+            var result = await _mediator.Send(command);
+            return ReturnFormattedResponse(result);
+        }
+        
+        /// <summary>
+        /// Bulk Adjust Product Stock (Set Absolute Value)
+        /// </summary>
+        /// <param name="command"></param>
+        /// <returns></returns>
+        [HttpPost("bulk-adjust")]
+        //[ClaimCheck("INVE_MANAGE_INVENTORY")]
+        public async Task<IActionResult> BulkAdjustProductStock(BulkAdjustProductStockCommand command)
         {
             var result = await _mediator.Send(command);
             return ReturnFormattedResponse(result);

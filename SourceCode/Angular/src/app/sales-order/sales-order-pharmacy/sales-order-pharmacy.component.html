@@ -1,0 +1,109 @@
+<div class="pos-container">
+    <!-- LEFT: Product Catalog -->
+    <div class="product-section">
+        <!-- Search -->
+        <div class="p-3 border-bottom d-flex gap-2">
+            <div class="input-group input-group-lg flex-grow-1">
+                <span class="input-group-text bg-white border-end-0"><span class="material-icons">search</span></span>
+                <input type="text" class="form-control border-start-0 ps-0" placeholder="Search Medicine (Generic/Brand)..." (keyup)="onSearch($event)">
+            </div>
+            <button class="btn btn-outline-success"><span class="material-icons">qr_code_scanner</span></button>
+        </div>
+
+        <!-- Categories -->
+        <div class="p-2 border-bottom overflow-auto text-nowrap">
+            <span class="category-pill active">All Meds</span>
+            <!-- Could be dynamic later -->
+        </div>
+
+        <!-- Grid -->
+        <div class="product-grid">
+            <div class="row g-3">
+                 <div class="col-xl-3 col-lg-4 col-6" *ngFor="let product of products" (click)="onProductSelect(product)">
+                    <div class="product-card">
+                         <img [src]="product.productUrl || 'assets/images/product-placeholder.png'" class="product-img">
+                        <div class="product-body">
+                            <div class="fw-bold text-truncate">{{product.name}}</div>
+                            <small class="text-muted d-block">Generic: {{product.description || 'N/A'}}</small>
+                            <div class="d-flex justify-content-between mt-2">
+                                <span class="product-price">{{product.salesPrice | currency}}</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- RIGHT: Cart -->
+    <div class="cart-section">
+        <div class="p-3 border-bottom bg-light">
+             <div class="d-flex justify-content-between align-items-center mb-2">
+                <h5 class="m-0 fw-bold text-success">Order #{{salesOrder.orderNumber}}</h5>
+            </div>
+            <select class="form-select form-select-sm" [(ngModel)]="salesOrder.customerId">
+                 <option *ngFor="let cust of customers" [value]="cust.id">{{cust.customerName}}</option>
+            </select>
+        </div>
+
+        <div class="flex-grow-1 overflow-auto">
+             <div class="text-center p-4 text-muted" *ngIf="salesOrder.salesOrderItems.length === 0">
+                <span class="material-icons fs-1">medication</span>
+                <p>No medicines added</p>
+            </div>
+            
+            <div class="cart-item" *ngFor="let item of salesOrder.salesOrderItems; let i = index">
+               <div class="d-flex justify-content-between">
+                   <strong>{{item.productName}}</strong>
+                   <span class="text-danger" style="cursor: pointer" (click)="removeFromCart(i)">x</span>
+               </div>
+               <div class="small text-muted">{{item.quantity}} x {{item.unitPrice | currency}}</div>
+               <div *ngIf="item.batchNumber" class="batch-info">
+                   Batch: {{item.batchNumber}} | Exp: {{item.expiryDate | date:'MM/yy'}}
+               </div>
+               <div class="text-end fw-bold">{{(item.quantity * item.unitPrice) | currency}}</div>
+            </div>
+        </div>
+
+        <div class="p-3 border-top bg-light">
+             <div class="d-flex justify-content-between mb-2 fs-5 fw-bold">
+                <span>Total</span>
+                <span>{{salesOrder.totalAmount | currency}}</span>
+            </div>
+            <button class="btn btn-success w-100 py-3 fw-bold" (click)="saveOrder()">CHECKOUT</button>
+        </div>
+    </div>
+</div>
+
+<!-- SIMULATED POPUP FOR BATCH SELECTION -->
+<div class="modal-overlay" *ngIf="showBatchModal">
+    <div class="modal-card">
+        <div class="modal-header">
+            <span>Select Batch: {{selectedProduct?.name}}</span>
+            <span class="material-icons" style="cursor: pointer" (click)="closeModal()">close</span>
+        </div>
+        <div class="modal-body">
+            <div class="list-group">
+                <div class="text-center p-3" *ngIf="batches.length === 0">No active batches found.</div>
+                <button type="button" class="list-group-item list-group-item-action" 
+                        *ngFor="let batch of batches" 
+                        [class.active]="selectedBatch === batch.batchNumber"
+                        (click)="selectBatch(batch)">
+                    <div class="d-flex w-100 justify-content-between">
+                        <h6 class="mb-1">Batch # {{batch.batchNumber}}</h6>
+                        <small>Stock: {{batch.quantity}}</small>
+                    </div>
+                    <small>Expires: {{batch.expiryDate | date}}</small>
+                </button>
+            </div>
+            <div class="mt-3">
+                <label class="form-label small">Quantity</label>
+                <div class="input-group">
+                    <input type="number" class="form-control" [(ngModel)]="qtyToAdd">
+                    <button class="btn btn-success" (click)="confirmAddToBatch()">Add to Cart</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+

@@ -14,6 +14,7 @@ using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
+using POS.Common.Services;
 
 namespace POS.MediatR.Handlers
 {
@@ -24,7 +25,9 @@ namespace POS.MediatR.Handlers
 		private readonly IUnitOfWork<POSDbContext> _uow;
 		private readonly ILogger<UpdateCustomerCommandHandler> _logger;
 		private readonly IWebHostEnvironment _webHostEnvironment;
+
 		private readonly PathHelper _pathHelper;
+        private readonly IFileStorageService _fileStorageService;
 
 		public UpdateCustomerCommandHandler(
 			ICustomerRepository customerRepository,
@@ -32,7 +35,9 @@ namespace POS.MediatR.Handlers
 			IUnitOfWork<POSDbContext> uow,
 			ILogger<UpdateCustomerCommandHandler> logger,
 			IWebHostEnvironment webHostEnvironment,
-			PathHelper pathHelper
+
+			PathHelper pathHelper,
+            IFileStorageService fileStorageService
 			)
 		{
 			_customerRepository = customerRepository;
@@ -40,7 +45,9 @@ namespace POS.MediatR.Handlers
 			_uow = uow;
 			_logger = logger;
 			_webHostEnvironment = webHostEnvironment;
+
 			_pathHelper = pathHelper;
+            _fileStorageService = fileStorageService;
 		}
 		public async Task<ServiceResponse<CustomerDto>> Handle(UpdateCustomerCommand request, CancellationToken cancellationToken)
 		{
@@ -88,26 +95,15 @@ namespace POS.MediatR.Handlers
 
 			if (request.IsImageUpload)
 			{
-				string contentRootPath = _webHostEnvironment.WebRootPath;
-
-
-				string folderPath = Path.Combine(contentRootPath, _pathHelper.CustomerImagePath);
-				if (!Directory.Exists(folderPath))
-				{
-					Directory.CreateDirectory(folderPath);
-				}
-
 				// delete old file
-				if (!string.IsNullOrWhiteSpace(oldImageUrl)
-					&& File.Exists(Path.Combine(folderPath, oldImageUrl)))
+				if (!string.IsNullOrWhiteSpace(oldImageUrl))
 				{
-					FileData.DeleteFile(Path.Combine(folderPath, oldImageUrl));
+                    _fileStorageService.DeleteFile(Path.Combine(_pathHelper.CustomerImagePath, oldImageUrl));
 				}
 				// save new file
 				if (!string.IsNullOrWhiteSpace(request.Logo))
 				{
-					var pathToSave = Path.Combine(folderPath, customer.Url);
-					await FileData.SaveFile(pathToSave, request.Logo);
+                    await _fileStorageService.SaveFileAsync(_pathHelper.CustomerImagePath, request.Logo, customer.Url);
 				}
 			}
 

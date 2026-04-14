@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>POS - Default Theme</title>
+    <style>
+        :root {
+            --primary-color: #00acc1; /* Cyan 600 */
+            --primary-light: #b2ebf2;
+            --primary-dark: #00838f;
+            --background: #f5f5f5;
+            --surface: #ffffff;
+            --text-primary: #333333;
+            --text-secondary: #757575;
+            --border: #e0e0e0;
+        }
+
+        body {
+            margin: 0;
+            font-family: 'Roboto', sans-serif;
+            background-color: var(--background);
+            color: var(--text-primary);
+            display: flex;
+            height: 100vh;
+        }
+
+        .sidebar {
+            width: 250px;
+            background-color: var(--surface);
+            border-right: 1px solid var(--border);
+            display: flex;
+            flex-direction: column;
+        }
+
+        .sidebar-header {
+            padding: 20px;
+            font-size: 24px;
+            font-weight: bold;
+            color: var(--primary-color);
+            border-bottom: 1px solid var(--border);
+        }
+
+        .menu-item {
+            padding: 15px 20px;
+            color: var(--text-primary);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+        }
+
+        .menu-item:hover {
+            background-color: var(--primary-light);
+        }
+
+        .menu-item.active {
+            background-color: var(--primary-light);
+            color: var(--primary-dark);
+            font-weight: 500;
+            border-left: 4px solid var(--primary-color);
+        }
+
+        .main-content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .header {
+            height: 60px;
+            background-color: var(--primary-color);
+            color: white;
+            display: flex;
+            align-items: center;
+            padding: 0 20px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .content {
+            padding: 20px;
+            overflow-y: auto;
+        }
+
+        .card {
+            background-color: var(--surface);
+            border-radius: 4px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.12), 0 1px 2px rgba(0,0,0,0.24);
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+
+        .btn {
+            padding: 8px 16px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: 500;
+            text-transform: uppercase;
+        }
+
+        .btn-primary {
+            background-color: var(--primary-color);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background-color: var(--primary-dark);
+        }
+        
+        h1, h2, h3 { margin-top: 0; }
+        
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 20px;
+        }
+        
+        .stat-card {
+            background: var(--surface);
+            padding: 20px;
+            border-radius: 8px;
+            border-left: 4px solid var(--primary-color);
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+        }
+    </style>
+</head>
+<body>
+    <div class="sidebar">
+        <div class="sidebar-header">POS System</div>
+        <div class="menu-item active">Dashboard</div>
+        <div class="menu-item">Products</div>
+        <div class="menu-item">Sales</div>
+        <div class="menu-item">Customers</div>
+        <div class="menu-item">Reports</div>
+    </div>
+    <div class="main-content">
+        <div class="header">
+            <h3>Dashboard</h3>
+            <div style="flex:1"></div>
+            <span>Admin User</span>
+        </div>
+        <div class="content">
+            <div class="grid" style="margin-bottom: 20px;">
+                <div class="stat-card">
+                    <h3>Total Sales</h3>
+                    <p style="font-size: 24px; font-weight: bold;">$12,450</p>
+                </div>
+                <div class="stat-card">
+                    <h3>Orders</h3>
+                    <p style="font-size: 24px; font-weight: bold;">45</p>
+                </div>
+                 <div class="stat-card">
+                    <h3>Customers</h3>
+                    <p style="font-size: 24px; font-weight: bold;">120</p>
+                </div>
+            </div>
+        
+            <div class="card">
+                <h2>Recent Transactions</h2>
+                <table style="width: 100%; text-align: left; border-collapse: collapse;">
+                    <thead>
+                        <tr style="border-bottom: 1px solid var(--border);">
+                            <th style="padding: 10px;">ID</th>
+                            <th style="padding: 10px;">Customer</th>
+                            <th style="padding: 10px;">Date</th>
+                            <th style="padding: 10px;">Amount</th>
+                            <th style="padding: 10px;">Status</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr style="border-bottom: 1px solid var(--border);">
+                            <td style="padding: 10px;">#1001</td>
+                            <td style="padding: 10px;">John Doe</td>
+                            <td style="padding: 10px;">2023-10-25</td>
+                            <td style="padding: 10px;">$120.00</td>
+                            <td style="padding: 10px; color: green;">Completed</td>
+                        </tr>
+                        <tr>
+                            <td style="padding: 10px;">#1002</td>
+                            <td style="padding: 10px;">Jane Smith</td>
+                            <td style="padding: 10px;">2023-10-26</td>
+                            <td style="padding: 10px;">$85.50</td>
+                            <td style="padding: 10px; color: orange;">Pending</td>
+                        </tr>
+                    </tbody>
+                </table>
+                <br>
+                <button class="btn btn-primary">View All Transactions</button>
+            </div>
+            
+             <div class="card">
+                <h2>Form Elements</h2>
+                <div style="display: flex; gap: 10px; flex-direction: column; max-width: 400px;">
+                    <label>Product Name</label>
+                    <input type="text" style="padding: 8px; border: 1px solid var(--border); border-radius: 4px;" placeholder="Enter product name">
+                     <label>Category</label>
+                    <select style="padding: 8px; border: 1px solid var(--border); border-radius: 4px;">
+                        <option>Electronics</option>
+                        <option>Clothing</option>
+                    </select>
+                    <div style="margin-top: 10px;">
+                        <button class="btn btn-primary">Save Product</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

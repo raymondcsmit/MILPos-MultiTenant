@@ -1,0 +1,95 @@
+@model POS.Repository.ProductList
+@{
+    ViewData["Title"] = ViewBag.TenantName + " - Store";
+    var tenantName = ViewContext.RouteData.Values["tenantName"];
+    var hasPrev = Model.Skip > 0;
+    var hasNext = (Model.Skip + Model.PageSize) < Model.TotalCount;
+}
+
+<!-- Store Header -->
+<nav class="glass-nav">
+    <div style="font-size:1.5rem;">
+        🛒 <b>@ViewBag.TenantName</b> 
+        <span style="font-size:0.8rem; opacity:0.7; margin-left:10px;">Powered by MILPOS</span>
+    </div>
+    <div>
+        <a asp-action="Cart" asp-route-tenantName="@tenantName" class="glass-btn" style="position:relative;">
+            Cart 🛒 
+            <span class="badge" style="position:absolute; top:-5px; right:-5px;">@ViewBag.CartCount</span>
+        </a>
+    </div>
+</nav>
+
+<div class="glass-panel" style="display:flex; justify-content:space-between; align-items:center;">
+    <div>
+        <h1>Browse Products</h1>
+        <p>Select items to request a quote or order.</p>
+    </div>
+    <div>
+        <form method="get" asp-action="Index">
+             <input type="text" name="SearchQuery" class="glass-input" placeholder="Search products..." style="width:300px;" value="@Context.Request.Query["SearchQuery"]">
+        </form>
+    </div>
+</div>
+
+<!-- Product Grid -->
+<section class="glass-panel">
+    <div class="product-grid">
+        @if (Model != null && Model.Any())
+        {
+            foreach (var product in Model)
+            {
+                <div class="glass-card">
+                    <div style="height:150px; background:rgba(0,0,0,0.2); border-radius:8px; margin-bottom:1rem; display:flex; align-items:center; justify-content:center; overflow:hidden;">
+                         @if(!string.IsNullOrEmpty(product.ProductUrl))
+                         {
+                             <img src="@product.ProductUrl" style="max-width:100%; max-height:100%;" alt="@product.Name"/>
+                         }
+                         else
+                         {
+                             <span>📷 No Image</span>
+                         }
+                    </div>
+                    <h3>@product.Name</h3>
+                    <p style="color:#b2bec3; font-size:0.9rem;">@product.UnitName</p>
+                    <div style="display:flex; justify-content:space-between; align-items:center; margin-top:1rem;">
+                        <span style="font-size:1.2rem; font-weight:bold;">@(product.SalesPrice?.ToString("C") ?? "N/A")</span>
+                        <form asp-action="AddToCart" method="post">
+                            <input type="hidden" name="productId" value="@product.Id" />
+                            <input type="hidden" name="productName" value="@product.Name" />
+                            <input type="hidden" name="price" value="@product.SalesPrice" />
+                            <button type="submit" class="glass-btn glass-btn-primary">Add to Cart</button>
+                        </form>
+                    </div>
+                </div>
+            }
+        }
+        else
+        {
+            <div style="grid-column: 1/-1; text-align: center;">
+                <h3>No products found.</h3>
+            </div>
+        }
+    </div>
+    
+    <!-- Pagination -->
+    <div style="margin-top: 2rem; text-align: center;">
+        @if (hasPrev)
+        {
+             // Calculate prev page skip
+             var prevSkip = Math.Max(0, Model.Skip - Model.PageSize);
+             <a asp-action="Index" 
+                asp-route-skip="@prevSkip"
+                asp-route-searchQuery="@Context.Request.Query["SearchQuery"]"
+                class="glass-btn">Previous</a>
+        }
+        @if (hasNext)
+        {
+             var nextSkip = Model.Skip + Model.PageSize;
+             <a asp-action="Index" 
+                asp-route-skip="@nextSkip"
+                asp-route-searchQuery="@Context.Request.Query["SearchQuery"]"
+                class="glass-btn">Next</a>
+        }
+    </div>
+</section>

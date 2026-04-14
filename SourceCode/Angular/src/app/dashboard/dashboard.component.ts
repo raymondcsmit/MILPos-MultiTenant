@@ -6,6 +6,9 @@ import { BestSellingProductComponent } from './best-selling-product/best-selling
 import { SalesOrderExpectedShipmentComponent } from './sales-order-expected-shipment/sales-order-expected-shipment.component';
 import { PurchaseOrderExpectedDeliveryComponent } from './purchase-order-expected-delivery/purchase-order-expected-delivery.component';
 import { ProductStockAlertComponent } from './product-stock-alert/product-stock-alert.component';
+import { ProductSalesComparisonComponent } from './product-sales-comparison/product-sales-comparison.component';
+import { IncomeComparisonComponent } from './income-comparison/income-comparison.component';
+import { SalesComparisonComponent } from './sales-comparison/sales-comparison.component';
 
 @Component({
   selector: 'app-dashboard',
@@ -19,6 +22,9 @@ import { ProductStockAlertComponent } from './product-stock-alert/product-stock-
     SalesOrderExpectedShipmentComponent,
     PurchaseOrderExpectedDeliveryComponent,
     ProductStockAlertComponent,
+    ProductSalesComparisonComponent,
+    IncomeComparisonComponent,
+    SalesComparisonComponent,
   ]
 })
 export class DashboardComponent extends BaseComponent implements OnInit {

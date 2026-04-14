@@ -124,6 +124,7 @@ export class PosComponent extends BaseComponent implements OnInit, AfterViewInit
   }
   hasOnlyPOSPermission: boolean = false;
   taxes: Tax[] = [];
+  private scanSound = new Audio('sounds/success.mp3');
 
   constructor(
     private fb: UntypedFormBuilder,
@@ -225,8 +226,9 @@ export class PosComponent extends BaseComponent implements OnInit, AfterViewInit
         paymentMethod: [1],
         referenceNumber: [''],
         customerId: ['', [Validators.required]],
-        locationId: ['', [Validators.required]],
-        note: [''],
+          locationId: ['', [Validators.required]],
+          salesPersonId: [''],
+          note: [''],
         termAndCondition: [''],
         flatDiscount: [0],
         salesOrderItems: this.fb.array([]),
@@ -461,20 +463,9 @@ export class PosComponent extends BaseComponent implements OnInit, AfterViewInit
             taxPercentage: percentage
           });
 
-          const gradTotal =
-            this.grandTotal +
-            parseFloat(
-              this.quantitiesUnitPricePipe.transform(
-                so.quantity,
-                so.unitPrice,
-                so.discountPercentage,
-                so.taxValue,
-                this.taxes,
-                so.discountType
-              )
-            );
-          this.grandTotal = parseFloat(gradTotal.toFixed(2));
-
+          // BP-05 FIX: Reuse the already-computed itemGradTotal instead of calling
+          // quantitiesUnitPricePipe.transform() a second time for the grand total.
+          this.grandTotal = parseFloat((this.grandTotal + itemGradTotal).toFixed(2));
 
           const totalTax =
             this.totalTax +
@@ -521,11 +512,17 @@ export class PosComponent extends BaseComponent implements OnInit, AfterViewInit
   }
 
   onFlatDiscountChange() {
-    this.salesOrderForm.get('flatDiscount')?.valueChanges.subscribe(c => {
-
-      this.getAllTotal();
-
-    })
+    // BP-05 FIX: Track via sub$ (SubSink) so it is automatically unsubscribed
+    // on ngOnDestroy, preventing a leak. Also debounced to prevent per-keystroke recalculation.
+    const flatDiscountControl = this.salesOrderForm.get('flatDiscount');
+    if (flatDiscountControl) {
+      this.sub$.sink = flatDiscountControl.valueChanges.pipe(
+        debounceTime(400),
+        distinctUntilChanged()
+      ).subscribe(() => {
+        this.getAllTotal();
+      });
+    }
   }
 
   onDiscountChange() {
@@ -675,7 +672,7 @@ export class PosComponent extends BaseComponent implements OnInit, AfterViewInit
           this.salesOrderService.getSalesOrderById(orderResponse.id).subscribe({
             next: (fullOrder: SalesOrder) => {
               this.salesOrderForInvoice = fullOrder;
-              this.ngOnInit();
+              this.resetFormForNewOrder();
             },
             error: (err) => {
               console.error('Error fetching saved SalesOrder', err);
@@ -689,6 +686,36 @@ export class PosComponent extends BaseComponent implements OnInit, AfterViewInit
     });
   }
 
+  private resetFormForNewOrder(): void {
+    while (this.salesOrderItemsArray.length !== 0) {
+      this.salesOrderItemsArray.removeAt(0);
+    }
+    
+    this.salesOrderForm.reset({
+      orderNumber: '',
+      filerCustomer: '',
+      deliveryDate: this.CurrentDate,
+      soCreatedDate: this.CurrentDate,
+      deliveryStatus: SalesDeliveryStatusEnum.Delivered,
+      paymentMethod: 1,
+      referenceNumber: '',
+      // Restore walk-in customer; fall back to first customer if no walk-in exists
+      customerId: this.customers.find((c) => c.isWalkIn)?.id ?? (this.customers.length > 0 ? this.customers[0].id : ''),
+      // Preserve the currently selected locationId — do NOT reset to [0]
+      locationId: this.salesOrderForm.get('locationId')?.value ?? (this.locations?.length > 0 ? this.locations[0].id : ''),
+      salesPersonId: '',
+      note: '',
+      termAndCondition: '',
+      flatDiscount: 0,
+      filterProductValue: '',
+      filterBarCodeValue: ''
+    });
+
+    this.filterProducts = [];
+    this.resetAllTotal();
+    this.getNewSalesOrderNumber();
+  }
+
   reloadCurrentRoute() {
     let currentUrl = this.router.url;
     this.router.navigateByUrl('/', { skipLocationChange: true }).then(() => {
@@ -698,16 +725,17 @@ export class PosComponent extends BaseComponent implements OnInit, AfterViewInit
 
   buildSalesOrder() {
     const salesOrder: SalesOrder = {
-      id: this.salesOrder ? this.salesOrder.id : '',
-      orderNumber: this.salesOrderForm.get('orderNumber')?.value,
-      deliveryDate: this.salesOrderForm.get('deliveryDate')?.value,
-      deliveryStatus: this.salesOrderForm.get('deliveryStatus')?.value,
-      isSalesOrderRequest: false,
-      soCreatedDate: this.salesOrderForm.get('soCreatedDate')?.value,
-      salesOrderStatus: SalesOrderStatusEnum.Not_Return,
-      customerId: this.salesOrderForm.get('customerId')?.value,
-      locationId: this.salesOrderForm.get('locationId')?.value,
-      totalAmount: this.grandTotal,
+        id: this.salesOrder ? this.salesOrder.id : '',
+        orderNumber: this.salesOrderForm.get('orderNumber')?.value,
+        deliveryDate: this.salesOrderForm.get('deliveryDate')?.value,
+        deliveryStatus: this.salesOrderForm.get('deliveryStatus')?.value,
+        isSalesOrderRequest: false,
+        soCreatedDate: this.salesOrderForm.get('soCreatedDate')?.value,
+        salesOrderStatus: SalesOrderStatusEnum.Not_Return,
+        customerId: this.salesOrderForm.get('customerId')?.value,
+        locationId: this.salesOrderForm.get('locationId')?.value,
+        salesPersonId: this.salesOrderForm.get('salesPersonId')?.value,
+        totalAmount: this.grandTotal,
       totalDiscount: this.totalDiscount,
       totalTax: this.totalTax,
       flatDiscount: this.salesOrderForm.get('flatDiscount')?.value,
@@ -791,10 +819,8 @@ export class PosComponent extends BaseComponent implements OnInit, AfterViewInit
   }
 
   playSound() {
-    const audio = new Audio();
-    audio.src = 'sounds/success.mp3';
-    audio.load();
-    audio.play().catch((err) => console.warn('Sound play failed:', err));
+    this.scanSound.currentTime = 0;
+    this.scanSound.play().catch((err) => console.warn('Sound play failed:', err));
   }
 
   toggleDrawer(value?: string) {

@@ -1,4 +1,4 @@
-﻿using MediatR;
+using MediatR;
 using Microsoft.EntityFrameworkCore;
 using POS.Data.Dto;
 using POS.Data.Entities.Accounts;
@@ -22,38 +22,52 @@ namespace POS.MediatR.Dashboard.Handlers
         {
             var fromDate = request.FromDate;
             var toDate = request.ToDate.AddDays(1);
-            var transactionQuery = _transactionRepository.All
-                .Where(c=>c.TransactionDate >= fromDate && c.TransactionDate < toDate 
-                        && c.TransactionType == TransactionType.Purchase
+            
+            var transactionQuery = _transactionRepository.All.AsNoTracking()
+                .Where(c => c.TransactionDate >= fromDate && c.TransactionDate < toDate 
+                        && (c.TransactionType == TransactionType.Purchase
                         || c.TransactionType == TransactionType.PurchaseReturn
                         || c.TransactionType == TransactionType.Sale
-                        || c.TransactionType == TransactionType.SaleReturn);
+                        || c.TransactionType == TransactionType.SaleReturn));
+
             if (request.LocationId.HasValue)
             {
                 transactionQuery = transactionQuery.Where(c => c.BranchId == request.LocationId.Value);
             }
-            var transactions = await transactionQuery.ToListAsync();
-            var purchaseTotal = transactions 
-                .Where(c => c.TransactionType == TransactionType.Purchase )
+
+            var aggregatedData = await transactionQuery
+                .GroupBy(c => new { c.TransactionType, IsPayment = c.Narration.ToUpper().Contains("PAYMENT") })
+                .Select(g => new 
+                { 
+                    g.Key.TransactionType, 
+                    g.Key.IsPayment, 
+                    TotalAmount = g.Sum(c => c.TotalAmount) 
+                })
+                .ToListAsync(cancellationToken);
+
+            var purchaseTotal = aggregatedData
+                .Where(c => c.TransactionType == TransactionType.Purchase)
                 .Sum(c => c.TotalAmount);
-            var purchaseReturnTotal = transactions
-                .Where(c => c.TransactionType == TransactionType.PurchaseReturn && !c.Narration.ToUpper().Contains("PAYMENT"))
+                
+            var purchaseReturnTotal = aggregatedData
+                .Where(c => c.TransactionType == TransactionType.PurchaseReturn && !c.IsPayment)
                 .Sum(c => c.TotalAmount);
-            var salesTotal = transactions
-                .Where(c => c.TransactionType == TransactionType.Sale )
+                
+            var salesTotal = aggregatedData
+                .Where(c => c.TransactionType == TransactionType.Sale)
                 .Sum(c => c.TotalAmount);
-            var salesReturnTotal = transactions
-                .Where(c => c.TransactionType == TransactionType.SaleReturn && !c.Narration.ToUpper().Contains("PAYMENT"))
+                
+            var salesReturnTotal = aggregatedData
+                .Where(c => c.TransactionType == TransactionType.SaleReturn && !c.IsPayment)
                 .Sum(c => c.TotalAmount);
 
-            var dashboardStatics = new DashboardStatics
+            return new DashboardStatics
             {
                 TotalPurchase = purchaseTotal,
                 TotalPurchaseReturn = purchaseReturnTotal,
                 TotalSalesReturn = salesReturnTotal,
                 TotalSales = salesTotal,
             };
-            return dashboardStatics;
         }
     }
 }

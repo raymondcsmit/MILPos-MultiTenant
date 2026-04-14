@@ -40,9 +40,9 @@
               }
             ],
             "styles": [
-              "public/scss/style.scss",
+              "node_modules/bootstrap/dist/css/bootstrap.min.css",
               "public/scss/theme/custom-theme.scss",
-              "node_modules/bootstrap/dist/css/bootstrap.min.css"
+              "public/scss/style.scss"
             ]
           },
           "configurations": {

@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Purchase Order Mockup</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        body { background-color: #f8fafc; font-family: 'Inter', sans-serif; }
+    </style>
+</head>
+<body class="p-6 md:p-12">
+
+<div class="max-w-5xl mx-auto bg-white rounded-xl shadow-lg overflow-hidden border border-gray-200">
+    
+    <!-- Header -->
+    <div class="bg-gray-800 px-6 py-4 flex justify-between items-center text-white">
+        <div class="flex items-center space-x-3">
+            <button class="hover:bg-gray-700 p-2 rounded-full transition-colors text-gray-300">
+                <i class="fas fa-arrow-left"></i>
+            </button>
+            <h1 class="text-xl font-semibold flex items-center"><i class="fas fa-file-invoice-dollar mr-3 text-indigo-400"></i> Create Purchase Order</h1>
+        </div>
+        <div class="space-x-3">
+            <button class="bg-transparent border border-gray-500 text-gray-300 px-4 py-2 rounded font-medium hover:bg-gray-700 transition-colors">
+                Cancel
+            </button>
+            <button class="bg-indigo-600 text-white px-4 py-2 rounded font-medium hover:bg-indigo-700 transition-colors shadow-sm">
+                <i class="fas fa-save mr-2"></i> Save Order
+            </button>
+        </div>
+    </div>
+
+    <div class="p-6 lg:p-8 space-y-8">
+        
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+            
+            <!-- Left Column: Supplier & Order Details -->
+            <div class="lg:col-span-2 space-y-6">
+                <section>
+                    <h2 class="text-sm font-bold text-gray-500 uppercase tracking-wider mb-4 border-b pb-2"><i class="fas fa-truck text-gray-400 mr-2"></i> Supplier & Logistics</h2>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-5">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Supplier <span class="text-red-500">*</span></label>
+                            <select class="w-full border border-gray-300 rounded-md px-3 py-2 focus:ring-indigo-500 focus:border-indigo-500 bg-white">
+                                <option>Select Supplier...</option>
+                                <option selected>Global Distributors Inc.</option>
+                                <option>TechCorp Supplies</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Delivery Location <span class="text-red-500">*</span></label>
+                            <select class="w-full border border-gray-300 rounded-md px-3 py-2 focus:ring-indigo-500 focus:border-indigo-500 bg-white">
+                                <option selected>Warehouse A - North America</option>
+                                <option>Storefront 1 - New York</option>
+                            </select>
+                        </div>
+                    </div>
+                </section>
+
+                <section>
+                    <h2 class="text-sm font-bold text-gray-500 uppercase tracking-wider mb-4 border-b pb-2"><i class="fas fa-info-circle text-gray-400 mr-2"></i> Order Details</h2>
+                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-5">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Order Number</label>
+                            <input type="text" value="PO-2023-0899" disabled class="w-full border border-gray-200 bg-gray-50 text-gray-500 rounded-md px-3 py-2 cursor-not-allowed">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Status</label>
+                            <select class="w-full border border-gray-300 rounded-md px-3 py-2 focus:ring-indigo-500 focus:border-indigo-500 bg-white">
+                                <option selected>Pending Payment</option>
+                                <option>Received</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Expected Delivery</label>
+                            <div class="relative">
+                                <input type="date" value="2023-10-25" class="w-full border border-gray-300 rounded-md px-3 py-2 focus:ring-indigo-500 focus:border-indigo-500">
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            </div>
+
+            <!-- Right Column: Attribution (NEW) -->
+            <div class="lg:col-span-1">
+                <section class="bg-indigo-50 border border-indigo-200 rounded-lg p-5 h-full shadow-sm">
+                    <div class="flex items-center mb-4 border-b border-indigo-200 pb-3">
+                        <div class="bg-indigo-100 p-2 rounded-full mr-3">
+                            <i class="fas fa-user-tag text-indigo-600"></i>
+                        </div>
+                        <h2 class="text-md font-bold text-indigo-900">Internal Attribution</h2>
+                    </div>
+                    
+                    <div class="space-y-4">
+                        <div>
+                            <label class="block text-sm font-medium text-indigo-900 mb-1">Purchased On Behalf Of</label>
+                            <p class="text-xs text-indigo-700 mb-2">Select the Sales Person requesting this stock or making this deal.</p>
+                            <select class="w-full border border-indigo-300 rounded-md px-3 py-2 focus:ring-indigo-500 focus:border-indigo-500 bg-white shadow-sm">
+                                <option>Select Sales Person...</option>
+                                <option selected>Michael Scott</option>
+                                <option>Jim Halpert</option>
+                                <option>Dwight Schrute</option>
+                            </select>
+                        </div>
+                        
+                        <div class="bg-white p-3 rounded border border-indigo-100 text-sm text-gray-600">
+                            <p><i class="fas fa-lock text-gray-400 mr-1"></i> If logged in as a Sales Person, this field is locked to your own account.</p>
+                        </div>
+                    </div>
+                </section>
+            </div>
+        </div>
+
+        <!-- Line Items Table -->
+        <section class="mt-8 border-t pt-8">
+            <div class="flex justify-between items-center mb-4">
+                <h2 class="text-lg font-bold text-gray-800">Line Items</h2>
+                <button class="text-sm bg-indigo-100 text-indigo-700 px-3 py-1.5 rounded hover:bg-indigo-200 font-medium transition-colors">
+                    <i class="fas fa-plus mr-1"></i> Add Item
+                </button>
+            </div>
+            
+            <div class="overflow-x-auto border border-gray-200 rounded-lg">
+                <table class="min-w-full divide-y divide-gray-200 text-sm text-left">
+                    <thead class="bg-gray-50 text-gray-600 uppercase font-medium">
+                        <tr>
+                            <th class="px-4 py-3">Product Name</th>
+                            <th class="px-4 py-3 w-24">Qty</th>
+                            <th class="px-4 py-3 w-32">Unit Price</th>
+                            <th class="px-4 py-3 w-24">Discount</th>
+                            <th class="px-4 py-3 w-24">Tax %</th>
+                            <th class="px-4 py-3 w-32 text-right">Total</th>
+                            <th class="px-4 py-3 w-12 text-center"></th>
+                        </tr>
+                    </thead>
+                    <tbody class="bg-white divide-y divide-gray-200">
+                        <tr>
+                            <td class="px-4 py-3">
+                                <select class="w-full border-gray-300 rounded-md text-sm">
+                                    <option>Laptop</option>
+                                </select>
+                            </td>
+                            <td class="px-4 py-3">
+                                <input type="number" value="10" class="w-full border-gray-300 rounded-md text-sm text-center">
+                            </td>
+                            <td class="px-4 py-3">
+                                <div class="relative">
+                                    <span class="absolute inset-y-0 left-0 pl-2 flex items-center text-gray-500">$</span>
+                                    <input type="text" value="500.00" class="w-full border-gray-300 rounded-md pl-6 text-sm">
+                                </div>
+                            </td>
+                            <td class="px-4 py-3">
+                                <input type="text" value="0.00" class="w-full border-gray-300 rounded-md text-sm">
+                            </td>
+                            <td class="px-4 py-3">
+                                <input type="number" value="10" class="w-full border-gray-300 rounded-md text-sm text-center">
+                            </td>
+                            <td class="px-4 py-3 text-right font-medium text-gray-900">
+                                $5,500.00
+                            </td>
+                            <td class="px-4 py-3 text-center">
+                                <button class="text-red-500 hover:text-red-700"><i class="fas fa-trash-alt"></i></button>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            
+            <div class="flex justify-end mt-4">
+                <div class="w-64 space-y-2">
+                    <div class="flex justify-between text-gray-600 text-sm">
+                        <span>Subtotal:</span>
+                        <span>$5,000.00</span>
+                    </div>
+                    <div class="flex justify-between text-gray-600 text-sm border-b pb-2">
+                        <span>Total Tax:</span>
+                        <span>$500.00</span>
+                    </div>
+                    <div class="flex justify-between text-gray-900 font-bold text-lg pt-1">
+                        <span>Grand Total:</span>
+                        <span>$5,500.00</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+    </div>
+</div>
+
+</body>
+</html>

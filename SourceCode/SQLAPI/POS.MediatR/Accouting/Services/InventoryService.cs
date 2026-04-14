@@ -20,7 +20,7 @@ public class InventoryService(
     public async Task ProcessInventoryChangesAsync(Transaction transaction)
     {
         //for tracked entity Detached
-        var updatedStocks = new List<ProductStock>();
+        var updatedStocks = new List<Data.Entities.ProductStock>();
         foreach (var item in transaction.TransactionItems)
         {
             var quantityChange = transaction.TransactionType switch

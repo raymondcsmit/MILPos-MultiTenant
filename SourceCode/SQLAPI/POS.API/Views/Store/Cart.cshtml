@@ -1,0 +1,84 @@
+@model POS.API.ViewModels.CartViewModel
+@{
+    ViewData["Title"] = "Shopping Cart";
+    var tenantName = ViewContext.RouteData.Values["tenantName"];
+}
+
+<nav class="glass-nav">
+    <div style="font-size:1.5rem;">🛒 <b>@ViewBag.TenantName</b></div>
+    <div>
+        <a asp-action="Index" asp-route-tenantName="@tenantName" class="glass-btn">Continue Shopping</a>
+    </div>
+</nav>
+
+<div class="glass-panel" style="max-width: 800px; margin: 2rem auto;">
+    <h1>Your Cart</h1>
+    <hr style="border-color:var(--glass-border); margin:1rem 0;">
+
+    @if (Model != null && Model.Items.Any())
+    {
+        <!-- Cart Items -->
+        <div style="margin-bottom: 2rem;">
+            @foreach (var item in Model.Items)
+            {
+                <div style="display:flex; justify-content:space-between; align-items:center; padding:1rem; border-bottom:1px solid rgba(255,255,255,0.1);">
+                    <div style="display:flex; align-items:center;">
+                        <div style="width:50px; height:50px; background:rgba(255,255,255,0.1); border-radius:4px; margin-right:1rem; overflow:hidden;">
+                             @if(!string.IsNullOrEmpty(item.ImageUrl))
+                             {
+                                 <img src="@item.ImageUrl" style="width:100%; height:100%; object-fit:cover;" />
+                             }
+                        </div>
+                        <div>
+                            <h4 style="margin:0;">@item.ProductName</h4>
+                            <small>Qty: @item.Quantity</small>
+                        </div>
+                    </div>
+                    <div style="display:flex; align-items:center; gap:10px;">
+                        <span>@item.Total.ToString("C")</span>
+                        <form asp-action="RemoveFromCart" method="post" style="display:inline;">
+                             <input type="hidden" name="productId" value="@item.ProductId" />
+                             <button type="submit" class="glass-btn" style="padding: 0.2rem 0.6rem; background: rgba(255,0,0,0.2);">X</button>
+                        </form>
+                    </div>
+                </div>
+            }
+        </div>
+
+        <div style="text-align:right; margin-bottom:2rem; font-size:1.5rem;">
+            Total: <b>@Model.TotalAmount.ToString("C")</b>
+        </div>
+
+        <!-- Checkout Form -->
+        <div class="glass-card">
+            <h3>Checkout Details</h3>
+            <p>This will submit a sales order request to the shop owner.</p>
+            <form asp-action="Checkout" method="post">
+                @Html.AntiForgeryToken()
+                
+                <label>Name</label>
+                <input type="text" name="Properties[CustomerName]" class="glass-input" placeholder="John Doe" required>
+                
+                <label>Email</label>
+                <input type="email" name="Properties[Email]" class="glass-input" placeholder="john@example.com" required>
+                
+                <label>Phone</label>
+                <input type="tel" name="Properties[Phone]" class="glass-input" placeholder="+1 234 567 8900" required>
+                
+                <label>Address (Optional)</label>
+                <input type="text" name="Properties[Address]" class="glass-input" placeholder="123 Main St, City">
+
+                <button type="submit" class="glass-btn glass-btn-primary" style="width:100%; margin-top:1rem; font-size:1.1rem;">
+                    Submit Order Request
+                </button>
+            </form>
+        </div>
+    }
+    else
+    {
+        <div style="text-align:center; padding: 2rem;">
+            <h3>Your cart is empty.</h3>
+            <a asp-action="Index" asp-route-tenantName="@tenantName" class="glass-btn glass-btn-primary" style="margin-top:1rem;">Start Shopping</a>
+        </div>
+    }
+</div>

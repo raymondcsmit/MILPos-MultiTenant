@@ -24,7 +24,7 @@
 
   .navbar-toggle {
     text-decoration: none;
-    color: #fff;
+    color: vars.$theme-navbar-brand;
     width: 20px;
     height: 60px;
     margin-top: 0;
@@ -167,7 +167,7 @@
 }
 
 .logo-name {
-  color: white;
+  color: vars.$theme-navbar-brand;
   font-size: 24px;
   font-weight: 400;
 }
@@ -185,7 +185,7 @@
     position: relative;
     margin-bottom: 0px;
     line-height: 60px;
-    color: #fff;
+    color: vars.$theme-navbar-brand;
 
     .fullscreen {
       height: 60px;

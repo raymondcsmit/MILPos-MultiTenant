@@ -1,0 +1,124 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<CodeSnippets xmlns="http://schemas.microsoft.com/VisualStudio/2005/CodeSnippet">
+  <CodeSnippet Format="1.0.0">
+    <Header>
+      <Title>Dapper Migration Template</Title>
+      <Shortcut>// MIGRATE-TO-DAPPER</Shortcut>
+      <Description>Vibe-Coding template to safely scaffold a Dapper query handler alongside the legacy EF Core implementation.</Description>
+      <Author>Autonomous Vibe-Coder</Author>
+      <SnippetTypes>
+        <SnippetType>Expansion</SnippetType>
+      </SnippetTypes>
+    </Header>
+    <Snippet>
+      <Declarations>
+        <Literal>
+          <ID>QueryHandlerName</ID>
+          <ToolTip>The name of the MediatR QueryHandler class</ToolTip>
+          <Default>GetSampleQueryHandler</Default>
+        </Literal>
+        <Literal>
+          <ID>EntityType</ID>
+          <ToolTip>The return DTO type</ToolTip>
+          <Default>SampleDto</Default>
+        </Literal>
+        <Literal>
+          <ID>ConnectionStringKey</ID>
+          <ToolTip>The DI key for the ISqlConnectionAccessor or ISqlQueryTextProvider</ToolTip>
+          <Default>SqlAccessor</Default>
+        </Literal>
+        <Literal>
+          <ID>SQL_TEXT</ID>
+          <ToolTip>The raw SQL query strings (must include TenantId and IsDeleted)</ToolTip>
+          <Default>"SELECT * FROM Table WHERE TenantId = @TenantId AND IsDeleted = 0"</Default>
+        </Literal>
+        <Literal>
+          <ID>ParamsObject</ID>
+          <ToolTip>Anonymous object containing Dapper parameters</ToolTip>
+          <Default>new { TenantId = tenantId }</Default>
+        </Literal>
+      </Declarations>
+      <Code Language="csharp">
+        <![CDATA[
+using System;
+using System.Collections.Generic;
+using System.Data;
+using System.Threading;
+using System.Threading.Tasks;
+using Dapper;
+using MediatR;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Logging;
+using POS.Domain;
+// using POS.Common.DapperInfrastructure; // Uncomment if ISqlConnectionAccessor is moved here
+
+namespace POS.MediatR.Handlers
+{
+    public class $QueryHandlerName$ : IRequestHandler<GetSampleQuery, List<$EntityType$>> // Adjust Request signature as needed
+    {
+        private readonly ILogger<$QueryHandlerName$> _logger;
+        private readonly ITenantProvider _tenantProvider;
+        private readonly IConfiguration _configuration;
+        // private readonly ISqlConnectionAccessor _$ConnectionStringKey$; // Inject the Dapper connection factory here
+
+        public $QueryHandlerName$(
+            ILogger<$QueryHandlerName$> logger,
+            ITenantProvider tenantProvider,
+            IConfiguration configuration)
+        {
+            _logger = logger;
+            _tenantProvider = tenantProvider;
+            _configuration = configuration;
+        }
+
+        public async Task<List<$EntityType$>> Handle(GetSampleQuery request, CancellationToken cancellationToken)
+        {
+            // FEATURE FLAG GATING: Fallback to EF Core if disabled or errors out
+            var useDapper = _configuration.GetValue<bool>("Features:Dapper:$QueryHandlerName$");
+
+            if (useDapper)
+            {
+                try
+                {
+                    var tenantId = _tenantProvider.GetTenantId();
+
+                    // CRITICAL: Dapper bypasses EF Core Global Query Filters. 
+                    // You MUST explicitly include `TenantId = @TenantId AND IsDeleted = 0` in your SQL!
+                    var sql = $SQL_TEXT$;
+
+                    // using var connection = _$ConnectionStringKey$.GetOpenConnection(); // Resolve from your factory
+                    // var currentTransaction = _$ConnectionStringKey$.GetCurrentTransaction(); // Pass transaction if inside UnitOfWork
+
+                    // using var command = new CommandDefinition(
+                    //     sql,
+                    //     $ParamsObject$,
+                    //     transaction: currentTransaction,
+                    //     commandTimeout: 60,
+                    //     cancellationToken: cancellationToken);
+
+                    // INJECTION POINT: Custom Column Mappers or Multi-Mapping (e.g. QueryAsync<T1, T2, TReturn>)
+                    // var result = await connection.QueryAsync<$EntityType$>(command);
+                    // return result.AsList();
+                    
+                    throw new NotImplementedException("Dapper connection accessor not yet wired up. Remove this throw once implemented.");
+                }
+                catch (Exception ex)
+                {
+                    // Rollback Condition: Log the Dapper failure, but gracefully fallback to EF Core for 100% Uptime
+                    _logger.LogError(ex, "Dapper execution failed for $QueryHandlerName$. Falling back to EF Core.");
+                }
+            }
+
+            #region LEGACY EF CORE IMPLEMENTATION
+            // Keep the original EF Core handler logic here for 1 sprint (Side-by-side Shadow Traffic)
+            // e.g., return await _repository.All.AsNoTracking().ProjectTo<$EntityType$>().ToListAsync(cancellationToken);
+            throw new NotImplementedException("Legacy EF Core logic goes here.");
+            #endregion
+        }
+    }
+}
+        ]]>
+      </Code>
+    </Snippet>
+  </CodeSnippet>
+</CodeSnippets>

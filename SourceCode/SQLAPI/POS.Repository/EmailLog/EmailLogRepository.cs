@@ -19,7 +19,6 @@ namespace POS.Repository
 {
     public class EmailLogRepository : GenericRepository<EmailLog, POSDbContext>, IEmailLogRepository
     {
-        private readonly IUnitOfWork<POSDbContext> _uow;
         private readonly ILogger<EmailLogRepository> _logger;
         private readonly IPropertyMappingService _propertyMappingService;
         private readonly IWebHostEnvironment _webHostEnvironment;
@@ -32,7 +31,6 @@ namespace POS.Repository
             PathHelper pathHelper
             ) : base(uow)
         {
-            _uow = uow;
             _logger = logger;
             _propertyMappingService = propertyMappingService;
             _webHostEnvironment = webHostEnvironment;

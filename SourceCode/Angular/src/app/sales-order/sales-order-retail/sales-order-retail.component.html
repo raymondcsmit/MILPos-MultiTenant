@@ -1,0 +1,104 @@
+<div class="pos-container">
+    <!-- LEFT: Product Catalog -->
+    <div class="product-section">
+        <!-- Search Bar -->
+        <div class="p-3 border-bottom">
+            <div class="input-group input-group-lg">
+                <span class="input-group-text bg-white border-end-0"><span class="material-icons">search</span></span>
+                <input type="text" class="form-control border-start-0 ps-0" placeholder="Search Products or Scan Barcode..." (keyup)="onSearch($event)">
+            </div>
+        </div>
+
+        <!-- Categories -->
+        <div class="category-scroll">
+            <span class="category-pill" [class.active]="selectedCategory === 'All'" (click)="selectedCategory = 'All'">All Items</span>
+            <!-- Add *ngFor for categories if dynamic -->
+        </div>
+
+        <!-- Grid -->
+        <div class="product-grid">
+            <div class="row g-3">
+                <div class="col-xl-3 col-lg-4 col-md-4 col-6" *ngFor="let product of products" (click)="addToCart(product)">
+                    <div class="product-card">
+                        <img [src]="product.productUrl || 'assets/images/product-placeholder.png'" class="product-img">
+                        <div class="product-body">
+                            <div class="product-title">{{product.name}}</div>
+                            <div class="d-flex justify-content-between align-items-center mt-2">
+                                <span class="product-price">{{product.salesPrice | currency}}</span>
+                                <!-- <small class="text-muted">Stock: {{product.stockLevel || 0}}</small> -->
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- RIGHT: Shopping Cart -->
+    <div class="cart-section">
+        <!-- Customer & Info -->
+        <div class="cart-header">
+            <div class="d-flex justify-content-between align-items-center mb-2">
+                <h5 class="m-0 fw-bold">Order #{{salesOrder.orderNumber}}</h5>
+                <button class="btn btn-sm btn-outline-danger" (click)="clearCart()"><span class="material-icons fs-6 align-middle">delete_sweep</span> Clear</button>
+            </div>
+            <div class="input-group">
+                <span class="input-group-text bg-white"><span class="material-icons fs-6">person</span></span>
+                <select class="form-select border-start-0" [(ngModel)]="salesOrder.customerId">
+                    <option *ngFor="let cust of customers" [value]="cust.id">{{cust.customerName}}</option>
+                </select>
+            </div>
+        </div>
+
+        <!-- Cart Items List -->
+        <div class="cart-items">
+            <div class="text-center p-4 text-muted" *ngIf="salesOrder.salesOrderItems.length === 0">
+                <span class="material-icons fs-1">shopping_cart</span>
+                <p>Cart is empty</p>
+            </div>
+            
+             <div class="cart-item" *ngFor="let item of salesOrder.salesOrderItems; let i = index">
+                <div class="flex-grow-1">
+                    <div class="fw-bold">{{item.productName}}</div>
+                    <div class="text-muted small">{{item.unitPrice | currency}} x {{item.quantity}}</div>
+                </div>
+                <div class="qty-control me-3">
+                    <div class="qty-btn" (click)="decreaseQty(item)">-</div>
+                    <input type="text" class="qty-input" [(ngModel)]="item.quantity" readonly>
+                    <div class="qty-btn" (click)="increaseQty(item)">+</div>
+                </div>
+                <div class="text-end">
+                    <div class="fw-bold">{{(item.unitPrice * item.quantity) | currency}}</div>
+                    <span class="text-danger small" style="cursor: pointer" (click)="removeFromCart(i)">Remove</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Totals & Pay -->
+        <div class="cart-footer">
+            <div class="total-row">
+                <span class="text-muted">Subtotal</span>
+                <span class="fw-bold">{{salesOrder.totalAmount + salesOrder.totalDiscount - salesOrder.totalTax | currency}}</span> <!-- Approx -->
+            </div>
+            <div class="total-row">
+                <span class="text-muted">Tax</span>
+                <span>{{salesOrder.totalTax | currency}}</span>
+            </div>
+             <div class="total-row">
+                <span class="text-muted">Discount</span>
+                <span class="text-danger">- {{salesOrder.totalDiscount | currency}}</span>
+            </div>
+            <div class="total-row grand-total">
+                <span>Total Payable</span>
+                <span class="text-primary">{{salesOrder.totalAmount | currency}}</span>
+            </div>
+            
+            <div class="row g-2 mt-2">
+                <div class="col-12">
+                     <button class="btn btn-primary w-100 py-3 fw-bold shadow-sm" (click)="saveOrder()">PAY NOW</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+

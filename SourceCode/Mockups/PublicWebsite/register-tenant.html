@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Register Tenant | NexusPOS</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+    <!-- Navigation -->
+    <nav class="glass-nav">
+        <div style="font-size:1.5rem; font-weight:bold;">NexusPOS</div>
+        <div>
+            <a href="index.html" class="glass-btn">Home</a>
+            <a href="pricing.html" class="glass-btn">Pricing</a>
+        </div>
+    </nav>
+
+    <div class="glass-panel" style="max-width: 600px; margin: 2rem auto;">
+        <h1 style="text-align: center;">Register Your Business</h1>
+        <p style="text-align: center; margin-bottom: 2rem; color: #b2bec3;">Start your 14-day free trial. No credit card required.</p>
+
+        <form onsubmit="alert('Registration Submitted! Check your email for login details.'); return false;">
+            
+            <!-- Business Details -->
+            <h3 style="border-bottom: 1px solid var(--glass-border); padding-bottom: 0.5rem;">Business Information</h3>
+            
+            <label>Business Name</label>
+            <input type="text" class="glass-input" placeholder="My Retail Store" required>
+
+            <label>Subdomain (Your URL)</label>
+            <div style="display: flex; align-items: center; margin-bottom: 1rem;">
+                <input type="text" class="glass-input" placeholder="my-store" style="margin-bottom: 0; border-top-right-radius: 0; border-bottom-right-radius: 0;" required>
+                <div style="background: rgba(255,255,255,0.1); padding: 0.8rem; border: 1px solid var(--glass-border); border-left: none; border-top-right-radius: 8px; border-bottom-right-radius: 8px; color: #b2bec3;">.nexuspos.com</div>
+            </div>
+
+            <label>Business Type</label>
+            <select class="glass-input">
+                <option value="Retail" style="color: black;">Retail Store</option>
+                <option value="Pharmacy" style="color: black;">Pharmacy</option>
+                <option value="Restaurant" style="color: black;">Restaurant / Cafe</option>
+                <option value="Petrol" style="color: black;">Petrol Station</option>
+            </select>
+
+            <label>Address</label>
+            <textarea class="glass-input" rows="2" placeholder="123 Main St, City, Country" required></textarea>
+
+            <!-- Contact / Admin Details -->
+            <h3 style="border-bottom: 1px solid var(--glass-border); padding-bottom: 0.5rem; margin-top: 2rem;">Admin Account</h3>
+            
+            <label>Contact Name</label>
+            <input type="text" class="glass-input" placeholder="John Doe" required>
+
+            <label>Email Address (Admin Login)</label>
+            <input type="email" class="glass-input" placeholder="admin@mystore.com" required>
+
+            <label>Phone Number</label>
+            <input type="tel" class="glass-input" placeholder="+1 234 567 890" required>
+
+            <label>Password</label>
+            <input type="password" class="glass-input" placeholder="••••••••" required>
+
+            <label>Confirm Password</label>
+            <input type="password" class="glass-input" placeholder="••••••••" required>
+
+            <div style="margin: 1.5rem 0;">
+                <label style="display: flex; align-items: center; gap: 10px; cursor: pointer;">
+                    <input type="checkbox" required style="width: 20px; height: 20px;">
+                    <span>I agree to the <a href="#" style="color: var(--accent-color);">Terms of Service</a> and <a href="#" style="color: var(--accent-color);">Privacy Policy</a>.</span>
+                </label>
+            </div>
+
+            <button type="submit" class="glass-btn glass-btn-primary" style="width: 100%; font-size: 1.2rem; padding: 1rem;">
+                Create Account
+            </button>
+        </form>
+    </div>
+
+</body>
+</html>

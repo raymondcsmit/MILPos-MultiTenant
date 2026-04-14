@@ -1,0 +1,23 @@
+@use 'sass:meta';
+@use 'sass:map';
+
+// Mixin to generate CSS variables from a palette map
+// Usage: @include generate-theme-vars($mat-cyan, 'primary');
+@mixin generate-theme-vars($palette, $prefix) {
+  @each $key, $value in $palette {
+    // Only generate variables for direct colors (skip nested maps like 'contrast')
+    @if meta.type-of($value) != 'map' {
+      --#{$prefix}-#{$key}: #{$value};
+    }
+  }
+
+  // Generate contrast colors if they exist
+  @if map.has-key($palette, 'contrast') {
+    $contrast-map: map.get($palette, 'contrast');
+    @each $key, $value in $contrast-map {
+      @if meta.type-of($value) != 'map' {
+        --#{$prefix}-contrast-#{$key}: #{$value};
+      }
+    }
+  }
+}

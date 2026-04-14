@@ -1,3 +1,4 @@
+@use "../../../public/scss/theme/glassmorphism" as glass;
   .login-container {
     width: 100%;
     min-height: 100vh;
@@ -19,13 +20,15 @@
     }
   }
 
+
+
   .login-form {
     width: 380px;
     display: block;
-    background-color: #fff;
+    // background-color: var(--surface-color);
+    @include glass.glass-panel($opacity: 0.15, $blur: 15px); // Use Glassmorphism
     padding: 60px 55px 55px 55px;
-    border-radius: 10px;
-    box-shadow: 0 0 20px 0 rgba(0, 0, 0, 0.1);
+    box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37); // Enhanced shadow for login
 
     img {
       margin: auto;
@@ -33,7 +36,7 @@
   }
 
   .login-btn {
-    color: #fff;
+    // color: #fff;
     display: block;
     font-size: 15px;
     letter-spacing: 1px;

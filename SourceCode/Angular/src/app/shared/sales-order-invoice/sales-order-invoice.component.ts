@@ -78,12 +78,25 @@ export class SalesOrderInvoiceComponent implements OnInit, OnChanges {
   printInvoice() {
     this.isVisible = false;
     let name = this.salesOrderForInvoice?.orderNumber ?? '';
-    let printContents, popupWin;
-    printContents = document.getElementById('salesOrderForInvoice')?.innerHTML;
-    popupWin = window.open('', '_blank', 'top=0,left=0,height=100%,width=auto');
-    if (popupWin) {
-      popupWin.document.open();
-      popupWin.document.write(`
+    let printContents = document.getElementById('salesOrderForInvoice')?.innerHTML;
+
+    if (!printContents) {
+      return;
+    }
+
+    const iframe = document.createElement('iframe');
+    iframe.style.position = 'fixed';
+    iframe.style.right = '0';
+    iframe.style.bottom = '0';
+    iframe.style.width = '0';
+    iframe.style.height = '0';
+    iframe.style.border = '0';
+    document.body.appendChild(iframe);
+
+    const doc = iframe.contentWindow?.document;
+    if (doc) {
+      doc.open();
+      doc.write(`
         <html>
           <head>
             <title>${name}</title>
@@ -107,29 +120,24 @@ export class SalesOrderInvoiceComponent implements OnInit, OnChanges {
               padding: 5px;
             }
             </style>
-            <script>
-            function loadHandler(){
-
-            var is_chrome = function () { return Boolean(window.chrome); }
-        if(is_chrome)
-        {
-           window.print();
-           setTimeout(function(){window.close();}, 1000);
-           //give them 10 seconds to print, then close
-        }
-        else
-        {
-           window.print();
-           window.close();
-        }
-        }
-        </script>
           </head>
-      <body onload="loadHandler()">${printContents}</body>
+          <body>${printContents}</body>
         </html>
-    `
-      );
-      popupWin.document.close();
+      `);
+      doc.close();
+
+      iframe.contentWindow?.focus();
+      
+      // Allow images to load
+      setTimeout(() => {
+        iframe.contentWindow?.print();
+        // Remove iframe after print dialog closes (or a reasonable timeout)
+        // Note: In many browsers print() blocks, but not always. 
+        // We use a safe timeout or just leave it (it's hidden/empty)
+        setTimeout(() => {
+           document.body.removeChild(iframe);
+        }, 1000);
+      }, 500); 
     }
   }
 

@@ -1,4 +1,4 @@
-﻿using AutoMapper;
+using AutoMapper;
 using POS.Common.GenericRepository;
 using POS.Common.UnitOfWork;
 using POS.Data;
@@ -37,8 +37,22 @@ namespace POS.Repository
         public async Task<CustomerList> GetCustomers(CustomerResource customerResource)
         {
             var collectionBeforePaging =
-                All.ApplySort(customerResource.OrderBy,
+                All.AsNoTracking().ApplySort(customerResource.OrderBy,
                 _propertyMappingService.GetPropertyMapping<CustomerDto, Customer>());
+
+            // Data Isolation: Enforce Region/Sales Person constraints
+            // We use LocationIds array as a proxy to determine if they are restricted
+            var isSalesPerson = _userInfoToken.LocationIds != null && _userInfoToken.LocationIds.Any();
+            if (isSalesPerson)
+            {
+                var userId = _userInfoToken.Id;
+                var allowedLocations = _userInfoToken.LocationIds ?? new List<Guid>();
+                
+                collectionBeforePaging = collectionBeforePaging.Where(c => 
+                    c.SalesPersonId == userId || 
+                    (c.LocationId.HasValue && allowedLocations.Contains(c.LocationId.Value))
+                );
+            }
 
             if (!string.IsNullOrEmpty(customerResource.CustomerName))
             {

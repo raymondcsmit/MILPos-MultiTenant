@@ -18,8 +18,11 @@ public class UserAuthDto
     public string BearerToken { get; set; }
     public bool IsAuthenticated { get; set; }
     public string ProfilePhoto { get; set; }
+    public bool IsSuperAdmin { get; set; }
     public List<string> Claims { get; set; }
     public string LicenseKey { get; set; }
     public string PurchaseCode { get; set; }
     public bool HasAllLocationAssigned { get; set; }
+    public string ApiKey { get; set; }
+    public List<MenuItemDto> Menus { get; set; }
 }

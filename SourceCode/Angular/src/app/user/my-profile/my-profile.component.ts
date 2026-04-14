@@ -13,6 +13,7 @@ import { MatCardModule } from '@angular/material/card';
 import { BaseComponent } from '../../base.component';
 import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
+import { ThemeSelectorComponent } from '@shared/theme-selector/theme-selector.component';
 
 @Component({
   selector: 'app-my-profile',
@@ -24,7 +25,8 @@ import { MatButtonModule } from '@angular/material/button';
     ReactiveFormsModule,
     MatCardModule,
     MatIconModule,
-    MatButtonModule
+    MatButtonModule,
+    ThemeSelectorComponent
   ]
 })
 export class MyProfileComponent extends BaseComponent implements OnInit {

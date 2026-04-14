@@ -261,7 +261,7 @@ Add to [`appsettings.json`](file:///f:/MIllyass/pos-with-inventory-management/So
     "Enabled": true,
     "TenantResolutionStrategy": "Subdomain",
     "DefaultTenantId": "00000000-0000-0000-0000-000000000000",
-    "AllowTenantSwitching": false
+    "AllowTenantSwitching": true
   }
 }
 ```

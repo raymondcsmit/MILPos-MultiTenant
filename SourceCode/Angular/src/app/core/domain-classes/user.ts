@@ -26,4 +26,5 @@ export interface User {
   userLocations?: UserLocations[];
   isAllLocations?: boolean;
   selectedLocation?: string;
+  isSuperAdmin?: boolean;
 }

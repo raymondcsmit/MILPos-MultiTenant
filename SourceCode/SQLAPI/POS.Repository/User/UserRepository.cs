@@ -91,15 +91,15 @@ public class UserRepository : GenericRepository<User, POSDbContext>,
 
     public async Task<UserAuthDto> BuildUserAuthObject(User appUser)
     {
-        var companyProfile = _companyProfileRepository.All.FirstOrDefault();
+        var companyProfile = await _companyProfileRepository.All.IgnoreQueryFilters().FirstOrDefaultAsync(c => c.TenantId == appUser.TenantId);
         List<Guid> locations;
         if (appUser.IsAllLocations)
         {
-            locations = await _locationRepository.All.Select(c => c.Id).ToListAsync();
+            locations = await _locationRepository.All.IgnoreQueryFilters().Where(c => c.TenantId == appUser.TenantId).Select(c => c.Id).ToListAsync();
         }
         else
         {
-            locations = await _userLocationsRepository.All.Where(ul => ul.UserId == appUser.Id)
+            locations = await _userLocationsRepository.All.IgnoreQueryFilters().Where(ul => ul.UserId == appUser.Id)
                 .Select(d => d.LocationId).ToListAsync();
         }
 
@@ -114,16 +114,47 @@ public class UserRepository : GenericRepository<User, POSDbContext>,
         ret.PhoneNumber = appUser.PhoneNumber;
         ret.IsAuthenticated = true;
         ret.ProfilePhoto = appUser.ProfilePhoto;
-        ret.LicenseKey = string.IsNullOrEmpty(companyProfile.LicenseKey) ? "" : HttpUtility.UrlEncode(companyProfile.LicenseKey.ToString());
-        ret.PurchaseCode = string.IsNullOrEmpty(companyProfile.PurchaseCode) ? "" : HttpUtility.UrlEncode(companyProfile.PurchaseCode.ToString());
+        ret.IsSuperAdmin = appUser.IsSuperAdmin;
+        
+        if (companyProfile != null)
+        {
+            ret.LicenseKey = string.IsNullOrEmpty(companyProfile.LicenseKey) ? "" : HttpUtility.UrlEncode(companyProfile.LicenseKey.ToString());
+            ret.PurchaseCode = string.IsNullOrEmpty(companyProfile.PurchaseCode) ? "" : HttpUtility.UrlEncode(companyProfile.PurchaseCode.ToString());
+        }
+        else
+        {
+            ret.LicenseKey = "";
+            ret.PurchaseCode = "";
+        }
+        // Get Tenant ApiKey
+        var tenant = await Context.Set<Data.Entities.Tenant>().IgnoreQueryFilters().FirstOrDefaultAsync(t => t.Id == appUser.TenantId);
+        ret.ApiKey = tenant?.ApiKey;
+
         // Get all claims for this user
         var appClaimDtos = await this.GetUserAndRoleClaims(appUser);
         ret.Claims = appClaimDtos.Select(c => c).ToList();
+
         var claims = appClaimDtos.Select(c => new Claim(c, "true")).ToList(); // Convert to List<Claim>
-        claims.Add(new Claim("licensekey", string.IsNullOrEmpty(companyProfile.LicenseKey) ? "" : HttpUtility.UrlEncode(companyProfile.LicenseKey.ToString())));
-        claims.Add(new Claim("purchasecode", string.IsNullOrEmpty(companyProfile.PurchaseCode) ? "" : HttpUtility.UrlEncode(companyProfile.PurchaseCode.ToString())));
+        
+        if (companyProfile != null)
+        {
+            claims.Add(new Claim("licensekey", string.IsNullOrEmpty(companyProfile.LicenseKey) ? "" : HttpUtility.UrlEncode(companyProfile.LicenseKey.ToString())));
+            claims.Add(new Claim("purchasecode", string.IsNullOrEmpty(companyProfile.PurchaseCode) ? "" : HttpUtility.UrlEncode(companyProfile.PurchaseCode.ToString())));
+        }
+        else
+        {
+            claims.Add(new Claim("licensekey", ""));
+            claims.Add(new Claim("purchasecode", ""));
+        }
+        
+        claims.Add(new Claim("isSuperAdmin", appUser.IsSuperAdmin.ToString().ToLower()));
+        if (!string.IsNullOrEmpty(ret.ApiKey))
+        {
+            claims.Add(new Claim("ApiKey", ret.ApiKey));
+        }
+
         // Set JWT bearer token
-        ret.BearerToken = BuildJwtToken(ret, claims, appUser.Id, locations);
+        ret.BearerToken = BuildJwtToken(ret, claims, appUser.Id, locations, appUser.TenantId);
 
         return ret;
     }
@@ -163,13 +194,14 @@ public class UserRepository : GenericRepository<User, POSDbContext>,
         return roleClaims;
     }
 
-    protected string BuildJwtToken(UserAuthDto authUser, IList<Claim> claims, Guid Id, List<Guid> locationIds)
+    protected string BuildJwtToken(UserAuthDto authUser, IList<Claim> claims, Guid Id, List<Guid> locationIds, Guid tenantId)
     {
         SymmetricSecurityKey key = new SymmetricSecurityKey(
           Encoding.UTF8.GetBytes(_settings.Key));
         claims.Add(new Claim(Microsoft.IdentityModel.JsonWebTokens.JwtRegisteredClaimNames.Sub.ToString(), Id.ToString()));
         claims.Add(new Claim("Email", authUser.Email));
         claims.Add(new Claim("locationIds", String.Join(",", locationIds)));
+        claims.Add(new Claim("TenantId", tenantId.ToString())); // ✅ CRITICAL FIX: Add TenantId to JWT
         // Create the JwtSecurityToken object
         var token = new JwtSecurityToken(
           issuer: _settings.Issuer,

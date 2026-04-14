@@ -1,4 +1,4 @@
-﻿using System.IO;
+using System.IO;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -29,7 +29,7 @@ namespace POS.MediatR.Handlers
 
         public async Task<ServiceResponse<PurchaseOrderDto>> Handle(GetPurchaseOrderQuery request, CancellationToken cancellationToken)
         {
-            var entity = await _purchaseOrderRepository.All
+            var entity = await _purchaseOrderRepository.All.AsNoTracking()
                  .Where(c => c.Id == request.Id)
                  .Include(c => c.CreatedByUser)
                 .Include(c => c.PurchaseOrderPayments)
@@ -45,7 +45,13 @@ namespace POS.MediatR.Handlers
                  .Include(c => c.PurchaseOrderItems)
                     .ThenInclude(c => c.UnitConversation)
                     .Include(c => c.Location)
-                .FirstOrDefaultAsync();
+                .AsSplitQuery()
+                .FirstOrDefaultAsync(cancellationToken);
+
+            if (entity == null)
+            {
+                return ServiceResponse<PurchaseOrderDto>.Return404("Purchase order not found.");
+            }
 
             var dto = _mapper.Map<PurchaseOrderDto>(entity);
 

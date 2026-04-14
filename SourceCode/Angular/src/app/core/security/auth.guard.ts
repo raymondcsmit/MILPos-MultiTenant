@@ -32,8 +32,8 @@ export class AuthGuard implements CanActivate, CanActivateChild, CanLoad {
       if (claimType) {
         if (!this.securityService.hasClaim(claimType)) {
           this.toastr.error(this.translationService.getValue(`UI_PERMISSION_ERROR`));
-          if (this.router.url == '/login') {
-            this.router.navigate(['/my-profile']);
+          if (this.router.url !== '/login') {
+            this.router.navigate(['/login']);
           }
           return false;
         }

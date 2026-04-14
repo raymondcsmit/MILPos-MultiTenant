@@ -1,4 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Storage;
 using System.Threading.Tasks;
 
 namespace POS.Common.UnitOfWork
@@ -9,5 +10,9 @@ namespace POS.Common.UnitOfWork
         int Save();
         Task<int> SaveAsync();
         TContext Context { get; }
+        
+        Task<IDbContextTransaction> BeginTransactionAsync();
+        Task CommitTransactionAsync();
+        Task RollbackTransactionAsync();
     }
 }

@@ -22,6 +22,9 @@ import { MatMenuModule } from '@angular/material/menu';
 import { MatButtonModule } from '@angular/material/button';
 import { MatCardModule } from "@angular/material/card";
 import { ToastrService } from '@core/services/toastr.service';
+import { MatDialog } from '@angular/material/dialog';
+import { ImportExportService } from '@core/services/import-export.service';
+import { ImportExportDialogComponent } from '@shared/import-export-dialog/import-export-dialog.component';
 
 @Component({
   selector: 'app-customer-list',
@@ -137,7 +140,9 @@ export class CustomerListComponent extends BaseComponent implements OnInit {
     private commonDialogService: CommonDialogService,
     private router: Router,
     private cd: ChangeDetectorRef,
-    private toastrService: ToastrService
+    private toastrService: ToastrService,
+    private dialog: MatDialog,
+    private importExportService: ImportExportService
   ) {
     super();
     this.getLangDir();
@@ -229,5 +234,36 @@ export class CustomerListComponent extends BaseComponent implements OnInit {
 
   getDataIndex(row: any) {
     return this.customerStore.customers().indexOf(row);
+  }
+
+  openImportDialog(): void {
+    const dialogRef = this.dialog.open(ImportExportDialogComponent, {
+      width: '850px',
+      data: {
+        entityType: 'customers',
+        entityName: 'Customer'
+      }
+    });
+
+    dialogRef.afterClosed().subscribe(result => {
+      if (result) {
+        this.refresh();
+      }
+    });
+  }
+
+  exportData(format: 'csv' | 'excel'): void {
+    this.importExportService.exportData('customers', format)
+      .subscribe({
+        next: (blob) => {
+          const date = new Date().toISOString().split('T')[0];
+          const fileName = `Customers_${date}.${format === 'excel' ? 'xlsx' : 'csv'}`;
+          this.importExportService.downloadFile(blob, fileName);
+          this.toastrService.success('Data exported successfully');
+        },
+        error: (error) => {
+          this.toastrService.error('Export failed: ' + error.message);
+        }
+      });
   }
 }

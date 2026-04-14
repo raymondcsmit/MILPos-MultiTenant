@@ -1,10 +1,9 @@
-﻿using System;
+using System;
 
 namespace POS.Data
 {
-    public class Currency
+    public class Currency : SharedBaseEntity
     {
-        public Guid Id { get; set; }
         public string Name { get; set; }
         public string Symbol { get; set; }
     }

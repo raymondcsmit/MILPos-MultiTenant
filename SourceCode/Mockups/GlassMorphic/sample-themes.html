@@ -1,0 +1,718 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GLASSMORPHIC VAULT · 40+ THEMES · navy · bright · pro</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Inter', 'SF Pro', -apple-system, BlinkMacSystemFont, sans-serif;
+        }
+
+        body {
+            background: #0a0c15;
+            background-image: 
+                radial-gradient(circle at 0% 0%, #1a1f2c 0%, #07090e 100%),
+                radial-gradient(circle at 100% 100%, #1e2432 0%, #080b10 100%);
+            min-height: 100vh;
+            padding: 2.5rem 2rem;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            position: relative;
+        }
+
+        .ambient {
+            position: fixed;
+            width: 100%;
+            height: 100%;
+            top: 0;
+            left: 0;
+            background: 
+                radial-gradient(circle at 15% 20%, rgba(20, 80, 150, 0.08) 0%, transparent 45%),
+                radial-gradient(circle at 85% 65%, rgba(200, 80, 200, 0.08) 0%, transparent 50%),
+                radial-gradient(circle at 40% 80%, rgba(50, 200, 200, 0.05) 0%, transparent 55%),
+                radial-gradient(circle at 70% 25%, rgba(255, 200, 50, 0.05) 0%, transparent 50%);
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        .master-header {
+            position: relative;
+            z-index: 30;
+            max-width: 1400px;
+            width: 100%;
+            margin-bottom: 3rem;
+            color: white;
+            text-align: center;
+        }
+
+        h1 {
+            font-size: 3.2rem;
+            font-weight: 700;
+            letter-spacing: -0.02em;
+            background: linear-gradient(135deg, #ffffff, #c7d2fe, #a5f3fc, #fbc2eb);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 0.75rem;
+            text-shadow: 0 0 40px rgba(120, 100, 255, 0.3);
+        }
+
+        .header-stats {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1.5rem;
+            justify-content: center;
+            margin-top: 0.8rem;
+        }
+
+        .stat-pill {
+            background: rgba(10, 20, 35, 0.6);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255,255,255,0.15);
+            padding: 0.6rem 1.8rem;
+            border-radius: 60px;
+            color: #e6edff;
+            font-size: 1rem;
+            font-weight: 500;
+            letter-spacing: 0.3px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+        }
+
+        .section-title {
+            position: relative;
+            z-index: 30;
+            width: 100%;
+            max-width: 1400px;
+            margin: 3rem 0 1.8rem 0;
+            color: white;
+            font-size: 2rem;
+            font-weight: 600;
+            letter-spacing: -0.01em;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            border-bottom: 2px solid rgba(255,255,255,0.1);
+            padding-bottom: 0.8rem;
+        }
+
+        .section-title span {
+            background: rgba(255,255,255,0.1);
+            padding: 0.3rem 1.2rem;
+            border-radius: 60px;
+            font-size: 1rem;
+            font-weight: 400;
+            color: #cbd5e1;
+            border: 1px solid rgba(255,255,255,0.2);
+        }
+
+        .grid {
+            position: relative;
+            z-index: 30;
+            max-width: 1400px;
+            width: 100%;
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(330px, 1fr));
+            gap: 2rem;
+        }
+
+        /* ----- GLASS BASE (unified) ----- */
+        .glass-card {
+            background: rgba(15, 25, 40, 0.45);
+            backdrop-filter: blur(15px) saturate(180%);
+            -webkit-backdrop-filter: blur(15px) saturate(180%);
+            border-radius: 32px;
+            border: 1px solid rgba(255,255,255,0.18);
+            border-bottom-width: 2px;
+            border-right-width: 2px;
+            box-shadow: 0 20px 35px -12px rgba(0,0,0,0.5);
+            padding: 1.8rem;
+            color: white;
+            transition: all 0.25s ease;
+            display: flex;
+            flex-direction: column;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .glass-card:hover {
+            transform: translateY(-6px);
+            box-shadow: 0 28px 45px -12px black;
+            border-color: rgba(255,255,255,0.3);
+            background: rgba(20, 32, 50, 0.55);
+        }
+
+        .glass-card::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
+            opacity: 0.1;
+            pointer-events: none;
+        }
+
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.2rem;
+            position: relative;
+            z-index: 2;
+        }
+
+        .card-num {
+            font-size: 1.7rem;
+            font-weight: 700;
+            color: rgba(255,255,255,0.3);
+            letter-spacing: -0.03em;
+        }
+
+        .badge {
+            background: rgba(0,0,0,0.35);
+            backdrop-filter: blur(8px);
+            padding: 0.3rem 1.2rem;
+            border-radius: 40px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            border: 1px solid rgba(255,255,255,0.2);
+            color: #f0f4ff;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .swatch-row {
+            display: flex;
+            gap: 0.8rem;
+            margin: 1rem 0;
+            flex-wrap: wrap;
+            align-items: center;
+            position: relative;
+            z-index: 2;
+        }
+
+        .swatch {
+            width: 48px;
+            height: 48px;
+            border-radius: 16px;
+            border: 2px solid rgba(255,255,255,0.4);
+            box-shadow: 0 8px 16px -6px rgba(0,0,0,0.5);
+            transition: 0.2s;
+        }
+
+        .swatch:hover {
+            transform: scale(1.1);
+            border-color: white;
+            box-shadow: 0 0 20px currentColor;
+        }
+
+        .hex {
+            font-family: 'SF Mono', 'Fira Code', monospace;
+            background: rgba(0,0,0,0.4);
+            backdrop-filter: blur(4px);
+            padding: 0.3rem 0.9rem;
+            border-radius: 12px;
+            font-size: 0.75rem;
+            border: 1px solid rgba(255,255,255,0.15);
+            color: #e2ecff;
+        }
+
+        .desc {
+            color: #e6edff;
+            font-size: 0.98rem;
+            line-height: 1.5;
+            margin: 0.5rem 0 0.8rem;
+            position: relative;
+            z-index: 2;
+            font-weight: 350;
+        }
+
+        .meta {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: auto;
+            padding-top: 1.2rem;
+            border-top: 1px solid rgba(255,255,255,0.1);
+            position: relative;
+            z-index: 2;
+            color: #cbd5e1;
+            font-size: 0.85rem;
+        }
+
+        .tag {
+            background: rgba(255,255,255,0.06);
+            padding: 0.25rem 1rem;
+            border-radius: 30px;
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .accent-line {
+            width: 60px;
+            height: 4px;
+            border-radius: 4px;
+            margin: 0.3rem 0 0.8rem;
+        }
+
+        /* section separators */
+        .section-divider {
+            position: relative;
+            z-index: 30;
+            width: 100%;
+            max-width: 1400px;
+            margin: 2.5rem 0 1rem;
+            display: flex;
+            justify-content: center;
+        }
+
+        @media (max-width: 700px) {
+            h1 { font-size: 2.2rem; }
+            body { padding: 1.5rem; }
+            .grid { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+    <div class="ambient"></div>
+
+    <!-- MASTER HEADER -->
+    <div class="master-header">
+        <h1>✦ GLASSMORPHIC THEMING VAULT ✦</h1>
+        <div class="header-stats">
+            <span class="stat-pill">⚓ 15 NAVY · GREY</span>
+            <span class="stat-pill">⚡ 15 BRIGHT · NEON</span>
+            <span class="stat-pill">✨ 15 PRO · ELEVATED</span>
+            <span class="stat-pill">🧊 45+ TOTAL COMBOS</span>
+        </div>
+        <p style="color: #b0c8e0; margin-top: 1.2rem; font-size: 1.1rem; max-width: 800px; margin-left: auto; margin-right: auto;">
+            Complete collection · navy anchor, bright energy, professional soul · ready for theming
+        </p>
+    </div>
+
+    <!-- ========== SECTION 1: NAVY + GREY (original 15) ========= -->
+    <div class="section-title">
+        ⚓ NAVY · GREY FOUNDATION <span>15 palettes · deep · classic</span>
+    </div>
+    <div class="grid">
+        <!-- 1. classic navy grey -->
+        <div class="glass-card" style="background: rgba(10,25,45,0.55); border-color: rgba(140,180,230,0.3);">
+            <div class="card-header"><span class="card-num">N1</span><span class="badge" style="color:#b0d0ff;">navy · grey</span></div>
+            <div class="swatch-row">
+                <div class="swatch" style="background:#0a1e33; box-shadow:0 0 15px #0a1e33;"></div>
+                <div class="swatch" style="background:#4f657f;"></div>
+                <div class="swatch" style="background:#8a9bb0;"></div>
+                <span class="hex">#0A1E33</span><span class="hex">#4F657F</span>
+            </div>
+            <div class="accent-line" style="background:linear-gradient(90deg,#4f657f,#8a9bb0);"></div>
+            <div class="desc">Deep navy foundation · grey glass · blur 14px</div>
+            <div class="meta"><span>🔹 original</span><span class="tag">backdrop: rgba(10,25,45,0.55)</span></div>
+        </div>
+        <!-- 2. navy rose grey -->
+        <div class="glass-card" style="background: rgba(30,25,45,0.55); border-color: rgba(210,170,180,0.35);">
+            <div class="card-header"><span class="card-num">N2</span><span class="badge" style="color:#ffc0cb;">rose grey</span></div>
+            <div class="swatch-row">
+                <div class="swatch" style="background:#1e1a2e;"></div><div class="swatch" style="background:#6d5b6e;"></div><div class="swatch" style="background:#b69eaa;"></div>
+                <span class="hex">#1E1A2E</span><span class="hex">#6D5B6E</span>
+            </div>
+            <div class="accent-line" style="background:linear-gradient(90deg,#6d5b6e,#b69eaa);"></div>
+            <div class="desc">Navy with plum undertone · warm grey · romantic glass</div>
+            <div class="meta"><span>🌆 dusk</span><span class="tag">blur 16px</span></div>
+        </div>
+        <!-- 3. navy teal grey -->
+        <div class="glass-card" style="background: rgba(8,40,50,0.6); border-color: rgba(100,200,200,0.3);">
+            <div class="card-header"><span class="card-num">N3</span><span class="badge" style="color:#a0e7e7;">teal navy</span></div>
+            <div class="swatch-row">
+                <div class="swatch" style="background:#0a2a32;"></div><div class="swatch" style="background:#3e6a70;"></div><div class="swatch" style="background:#7ea3a6;"></div>
+                <span class="hex">#0A2A32</span><span class="hex">#3E6A70</span>
+            </div>
+            <div class="accent-line" style="background:linear-gradient(90deg,#3e6a70,#7ea3a6);"></div>
+            <div class="desc">Teal-tinted navy · seafoam grey · arctic glass</div>
+            <div class="meta"><span>🧊 arctic</span><span class="tag">saturate 200%</span></div>
+        </div>
+        <!-- 4. navy burgundy grey -->
+        <div class="glass-card" style="background: rgba(35,20,35,0.6); border-color: rgba(200,120,140,0.4);">
+            <div class="card-header"><span class="card-num">N4</span><span class="badge" style="color:#f2a0b0;">burgundy</span></div>
+            <div class="swatch-row">
+                <div class="swatch" style="background:#221a24;"></div><div class="swatch" style="background:#684e5a;"></div><div class="swatch" style="background:#b08795;"></div>
+                <span class="hex">#221A24</span><span class="hex">#684E5A</span>
+            </div>
+            <div class="accent-line" style="background:linear-gradient(90deg,#684e5a,#b08795);"></div>
+            <div class="desc">Wine-stained navy · mauve grey · velvety glass</div>
+            <div class="meta"><span>🥂 merlot</span><span class="tag">border rose</span></div>
+        </div>
+        <!-- 5. navy olive grey -->
+        <div class="glass-card" style="background: rgba(30,40,30,0.6); border-color: rgba(170,180,110,0.3);">
+            <div class="card-header"><span class="card-num">N5</span><span class="badge" style="color:#c0d6a0;">olive</span></div>
+            <div class="swatch-row">
+                <div class="swatch" style="background:#1e2a1e;"></div><div class="swatch" style="background:#5a6952;"></div><div class="swatch" style="background:#9eab8b;"></div>
+                <span class="hex">#1E2A1E</span><span class="hex">#5A6952</span>
+            </div>
+            <div class="accent-line" style="background:linear-gradient(90deg,#5a6952,#9eab8b);"></div>
+            <div class="desc">Forest navy · sage grey · botanical glass</div>
+            <div class="meta"><span>🍃 forest</span><span class="tag">green nuance</span></div>
+        </div>
+        <!-- 6. navy gold grey -->
+        <div class="glass-card" style="background: rgba(20,25,45,0.6); border-color: rgba(230,200,120,0.45);">
+            <div class="card-header"><span class="card-num">N6</span><span class="badge" style="color:#f9e7a0;">gold</span></div>
+            <div class="swatch-row">
+                <div class="swatch" style="background:#141d2e;"></div><div class="swatch" style="background:#7a7156;"></div><div class="swatch" style="background:#cfbc8c;"></div>
+                <span class="hex">#141D2E</span><span class="hex">#7A7156</span>
+            </div>
+            <div class="accent-line" style="background:linear-gradient(90deg,#7a7156,#cfbc8c);"></div>
+            <div class="desc">Midnight navy · antique gold grey · luminous glass</div>
+            <div class="meta"><span>🏆 luxe</span><span class="tag">warm border</span></div>
+        </div>
+        <!-- 7. navy lavender grey -->
+        <div class="glass-card" style="background: rgba(30,25,50,0.6); border-color: rgba(190,170,230,0.4);">
+            <div class="card-header"><span class="card-num">N7</span><span class="badge" style="color:#d6c2ff;">lavender</span></div>
+            <div class="swatch-row">
+                <div class="swatch" style="background:#1d1a33;"></div><div class="swatch" style="background:#63597e;"></div><div class="swatch" style="background:#b2a4d4;"></div>
+                <span class="hex">#1D1A33</span><span class="hex">#63597E</span>
+            </div>
+            <div class="accent-line" style="background:linear-gradient(90deg,#63597e,#b2a4d4);"></div>
+            <div class="desc">Indigo night · lavender mist · dreamy glass</div>
+            <div class="meta"><span>🌌 twilight</span><span class="tag">purple hue</span></div>
+        </div>
+        <!-- 8. navy coral grey -->
+        <div class="glass-card" style="background: rgba(40,30,45,0.6); border-color: rgba(255,150,140,0.35);">
+            <div class="card-header"><span class="card-num">N8</span><span class="badge" style="color:#ffc2b0;">coral</span></div>
+            <div class="swatch-row">
+                <div class="swatch" style="background:#241e2c;"></div><div class="swatch" style="background:#975d62;"></div><div class="swatch" style="background:#e2a9a1;"></div>
+                <span class="hex">#241E2C</span><span class="hex">#975D62</span>
+            </div>
+            <div class="accent-line" style="background:linear-gradient(90deg,#975d62,#e2a9a1);"></div>
+            <div class="desc">Deep navy rose · coral sand · friendly glass</div>
+            <div class="meta"><span>🧜‍♀️ reef</span><span class="tag">peach glint</span></div>
+        </div>
+        <!-- 9. navy slate blue -->
+        <div class="glass-card" style="background: rgba(20,35,60,0.6); border-color: rgba(120,160,210,0.4);">
+            <div class="card-header"><span class="card-num">N9</span><span class="badge" style="color:#aad0ff;">slate</span></div>
+            <div class="swatch-row">
+                <div class="swatch" style="background:#13223b;"></div><div class="swatch" style="background:#466282;"></div><div class="swatch" style="background:#96b2cf;"></div>
+                <span class="hex">#13223B</span><span class="hex">#466282</span>
+            </div>
+            <div class="accent-line" style="background:linear-gradient(90deg,#466282,#96b2cf);"></div>
+            <div class="desc">Classic navy · slate grey · professional glass</div>
+            <div class="meta"><span>🏢 corporate</span><span class="tag">blue harmony</span></div>
+        </div>
+        <!-- 10. navy emerald grey -->
+        <div class="glass-card" style="background: rgba(10,25,35,0.65); border-color: rgba(70,180,140,0.35);">
+            <div class="card-header"><span class="card-num">N10</span><span class="badge" style="color:#a0e6c0;">emerald</span></div>
+            <div class="swatch-row">
+                <div class="swatch" style="background:#0a1e26;"></div><div class="swatch" style="background:#2c5e4a;"></div><div class="swatch" style="background:#78a58b;"></div>
+                <span class="hex">#0A1E26</span><span class="hex">#2C5E4A</span>
+            </div>
+            <div class="accent-line" style="background:linear-gradient(90deg,#2c5e4a,#78a58b);"></div>
+            <div class="desc">Deep teal navy · emerald grey · refreshing glass</div>
+            <div class="meta"><span>🌱 jade</span><span class="tag">green accent</span></div>
+        </div>
+        <!-- 11. navy taupe -->
+        <div class="glass-card" style="background: rgba(30,30,40,0.6); border-color: rgba(180,150,130,0.4);">
+            <div class="card-header"><span class="card-num">N11</span><span class="badge" style="color:#e0c0a0;">taupe</span></div>
+            <div class="swatch-row">
+                <div class="swatch" style="background:#1e1e28;"></div><div class="swatch" style="background:#695d54;"></div><div class="swatch" style="background:#b7a69a;"></div>
+                <span class="hex">#1E1E28</span><span class="hex">#695D54</span>
+            </div>
+            <div class="accent-line" style="background:linear-gradient(90deg,#695d54,#b7a69a);"></div>
+            <div class="desc">Charcoal navy · warm taupe · cozy glass</div>
+            <div class="meta"><span>🏺 clay</span><span class="tag">muted earth</span></div>
+        </div>
+        <!-- 12. navy dusty pink -->
+        <div class="glass-card" style="background: rgba(30,25,45,0.6); border-color: rgba(230,160,180,0.4);">
+            <div class="card-header"><span class="card-num">N12</span><span class="badge" style="color:#ffc0cb;">dusty pink</span></div>
+            <div class="swatch-row">
+                <div class="swatch" style="background:#1d182f;"></div><div class="swatch" style="background:#865f70;"></div><div class="swatch" style="background:#d9aab6;"></div>
+                <span class="hex">#1D182F</span><span class="hex">#865F70</span>
+            </div>
+            <div class="accent-line" style="background:linear-gradient(90deg,#865f70,#d9aab6);"></div>
+            <div class="desc">Navy violet · dusty rose · delicate glass</div>
+            <div class="meta"><span>🎀 chiffon</span><span class="tag">pink haze</span></div>
+        </div>
+        <!-- 13. navy mustard -->
+        <div class="glass-card" style="background: rgba(25,25,45,0.65); border-color: rgba(230,190,80,0.45);">
+            <div class="card-header"><span class="card-num">N13</span><span class="badge" style="color:#f0d080;">mustard</span></div>
+            <div class="swatch-row">
+                <div class="swatch" style="background:#191e2e;"></div><div class="swatch" style="background:#8a793d;"></div><div class="swatch" style="background:#dbbc67;"></div>
+                <span class="hex">#191E2E</span><span class="hex">#8A793D</span>
+            </div>
+            <div class="accent-line" style="background:linear-gradient(90deg,#8a793d,#dbbc67);"></div>
+            <div class="desc">Midnight navy · ochre grey · vintage glass</div>
+            <div class="meta"><span>🕰️ retro</span><span class="tag">golden touch</span></div>
+        </div>
+        <!-- 14. navy terracotta -->
+        <div class="glass-card" style="background: rgba(45,30,35,0.6); border-color: rgba(210,130,100,0.4);">
+            <div class="card-header"><span class="card-num">N14</span><span class="badge" style="color:#eab090;">terracotta</span></div>
+            <div class="swatch-row">
+                <div class="swatch" style="background:#261e24;"></div><div class="swatch" style="background:#925e53;"></div><div class="swatch" style="background:#d7a38e;"></div>
+                <span class="hex">#261E24</span><span class="hex">#925E53</span>
+            </div>
+            <div class="accent-line" style="background:linear-gradient(90deg,#925e53,#d7a38e);"></div>
+            <div class="desc">Espresso navy · clay grey · mediterranean glass</div>
+            <div class="meta"><span>🏜️ adobe</span><span class="tag">rust edge</span></div>
+        </div>
+        <!-- 15. navy cyan -->
+        <div class="glass-card" style="background: rgba(8,30,55,0.65); border-color: rgba(0,220,240,0.5);">
+            <div class="card-header"><span class="card-num">N15</span><span class="badge" style="color:#8cf0ff;">cyan</span></div>
+            <div class="swatch-row">
+                <div class="swatch" style="background:#081e38;"></div><div class="swatch" style="background:#007c92;"></div><div class="swatch" style="background:#6ad4e0;"></div>
+                <span class="hex">#081E38</span><span class="hex">#007C92</span>
+            </div>
+            <div class="accent-line" style="background:linear-gradient(90deg,#007c92,#6ad4e0);"></div>
+            <div class="desc">Deep navy · electric cyan · futuristic glass</div>
+            <div class="meta"><span>🤖 cyber</span><span class="tag">neon accent</span></div>
+        </div>
+    </div>
+
+    <!-- ========== SECTION 2: BRIGHT + NEON (15) ========= -->
+    <div class="section-title">
+        ⚡ BRIGHT · NEON GLASS <span>15 palettes · high voltage · electric</span>
+    </div>
+    <div class="grid">
+        <!-- B1. neon pink + electric blue -->
+        <div class="glass-card" style="background: rgba(45,15,45,0.5); border-color: #ff44aa; box-shadow:0 0 30px rgba(255,68,170,0.3);">
+            <div class="card-header"><span class="card-num">B1</span><span class="badge" style="color:#ffaadd;">NEON PUNK</span></div>
+            <div class="swatch-row"><div class="swatch" style="background:#ff1493;box-shadow:0 0 20px #ff1493;"></div><div class="swatch" style="background:#00ffff;box-shadow:0 0 20px #00ffff;"></div><div class="swatch" style="background:#aa00ff;box-shadow:0 0 20px #aa00ff;"></div><span class="hex">#FF1493</span><span class="hex">#00FFFF</span></div>
+            <div class="desc">Hot pink · cyan burst · purple nebula</div>
+            <div class="meta"><span>🔆 100% sat</span><span class="tag">blur 16px</span></div>
+        </div>
+        <!-- B2. lime + neon yellow -->
+        <div class="glass-card" style="background: rgba(30,50,20,0.5); border-color: #ccff00; box-shadow:0 0 30px rgba(200,255,0,0.4);">
+            <div class="card-header"><span class="card-num">B2</span><span class="badge" style="color:#eeff88;">HIGH VOLTAGE</span></div>
+            <div class="swatch-row"><div class="swatch" style="background:#ccff00;box-shadow:0 0 20px #ccff00;"></div><div class="swatch" style="background:#7fff00;box-shadow:0 0 20px #7fff00;"></div><div class="swatch" style="background:#00ff7f;"></div><span class="hex">#CCFF00</span><span class="hex">#7FFF00</span></div>
+            <div class="desc">Electric lime · chartreuse · acid green</div>
+            <div class="meta"><span>🔆 120% sat</span><span class="tag">glare 18px</span></div>
+        </div>
+        <!-- B3. orange + hot pink -->
+        <div class="glass-card" style="background: rgba(55,25,35,0.5); border-color: #ff8800; box-shadow:0 0 30px rgba(255,136,0,0.4);">
+            <div class="card-header"><span class="card-num">B3</span><span class="badge" style="color:#ffaa66;">SUNSET POP</span></div>
+            <div class="swatch-row"><div class="swatch" style="background:#ff5500;box-shadow:0 0 20px #ff5500;"></div><div class="swatch" style="background:#ff44aa;box-shadow:0 0 20px #ff44aa;"></div><div class="swatch" style="background:#ffaa00;"></div><span class="hex">#FF5500</span><span class="hex">#FF44AA</span></div>
+            <div class="desc">Blazing orange · flamingo pink · tangerine</div>
+            <div class="meta"><span>🔆 110% sat</span><span class="tag">haze 16px</span></div>
+        </div>
+        <!-- B4. cyan + magenta vaporwave -->
+        <div class="glass-card" style="background: rgba(25,20,50,0.5); border-color: #00ffff; box-shadow:0 0 30px cyan;">
+            <div class="card-header"><span class="card-num">B4</span><span class="badge" style="color:#88ffff;">VAPORWAVE</span></div>
+            <div class="swatch-row"><div class="swatch" style="background:#00ffff;box-shadow:0 0 20px #00ffff;"></div><div class="swatch" style="background:#ff00cc;box-shadow:0 0 20px #ff00cc;"></div><div class="swatch" style="background:#aa88ff;"></div><span class="hex">#00FFFF</span><span class="hex">#FF00CC</span></div>
+            <div class="desc">Aqua dream · hot magenta · retro wave</div>
+            <div class="meta"><span>🔆 130% sat</span><span class="tag">glitch 15px</span></div>
+        </div>
+        <!-- B5. purple + neon lime -->
+        <div class="glass-card" style="background: rgba(35,15,55,0.55); border-color: #aa00ff; box-shadow:0 0 40px rgba(170,0,255,0.5);">
+            <div class="card-header"><span class="card-num">B5</span><span class="badge" style="color:#dd88ff;">PSYCHEDELIC</span></div>
+            <div class="swatch-row"><div class="swatch" style="background:#aa00ff;box-shadow:0 0 20px #aa00ff;"></div><div class="swatch" style="background:#ccff00;box-shadow:0 0 20px #ccff00;"></div><div class="swatch" style="background:#ff66aa;"></div><span class="hex">#AA00FF</span><span class="hex">#CCFF00</span></div>
+            <div class="desc">Deep violet · toxic lime · rave</div>
+            <div class="meta"><span>🔆 140% sat</span><span class="tag">blur 18px</span></div>
+        </div>
+        <!-- B6. neon red + cobalt -->
+        <div class="glass-card" style="background: rgba(50,15,25,0.55); border-color: #ff3300; box-shadow:0 0 35px rgba(255,51,0,0.5);">
+            <div class="card-header"><span class="card-num">B6</span><span class="badge" style="color:#ff9980;">SUPERHOT</span></div>
+            <div class="swatch-row"><div class="swatch" style="background:#ff3300;box-shadow:0 0 20px #ff3300;"></div><div class="swatch" style="background:#0066ff;box-shadow:0 0 20px #0066ff;"></div><div class="swatch" style="background:#ffcc00;"></div><span class="hex">#FF3300</span><span class="hex">#0066FF</span></div>
+            <div class="desc">Inferno red · cobalt blue · strike</div>
+            <div class="meta"><span>🔆 125% sat</span><span class="tag">fusion 17px</span></div>
+        </div>
+        <!-- B7. neon yellow + purple -->
+        <div class="glass-card" style="background: rgba(40,25,55,0.5); border-color: #ffdd00; box-shadow:0 0 35px rgba(255,221,0,0.5);">
+            <div class="card-header"><span class="card-num">B7</span><span class="badge" style="color:#ffee88;">ELECTRIC ROYAL</span></div>
+            <div class="swatch-row"><div class="swatch" style="background:#ffdd00;box-shadow:0 0 20px #ffdd00;"></div><div class="swatch" style="background:#9900ff;box-shadow:0 0 20px #9900ff;"></div><div class="swatch" style="background:#ff88dd;"></div><span class="hex">#FFDD00</span><span class="hex">#9900FF</span></div>
+            <div class="desc">Solar yellow · royal purple · regal neon</div>
+            <div class="meta"><span>🔆 115% sat</span><span class="tag">blur 16px</span></div>
+        </div>
+        <!-- B8. mint + coral -->
+        <div class="glass-card" style="background: rgba(25,55,55,0.5); border-color: #00ffaa; box-shadow:0 0 35px rgba(0,255,170,0.4);">
+            <div class="card-header"><span class="card-num">B8</span><span class="badge" style="color:#aaffdd;">TROPICAL</span></div>
+            <div class="swatch-row"><div class="swatch" style="background:#00ffaa;box-shadow:0 0 20px #00ffaa;"></div><div class="swatch" style="background:#ff7f50;box-shadow:0 0 20px #ff7f50;"></div><div class="swatch" style="background:#ffe066;"></div><span class="hex">#00FFAA</span><span class="hex">#FF7F50</span></div>
+            <div class="desc">Neon mint · coral reef · summer</div>
+            <div class="meta"><span>🔆 105% sat</span><span class="tag">haze 15px</span></div>
+        </div>
+        <!-- B9. fuchsia + gold -->
+        <div class="glass-card" style="background: rgba(55,20,45,0.55); border-color: #ff44cc; box-shadow:0 0 40px rgba(255,68,204,0.5);">
+            <div class="card-header"><span class="card-num">B9</span><span class="badge" style="color:#ffaae6;">GLAM ROCK</span></div>
+            <div class="swatch-row"><div class="swatch" style="background:#ff44cc;box-shadow:0 0 20px #ff44cc;"></div><div class="swatch" style="background:#ffaa00;box-shadow:0 0 20px #ffaa00;"></div><div class="swatch" style="background:#ffffff;"></div><span class="hex">#FF44CC</span><span class="hex">#FFAA00</span></div>
+            <div class="desc">Fuchsia · gold gleam · disco</div>
+            <div class="meta"><span>🔆 135% sat</span><span class="tag">sparkle 19px</span></div>
+        </div>
+        <!-- B10. aqua + neon orange -->
+        <div class="glass-card" style="background: rgba(20,50,65,0.5); border-color: #0ff0f0; box-shadow:0 0 35px rgba(0,255,240,0.5);">
+            <div class="card-header"><span class="card-num">B10</span><span class="badge" style="color:#aaffff;">90s RACER</span></div>
+            <div class="swatch-row"><div class="swatch" style="background:#0ff0f0;box-shadow:0 0 20px #0ff0f0;"></div><div class="swatch" style="background:#ff8800;box-shadow:0 0 20px #ff8800;"></div><div class="swatch" style="background:#ffffff;"></div><span class="hex">#0FF0F0</span><span class="hex">#FF8800</span></div>
+            <div class="desc">Turbo aqua · safety orange · retro</div>
+            <div class="meta"><span>🔆 120% sat</span><span class="tag">blur 16px</span></div>
+        </div>
+        <!-- B11. hot pink + solar yellow -->
+        <div class="glass-card" style="background: rgba(55,15,40,0.55); border-color: #ff69b4; box-shadow:0 0 40px rgba(255,105,180,0.5);">
+            <div class="card-header"><span class="card-num">B11</span><span class="badge" style="color:#ffb6c1;">BARBIECORE</span></div>
+            <div class="swatch-row"><div class="swatch" style="background:#ff69b4;box-shadow:0 0 20px #ff69b4;"></div><div class="swatch" style="background:#ffdd00;box-shadow:0 0 20px #ffdd00;"></div><div class="swatch" style="background:#00ffff;"></div><span class="hex">#FF69B4</span><span class="hex">#FFDD00</span></div>
+            <div class="desc">Hot pink · solar yellow · paradise</div>
+            <div class="meta"><span>🔆 130% sat</span><span class="tag">blur 17px</span></div>
+        </div>
+        <!-- B12. neon teal + magenta -->
+        <div class="glass-card" style="background: rgba(15,45,60,0.55); border-color: #00ffcc; box-shadow:0 0 35px rgba(0,255,204,0.5);">
+            <div class="card-header"><span class="card-num">B12</span><span class="badge" style="color:#aaffee;">MERMAID</span></div>
+            <div class="swatch-row"><div class="swatch" style="background:#00ffcc;box-shadow:0 0 20px #00ffcc;"></div><div class="swatch" style="background:#ff0099;box-shadow:0 0 20px #ff0099;"></div><div class="swatch" style="background:#6600ff;"></div><span class="hex">#00FFCC</span><span class="hex">#FF0099</span></div>
+            <div class="desc">Tropical teal · hot magenta · coral reef</div>
+            <div class="meta"><span>🔆 125% sat</span><span class="tag">ocean 18px</span></div>
+        </div>
+        <!-- B13. laser red + cyan -->
+        <div class="glass-card" style="background: rgba(50,10,20,0.6); border-color: #ff0040; box-shadow:0 0 45px rgba(255,0,64,0.6);">
+            <div class="card-header"><span class="card-num">B13</span><span class="badge" style="color:#ff99aa;">LASER TAG</span></div>
+            <div class="swatch-row"><div class="swatch" style="background:#ff0040;box-shadow:0 0 20px #ff0040;"></div><div class="swatch" style="background:#00ffff;box-shadow:0 0 20px #00ffff;"></div><div class="swatch" style="background:#ffffff;"></div><span class="hex">#FF0040</span><span class="hex">#00FFFF</span></div>
+            <div class="desc">Laser red · electric cyan · combat</div>
+            <div class="meta"><span>🔆 140% sat</span><span class="tag">strike 20px</span></div>
+        </div>
+        <!-- B14. acid green + neon pink -->
+        <div class="glass-card" style="background: rgba(35,45,15,0.55); border-color: #aaff00; box-shadow:0 0 35px rgba(170,255,0,0.5);">
+            <div class="card-header"><span class="card-num">B14</span><span class="badge" style="color:#ddff88;">RADICAL</span></div>
+            <div class="swatch-row"><div class="swatch" style="background:#aaff00;box-shadow:0 0 20px #aaff00;"></div><div class="swatch" style="background:#ff22aa;box-shadow:0 0 20px #ff22aa;"></div><div class="swatch" style="background:#44ff88;"></div><span class="hex">#AAFF00</span><span class="hex">#FF22AA</span></div>
+            <div class="desc">Acid splash · hot fuchsia · extreme</div>
+            <div class="meta"><span>🔆 135% sat</span><span class="tag">blur 16px</span></div>
+        </div>
+        <!-- B15. ultraviolet + lime -->
+        <div class="glass-card" style="background: rgba(25,10,50,0.6); border-color: #cc44ff; box-shadow:0 0 45px rgba(204,68,255,0.6);">
+            <div class="card-header"><span class="card-num">B15</span><span class="badge" style="color:#e8aaff;">BLACKLIGHT</span></div>
+            <div class="swatch-row"><div class="swatch" style="background:#cc44ff;box-shadow:0 0 20px #cc44ff;"></div><div class="swatch" style="background:#88ff44;box-shadow:0 0 20px #88ff44;"></div><div class="swatch" style="background:#ff44aa;"></div><span class="hex">#CC44FF</span><span class="hex">#88FF44</span></div>
+            <div class="desc">Ultra violet · neon lime · rave glow</div>
+            <div class="meta"><span>🔆 145% sat</span><span class="tag">glow 22px</span></div>
+        </div>
+    </div>
+
+    <!-- ========== SECTION 3: PROFESSIONAL · ELEVATED (15) ========= -->
+    <div class="section-title">
+        ✨ PROFESSIONAL · ELEVATED <span>15 palettes · sophisticated · human</span>
+    </div>
+    <div class="grid">
+        <!-- P1. sage + dusty rose -->
+        <div class="glass-card" style="background: rgba(20,35,35,0.5); border-color: #b48b7d;">
+            <div class="card-header"><span class="card-num">P1</span><span class="badge" style="color:#d1fae5;">conscious</span></div>
+            <div class="swatch-row"><div class="swatch" style="background:#2c3e4e;"></div><div class="swatch" style="background:#5f7a6b;"></div><div class="swatch" style="background:#b48b7d;"></div><div class="swatch" style="background:#e6d5d0;"></div><span class="hex">#2C3E4E</span><span class="hex">#B48B7D</span></div>
+            <div class="desc">Nordic forest · deep teal-grey, sage, dusted rose</div>
+            <div class="meta"><span>🧘 wellness</span><span class="tag">soft contrast</span></div>
+        </div>
+        <!-- P2. oceanic blue + coral -->
+        <div class="glass-card" style="background: rgba(10,35,50,0.55); border-color: #ff8c6a;">
+            <div class="card-header"><span class="card-num">P2</span><span class="badge" style="color:#bae6fd;">dynamic</span></div>
+            <div class="swatch-row"><div class="swatch" style="background:#0f2a44;"></div><div class="swatch" style="background:#2d6a8f;"></div><div class="swatch" style="background:#58a5b0;"></div><div class="swatch" style="background:#ff8c6a;"></div><span class="hex">#0F2A44</span><span class="hex">#FF8C6A</span></div>
+            <div class="desc">Deep trust · navy, coral · professional warmth</div>
+            <div class="meta"><span>💼 fintech</span><span class="tag">trust + energy</span></div>
+        </div>
+        <!-- P3. plum + mustard -->
+        <div class="glass-card" style="background: rgba(40,25,40,0.55); border-color: #e6b450;">
+            <div class="card-header"><span class="card-num">P3</span><span class="badge" style="color:#fde68a;">artisanal</span></div>
+            <div class="swatch-row"><div class="swatch" style="background:#2d1b34;"></div><div class="swatch" style="background:#5e3c5c;"></div><div class="swatch" style="background:#b68b7d;"></div><div class="swatch" style="background:#e6b450;"></div><span class="hex">#2D1B34</span><span class="hex">#E6B450</span></div>
+            <div class="desc">Plum noir · aubergine, aged gold · creative luxury</div>
+            <div class="meta"><span>🪙 design studio</span><span class="tag">opulent</span></div>
+        </div>
+        <!-- P4. slate + terracotta -->
+        <div class="glass-card" style="background: rgba(30,45,55,0.55); border-color: #c06e4e;">
+            <div class="card-header"><span class="card-num">P4</span><span class="badge" style="color:#fed7aa;">terracotta</span></div>
+            <div class="swatch-row"><div class="swatch" style="background:#2e3b4e;"></div><div class="swatch" style="background:#4f6d7a;"></div><div class="swatch" style="background:#c06e4e;"></div><div class="swatch" style="background:#e7b183;"></div><span class="hex">#2E3B4E</span><span class="hex">#C06E4E</span></div>
+            <div class="desc">Coastal stone · slate, terracotta, sand · timeless</div>
+            <div class="meta"><span>🏛️ hospitality</span><span class="tag">grounded</span></div>
+        </div>
+        <!-- P5. moss + sand -->
+        <div class="glass-card" style="background: rgba(30,45,30,0.55); border-color: #e0cba0;">
+            <div class="card-header"><span class="card-num">P5</span><span class="badge" style="color:#d9f99d;">biophilic</span></div>
+            <div class="swatch-row"><div class="swatch" style="background:#2c3e2f;"></div><div class="swatch" style="background:#5c735e;"></div><div class="swatch" style="background:#9caa6d;"></div><div class="swatch" style="background:#e0cba0;"></div><span class="hex">#2C3E2F</span><span class="hex">#E0CBA0</span></div>
+            <div class="desc">Forest floor · moss, sage, linen · organic</div>
+            <div class="meta"><span>🌳 sustainable</span><span class="tag">natural</span></div>
+        </div>
+        <!-- P6. indigo + peach -->
+        <div class="glass-card" style="background: rgba(20,30,55,0.55); border-color: #ffbe98;">
+            <div class="card-header"><span class="card-num">P6</span><span class="badge" style="color:#ffe0b5;">expressive</span></div>
+            <div class="swatch-row"><div class="swatch" style="background:#1e2b4f;"></div><div class="swatch" style="background:#3f5c8a;"></div><div class="swatch" style="background:#85a3b2;"></div><div class="swatch" style="background:#ffbe98;"></div><span class="hex">#1E2B4F</span><span class="hex">#FFBE98</span></div>
+            <div class="desc">Midnight peach · indigo, peach · emotional tech</div>
+            <div class="meta"><span>📱 consumer app</span><span class="tag">friendly</span></div>
+        </div>
+        <!-- P7. charcoal + chartreuse -->
+        <div class="glass-card" style="background: rgba(25,30,40,0.6); border-color: #b9d48b;">
+            <div class="card-header"><span class="card-num">P7</span><span class="badge" style="color:#d9f99d;">electric calm</span></div>
+            <div class="swatch-row"><div class="swatch" style="background:#1f2937;"></div><div class="swatch" style="background:#4b5563;"></div><div class="swatch" style="background:#9ca3af;"></div><div class="swatch" style="background:#b9d48b;"></div><span class="hex">#1F2937</span><span class="hex">#B9D48B</span></div>
+            <div class="desc">Graphite · charcoal, chartreuse · serious but not boring</div>
+            <div class="meta"><span>⚙️ industrial</span><span class="tag">bold neutral</span></div>
+        </div>
+        <!-- P8. berry + blush -->
+        <div class="glass-card" style="background: rgba(45,25,35,0.6); border-color: #f5cfc2;">
+            <div class="card-header"><span class="card-num">P8</span><span class="badge" style="color:#fecaca;">refined</span></div>
+            <div class="swatch-row"><div class="swatch" style="background:#35202e;"></div><div class="swatch" style="background:#613a4a;"></div><div class="swatch" style="background:#ad6c6c;"></div><div class="swatch" style="background:#f5cfc2;"></div><span class="hex">#35202E</span><span class="hex">#F5CFC2</span></div>
+            <div class="desc">Burgundy blush · deep berry, blush · feminine power</div>
+            <div class="meta"><span>💄 beauty</span><span class="tag">sophisticated</span></div>
+        </div>
+        <!-- P9. teal + gold -->
+        <div class="glass-card" style="background: rgba(10,45,50,0.6); border-color: #d9b650;">
+            <div class="card-header"><span class="card-num">P9</span><span class="badge" style="color:#fef9c3;">prestige</span></div>
+            <div class="swatch-row"><div class="swatch" style="background:#0f3a47;"></div><div class="swatch" style="background:#1e6468;"></div><div class="swatch" style="background:#61988e;"></div><div class="swatch" style="background:#d9b650;"></div><span class="hex">#0F3A47</span><span class="hex">#D9B650</span></div>
+            <div class="desc">Deep teal · patina, antique gold · heritage</div>
+            <div class="meta"><span>🏦 private banking</span><span class="tag">authority</span></div>
+        </div>
+        <!-- P10. lavender + mist -->
+        <div class="glass-card" style="background: rgba(30,25,55,0.6); border-color: #c5c0d9;">
+            <div class="card-header"><span class="card-num">P10</span><span class="badge" style="color:#e2d9f3;">future-forward</span></div>
+            <div class="swatch-row"><div class="swatch" style="background:#282844;"></div><div class="swatch" style="background:#4f4c7a;"></div><div class="swatch" style="background:#8982b0;"></div><div class="swatch" style="background:#c5c0d9;"></div><span class="hex">#282844</span><span class="hex">#8982B0</span></div>
+            <div class="desc">Dusk lavender · indigo-violet, mist · AI, meditation</div>
+            <div class="meta"><span>🧠 AI</span><span class="tag">serene</span></div>
+        </div>
+        <!-- P11. cinnamon + espresso -->
+        <div class="glass-card" style="background: rgba(40,30,25,0.6); border-color: #e6c9af;">
+            <div class="card-header"><span class="card-num">P11</span><span class="badge" style="color:#fed7aa;">warm minimal</span></div>
+            <div class="swatch-row"><div class="swatch" style="background:#2c2220;"></div><div class="swatch" style="background:#6f4e3a;"></div><div class="swatch" style="background:#aa7b64;"></div><div class="swatch" style="background:#e6c9af;"></div><span class="hex">#2C2220</span><span class="hex">#E6C9AF</span></div>
+            <div class="desc">Café crème · espresso, cinnamon, latte · tactile</div>
+            <div class="meta"><span>☕ craft</span><span class="tag">tactile</span></div>
+        </div>
+        <!-- P12. steel + saffron -->
+        <div class="glass-card" style="background: rgba(30,35,50,0.6); border-color: #fbbf24;">
+            <div class="card-header"><span class="card-num">P12</span><span class="badge" style="color:#fde047;">industrial</span></div>
+            <div class="swatch-row"><div class="swatch" style="background:#2b2f40;"></div><div class="swatch" style="background:#4a5266;"></div><div class="swatch" style="background:#858f9b;"></div><div class="swatch" style="background:#fbbf24;"></div><span class="hex">#2B2F40</span><span class="hex">#FBBF24</span></div>
+            <div class="desc">Steel & sun · blue-grey, saffron · B2B personality</div>
+            <div class="meta"><span>🏭 manufacturing</span><span class="tag">confident</span></div>
+        </div>
+        <!-- P13. pine + frost -->
+        <div class="glass-card" style="background: rgba(20,45,45,0.6); border-color: #dbe7e4;">
+            <div class="card-header"><span class="card-num">P13</span><span class="badge" style="color:#b7e4c7;">nordic</span></div>
+            <div class="swatch-row"><div class="swatch" style="background:#1e3a3f;"></div><div class="swatch" style="background:#2f5e5e;"></div><div class="swatch" style="background:#649696;"></div><div class="swatch" style="background:#dbe7e4;"></div><span class="hex">#1E3A3F</span><span class="hex">#DBE7E4</span></div>
+            <div class="desc">Pine frost · forest teal, frozen lake · Nordic clarity</div>
+            <div class="meta"><span>🧊 furniture</span><span class="tag">crisp</span></div>
+        </div>
+        <!-- P14. wine + dusty lilac -->
+        <div class="glass-card" style="background: rgba(45,25,40,0.6); border-color: #dbbec3;">
+            <div class="card-header"><span class="card-num">P14</span><span class="badge" style="color:#f1d5e5;">poetic</span></div>
+            <div class="swatch-row"><div class="swatch" style="background:#341f2b;"></div><div class="swatch" style="background:#693b4c;"></div><div class="swatch" style="background:#a16b7a;"></div><div class="swatch" style="background:#dbbec3;"></div><span class="hex">#341F2B</span><span class="hex">#DBBEC3</span></div>
+            <div class="desc">Burgundy mist · oxblood, vintage rose · editorial</div>
+            <div class="meta"><span>📚 publishing</span><span class="tag">literary</span></div>
+        </div>
+        <!-- P15. navy + mint -->
+        <div class="glass-card" style="background: rgba(10,35,50,0.6); border-color: #b9e6d9;">
+            <div class="card-header"><span class="card-num">P15</span><span class="badge" style="color:#cffafe;">fresh prestige</span></div>
+            <div class="swatch-row"><div class="swatch" style="background:#13293d;"></div><div class="swatch" style="background:#1e4a5f;"></div><div class="swatch" style="background:#398d8d;"></div><div class="swatch" style="background:#b9e6d9;"></div><span class="hex">#13293D</span><span class="hex">#B9E6D9</span></div>
+            <div class="desc">Midnight mint · navy, teal, mint · healthcare, clean tech</div>
+            <div class="meta"><span>⚕️ healthcare</span><span class="tag">reassuring</span></div>
+        </div>
+    </div>
+
+    <!-- MASTER FOOTER - THEME LEGEND -->
+    <div style="position: relative; z-index: 50; margin-top: 4rem; max-width: 1400px; width: 100%;">
+        <div style="background: rgba(8, 16, 28, 0.7); backdrop-filter: blur(16px); border: 1px solid rgba(255,255,255,0.12); border-radius: 60px; padding: 2rem 2.5rem; color: white; box-shadow: 0 25px 40px -15px black;">
+            <div style="display: flex; flex-wrap: wrap; gap: 2.5rem; justify-content: space-between; align-items: center;">
+                <div>
+                    <span style="font-size: 1.6rem; font-weight: 600; background: linear-gradient(to right, #fff, #cbd5e1); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">THEMING VAULT</span>
+                    <div style="display: flex; gap: 2rem; margin-top: 1rem; flex-wrap: wrap;">
+                        <span style="display: flex; align-items: center; gap: 0.5rem;">⚓ <span style="color: #b8d0ff;">15 Navy·Grey</span></span>
+                        <span style="display: flex; align-items: center; gap: 0.5rem;">⚡ <span style="color: #ffe09c;">15 Bright·Neon</span></span>
+                        <span style="display: flex; align-items: center; gap: 0.5rem;">✨ <span style="color: #bae6fd;">15 Pro·Elevated</span></span>
+                        <span style="display: flex; align-items: center; gap: 0.5rem;">🧊 <span style="color: #bbf7d0;">45 Total Palettes</span></span>
+                    </div>
+                </div>
+                <div style="background: rgba(255,255,255,0.05); padding: 0.8rem 1.8rem; border-radius: 60px; border: 1px solid rgba(255,255,255,0.1);">
+                    <span style="color: #e0e7ff; font-size: 0.95rem;">ready for copy · theme injection · design systems</span>
+                </div>
+            </div>
+            <p style="color: #a0b8d0; margin-top: 1.5rem; font-size: 0.95rem; border-top: 1px solid rgba(255,255,255,0.05); padding-top: 1.2rem;">
+                Complete glassmorphic color system · backdrop-filter: blur(14-22px) · rgba layering · border glow · hex references · 45+ unique color stories
+            </p>
+        </div>
+    </div>
+</body>
+</html>

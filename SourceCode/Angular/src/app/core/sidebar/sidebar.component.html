@@ -7,10 +7,9 @@
         <ul id="sidebarnav" class="list">
           <!-- Top Most level menu -->
           @for (sidebarItem of sidebarItems; track sidebarItem) {
-          <li [routerLinkActiveOptions]="{ exact: true }" [routerLinkActiveOptions]="{ exact: true }"
-            *hasClaim="sidebarItem.hasClaims"
+          <li [routerLinkActiveOptions]="{ exact: true }"
             [routerLinkActive]="sidebarItem.submenu.length !== 0 ? 'active' : 'active-top'">
-            <a [routerLink]="sidebarItem.class === '' ? [sidebarItem.path] : null" [ngClass]="[sidebarItem.class]"
+            <a [routerLink]="sidebarItem.submenu.length === 0 ? ['/', sidebarItem.path] : null" [ngClass]="[sidebarItem.class || '']"
               (click)="callToggleMenu($event, sidebarItem.submenu.length)" class="menu-top">
               <mat-icon class="medium-icon fs-6 align-middle me-1 text-white">{{sidebarItem.icon}}</mat-icon>
               <span class="hide-menu">{{sidebarItem.title | translate}}
@@ -20,22 +19,21 @@
             @if (sidebarItem.submenu.length > 0) {
             <ul class="ml-menu">
               @for (sidebarSubItem1 of sidebarItem.submenu; track sidebarSubItem1) {
-              <li *hasClaim="sidebarSubItem1.hasClaims"
-                [routerLinkActive]="sidebarSubItem1.submenu.length > 0 ? '' : 'active'"
+              <li [routerLinkActive]="sidebarSubItem1.submenu.length > 0 ? '' : 'active'"
                 [routerLinkActiveOptions]="{ exact: true }">
                 <a [routerLink]="sidebarSubItem1.submenu.length > 0 ? null : [sidebarSubItem1.path]"
-                  (click)="callToggleMenu($event,sidebarSubItem1.submenu.length)" [ngClass]="[sidebarSubItem1.class]">
+                  (click)="callToggleMenu($event,sidebarSubItem1.submenu.length)" [ngClass]="[sidebarSubItem1.class || '']">
                   {{sidebarSubItem1.title | translate}}
                 </a>
                 <!-- Second level menu -->
                 @if (sidebarSubItem1.submenu.length > 0) {
                 <ul class="ml-menu-2">
                   @for (sidebarSubItem2 of sidebarSubItem1.submenu; track sidebarSubItem2) {
-                  <li [routerLinkActiveOptions]="{ exact: true }" *hasClaim="sidebarSubItem2.hasClaims"
+                  <li [routerLinkActiveOptions]="{ exact: true }"
                     [routerLinkActive]="sidebarSubItem2.submenu.length > 0 ? '' : 'active'">
                     <a [routerLink]="sidebarSubItem2.submenu.length > 0 ? null : [sidebarSubItem2.path]"
                       (click)="callToggleMenu($event,sidebarSubItem2.submenu.length)"
-                      [ngClass]="[sidebarSubItem2.class]">
+                      [ngClass]="[sidebarSubItem2.class || '']">
                       {{sidebarSubItem2.title | translate}}
                     </a>
                     <!-- Third level menu -->

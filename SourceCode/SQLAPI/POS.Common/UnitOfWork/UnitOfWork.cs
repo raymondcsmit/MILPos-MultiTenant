@@ -1,5 +1,6 @@
-﻿using POS.Data;
+using POS.Data;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Storage;
 using Microsoft.Extensions.Logging;
 using System;
 using System.Threading.Tasks;
@@ -7,12 +8,14 @@ using POS.Data.Dto;
 
 namespace POS.Common.UnitOfWork
 {
-    public class UnitOfWork<TContext> : IUnitOfWork<TContext>
+    public class UnitOfWork<TContext> : IUnitOfWork<TContext>, IDisposable
         where TContext : DbContext
     {
         private readonly TContext _context;
         private readonly ILogger<UnitOfWork<TContext>> _logger;
         private readonly UserInfoToken _userInfoToken;
+        private IDbContextTransaction _currentTransaction;
+
         public UnitOfWork(
             TContext context,
             ILogger<UnitOfWork<TContext>> logger,
@@ -22,42 +25,86 @@ namespace POS.Common.UnitOfWork
             _logger = logger;
             _userInfoToken = userInfoToken;
         }
+
+        public async Task<IDbContextTransaction> BeginTransactionAsync()
+        {
+            if (_currentTransaction != null)
+            {
+                return null;
+            }
+
+            _currentTransaction = await _context.Database.BeginTransactionAsync();
+            return _currentTransaction;
+        }
+
+        public async Task CommitTransactionAsync()
+        {
+            try
+            {
+                await _context.SaveChangesAsync();
+                if (_currentTransaction != null)
+                {
+                    await _currentTransaction.CommitAsync();
+                }
+            }
+            catch
+            {
+                await RollbackTransactionAsync();
+                throw;
+            }
+            finally
+            {
+                if (_currentTransaction != null)
+                {
+                    _currentTransaction.Dispose();
+                    _currentTransaction = null;
+                }
+            }
+        }
+
+        public async Task RollbackTransactionAsync()
+        {
+            try
+            {
+                if (_currentTransaction != null)
+                {
+                    await _currentTransaction.RollbackAsync();
+                }
+            }
+            finally
+            {
+                if (_currentTransaction != null)
+                {
+                    _currentTransaction.Dispose();
+                    _currentTransaction = null;
+                }
+            }
+        }
+
         public int Save()
         {
-            using (var transaction = _context.Database.BeginTransaction())
+            try
             {
-                try
-                {
-                    SetModifiedInformation();
-                    var retValu = _context.SaveChanges();
-                    transaction.Commit();
-                    return retValu;
-                }
-                catch (Exception e)
-                {
-                    transaction.Rollback();
-                    _logger.LogError(e, e.Message);
-                    return 0;
-                }
+                SetModifiedInformation();
+                return _context.SaveChanges();
+            }
+            catch (Exception e)
+            {
+                _logger.LogError(e, e.Message);
+                return 0;
             }
         }
         public async Task<int> SaveAsync()
         {
-            using (var transaction = _context.Database.BeginTransaction())
+            try
             {
-                try
-                {
-                    SetModifiedInformation();
-                    var val = await _context.SaveChangesAsync();
-                    transaction.Commit();
-                    return val;
-                }
-                catch (Exception e)
-                {
-                    transaction.Rollback();
-                    _logger.LogError(e, e.Message);
-                    return 0;
-                }
+                SetModifiedInformation();
+                return await _context.SaveChangesAsync();
+            }
+            catch (Exception e)
+            {
+                _logger.LogError(e, e.Message);
+                return 0;
             }
         }
         public TContext Context => _context;

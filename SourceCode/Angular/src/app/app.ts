@@ -1,4 +1,5 @@
 import { Component, OnInit } from '@angular/core';
+import { ThemeService } from '@core/services/theme.service';
 import { ActivatedRoute, NavigationCancel, NavigationEnd, NavigationError, NavigationStart, Router, RouterOutlet } from '@angular/router';
 import { BaseComponent } from './base.component';
 import { SecurityService } from '@core/security/security.service';
@@ -24,6 +25,7 @@ export class App extends BaseComponent implements OnInit {
     private titleService: Title,
     private signalrService: SignalrService,
     private loadingService: LoadingProgressService,
+    public themeService: ThemeService,
     router: Router) {
     super();
     this.getLangDir();
@@ -51,7 +53,7 @@ export class App extends BaseComponent implements OnInit {
 
   getAuthObj() {
     this.sub$.sink = this.securityService.securityObject$.subscribe(
-      (c: User) => {
+      (c: User | null) => {
         if (c) {
           const online: OnlineUser = {
             email: c.email,

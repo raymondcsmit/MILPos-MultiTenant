@@ -26,6 +26,9 @@ import { BaseComponent } from '../../base.component';
 import { TableSettingsStore } from '../../table-setting/table-setting-store';
 import { MatCardModule } from "@angular/material/card";
 import { ToastrService } from '@core/services/toastr.service';
+import { MatDialog } from '@angular/material/dialog';
+import { ImportExportService } from '@core/services/import-export.service';
+import { ImportExportDialogComponent } from '@shared/import-export-dialog/import-export-dialog.component';
 
 @Component({
   selector: 'app-supplier-list',
@@ -149,7 +152,9 @@ export class SupplierListComponent extends BaseComponent implements OnInit {
     private router: Router,
     private commonService: CommonService,
     private cd: ChangeDetectorRef,
-    private toastrService: ToastrService
+    private toastrService: ToastrService,
+    private dialog: MatDialog,
+    private importExportService: ImportExportService
   ) {
     super();
     this.getLangDir();
@@ -261,6 +266,37 @@ export class SupplierListComponent extends BaseComponent implements OnInit {
 
   getDataIndex(row: any) {
     return this.supplierStore.suppliers().indexOf(row);
+  }
+
+  openImportDialog(): void {
+    const dialogRef = this.dialog.open(ImportExportDialogComponent, {
+      width: '850px',
+      data: {
+        entityType: 'suppliers',
+        entityName: 'Supplier'
+      }
+    });
+
+    dialogRef.afterClosed().subscribe(result => {
+      if (result) {
+        this.refresh();
+      }
+    });
+  }
+
+  exportData(format: 'csv' | 'excel'): void {
+    this.importExportService.exportData('suppliers', format)
+      .subscribe({
+        next: (blob) => {
+          const date = new Date().toISOString().split('T')[0];
+          const fileName = `Suppliers_${date}.${format === 'excel' ? 'xlsx' : 'csv'}`;
+          this.importExportService.downloadFile(blob, fileName);
+          this.toastrService.success('Data exported successfully');
+        },
+        error: (error) => {
+          this.toastrService.error('Export failed: ' + error.message);
+        }
+      });
   }
 
 }

@@ -2,9 +2,8 @@
 using System.ComponentModel.DataAnnotations.Schema;
 
 namespace POS.Data.Entities;
-public class ProductStock
+public class ProductStock : BaseEntity
 {
-    public Guid Id { get; set; }
     [Column(TypeName = "decimal(18,2)")]
     public decimal CurrentStock { get; set; }
     [Column(TypeName = "decimal(18,2)")]

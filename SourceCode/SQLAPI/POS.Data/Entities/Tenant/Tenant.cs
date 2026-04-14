@@ -20,5 +20,13 @@ namespace POS.Data.Entities
         public string LogoUrl { get; set; }
         public string TimeZone { get; set; }
         public string Currency { get; set; }
+        public string BusinessType { get; set; } = "Retail";
+        public string LicenseType { get; set; } = "Trial"; // Trial, Full
+        public DateTime? TrialExpiryDate { get; set; }
+
+        public string ApiKey { get; set; }
+        public DateTime? ApiKeyCreatedDate { get; set; }
+        public DateTime? ApiKeyLastUsedDate { get; set; }
+        public bool ApiKeyEnabled { get; set; } = true;
     }
 }

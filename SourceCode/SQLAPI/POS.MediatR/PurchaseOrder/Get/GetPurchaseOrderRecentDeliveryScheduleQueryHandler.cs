@@ -1,4 +1,4 @@
-﻿using AutoMapper;
+using AutoMapper;
 using POS.Data.Entities;
 using POS.MediatR.CommandAndQuery;
 using POS.Repository;
@@ -12,6 +12,14 @@ using System.Threading.Tasks;
 using POS.MediatR;
 using POS.Data.Dto;
 using Microsoft.AspNetCore.Components.Web;
+using System;
+using Dapper;
+using Microsoft.Extensions.Configuration;
+using POS.Common.DapperInfrastructure;
+using POS.Data;
+using POS.Domain;
+using SqlKata;
+using SqlKata.Compilers;
 
 namespace POS.MediatR.PurchaseOrder.Handlers
 {
@@ -22,42 +30,106 @@ namespace POS.MediatR.PurchaseOrder.Handlers
         private readonly IPurchaseOrderRepository _purchaseOrderRepository;
         private readonly ILogger<GetPurchaseOrderRecentDeliveryScheduleQueryHandler> _logger;
         private readonly UserInfoToken _userInfoToken;
-
+        private readonly IConfiguration _configuration;
+        private readonly ISqlConnectionAccessor _sqlAccessor;
+        private readonly ITenantProvider _tenantProvider;
+        private readonly Compiler _compiler;
 
         public GetPurchaseOrderRecentDeliveryScheduleQueryHandler(
             IPurchaseOrderRepository purchaseOrderRepository,
             IMapper mapper,
             ILogger<GetPurchaseOrderRecentDeliveryScheduleQueryHandler> logger,
-            UserInfoToken userInfoToken
+            UserInfoToken userInfoToken,
+            IConfiguration configuration,
+            ISqlConnectionAccessor sqlAccessor,
+            ITenantProvider tenantProvider,
+            Compiler compiler
           )
         {
             _purchaseOrderRepository = purchaseOrderRepository;
             _logger = logger;
             _userInfoToken = userInfoToken;
-
+            _configuration = configuration;
+            _sqlAccessor = sqlAccessor;
+            _tenantProvider = tenantProvider;
+            _compiler = compiler;
         }
 
         public async Task<List<PurchaseOrderRecentDeliverySchedule>> Handle(GetPurchaseOrderRecentDeliveryScheduleQuery request, CancellationToken cancellationToken)
         {
+            var useDapper = _configuration.GetValue<bool>("Features:Dapper:GetPurchaseOrderRecentDeliveryScheduleQueryHandler", true);
+
+            if (useDapper)
+            {
+                try
+                {
+                    var tenantId = _tenantProvider.GetTenantId();
+                    var purchaseOrderTable = _sqlAccessor.GetTableName<POS.Data.PurchaseOrder>();
+                    var purchaseOrderItemTable = _sqlAccessor.GetTableName<POS.Data.PurchaseOrderItem>();
+                    var supplierTable = _sqlAccessor.GetTableName<POS.Data.Supplier>();
+
+                    var notReturnStatus = (int)PurchaseSaleItemStatusEnum.Not_Return;
+                    var pendingStatus = (int)PurchaseDeliveryStatus.PENDING;
+
+                    var query = new Query($"{purchaseOrderTable} AS po")
+                        .Select("po.Id AS PurchaseOrderId", "po.OrderNumber AS PurchaseOrderNumber", "po.DeliveryDate AS ExpectedDispatchDate", "po.SupplierId", "s.SupplierName")
+                        .SelectRaw("SUM(CASE WHEN poi.\"Status\" = ? THEN poi.\"Quantity\" ELSE -poi.\"Quantity\" END) AS \"TotalQuantity\"", notReturnStatus)
+                        .Join($"{supplierTable} AS s", "po.SupplierId", "s.Id")
+                        .Join($"{purchaseOrderItemTable} AS poi", "po.Id", "poi.PurchaseOrderId")
+                        .Where("po.TenantId", tenantId)
+                        .Where("po.IsDeleted", false)
+                        .Where("po.IsPurchaseOrderRequest", false)
+                        .Where("po.DeliveryStatus", pendingStatus)
+                        .WhereIn("po.LocationId", _userInfoToken.LocationIds ?? new List<Guid>())
+                        .GroupBy("po.Id", "po.OrderNumber", "po.DeliveryDate", "po.SupplierId", "s.SupplierName")
+                        .HavingRaw("SUM(CASE WHEN poi.\"Status\" = ? THEN poi.\"Quantity\" ELSE -poi.\"Quantity\" END) > 0", notReturnStatus)
+                        .OrderByDesc("po.DeliveryDate")
+                        .Limit(10);
+
+                    var compiled = _compiler.Compile(query);
+                    var connection = _sqlAccessor.GetOpenConnection();
+                    var currentTransaction = _sqlAccessor.GetCurrentTransaction();
+
+                    var result = await connection.QueryAsync<PurchaseOrderRecentDeliverySchedule>(
+                        compiled.Sql, 
+                        compiled.NamedBindings, 
+                        currentTransaction, 
+                        commandTimeout: 60);
+
+                    return result.ToList();
+                }
+                catch (Exception ex)
+                {
+                    _logger.LogError(ex, "Dapper migration failed for GetPurchaseOrderRecentDeliveryScheduleQueryHandler. Falling back to EF Core.");
+                }
+            }
+
             try
             {
                 var entities = await _purchaseOrderRepository
-                    .AllIncluding(c => c.Supplier, c => c.PurchaseOrderItems)
+                    .All.AsNoTracking()
+                    .Include(c => c.Supplier)
                     .Where(d => !d.IsPurchaseOrderRequest
                         && d.DeliveryStatus == Data.PurchaseDeliveryStatus.PENDING
-                        && _userInfoToken.LocationIds.Contains(d.LocationId)
-                        && d.PurchaseOrderItems.Sum(c => c.Status == PurchaseSaleItemStatusEnum.Not_Return ? c.Quantity : -1 * (c.Quantity)) > 0)
-                    .OrderByDescending(c => c.DeliveryDate)
-                    .Take(10)
-                    .Select(c => new PurchaseOrderRecentDeliverySchedule
+                        && _userInfoToken.LocationIds.Contains(d.LocationId))
+                    .Select(d => new
                     {
-                        PurchaseOrderId = c.Id,
-                        PurchaseOrderNumber = c.OrderNumber,
-                        ExpectedDispatchDate = c.DeliveryDate,
-                        SupplierName = c.Supplier.SupplierName,
-                        SupplierId = c.SupplierId,
-                        TotalQuantity = c.PurchaseOrderItems.Sum(d => d.Status == PurchaseSaleItemStatusEnum.Not_Return ? d.Quantity : -1 * (d.Quantity)),
-                    }).ToListAsync();
+                        Order = d,
+                        SupplierName = d.Supplier.SupplierName,
+                        TotalQuantity = d.PurchaseOrderItems.Sum(c => c.Status == PurchaseSaleItemStatusEnum.Not_Return ? c.Quantity : -c.Quantity)
+                    })
+                    .Where(x => x.TotalQuantity > 0)
+                    .OrderByDescending(x => x.Order.DeliveryDate)
+                    .Take(10)
+                    .Select(x => new PurchaseOrderRecentDeliverySchedule
+                    {
+                        PurchaseOrderId = x.Order.Id,
+                        PurchaseOrderNumber = x.Order.OrderNumber,
+                        ExpectedDispatchDate = x.Order.DeliveryDate,
+                        SupplierName = x.SupplierName,
+                        SupplierId = x.Order.SupplierId,
+                        TotalQuantity = x.TotalQuantity,
+                    }).ToListAsync(cancellationToken);
 
                 return entities;
             }

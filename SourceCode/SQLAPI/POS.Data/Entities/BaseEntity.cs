@@ -3,8 +3,10 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace POS.Data
 {
-    public abstract class BaseEntity
+    public abstract class BaseEntity : ISoftDelete
     {
+        public Guid Id { get; set; }
+        
         // Multi-tenant support
         public Guid TenantId { get; set; }
 
@@ -33,6 +35,11 @@ namespace POS.Data
             set => _deletedDate = value;
         }
         public Guid? DeletedBy { get; set; }
+        
+        // Sync tracking fields for data synchronization
+        public long SyncVersion { get; set; } = 0;
+        public DateTime? LastSyncedAt { get; set; }
+        
         [NotMapped]
         public ObjectState ObjectState { get; set; }
         public bool IsDeleted { get; set; } = false;

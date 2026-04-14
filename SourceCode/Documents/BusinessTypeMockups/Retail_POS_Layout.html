@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Retail POS - Split Layout Mockup</title>
+    <!-- Bootstrap 5 -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <style>
+        body, html { height: 100%; background-color: #f0f2f5; overflow: hidden; font-family: 'Segoe UI', sans-serif; }
+        
+        /* Layout Structure */
+        .pos-container { height: 100vh; display: flex; flex-direction: row; }
+        .product-section { flex: 7; background: #fff; display: flex; flex-direction: column; border-right: 1px solid #e0e0e0; }
+        .cart-section { flex: 3; background: #f8f9fa; display: flex; flex-direction: column; box-shadow: -2px 0 5px rgba(0,0,0,0.05); min-width: 400px; }
+        
+        /* Product Section Styles */
+        .category-scroll { overflow-x: auto; white-space: nowrap; padding: 10px; border-bottom: 1px solid #eee; -ms-overflow-style: none; scrollbar-width: none; }
+        .category-scroll::-webkit-scrollbar { display: none; }
+        .category-pill { display: inline-block; padding: 8px 16px; margin-right: 8px; border-radius: 20px; background: #f1f3f4; color: #5f6368; cursor: pointer; font-weight: 500; font-size: 0.9rem; transition: all 0.2s; }
+        .category-pill.active { background: #1a73e8; color: white; }
+        
+        .product-grid { flex: 1; overflow-y: auto; padding: 15px; }
+        .product-card { 
+            cursor: pointer; transition: transform 0.1s; border: 1px solid #eee; border-radius: 8px; overflow: hidden; height: 100%; background: #fff;
+        }
+        .product-card:hover { transform: translateY(-2px); box-shadow: 0 4px 6px rgba(0,0,0,0.1); border-color: #1a73e8; }
+        .product-img { height: 120px; width: 100%; object-fit: contain; padding: 10px; background: #fff; }
+        .product-body { padding: 10px; }
+        .product-price { font-weight: bold; color: #1a73e8; font-size: 1.1rem; }
+        .product-title { font-size: 0.9rem; font-weight: 500; height: 3em; overflow: hidden; text-overflow: ellipsis; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; }
+
+        /* Cart Section Styles */
+        .cart-header { padding: 15px; background: #fff; border-bottom: 1px solid #dee2e6; }
+        .cart-items { flex: 1; overflow-y: auto; padding: 0; background: #fff; }
+        .cart-item { padding: 10px 15px; border-bottom: 1px solid #f0f0f0; display: flex; align-items: center; justify-content: space-between; position: relative; }
+        .cart-item:hover { background-color: #fcfcfc; }
+        .qty-control { display: flex; align-items: center; background: #f1f3f4; border-radius: 4px; }
+        .qty-btn { width: 28px; height: 28px; display: flex; align-items: center; justify-content: center; cursor: pointer; color: #555; user-select: none; }
+        .qty-btn:hover { background: #e0e0e0; color: #000; }
+        .qty-input { width: 30px; border: none; background: transparent; text-align: center; font-size: 0.9rem; font-weight: 600; padding: 0; }
+        .qty-input:focus { outline: none; }
+        
+        .cart-footer { padding: 15px; background: #fff; border-top: 1px solid #dee2e6; }
+        .total-row { display: flex; justify-content: space-between; margin-bottom: 5px; font-size: 0.95rem; }
+        .grand-total { font-size: 1.4rem; font-weight: 700; color: #202124; margin-top: 10px; padding-top: 10px; border-top: 1px dashed #ccc; }
+        
+        .pay-btn { width: 100%; padding: 12px; font-size: 1.1rem; font-weight: 600; border-radius: 8px; margin-top: 10px; }
+    </style>
+</head>
+<body>
+
+<div class="pos-container">
+    <!-- LEFT: Product Catalog -->
+    <div class="product-section">
+        <!-- Search Bar -->
+        <div class="p-3 border-bottom">
+            <div class="input-group input-group-lg">
+                <span class="input-group-text bg-white border-end-0"><span class="material-icons">search</span></span>
+                <input type="text" class="form-control border-start-0 ps-0" placeholder="Search Products or Scan Barcode...">
+            </div>
+        </div>
+
+        <!-- Categories -->
+        <div class="category-scroll">
+            <span class="category-pill active">All Items</span>
+            <span class="category-pill">Beverages</span>
+            <span class="category-pill">Snacks</span>
+            <span class="category-pill">Fruits & Veg</span>
+            <span class="category-pill">Bakery</span>
+            <span class="category-pill">Dairy</span>
+            <span class="category-pill">Household</span>
+            <span class="category-pill">Personal Care</span>
+        </div>
+
+        <!-- Grid -->
+        <div class="product-grid">
+            <div class="row g-3">
+                <!-- Product 1 -->
+                <div class="col-xl-3 col-lg-4 col-md-4 col-6">
+                    <div class="product-card">
+                        <img src="https://via.placeholder.com/150/ffcfcf?text=Coke" class="product-img">
+                        <div class="product-body">
+                            <div class="product-title">Coca Cola 1.5L Bottle</div>
+                            <div class="d-flex justify-content-between align-items-center mt-2">
+                                <span class="product-price">$ 1.50</span>
+                                <small class="text-muted">Stock: 50</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!-- Product 2 -->
+                <div class="col-xl-3 col-lg-4 col-md-4 col-6">
+                    <div class="product-card">
+                        <img src="https://via.placeholder.com/150/caf0f8?text=Water" class="product-img">
+                        <div class="product-body">
+                            <div class="product-title">Nestle Mineral Water 500ml</div>
+                            <div class="d-flex justify-content-between align-items-center mt-2">
+                                <span class="product-price">$ 0.50</span>
+                                <small class="text-muted">Stock: 120</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!-- Product 3 -->
+                <div class="col-xl-3 col-lg-4 col-md-4 col-6">
+                    <div class="product-card">
+                        <img src="https://via.placeholder.com/150/e0fbfc?text=Milk" class="product-img">
+                        <div class="product-body">
+                            <div class="product-title">Dairy Pure Whole Milk 1L</div>
+                            <div class="d-flex justify-content-between align-items-center mt-2">
+                                <span class="product-price">$ 2.20</span>
+                                <small class="text-muted">Stock: 15</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!-- Product 4 -->
+                <div class="col-xl-3 col-lg-4 col-md-4 col-6">
+                    <div class="product-card">
+                        <img src="https://via.placeholder.com/150/ffe5d9?text=Bread" class="product-img">
+                        <div class="product-body">
+                            <div class="product-title">Whole Wheat Bread Large</div>
+                            <div class="d-flex justify-content-between align-items-center mt-2">
+                                <span class="product-price">$ 3.00</span>
+                                <small class="text-muted">Stock: 8</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                 <!-- Product 5 -->
+                 <div class="col-xl-3 col-lg-4 col-md-4 col-6">
+                    <div class="product-card">
+                        <img src="https://via.placeholder.com/150/fdfcdc?text=Lays" class="product-img">
+                        <div class="product-body">
+                            <div class="product-title">Lays Masala Chips Large</div>
+                            <div class="d-flex justify-content-between align-items-center mt-2">
+                                <span class="product-price">$ 1.00</span>
+                                <small class="text-muted">Stock: 100</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- RIGHT: Shopping Cart -->
+    <div class="cart-section">
+        <!-- Customer & Info -->
+        <div class="cart-header">
+            <div class="d-flex justify-content-between align-items-center mb-2">
+                <h5 class="m-0 fw-bold">Current Order</h5>
+                <button class="btn btn-sm btn-outline-danger"><span class="material-icons fs-6 align-middle">delete_sweep</span> Clear</button>
+            </div>
+            <div class="input-group">
+                <span class="input-group-text bg-white"><span class="material-icons fs-6">person</span></span>
+                <select class="form-select border-start-0">
+                    <option>Walk-in Customer</option>
+                    <option>Alice Johnson</option>
+                    <option>Bob Williams</option>
+                </select>
+                <button class="btn btn-outline-primary"><span class="material-icons fs-6">add</span></button>
+            </div>
+        </div>
+
+        <!-- Cart Items List -->
+        <div class="cart-items">
+            <!-- Item 1 -->
+            <div class="cart-item">
+                <div style="flex: 1">
+                    <div class="fw-bold text-dark">Coca Cola 1.5L Bottle</div>
+                    <div class="text-muted small">$ 1.50</div>
+                </div>
+                <div class="d-flex align-items-center gap-3">
+                    <div class="qty-control">
+                        <span class="qty-btn">-</span>
+                        <input type="text" class="qty-input" value="2">
+                        <span class="qty-btn">+</span>
+                    </div>
+                    <div class="fw-bold" style="min-width: 60px; text-align: right;">$ 3.00</div>
+                    <span class="material-icons text-danger fs-6" style="cursor: pointer">close</span>
+                </div>
+            </div>
+             <!-- Item 2 -->
+             <div class="cart-item">
+                <div style="flex: 1">
+                    <div class="fw-bold text-dark">Whole Wheat Bread</div>
+                    <div class="text-muted small">$ 3.00</div>
+                </div>
+                <div class="d-flex align-items-center gap-3">
+                    <div class="qty-control">
+                        <span class="qty-btn">-</span>
+                        <input type="text" class="qty-input" value="1">
+                        <span class="qty-btn">+</span>
+                    </div>
+                    <div class="fw-bold" style="min-width: 60px; text-align: right;">$ 3.00</div>
+                    <span class="material-icons text-danger fs-6" style="cursor: pointer">close</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Totals & Pay -->
+        <div class="cart-footer">
+            <div class="total-row">
+                <span class="text-muted">Subtotal</span>
+                <span class="fw-bold">$ 6.00</span>
+            </div>
+            <div class="total-row">
+                <span class="text-muted">Tax (0%)</span>
+                <span>$ 0.00</span>
+            </div>
+             <div class="total-row">
+                <span class="text-muted">Discount</span>
+                <span class="text-danger">- $ 0.00</span>
+            </div>
+            <div class="total-row grand-total">
+                <span>Total Payable</span>
+                <span class="text-primary">$ 6.00</span>
+            </div>
+            
+            <div class="row g-2 mt-2">
+                <div class="col-6">
+                    <button class="btn btn-outline-secondary w-100 py-3 fw-bold">Hold Order</button>
+                </div>
+                <div class="col-6">
+                     <button class="btn btn-primary w-100 py-3 fw-bold shadow-sm">PAY NOW</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+</body>
+</html>

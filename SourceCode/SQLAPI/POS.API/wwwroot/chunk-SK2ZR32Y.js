@@ -1,0 +1,1 @@
+var n=(i=>(i[i.Plush=0]="Plush",i[i.Minus=1]="Minus",i[i.Multiply=2]="Multiply",i[i.Divide=3]="Divide",i))(n||{}),u=[{id:0,name:"Plush"},{id:1,name:"Minus"},{id:2,name:"Multiply"},{id:3,name:"Divide"}];export{n as a,u as b};

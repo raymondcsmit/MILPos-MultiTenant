@@ -4,7 +4,7 @@
 
 export const environment = {
   production: false,
-  apiUrl: 'https://localhost:44346/',
+  apiUrl: 'http://localhost:5000/',
   // production: true,
   // apiUrl: '/',
   allowFileExtension: ['pdf', 'doc', 'docx', 'xls', 'xlsx']

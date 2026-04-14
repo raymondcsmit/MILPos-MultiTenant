@@ -1,0 +1,138 @@
+// Shared Glass Variables
+@mixin glass-theme-base($bg-gradient, $glass-bg, $border-color, $primary, $text-color: #ffffff) {
+    --background-color: #{$bg-gradient}; 
+    --glass-bg: #{$glass-bg};
+    --glass-border: #{$border-color};
+    --primary-color: #{$primary}; 
+    --text-color: #{$text-color};
+    --card-bg: transparent;
+    --sidenav-bg: transparent;
+    
+    // Override material vars
+    --mdc-filled-button-container-color: #{$primary};
+}
+
+// 1. NAVY · GREY FOUNDATION (Deep & Classic)
+// N1 Classic Navy: Deep Blue/Black Gradient
+.theme-n1 { 
+    @include glass-theme-base(
+        radial-gradient(circle at 0% 0%, #1a1f2c 0%, #07090e 100%) comma radial-gradient(circle at 100% 100%, #1e2432 0%, #080b10 100%) #0a0c15, 
+        rgba(10,25,45,0.55), rgba(140,180,230,0.3), #4F657F
+    ); 
+} 
+
+// N3 Teal Navy: Teal/Dark Gradient
+.theme-n3 { 
+    @include glass-theme-base(
+        linear-gradient(135deg, #0f2027 0%, #203a43 50%, #2c5364 100%), 
+        rgba(8,40,50,0.6), rgba(100,200,200,0.3), #3E6A70
+    ); 
+}
+
+// N6 Gold Navy: Dark Blue with Gold tint
+.theme-n6 { 
+    @include glass-theme-base(
+        radial-gradient(circle at 100% 0%, #2c2618 0%, #0f121d 60%, #0a0c15 100%), 
+        rgba(20,25,45,0.6), rgba(230,200,120,0.45), #7A7156
+    ); 
+}
+
+// N8 Coral Navy: Dark with Coral warmth
+.theme-n8 { 
+    @include glass-theme-base(
+        linear-gradient(to bottom right, #231821 0%, #1a1015 100%), 
+        rgba(40,30,45,0.6), rgba(255,150,140,0.35), #975D62
+    ); 
+}
+
+// N12 Dusty Pink: Muted Purple/Pink Dark
+.theme-n12 { 
+    @include glass-theme-base(
+        linear-gradient(to right, #2b1f2e 0%, #15101a 100%), 
+        rgba(30,25,45,0.6), rgba(230,160,180,0.4), #865F70
+    ); 
+}
+
+
+// 2. BRIGHT · NEON GLASS (High Voltage)
+// B1 Neon Punk: Vibrant Pink/Purple
+.theme-b1 { 
+    @include glass-theme-base(
+        linear-gradient(135deg, #2b0824 0%, #4a0e36 50%, #1a0515 100%), 
+        rgba(45,15,45,0.5), #ff44aa, #FF1493
+    ); 
+}
+
+// B2 High Voltage: Electric Green/Dark
+.theme-b2 { 
+    @include glass-theme-base(
+        radial-gradient(circle at 50% 50%, #1a2e05 0%, #000000 100%), 
+        rgba(30,50,20,0.5), #ccff00, #CCFF00
+    ); 
+}
+
+// B4 Vaporwave: Cyan/Purple
+.theme-b4 { 
+    @include glass-theme-base(
+        linear-gradient(45deg, #180c2e 0%, #062b33 100%), 
+        rgba(25,20,50,0.5), #00ffff, #00FFFF
+    ); 
+}
+
+// B6 Superhot: Red/Orange Dark
+.theme-b6 { 
+    @include glass-theme-base(
+        linear-gradient(to bottom, #300c0c 0%, #120303 100%), 
+        rgba(50,15,25,0.55), #ff3300, #FF3300
+    ); 
+}
+
+// B15 Blacklight: Deep Purple
+.theme-b15 { 
+    @include glass-theme-base(
+        radial-gradient(circle at 20% 80%, #2e0836 0%, #0d020f 100%), 
+        rgba(25,10,50,0.6), #cc44ff, #CC44FF
+    ); 
+}
+
+
+// 3. PROFESSIONAL · ELEVATED (Sophisticated)
+// P2 Dynamic: Dynamic Blue
+.theme-p2 { 
+    @include glass-theme-base(
+        linear-gradient(160deg, #0e1c26 0%, #2a4557 100%), 
+        rgba(10,35,50,0.55), #ff8c6a, #2D6A8F
+    ); 
+}
+
+// P5 Biophilic: Natural Green/Earth
+.theme-p5 { 
+    @include glass-theme-base(
+        linear-gradient(to top left, #1a241b 0%, #2e3b30 100%), 
+        rgba(30,45,30,0.55), #e0cba0, #5C735E
+    ); 
+}
+
+// P9 Prestige: Luxurious Teal/Gold
+.theme-p9 { 
+    @include glass-theme-base(
+        radial-gradient(circle, #0e2a30 0%, #051417 100%), 
+        rgba(10,45,50,0.6), #d9b650, #1E6468
+    ); 
+}
+
+// P11 Warm Minimal: Warm Earth Tones
+.theme-p11 { 
+    @include glass-theme-base(
+        linear-gradient(to right, #2e2622 0%, #1a1512 100%), 
+        rgba(40,30,25,0.6), #e6c9af, #6F4E3A
+    ); 
+}
+
+// P14 Poetic: Soft Muted Rose/Grey
+.theme-p14 { 
+    @include glass-theme-base(
+        linear-gradient(135deg, #2e2227 0%, #171012 100%), 
+        rgba(45,25,40,0.6), #dbbec3, #693B4C
+    ); 
+}

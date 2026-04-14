@@ -1,13 +1,18 @@
-﻿using POS.Data.Dto;
+using POS.Data.Dto;
+using POS.MediatR.PipeLineBehavior;
 using MediatR;
-using System.Collections.Generic;
 using System;
+using System.Collections.Generic;
 
 namespace POS.MediatR.CommandAndQuery
 {
-    public class GetAllProductCategoriesQuery : IRequest<List<ProductCategoryDto>>
+    public class GetAllProductCategoriesQuery : IRequest<List<ProductCategoryDto>>, ICacheableQuery
     {
-        public Guid? Id { get; set; }
         public bool IsDropDown { get; set; } = false;
+        public Guid? Id { get; set; }
+
+        public string CacheKey => $"GetAllProductCategoriesQuery_{IsDropDown}_{Id}";
+        public TimeSpan? AbsoluteExpiration => TimeSpan.FromMinutes(15);
+        public bool BypassCache => false;
     }
 }

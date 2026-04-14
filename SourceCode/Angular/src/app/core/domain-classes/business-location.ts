@@ -6,6 +6,11 @@ export interface BusinessLocation {
   address?: string;
   mobile?: string;
   email?: string;
+  contactPerson?: string;
+  website?: string;
+  fbrKey?: string;
+  posid?: string;
+  apiBaseUrl?: string;
 }
 
 

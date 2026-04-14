@@ -24,6 +24,7 @@ namespace POS.API.Controllers.Authentication
         /// <param name="userLoginCommand"></param>
         /// <returns></returns>
         [HttpPost("authentication")]
+        [HttpPost("authentication/login")]
         [Produces("application/json", "application/xml", Type = typeof(UserAuthDto))]
         public async Task<IActionResult> Login(UserLoginCommand userLoginCommand)
         {

@@ -1,4 +1,4 @@
-﻿using AutoMapper;
+using AutoMapper;
 using MediatR;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.EntityFrameworkCore;
@@ -17,10 +17,12 @@ using POS.Repository;
 using POS.Repository.Accouting;
 using System;
 using System.Collections.Generic;
-using System.IO;
-using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using POS.Common.Services;
+using System.Threading;
+using System.Linq;
+using System.IO;
 
 namespace POS.MediatR.Handlers
 {
@@ -38,6 +40,7 @@ namespace POS.MediatR.Handlers
         private readonly ITransactionStrategyFactory _transactionStrategyFactory;
         private readonly ITaxRepository _taxRepository;
         private readonly IFinancialYearRepository _financialYearRepository;
+        private readonly IFileStorageService _fileStorageService;
 
         public AddExpenseCommandHandler(
             IExpenseRepository expenseRepository,
@@ -51,7 +54,8 @@ namespace POS.MediatR.Handlers
             ITransactionRepository transactionRepository,
             IExpenseStrategy expenseStrategy,
             ITransactionStrategyFactory transactionStrategyFactory,
-            IFinancialYearRepository financialYearRepository
+            IFinancialYearRepository financialYearRepository,
+            IFileStorageService fileStorageService
 
            )
         {
@@ -65,7 +69,9 @@ namespace POS.MediatR.Handlers
             _transactionRepository = transactionRepository;
             _transactionStrategyFactory = transactionStrategyFactory;
             _taxRepository = taxRepository;
+
             _financialYearRepository = financialYearRepository;
+            _fileStorageService = fileStorageService;
 
         }
 
@@ -83,38 +89,25 @@ namespace POS.MediatR.Handlers
 
             var requestTaxIds = request.ExpenseTaxIds?.ToList() ?? new List<Guid>();
 
-            if (entity.ExpenseTaxes != null & entity.ExpenseTaxes.Count() > 0)
+            if (entity.ExpenseTaxes != null && entity.ExpenseTaxes.Any())
             {
                 entity.ExpenseTaxes.ForEach(x => x.Tax = null);
             }
 
             if (!string.IsNullOrWhiteSpace(request.ReceiptName) && !string.IsNullOrWhiteSpace(request.DocumentData))
             {
-                string contentRootPath = _webHostEnvironment.WebRootPath;
-                var pathToSave = Path.Combine(contentRootPath, _pathHelper.Attachments);
-
-                if (!Directory.Exists(pathToSave))
-                {
-                    Directory.CreateDirectory(pathToSave);
-                }
-
-                var extension = Path.GetExtension(request.ReceiptName); ;
+                var extension = Path.GetExtension(request.ReceiptName);
                 var id = Guid.NewGuid();
-                var path = $"{id}.{extension}";
-                var documentPath = Path.Combine(pathToSave, path);
-                string base64 = request.DocumentData.Split(',').LastOrDefault();
-                if (!string.IsNullOrWhiteSpace(base64))
+                var path = $"{id}{extension}";
+                
+                try
                 {
-                    byte[] bytes = Convert.FromBase64String(base64);
-                    try
-                    {
-                        await File.WriteAllBytesAsync($"{documentPath}", bytes);
-                        entity.ReceiptPath = path;
-                    }
-                    catch
-                    {
-                        _logger.LogError("Error while saving files", entity);
-                    }
+                    await _fileStorageService.SaveFileAsync(_pathHelper.Attachments, request.DocumentData, path);
+                    entity.ReceiptPath = path;
+                }
+                catch
+                {
+                    _logger.LogError("Error while saving files", entity);
                 }
             }
 

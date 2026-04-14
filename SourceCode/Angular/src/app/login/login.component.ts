@@ -38,6 +38,7 @@ export class LoginComponent extends BaseComponent implements OnInit {
   lat!: number;
   lng!: number;
   logoImage!: string;
+  logoLoadFailed = false;
   constructor(
     private fb: UntypedFormBuilder,
     private router: Router,
@@ -61,6 +62,7 @@ export class LoginComponent extends BaseComponent implements OnInit {
     this.securityService.companyProfile.subscribe((profile) => {
       if (profile && profile.logoUrl) {
         this.logoImage = profile.logoUrl;
+        this.logoLoadFailed = false;
       }
     });
   }

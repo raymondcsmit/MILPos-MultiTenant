@@ -51,6 +51,13 @@ export class ManageBusinessLocationComponent
     this.createForm();
     if (this.data.id) {
       this.locationForm.patchValue(this.data);
+      // Handle casing mismatch from API (PascalCase vs camelCase)
+      const data = this.data as any;
+      this.locationForm.patchValue({
+        fbrKey: data.fbrKey || data.FBRKey,
+        posid: data.posid || data.POSID,
+        apiBaseUrl: data.apiBaseUrl || data.ApiBaseUrl
+      });
       this.isEdit = true;
     }
   }
@@ -62,7 +69,11 @@ export class ManageBusinessLocationComponent
       address: ['', Validators.required],
       mobile: [''],
       contactPerson: [''],
+      website: [''],
       email: ['', [Validators.email]],
+      fbrKey: ['', Validators.required],
+      posid: ['', Validators.required],
+      apiBaseUrl: ['', Validators.required],
     });
   }
 

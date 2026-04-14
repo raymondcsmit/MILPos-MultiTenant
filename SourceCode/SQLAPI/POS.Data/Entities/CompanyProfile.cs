@@ -15,4 +15,14 @@ public class CompanyProfile : BaseEntity
     public string CurrencyCode { get; set; }
     public string LicenseKey { get; set; } = string.Empty;
     public string PurchaseCode { get; set; } = string.Empty;
+    public BusinessType BusinessType { get; set; } = BusinessType.Retail;
+}
+
+public enum BusinessType
+{
+    Retail = 0,
+    Pharmacy = 1,
+    AgriPharma = 2,
+    PetrolPump = 3,
+    GeneralStore = 4
 }

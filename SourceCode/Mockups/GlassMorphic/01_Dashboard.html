@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - Glassmorphic Mockup</title>
+    <link rel="stylesheet" href="mockup-styles.css">
+</head>
+<body>
+    <div class="app-container">
+        <!-- Sidebar -->
+        <aside class="sidebar glass-panel">
+            <div class="brand">
+                <span class="material-icons">inventory_2</span>
+                POS System
+            </div>
+            <nav class="nav-links">
+                <a href="01_Dashboard.html" class="nav-item active">
+                    <span class="material-icons">dashboard</span> Dashboard
+                </a>
+                <a href="02_UserProfile.html" class="nav-item">
+                    <span class="material-icons">person</span> Profile
+                </a>
+                <a href="03_DataEntry.html" class="nav-item">
+                    <span class="material-icons">add_box</span> Add Product
+                </a>
+                <a href="05_SearchResults.html" class="nav-item">
+                    <span class="material-icons">search</span> Search
+                </a>
+                <a href="04_Settings.html" class="nav-item">
+                    <span class="material-icons">settings</span> Settings
+                </a>
+            </nav>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- Navbar -->
+            <header class="navbar glass-panel">
+                <div class="search-bar" style="display: flex; align-items: center; background: rgba(255,255,255,0.1); padding: 8px 16px; border-radius: 20px; border: 1px solid rgba(255,255,255,0.1); width: 300px;">
+                    <span class="material-icons" style="color: var(--text-secondary); margin-right: 8px;">search</span>
+                    <input type="text" placeholder="Search..." style="background: transparent; border: none; padding: 0; height: auto;">
+                </div>
+                <div class="user-menu">
+                    <span class="avatar">JD</span>
+                    <span>John Doe</span>
+                    <span class="material-icons">expand_more</span>
+                </div>
+            </header>
+
+            <div class="content-scroll">
+                <!-- Stats Grid (Demonstrating Tinted Glass Mitigation) -->
+                <div class="stats-grid">
+                    <div class="small-box bg-aqua">
+                        <div class="inner">
+                            <h3>150</h3>
+                            <p>New Orders</p>
+                        </div>
+                        <span class="material-icons icon">shopping_bag</span>
+                    </div>
+                    <div class="small-box bg-green">
+                        <div class="inner">
+                            <h3>53%</h3>
+                            <p>Bounce Rate</p>
+                        </div>
+                        <span class="material-icons icon">bar_chart</span>
+                    </div>
+                    <div class="small-box bg-yellow">
+                        <div class="inner">
+                            <h3>44</h3>
+                            <p>User Registrations</p>
+                        </div>
+                        <span class="material-icons icon">person_add</span>
+                    </div>
+                    <div class="small-box bg-red">
+                        <div class="inner">
+                            <h3>65</h3>
+                            <p>Unique Visitors</p>
+                        </div>
+                        <span class="material-icons icon">pie_chart</span>
+                    </div>
+                </div>
+
+                <!-- Main Chart Area -->
+                <div class="card glass-panel">
+                    <div class="card-header">
+                        <h3 class="card-title">Monthly Sales Report</h3>
+                        <div class="actions">
+                            <button class="btn btn-secondary" style="padding: 6px 12px; font-size: 12px;">
+                                <span class="material-icons" style="font-size: 16px;">download</span> Export
+                            </button>
+                        </div>
+                    </div>
+                    <div style="height: 300px; display: flex; align-items: flex-end; justify-content: space-around; padding: 0 20px;">
+                        <!-- Mock Chart Bars -->
+                        <div style="width: 40px; height: 40%; background: rgba(33, 150, 243, 0.5); border-radius: 8px 8px 0 0;"></div>
+                        <div style="width: 40px; height: 70%; background: rgba(33, 150, 243, 0.5); border-radius: 8px 8px 0 0;"></div>
+                        <div style="width: 40px; height: 50%; background: rgba(33, 150, 243, 0.5); border-radius: 8px 8px 0 0;"></div>
+                        <div style="width: 40px; height: 90%; background: rgba(33, 150, 243, 0.5); border-radius: 8px 8px 0 0;"></div>
+                        <div style="width: 40px; height: 60%; background: rgba(33, 150, 243, 0.5); border-radius: 8px 8px 0 0;"></div>
+                        <div style="width: 40px; height: 80%; background: rgba(33, 150, 243, 0.5); border-radius: 8px 8px 0 0;"></div>
+                    </div>
+                </div>
+
+                <!-- Recent Orders Table -->
+                <div class="card glass-panel">
+                    <div class="card-header">
+                        <h3 class="card-title">Recent Transactions</h3>
+                    </div>
+                    <div class="table-container">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Order ID</th>
+                                    <th>Item</th>
+                                    <th>Status</th>
+                                    <th>Amount</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr class="glass-row">
+                                    <td>#OR9842</td>
+                                    <td>Call of Duty IV</td>
+                                    <td><span class="badge badge-success">Shipped</span></td>
+                                    <td>$90.00</td>
+                                </tr>
+                                <tr class="glass-row">
+                                    <td>#OR1848</td>
+                                    <td>Samsung Galaxy S24</td>
+                                    <td><span class="badge badge-warning">Pending</span></td>
+                                    <td>$999.00</td>
+                                </tr>
+                                <tr class="glass-row">
+                                    <td>#OR7429</td>
+                                    <td>iPhone 15 Pro</td>
+                                    <td><span class="badge badge-danger">Delivered</span></td>
+                                    <td>$1200.00</td>
+                                </tr>
+                                <tr class="glass-row">
+                                    <td>#OR9842</td>
+                                    <td>PlayStation 5</td>
+                                    <td><span class="badge badge-success">Shipped</span></td>
+                                    <td>$499.00</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+</body>
+</html>

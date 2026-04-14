@@ -11,17 +11,17 @@
   .nav {
     >li {
       >a {
-        color: #000;
+        color: vars.$theme-navbar-brand;
       }
     }
   }
 
   .collapse-menu-icon .mat-icon {
-    color: #000;
+    color: vars.$theme-navbar-brand;
   }
 
   .nav-notification-icons .mat-icon {
-    color: #000;
+    color: vars.$theme-navbar-brand;
   }
 }
 
@@ -175,7 +175,7 @@
 }
 
 .demo-choose-skin li.actived:after {
-  color: #000;
+  color: vars.$theme-navbar-brand;
 }
 
 .nav-tabs>li>a:before {
@@ -183,17 +183,17 @@
 }
 
 .search-box input#search {
-  color: gray;
-  background: #edecec;
+  color: vars.$theme-navbar-brand;
+  background: vars.$theme-bar;
 }
 
 .settingSidebar ul.choose-theme li.active div::after {
-  color: #000;
+  color: vars.$theme-navbar-brand;
 }
 
 
 .navbar-header {
-  background-color: vars.$theme-navbar-brand;
+  background-color: transparent;
 
   .logo-name {
     color: #6f6f6f;
@@ -217,17 +217,17 @@
     .nav {
       >li {
         >a {
-          color: #fff;
+          color: vars.$theme-white;
         }
       }
     }
 
     .collapse-menu-icon .mat-icon {
-      color: #fff;
+      color: vars.$theme-white;
     }
 
     .nav-notification-icons .mat-icon {
-      color: #fff;
+      color: vars.$theme-white;
     }
   }
 

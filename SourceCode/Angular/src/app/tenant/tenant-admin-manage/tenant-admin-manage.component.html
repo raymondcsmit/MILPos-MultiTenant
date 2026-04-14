@@ -1,0 +1,55 @@
+<div class="modal-header">
+  <h4 class="modal-title">Manage Tenant Admin</h4>
+  <button type="button" class="close" aria-label="Close" (click)="close()">
+    <span aria-hidden="true">&times;</span>
+  </button>
+</div>
+<div class="modal-body">
+  <form [formGroup]="adminForm">
+    <div class="row">
+      <div class="col-md-12">
+        <mat-form-field appearance="outline" class="w-100">
+          <mat-label>Admin Email</mat-label>
+          <input matInput formControlName="adminEmail" required placeholder="admin@example.com">
+          <mat-error *ngIf="adminForm.get('adminEmail')?.hasError('required')">
+            Email is required
+          </mat-error>
+          <mat-error *ngIf="adminForm.get('adminEmail')?.hasError('email')">
+            Invalid email format
+          </mat-error>
+        </mat-form-field>
+      </div>
+    </div>
+
+    <div class="row">
+      <div class="col-md-6">
+        <mat-form-field appearance="outline" class="w-100">
+          <mat-label>New Password</mat-label>
+          <input matInput formControlName="newPassword" type="password" required>
+          <mat-error *ngIf="adminForm.get('newPassword')?.hasError('required')">
+            Password is required
+          </mat-error>
+          <mat-error *ngIf="adminForm.get('newPassword')?.hasError('minlength')">
+            Minimum 6 characters required
+          </mat-error>
+        </mat-form-field>
+      </div>
+      <div class="col-md-6">
+        <mat-form-field appearance="outline" class="w-100">
+          <mat-label>Confirm Password</mat-label>
+          <input matInput formControlName="confirmPassword" type="password" required>
+          <mat-error *ngIf="adminForm.hasError('notSame')">
+            Passwords do not match
+          </mat-error>
+        </mat-form-field>
+      </div>
+    </div>
+  </form>
+</div>
+<div class="modal-footer">
+  <button type="button" class="btn btn-secondary" (click)="close()">Close</button>
+  <button type="button" class="btn btn-primary" (click)="save()" [disabled]="adminForm.invalid || isSaving">
+    <span *ngIf="isSaving">Saving...</span>
+    <span *ngIf="!isSaving">Save Changes</span>
+  </button>
+</div>

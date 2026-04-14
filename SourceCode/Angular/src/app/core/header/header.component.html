@@ -2,18 +2,18 @@
   <div class="container-fluid">
     @if(!isMobile ){
     @if(!isPosPage ){
-    <div class="navbar-header d-flex d-none d-lg-block" #navbarHeader>
-      <a class="bars" onClick="return false;" (click)="mobileMenuSidebarOpen($event,'overlay-open')"></a>
+    <div class="navbar-header d-flex" #navbarHeader>
       <a class="navbar-brand" routerLink="/">
         @if(logoImage){
         <img [src]="logoImage" alt="Logo" class="logo-img" />
         }@else {
-        <img src="/images/logo.png" alt="Lofo" class="logo-img">
+        <img src="images/logo.png" alt="Lofo" class="logo-img">
         }
       </a>
-      <!-- mobile menu bars -->
-      <a onClick="return false;" class="navbar-toggle collapsed" (click)="isNavbarCollapsed = !isNavbarCollapsed"
-        aria-expanded="false"></a>
+      
+      <button mat-icon-button (click)="callSidemenuCollapse()">
+         <mat-icon [ngClass]="{'rotated': isOpenSidebar}" class="header-icon"> {{isOpenSidebar ? 'menu_close' : 'menu_open'}}</mat-icon>
+      </button>
     </div>
     }
     }
@@ -24,7 +24,7 @@
         @if(logoImage){
         <img [src]="logoImage" alt="Logo" class="logo-img" />
         }@else {
-        <img src="/images/logo.png" alt="Lofo" class="logo-img">
+        <img src="images/logo.png" alt="Lofo" class="logo-img">
         }
       </a>
       <!-- mobile menu bars -->
@@ -101,6 +101,16 @@
                 </button>
               </div>
             </mat-menu>
+            <!-- <button class="primary mt-4" matButton="filled" *hasClaim="'POS_POS'" [routerLink]="['/pos']">
+              <mat-icon class="medium-icon text-white">point_of_sale</mat-icon>
+              {{'POS' | translate }}
+            </button> -->
+            @if(isSuperAdmin){
+            <button class="accent mt-4" matButton="filled" [routerLink]="['/tenants']">
+              <mat-icon class="medium-icon text-white">business</mat-icon>
+              Tenants
+            </button>
+            }
             <button class="primary mt-4" matButton="filled" *hasClaim="'POS_POS'" [routerLink]="['/pos']">
               <mat-icon class="medium-icon text-white">point_of_sale</mat-icon>
               {{'POS' | translate }}
@@ -125,6 +135,11 @@
       <ul class="nav navbar-nav navbar-right">
         <li>
           <div class="d-flex gap-2">
+            @if(isSuperAdmin){
+            <button matTooltip="Manage Tenants" matMiniFab class="accent" [routerLink]="['/tenants']">
+              <mat-icon class="header-icon fs-4">business</mat-icon>
+            </button>
+            }
             <button matTooltip="Today's Summary Report" matMiniFab class="error">
               <mat-icon class="header-icon fs-4" (click)="openDailyReport()">assignment</mat-icon>
             </button>
@@ -226,7 +241,7 @@
                 @if(profilePath){
                 <img [src]="profilePath" class="rounded-circle border" width="32" height="32" alt="User">
                 }@else {
-                <img src="/images/user-profile.jpg" class="rounded-circle border mt-1app-pos" width="32" height="32"
+                <img src="images/user-profile.jpg" class="rounded-circle border mt-1app-pos" width="32" height="32"
                   alt="User">
                 }
               </div>

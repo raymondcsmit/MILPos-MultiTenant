@@ -1,5 +1,5 @@
 ﻿using POS.Data.Entities;
-using POS.Helper;
+using POS.Data.Resources;
 using System;
 using System.Collections.Generic;
 using System.Linq;

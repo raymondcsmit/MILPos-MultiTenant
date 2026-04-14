@@ -12,7 +12,7 @@ import { catchError, finalize } from 'rxjs/operators';
 import { Router } from '@angular/router';
 import { ToastrService } from '@core/services/toastr.service';
 import { TranslationService } from '@core/services/translation.service';
-import { LicenseValidatorService } from '@mlglobtech/license-validator-pos';
+import { WrLicenseService } from '@core/services/wr-license.service';
 import { LoadingProgressService } from '@shared/loading-indicator/loading-progress-service';
 
 export const HttpRequestInterceptor: HttpInterceptorFn = (
@@ -20,9 +20,9 @@ export const HttpRequestInterceptor: HttpInterceptorFn = (
   next: HttpHandlerFn,
 
 ): Observable<HttpEvent<unknown>> => {
-  const licenseValidatorService = inject(LicenseValidatorService);
+  const wrLicenseService = inject(WrLicenseService);
   const loadingService = inject(LoadingProgressService);
-  const token = licenseValidatorService.getBearerToken();
+  const token = wrLicenseService.getBearerToken();
   const baseUrl = environment.apiUrl;
   const envInjector = inject(EnvironmentInjector);
   loadingService.startRequest();
@@ -31,17 +31,23 @@ export const HttpRequestInterceptor: HttpInterceptorFn = (
       finalize(() => loadingService.endRequest())
     );
   }
-  const url = req.url.lastIndexOf('api') > -1 ? req.url : 'api/' + req.url;
   let newReq: HttpRequest<any>;
-  if (token) {
+  if (req.url.startsWith('http://') || req.url.startsWith('https://')) {
     newReq = req.clone({
-      headers: req.headers.set('Authorization', 'Bearer ' + token),
-      url: `${baseUrl}${url}`,
+      headers: token ? req.headers.set('Authorization', 'Bearer ' + token) : req.headers
     });
   } else {
-    newReq = req.clone({
-      url: `${baseUrl}${url}`,
-    });
+    const url = req.url.lastIndexOf('api') > -1 ? req.url : 'api/' + req.url;
+    if (token) {
+      newReq = req.clone({
+        headers: req.headers.set('Authorization', 'Bearer ' + token),
+        url: `${baseUrl}${url}`,
+      });
+    } else {
+      newReq = req.clone({
+        url: `${baseUrl}${url}`,
+      });
+    }
   }
   return next(newReq)
     .pipe(
@@ -55,9 +61,13 @@ export const HttpRequestInterceptor: HttpInterceptorFn = (
             if (err.status === 401) {
               router.navigate(['login']);
             } else if (err.status === 403) {
-              toastrService.error(
-                translationService.getValue('ACCESS_FORBIDDEN')
-              );
+              if (err.error && (err.error.isTrialExpired || (typeof err.error === 'string' && err.error.includes('Trial')))) {
+                router.navigate(['/subscription']);
+              } else {
+                  toastrService.error(
+                    translationService.getValue('ACCESS_FORBIDDEN')
+                  );
+              }
             } else if (err.error && err.error.length >= 0) {
               toastrService.error(err.error[0]);
             } else if (err.error && err.error?.messages?.length > 0) {

@@ -15,7 +15,6 @@ namespace POS.Repository
     public class LoginAuditRepository : GenericRepository<LoginAudit, POSDbContext>,
        ILoginAuditRepository
     {
-        private readonly IUnitOfWork<POSDbContext> _uow;
         private readonly ILogger<LoginAuditRepository> _logger;
         private readonly IPropertyMappingService _propertyMappingService;
         public LoginAuditRepository(
@@ -24,7 +23,6 @@ namespace POS.Repository
             IPropertyMappingService propertyMappingService
             ) : base(uow)
         {
-            _uow = uow;
             _logger = logger;
             _propertyMappingService = propertyMappingService;
         }

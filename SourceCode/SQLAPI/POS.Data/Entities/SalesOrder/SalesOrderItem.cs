@@ -32,5 +32,16 @@ namespace POS.Data
         [Column(TypeName = "decimal(18,2)")]
         public decimal PurchasePrice { get; set; }
         public string DiscountType { get; set; }
+
+        // Pharmacy / Agri Fields
+        public string BatchNumber { get; set; }
+        public DateTime? ExpiryDate { get; set; }
+
+        // Petrol Pump Fields
+        public Guid? NozzleId { get; set; }
+        [Column(TypeName = "decimal(18,2)")]
+        public decimal? MeterReadingStart { get; set; }
+        [Column(TypeName = "decimal(18,2)")]
+        public decimal? MeterReadingEnd { get; set; }
     }
 }

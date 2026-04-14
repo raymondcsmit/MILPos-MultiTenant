@@ -1,4 +1,4 @@
-﻿using POS.Common.GenericRepository;
+using POS.Common.GenericRepository;
 using POS.Data;
 using System;
 using System.Collections.Generic;
@@ -10,5 +10,6 @@ namespace POS.Repository
 {
     public interface ICompanyProfileRepository : IGenericRepository<CompanyProfile>
     {
+        Task<CompanyProfile> GetCompanyProfile();
     }
 }

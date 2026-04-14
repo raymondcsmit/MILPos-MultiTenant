@@ -2,7 +2,7 @@ import { Component, inject, OnInit } from '@angular/core';
 import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { TranslateModule } from '@ngx-translate/core';
 import { SecurityService } from '@core/security/security.service';
-import { LicenseValidatorService } from '@mlglobtech/license-validator-pos';
+import { WrLicenseService } from '@core/services/wr-license.service';
 
 @Component({
   selector: 'app-activate-license',
@@ -17,7 +17,7 @@ import { LicenseValidatorService } from '@mlglobtech/license-validator-pos';
 export class ActivateLicenseComponent implements OnInit {
   logoUrl?: string;
   securityService = inject(SecurityService);
-  licenseValidatorService = inject(LicenseValidatorService);
+  wrLicenseService = inject(WrLicenseService);
   activatedForm!: FormGroup;
 
   ngOnInit(): void {
@@ -43,7 +43,7 @@ export class ActivateLicenseComponent implements OnInit {
       this.activatedForm.markAllAsTouched();
       return;
     }
-    this.licenseValidatorService.onActivateLicense(this.activatedForm.value.purchaseCode);
+    this.wrLicenseService.onActivateLicense(this.activatedForm.value.purchaseCode);
   }
 
 }

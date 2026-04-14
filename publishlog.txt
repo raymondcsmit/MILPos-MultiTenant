@@ -1,0 +1,165 @@
+
+  • electron-builder  version=26.4.0 os=10.0.26100
+  • loaded configuration  file=package.json ("build" field)
+  • writing effective config  file=release\builder-effective-config.yaml
+  • executing @electron/rebuild  electronVersion=40.0.0 arch=x64 buildFromSource=false workspaceRoot=F:\MIllyass\pos-with-inventory-management\SourceCode\Angular projectDir=./ appDir=./
+  • installing native dependencies  arch=x64
+  • completed installing native dependencies
+  • packaging       platform=win32 arch=x64 electron=40.0.0 appOutDir=release\win-unpacked
+  • updating asar integrity executable resource  executablePath=release\win-unpacked\MIL POS.exe
+  • signing with signtool.exe  path=release\win-unpacked\resources\api\POS.API.exe
+  • signing with signtool.exe  path=release\win-unpacked\resources\api\createdump.exe
+  • signing with signtool.exe  path=release\win-unpacked\MIL POS.exe
+  • building        target=nsis file=release\MIL POS Setup 0.0.5.exe archs=x64 oneClick=false perMachine=false
+  • signing with signtool.exe  path=release\win-unpacked\resources\elevate.exe
+  • signing with signtool.exe  path=release\MIL POS Setup 0.0.5.__uninstaller.exe
+  • signing with signtool.exe  path=release\MIL POS Setup 0.0.5.exe
+  • building block map  blockMapFile=release\MIL POS Setup 0.0.5.exe.blockmap
+  • publishing      publisher=Github (owner: raymondcsmit, project: MILPos-MultiTenant, version: 0.0.5)
+  • uploading       file=MIL-POS-Setup-0.0.5.exe.blockmap provider=github
+  • uploading       file=MIL-POS-Setup-0.0.5.exe provider=github
+  ⨯ Cannot cleanup: 
+
+Error #1 --------------------------------------------------------------------------------
+HttpError: 401 Unauthorized
+"method: GET url: https://api.github.com/repos/raymondcsmit/MILPos-MultiTenant/releases\n\n          Data:\n          {\"message\":\"Bad credentials\",\"documentation_url\":\"https://docs.github.com/rest\",\"status\":\"401\"}\n          "
+Headers: {
+  "content-type": "application/json; charset=utf-8",
+  "x-github-media-type": "github.v3; format=json",
+  "access-control-expose-headers": "ETag, Link, Location, Retry-After, X-GitHub-OTP, X-RateLimit-Limit, X-RateLimit-Remaining, X-RateLimit-Used, X-RateLimit-Resource, X-RateLimit-Reset, X-OAuth-Scopes, X-Accepted-OAuth-Scopes, X-Poll-Interval, X-GitHub-Media-Type, X-GitHub-SSO, X-GitHub-Request-Id, Deprecation, Sunset",
+  "access-control-allow-origin": "*",
+  "strict-transport-security": "max-age=31536000; includeSubdomains; preload",
+  "x-frame-options": "deny",
+  "x-content-type-options": "nosniff",
+  "x-xss-protection": "0",
+  "referrer-policy": "origin-when-cross-origin, strict-origin-when-cross-origin",
+  "content-security-policy": "default-src 'none'",
+  "vary": "Accept-Encoding, Accept, X-Requested-With",
+  "server": "github.com",
+  "date": "Wed, 04 Feb 2026 16:51:18 GMT",
+  "x-github-request-id": "91BA:12A4FC:28061F:2CC0A8:69837906",
+  "connection": "close"
+}
+    at createHttpError (F:\MIllyass\pos-with-inventory-management\SourceCode\Angular\node_modules\builder-util-runtime\src\httpExecutor.ts:31:10)
+    at IncomingMessage.<anonymous> (F:\MIllyass\pos-with-inventory-management\SourceCode\Angular\node_modules\builder-util-runtime\src\httpExecutor.ts:202:13)
+    at IncomingMessage.emit (node:events:536:35)
+    at endReadableNT (node:internal/streams/readable:1698:12)
+    at processTicksAndRejections (node:internal/process/task_queues:90:21)
+
+Error #2 --------------------------------------------------------------------------------
+HttpError: 401 Unauthorized
+"method: GET url: https://api.github.com/repos/raymondcsmit/MILPos-MultiTenant/releases\n\n          Data:\n          {\"message\":\"Bad credentials\",\"documentation_url\":\"https://docs.github.com/rest\",\"status\":\"401\"}\n          "
+Headers: {
+  "content-type": "application/json; charset=utf-8",
+  "x-github-media-type": "github.v3; format=json",
+  "access-control-expose-headers": "ETag, Link, Location, Retry-After, X-GitHub-OTP, X-RateLimit-Limit, X-RateLimit-Remaining, X-RateLimit-Used, X-RateLimit-Resource, X-RateLimit-Reset, X-OAuth-Scopes, X-Accepted-OAuth-Scopes, X-Poll-Interval, X-GitHub-Media-Type, X-GitHub-SSO, X-GitHub-Request-Id, Deprecation, Sunset",
+  "access-control-allow-origin": "*",
+  "strict-transport-security": "max-age=31536000; includeSubdomains; preload",
+  "x-frame-options": "deny",
+  "x-content-type-options": "nosniff",
+  "x-xss-protection": "0",
+  "referrer-policy": "origin-when-cross-origin, strict-origin-when-cross-origin",
+  "content-security-policy": "default-src 'none'",
+  "vary": "Accept-Encoding, Accept, X-Requested-With",
+  "server": "github.com",
+  "date": "Wed, 04 Feb 2026 16:51:18 GMT",
+  "x-github-request-id": "91BA:12A4FC:28061F:2CC0A8:69837906",
+  "connection": "close"
+}
+    at createHttpError (F:\MIllyass\pos-with-inventory-management\SourceCode\Angular\node_modules\builder-util-runtime\src\httpExecutor.ts:31:10)
+    at IncomingMessage.<anonymous> (F:\MIllyass\pos-with-inventory-management\SourceCode\Angular\node_modules\builder-util-runtime\src\httpExecutor.ts:202:13)
+    at IncomingMessage.emit (node:events:536:35)
+    at endReadableNT (node:internal/streams/readable:1698:12)
+    at processTicksAndRejections (node:internal/process/task_queues:90:21)  failedTask=build stackTrace=Error: Cannot cleanup:
+                                                                                                                                                                                                                           
+                                                                                                                                                                                                                           
+                                                                                                                                                                                                                           
+                                                                                                                                                                                                                           
+                                                                                                                                                                                                                           
+                                                                                                                                                                                                                           
+                                                                                                                                                                                                                           
+                                                                                                                                                                                                                           
+                                                                                                                                                                                                                           
+                                                                                                                                                                                                                           
+                                                                                                                                                                                                                           
+                                                                                                                                                                                                                           
+                                                                                                                                                                                                                           
+                                                                                                                                                                                                                           
+                                                                                                                                                                                                                           
+                                                                                                                                                                                                                           
+                                                                                                                                                                                                                Error #1 --------------------------------------------------------------------------------
+HttpError: 401 Unauthorized
+"method: GET url: https://api.github.com/repos/raymondcsmit/MILPos-MultiTenant/releases\n\n          Data:\n          {\"message\":\"Bad credentials\",\"documentation_url\":\"https://docs.github.com/rest\",\"status\":\"401\"}\n          "
+Headers: {
+  "content-type": "application/json; charset=utf-8",
+  "x-github-media-type": "github.v3; format=json",
+  "access-control-expose-headers": "ETag, Link, Location, Retry-After, X-GitHub-OTP, X-RateLimit-Limit, X-RateLimit-Remaining, X-RateLimit-Used, X-RateLimit-Resource, X-RateLimit-Reset, X-OAuth-Scopes, X-Accepted-OAuth-Scopes, X-Poll-Interval, X-GitHub-Media-Type, X-GitHub-SSO, X-GitHub-Request-Id, Deprecation, Sunset",
+  "access-control-allow-origin": "*",
+  "strict-transport-security": "max-age=31536000; includeSubdomains; preload",
+  "x-frame-options": "deny",
+  "x-content-type-options": "nosniff",
+  "x-xss-protection": "0",
+  "referrer-policy": "origin-when-cross-origin, strict-origin-when-cross-origin",
+  "content-security-policy": "default-src 'none'",
+  "vary": "Accept-Encoding, Accept, X-Requested-With",
+  "server": "github.com",
+  "date": "Wed, 04 Feb 2026 16:51:18 GMT",
+  "x-github-request-id": "91BA:12A4FC:28061F:2CC0A8:69837906",
+  "connection": "close"
+}
+    at createHttpError (F:\MIllyass\pos-with-inventory-management\SourceCode\Angular\node_modules\builder-util-runtime\src\httpExecutor.ts:31:10)
+    at IncomingMessage.<anonymous> (F:\MIllyass\pos-with-inventory-management\SourceCode\Angular\node_modules\builder-util-runtime\src\httpExecutor.ts:202:13)
+    at IncomingMessage.emit (node:events:536:35)
+    at endReadableNT (node:internal/streams/readable:1698:12)
+    at processTicksAndRejections (node:internal/process/task_queues:90:21)
+                                                                                                                                                                                                                           
+                                                                                                                                                                                                                           
+                                                                                                                                                                                                                           
+                                                                                                                                                                                                                           
+                                                                                                                                                                                                                           
+                                                                                                                                                                                                                           
+                                                                                                                                                                                                                           
+                                                                                                                                                                                                                           
+                                                                                                                                                                                                                           
+                                                                                                                                                                                                                           
+                                                                                                                                                                                                                           
+                                                                                                                                                                                                                           
+                                                                                                                                                                                                                           
+                                                                                                                                                                                                                           
+                                                                                                                                                                                                                           
+                                                                                                                                                                                                                           
+                                                                                                                                                                                                                Error #2 --------------------------------------------------------------------------------
+HttpError: 401 Unauthorized
+"method: GET url: https://api.github.com/repos/raymondcsmit/MILPos-MultiTenant/releases\n\n          Data:\n          {\"message\":\"Bad credentials\",\"documentation_url\":\"https://docs.github.com/rest\",\"status\":\"401\"}\n          "
+Headers: {
+  "content-type": "application/json; charset=utf-8",
+  "x-github-media-type": "github.v3; format=json",
+  "access-control-expose-headers": "ETag, Link, Location, Retry-After, X-GitHub-OTP, X-RateLimit-Limit, X-RateLimit-Remaining, X-RateLimit-Used, X-RateLimit-Resource, X-RateLimit-Reset, X-OAuth-Scopes, X-Accepted-OAuth-Scopes, X-Poll-Interval, X-GitHub-Media-Type, X-GitHub-SSO, X-GitHub-Request-Id, Deprecation, Sunset",
+  "access-control-allow-origin": "*",
+  "strict-transport-security": "max-age=31536000; includeSubdomains; preload",
+  "x-frame-options": "deny",
+  "x-content-type-options": "nosniff",
+  "x-xss-protection": "0",
+  "referrer-policy": "origin-when-cross-origin, strict-origin-when-cross-origin",
+  "content-security-policy": "default-src 'none'",
+  "vary": "Accept-Encoding, Accept, X-Requested-With",
+  "server": "github.com",
+  "date": "Wed, 04 Feb 2026 16:51:18 GMT",
+  "x-github-request-id": "91BA:12A4FC:28061F:2CC0A8:69837906",
+  "connection": "close"
+}
+    at createHttpError (F:\MIllyass\pos-with-inventory-management\SourceCode\Angular\node_modules\builder-util-runtime\src\httpExecutor.ts:31:10)
+    at IncomingMessage.<anonymous> (F:\MIllyass\pos-with-inventory-management\SourceCode\Angular\node_modules\builder-util-runtime\src\httpExecutor.ts:202:13)
+    at IncomingMessage.emit (node:events:536:35)
+    at endReadableNT (node:internal/streams/readable:1698:12)
+    at processTicksAndRejections (node:internal/process/task_queues:90:21)
+    at throwError (F:\MIllyass\pos-with-inventory-management\SourceCode\Angular\node_modules\builder-util\src\asyncTaskManager.ts:88:11)
+    at checkErrors (F:\MIllyass\pos-with-inventory-management\SourceCode\Angular\node_modules\builder-util\src\asyncTaskManager.ts:53:9)
+    at AsyncTaskManager.awaitTasks (F:\MIllyass\pos-with-inventory-management\SourceCode\Angular\node_modules\builder-util\src\asyncTaskManager.ts:67:7)
+    at processTicksAndRejections (node:internal/process/task_queues:105:5)
+    at PublishManager.awaitTasks (F:\MIllyass\pos-with-inventory-management\SourceCode\Angular\node_modules\app-builder-lib\src\publish\PublishManager.ts:246:5)
+    at executeFinally (F:\MIllyass\pos-with-inventory-management\SourceCode\Angular\node_modules\builder-util\src\promise.ts:23:3)
+----------------------------------------
+ERROR: Publishing failed. Check logs above.
+----------------------------------------
+Press Enter to continue...:

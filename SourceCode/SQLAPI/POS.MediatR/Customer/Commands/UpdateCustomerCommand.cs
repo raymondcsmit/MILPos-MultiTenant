@@ -1,4 +1,4 @@
-﻿using POS.Data.Dto;
+using POS.Data.Dto;
 using POS.Helper;
 using MediatR;
 using System;
@@ -24,5 +24,8 @@ namespace POS.MediatR.CommandAndQuery
         public ContactAddressDto ShippingAddress { get; set; }
         public string TaxNumber { get; set; }
         public bool IsImageUpload { get; set; }
+        
+        public Guid? SalesPersonId { get; set; }
+        public Guid? LocationId { get; set; }
     }
 }

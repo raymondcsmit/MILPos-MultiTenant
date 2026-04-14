@@ -158,6 +158,26 @@ export class HeaderComponent extends BaseComponent implements OnInit {
     this.hasOnlyPOSPermission = this.securityService.isPOSPermissionOnly;
   }
 
+  get isSuperAdmin(): boolean {
+    // First check if user object has isSuperAdmin property
+    if (this.appUserAuth && this.appUserAuth.isSuperAdmin !== undefined) {
+      return this.appUserAuth.isSuperAdmin;
+    }
+    
+    // Fallback: check JWT token claim
+    const token = this.securityService.Token;
+    if (token && token['isSuperAdmin']) {
+      const value = token['isSuperAdmin'];
+      // Handle both string and boolean types
+      if (typeof value === 'boolean') {
+        return value;
+      }
+      return value === 'true';
+    }
+    
+    return false;
+  }
+
   // getLangDir() {
   //   this.translationService.lanDir$.subscribe((c: string) => {
   //     this.direction = c;
@@ -337,7 +357,7 @@ export class HeaderComponent extends BaseComponent implements OnInit {
   }
 
   setTopLogAndName() {
-    this.sub$.sink = this.securityService.securityObject$.subscribe((c) => {
+    this.sub$.sink = this.securityService.securityObject$.subscribe((c: User | null) => {
       if (c) {
         this.appUserAuth = c;
         if (this.appUserAuth.profilePhoto) {

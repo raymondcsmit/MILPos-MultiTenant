@@ -3,10 +3,8 @@ using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
 namespace POS.Data.Entities.Accounts;
-public class StockAdjustment
+public class StockAdjustment : BaseEntity
 {
-    public Guid Id { get; set; }
-
     public Guid InventoryItemId { get; set; }
 
     public Guid BranchId { get; set; }
@@ -26,8 +24,6 @@ public class StockAdjustment
     public string Reference { get; set; } = string.Empty;
 
     public DateTime AdjustmentDate { get; set; }
-
-    public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
 
     // Navigation Properties
     [ForeignKey("InventoryItemId")]

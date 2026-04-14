@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 
 namespace POS.Data.Dto
@@ -22,5 +22,11 @@ namespace POS.Data.Dto
         public bool IsImageUpload { get; set; }
         public string ImageUrl { get; set; }
         public bool IsWalkIn { get; set; }
+        
+        public Guid? SalesPersonId { get; set; }
+        public string SalesPersonName { get; set; }
+        
+        public Guid? LocationId { get; set; }
+        public string LocationName { get; set; }
     }
 }

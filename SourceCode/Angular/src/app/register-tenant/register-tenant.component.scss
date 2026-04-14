@@ -1,0 +1,19 @@
+@use "../../../public/scss/theme/glassmorphism" as glass;
+
+.login-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  // background-color: #f8f9fa; // Removed to show theme background
+  
+  .login-form {
+      // background: white;
+      @include glass.glass-panel($opacity: 0.15, $blur: 15px);
+      padding: 30px;
+      // border-radius: 8px; // Covered by mixin
+      box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
+      width: 100%;
+      max-width: 500px;
+  }
+}

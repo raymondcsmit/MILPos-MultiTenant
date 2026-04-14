@@ -1,7 +1,7 @@
 import { inject, Injectable } from '@angular/core';
-import { Observable, BehaviorSubject } from 'rxjs';
+import { Observable, BehaviorSubject, of, forkJoin } from 'rxjs';
 import { HttpClient } from '@angular/common/http';
-import { tap, map } from 'rxjs/operators';
+import { tap, map, switchMap, catchError } from 'rxjs/operators';
 import { AuthToken, UserAuth } from '../domain-classes/user-auth';
 import { User } from '@core/domain-classes/user';
 import { Router } from '@angular/router';
@@ -15,8 +15,11 @@ import {
   UserLocations,
 } from '@core/domain-classes/business-location';
 import { TranslationService } from '@core/services/translation.service';
-import { LicenseValidatorService } from '@mlglobtech/license-validator-pos';
+import { WrLicenseService } from '@core/services/wr-license.service';
 import { FinancialYear } from '../../accounting/financial-year/financial-year';
+import { CacheSyncService } from '../services/cache-sync.service';
+import { BusinessLocationService } from '../../business-location/business-location.service';
+import { CompanyProfileService } from '../../company-profile/company-profile.service';
 
 @Injectable({ providedIn: 'root' })
 export class SecurityService {
@@ -30,26 +33,49 @@ export class SecurityService {
   private _selectedLocation: string = '';
 
   public currencyCode = 'USD';
-  private licenseValidatorService: LicenseValidatorService = inject(LicenseValidatorService);
+  private wrLicenseService: WrLicenseService = inject(WrLicenseService);
 
   setCompany(companyProfile?: CompanyProfile) {
     if (companyProfile) {
       sessionStorage.setItem(
-        this.licenseValidatorService.keyValues.COMPANY_PROFILE,
+        this.wrLicenseService.keyValues.COMPANY_PROFILE,
         JSON.stringify(companyProfile)
       );
       this._companyProfile$.next(JSON.parse(JSON.stringify(companyProfile)));
     } else {
       const companyProfileJson = sessionStorage.getItem(
-        this.licenseValidatorService.keyValues.COMPANY_PROFILE
+        this.wrLicenseService.keyValues.COMPANY_PROFILE
       );
       if (
         companyProfileJson &&
         companyProfileJson !== 'null' &&
         companyProfileJson !== 'undefined'
       ) {
-        this._companyProfile$.next(JSON.parse(companyProfileJson));
+        const profileData: CompanyProfile = JSON.parse(companyProfileJson);
+        // Restore cached locations if the stored profile has none (e.g. after F5 refresh)
+        if (!profileData.locations || profileData.locations.length === 0) {
+          const locationJson = sessionStorage.getItem(this.wrLicenseService.keyValues.LOCATION_CACHE);
+          if (locationJson) {
+            profileData.locations = JSON.parse(locationJson);
+          }
+        }
+        this._companyProfile$.next(profileData);
       }
+    }
+  }
+
+  /** Cache location list in sessionStorage and merge into companyProfile so all
+   *  subscribers (CommonService.getLocationsForCurrentUser etc.) see fresh data. */
+  setLocationsCache(locations: BusinessLocation[]) {
+    sessionStorage.setItem(
+      this.wrLicenseService.keyValues.LOCATION_CACHE,
+      JSON.stringify(locations)
+    );
+    const current = this._companyProfile$.value;
+    if (current) {
+      this._companyProfile$.next({ ...current, locations });
+    } else {
+      this._companyProfile$.next({ locations } as CompanyProfile);
     }
   }
 
@@ -74,7 +100,7 @@ export class SecurityService {
     if (this._token) {
       return this._token;
     }
-    this._token = this.licenseValidatorService.getJWtToken();
+    this._token = this.wrLicenseService.getJWtToken();
     return this._token ?? null;
   }
 
@@ -82,8 +108,10 @@ export class SecurityService {
     if (this._selectedLocation) {
       return this._selectedLocation;
     }
-    const authObj: User = this.licenseValidatorService.getAuthObject();
-    this._selectedLocation = authObj.selectedLocation ?? '';
+    const authObj = this.wrLicenseService.getAuthObject();
+    if (authObj) {
+      this._selectedLocation = authObj.selectedLocation ?? '';
+    }
     return this._selectedLocation;
   }
 
@@ -91,13 +119,13 @@ export class SecurityService {
     return this.Claims.length == 1 && this.Claims[0].toLowerCase() == 'pos_pos';
   }
 
-  public get securityObject$(): Observable<User> {
+  public get securityObject$(): Observable<User | null> {
     return this._securityObject$.pipe(
       map((c) => {
         if (c) {
           return c;
         }
-        const currentData = localStorage.getItem(this.licenseValidatorService.keyValues.authObj);
+        const currentData = localStorage.getItem(this.wrLicenseService.keyValues.authObj);
         if (currentData) {
           this._securityObject$.next(JSON.parse(currentData));
           return JSON.parse(currentData);
@@ -122,10 +150,19 @@ export class SecurityService {
             const companyProfile = c as CompanyProfile;
             const userLocations = companyProfile.locations?.filter((l: BusinessLocation) =>
               this.Token ? this.Token['locationIds'].split(',')?.indexOf(l?.id ?? '') >= 0 : false
-            );
+            ) ?? [];
+
+            let selectedLoc = this.SelectedLocation;
+            if (!selectedLoc && userLocations.length > 0) {
+              selectedLoc = userLocations[0].id ?? '';
+              if (selectedLoc) {
+                setTimeout(() => this.updateSelectedLocation(selectedLoc), 0);
+              }
+            }
+
             return {
               locations: userLocations,
-              selectedLocation: this.SelectedLocation,
+              selectedLocation: selectedLoc,
             } as UserLocations;
           }
         }
@@ -168,9 +205,18 @@ export class SecurityService {
                 name: this.translationService.getValue('ALL_LOCATIONS'),
               });
             }
+
+            let selectedLoc = this.SelectedLocation;
+            if (!selectedLoc && userLocations.length > 0) {
+              selectedLoc = userLocations[0].id ?? '';
+              if (selectedLoc || selectedLoc === '') {
+                setTimeout(() => this.updateSelectedLocation(selectedLoc), 0);
+              }
+            }
+
             return {
               locations: userLocations,
-              selectedLocation: this.SelectedLocation,
+              selectedLocation: selectedLoc,
             };
           }
         }
@@ -224,33 +270,62 @@ export class SecurityService {
     private http: HttpClient,
     private router: Router,
     private clonerService: ClonerService,
-    private translationService: TranslationService
+    private translationService: TranslationService,
+    private cacheSyncService: CacheSyncService,
+    private businessLocationService: BusinessLocationService,
+    private companyProfileService: CompanyProfileService
   ) { }
 
   login(entity: User): Observable<UserAuth> {
     // Initialize security object
     this.resetSecurityObject();
     return this.http.post<UserAuth>('authentication', entity).pipe(
-      tap((resp: any) => {
+      switchMap((resp: any) => {
         this.securityObject = this.clonerService.deepClone<UserAuth>(resp);
-        this.licenseValidatorService.setTokenValue(this.securityObject);
+        this.wrLicenseService.setTokenValue(this.securityObject);
         if (this.Token) {
           const userLocations = this.Token['locationIds']?.split(',').filter((id: string) => id?.toString() != '');
           if (userLocations == null || userLocations.length == 0) {
-            this.licenseValidatorService.removeToken();
+            this.wrLicenseService.removeToken();
             throw new Error('No location assigned to user.');
           }
           this.updateSelectedLocation(userLocations[0]);
         }
+        if (resp.menus) {
+            localStorage.setItem('userMenus', JSON.stringify(resp.menus));
+        }
         this._securityObject$.next(resp.user);
+        
+        // Pre-load locations and company profile immediately at login so all components read from cache
+        // Wait for it to complete before emitting so that components get locations synchronously on load
+        return forkJoin({
+          locations: this.businessLocationService.getLocations().pipe(catchError(() => of([]))),
+          profile: this.companyProfileService.getCompanyProfile().pipe(catchError(() => of(null)))
+        }).pipe(
+          tap((result) => {
+            // Update profile first, which ensures it's not null
+            if (result.profile) {
+              this.updateProfile(result.profile);
+            }
+            if (result.locations && result.locations.length > 0) {
+              this.setLocationsCache(result.locations);
+            }
+            this.cacheSyncService.syncMasterData();
+          }),
+          map(() => resp),
+          catchError((err) => {
+            console.error('Could not pre-load profile and locations:', err);
+            this.cacheSyncService.syncMasterData();
+            return of(resp);
+          })
+        );
       })
     );
   }
 
   isLogin(): boolean {
-    const authStr = this.licenseValidatorService.getAuthObject();
-    if (authStr) return true;
-    else return false;
+    const authStr = this.wrLicenseService.getAuthObject();
+    return !!authStr;
   }
 
   logout(): void {
@@ -258,11 +333,24 @@ export class SecurityService {
   }
 
   resetSecurityObject(): void {
-    localStorage.removeItem(this.licenseValidatorService.keyValues.authObj);
-    localStorage.removeItem(this.licenseValidatorService.keyValues.bearerToken);
+    localStorage.removeItem(this.wrLicenseService.keyValues.authObj);
+    localStorage.removeItem(this.wrLicenseService.keyValues.BEARER_TOKEN);
+    localStorage.removeItem('userMenus');
+    sessionStorage.removeItem(this.wrLicenseService.keyValues.LOCATION_CACHE);
+    this.cacheSyncService.clearCache(); // Ensure IndexedDB is cleared on reset
+    
+    // Instead of nulling the entire profile, just clear the user-specific/tenant-specific parts
+    const currentProfile = this._companyProfile$.value;
+    if (currentProfile) {
+      this._companyProfile$.next({ ...currentProfile, locations: [], financialYears: [] });
+    } else {
+      this._companyProfile$.next(null);
+    }
+    
     this._securityObject$.next(null);
     this._token = null;
     this._claims = [];
+    this._selectedLocation = '';
     this.router.navigate(['/login']);
   }
 
@@ -271,24 +359,37 @@ export class SecurityService {
     if (companyProfile.logoUrl) {
       companyProfile.logoUrl = `${environment.apiUrl}${companyProfile.logoUrl}`;
     }
+
+    // Fix: Restore cached locations if the server profile has none (prevents empty dropdowns after login)
+    if (!companyProfile.locations || companyProfile.locations.length === 0) {
+      const locationJson = sessionStorage.getItem(this.wrLicenseService.keyValues.LOCATION_CACHE);
+      if (locationJson) {
+        companyProfile.locations = JSON.parse(locationJson);
+      }
+    }
+
     this._companyProfile$.next(companyProfile);
   }
 
   updateSelectedLocation(selectedLocation: string) {
-    const authObj: User = this.licenseValidatorService.getAuthObject();
-    authObj.selectedLocation = selectedLocation;
-    localStorage.setItem(this.licenseValidatorService.keyValues.authObj, JSON.stringify(authObj));
-    this._selectedLocation = selectedLocation;
+    const authObj = this.wrLicenseService.getAuthObject();
+    if (authObj) {
+      authObj.selectedLocation = selectedLocation;
+      localStorage.setItem(this.wrLicenseService.keyValues.authObj, JSON.stringify(authObj));
+      this._selectedLocation = selectedLocation;
+    }
   }
 
   updateUserProfile(user: User) {
-    const authObj: User = this.licenseValidatorService.getAuthObject();
-    authObj.firstName = user.firstName;
-    authObj.lastName = user.lastName;
-    authObj.profilePhoto = user.profilePhoto;
-    authObj.phoneNumber = user.phoneNumber;
-    localStorage.setItem(this.licenseValidatorService.keyValues.authObj, JSON.stringify(authObj));
-    this._securityObject$.next(this.clonerService.deepClone<User>(authObj));
+    const authObj = this.wrLicenseService.getAuthObject();
+    if (authObj) {
+      authObj.firstName = user.firstName;
+      authObj.lastName = user.lastName;
+      authObj.profilePhoto = user.profilePhoto;
+      authObj.phoneNumber = user.phoneNumber;
+      localStorage.setItem(this.wrLicenseService.keyValues.authObj, JSON.stringify(authObj));
+      this._securityObject$.next(this.clonerService.deepClone<User>(authObj));
+    }
   }
 
   // This method can be called a couple of different ways
@@ -330,16 +431,24 @@ export class SecurityService {
       // Either get the claim value, or assume 'true'
       claimValue = claimValue ? claimValue : 'true';
     }
-    const token = this.licenseValidatorService.getJWtToken();
+    const token = this.Token;
     if (token) {
-      const claims = Object.keys(token).filter((key) => token[key]);
-      ret = claims?.find((c: any) => c.toLowerCase() == claimType) != null;
+      const tokenRecord = token as Record<string, any>;
+      // For specific value checks, evaluate the exact token property
+      if (claimValue && claimValue !== 'true') {
+        ret = Object.keys(tokenRecord).some(
+          (key) => key.toLowerCase() === claimType && tokenRecord[key] === claimValue
+        );
+      } else {
+        // For standard permission checks, use the pre-cached Claims array
+        ret = this.Claims.some((c: string) => c.toLowerCase() === claimType);
+      }
     }
 
     return ret;
   }
 
-  getUserDetail(): User {
-    return this.licenseValidatorService.getAuthObject();
+  getUserDetail(): User | null {
+    return this.wrLicenseService.getAuthObject();
   }
 }

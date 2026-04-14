@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -8,6 +8,7 @@ using AutoMapper;
 using MediatR;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Logging;
 using POS.Common.UnitOfWork;
 using POS.Data;
@@ -19,6 +20,7 @@ using POS.MediatR.CommandAndQuery;
 using POS.MediatR.Language.Commands;
 using POS.Repository;
 using POS.Repository.Accouting;
+using POS.Common.Services;
 
 namespace POS.MediatR.Handlers
 {
@@ -35,6 +37,9 @@ namespace POS.MediatR.Handlers
         private readonly ILocationRepository _locationRepository;
         private readonly IFinancialYearRepository _financialYearRepository;
         private readonly IMediator _mediator;
+        private readonly IFileStorageService _fileStorageService;
+        private readonly IMemoryCache _cache;
+        private readonly ITenantProvider _tenantProvider;
 
         public UpdateCompanyProfileCommandHandler(
             ICompanyProfileRepository companyProfileRepository,
@@ -46,7 +51,10 @@ namespace POS.MediatR.Handlers
             ILanguageRepository languageRepository,
             ILocationRepository locationRepository,
             IFinancialYearRepository financialYearRepository,
-            IMediator mediator)
+            IMediator mediator,
+            IFileStorageService fileStorageService,
+            IMemoryCache cache,
+            ITenantProvider tenantProvider)
         {
             _companyProfileRepository = companyProfileRepository;
             _mapper = mapper;
@@ -58,14 +66,20 @@ namespace POS.MediatR.Handlers
             _locationRepository = locationRepository;
             _financialYearRepository = financialYearRepository;
             _mediator = mediator;
+            _fileStorageService = fileStorageService;
+            _cache = cache;
+            _tenantProvider = tenantProvider;
         }
         public async Task<ServiceResponse<CompanyProfileDto>> Handle(UpdateCompanyProfileCommand request, CancellationToken cancellationToken)
         {
             var logoUrl = string.Empty;
+            var oldLogoUrl = string.Empty;
 
             if (!string.IsNullOrWhiteSpace(request.ImageData))
             {
-                logoUrl = $"{Guid.NewGuid()}.{Path.GetExtension(request.LogoUrl)}";
+                var ext = Path.GetExtension(request.LogoUrl);
+                if (string.IsNullOrWhiteSpace(ext)) ext = ".png";
+                logoUrl = $"{Guid.NewGuid()}{ext}";
             }
 
             CompanyProfile companyProfile;
@@ -79,10 +93,10 @@ namespace POS.MediatR.Handlers
                     companyProfile.Phone = request.Phone;
                     companyProfile.Email = request.Email;
                     companyProfile.CurrencyCode = request.CurrencyCode;
-                    companyProfile.TaxName = request.TaxName;
                     companyProfile.TaxNumber = request.TaxNumber;
                     if (!string.IsNullOrWhiteSpace(request.ImageData))
                     {
+                        oldLogoUrl = companyProfile.LogoUrl;
                         companyProfile.LogoUrl = logoUrl;
                     }
                     _companyProfileRepository.Update(companyProfile);
@@ -119,31 +133,17 @@ namespace POS.MediatR.Handlers
 
             if (!string.IsNullOrWhiteSpace(request.ImageData))
             {
-                string pathToSave = _webHostEnvironment.WebRootPath;
-                pathToSave = Path.Combine(pathToSave, _pathHelper.CompanyLogo);
-                if (!Directory.Exists(pathToSave))
+                if (!string.IsNullOrWhiteSpace(oldLogoUrl))
                 {
-                    Directory.CreateDirectory(pathToSave);
+                    _fileStorageService.DeleteFile(Path.Combine(_pathHelper.CompanyLogo, oldLogoUrl));
                 }
-                var documentPath = Path.Combine(pathToSave, companyProfile.LogoUrl);
-                string base64 = request.ImageData.Split(',').LastOrDefault();
-                if (!string.IsNullOrWhiteSpace(base64))
-                {
-                    byte[] bytes = Convert.FromBase64String(base64);
-                    try
-                    {
-                        await File.WriteAllBytesAsync($"{documentPath}", bytes);
-                    }
-                    catch
-                    {
-                        _logger.LogError("Error while saving files");
-                    }
-                }
+
+                await _fileStorageService.SaveFileAsync(_pathHelper.CompanyLogo, request.ImageData, companyProfile.LogoUrl);
             }
             var result = _mapper.Map<CompanyProfileDto>(companyProfile);
             if (!string.IsNullOrWhiteSpace(result.LogoUrl))
             {
-                result.LogoUrl = Path.Combine(_pathHelper.CompanyLogo, result.LogoUrl);
+                result.LogoUrl = Path.Combine(_pathHelper.CompanyLogo, result.LogoUrl).Replace("\\", "/");
             }
 
             result.Languages = await _mediator.Send(new GetAllLanguageCommand());
@@ -151,6 +151,10 @@ namespace POS.MediatR.Handlers
             result.Locations = _mapper.Map<List<LocationDto>>(locations);
             var financialYears = await _financialYearRepository.All.ToListAsync();
             result.FinancialYears = _mapper.Map<List<FinancialYearDto>>(financialYears);
+
+            var tenantId = _tenantProvider.GetTenantId();
+            _cache.Remove($"CompanyProfile_{tenantId}");
+
             return ServiceResponse<CompanyProfileDto>.ReturnResultWith200(result);
         }
     }

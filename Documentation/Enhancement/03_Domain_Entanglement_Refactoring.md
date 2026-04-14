@@ -1,0 +1,1 @@
+- Run API integration tests to ensure DI container successfully resolves all relocated services.

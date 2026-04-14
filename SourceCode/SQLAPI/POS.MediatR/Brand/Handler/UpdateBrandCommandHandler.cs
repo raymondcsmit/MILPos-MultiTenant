@@ -11,9 +11,10 @@ using POS.MediatR.Brand.Command;
 using POS.MediatR.Tax.Commands;
 using POS.Repository;
 using System;
-using System.IO;
-using System.Threading;
 using System.Threading.Tasks;
+using POS.Common.Services;
+using System.Threading;
+using System.IO;
 
 namespace POS.MediatR.Brand.Handler
 {
@@ -26,13 +27,16 @@ namespace POS.MediatR.Brand.Handler
         private readonly IWebHostEnvironment _webHostEnvironment;
         private readonly PathHelper _pathHelper;
         private readonly IMapper _mapper;
+        private readonly IFileStorageService _fileStorageService;
+
         public UpdateBrandCommandHandler(
            IBrandRepository brandRepository,
             IUnitOfWork<POSDbContext> uow,
             ILogger<UpdateBrandCommandHandler> logger,
             IWebHostEnvironment webHostEnvironment,
             PathHelper pathHelper,
-            IMapper mapper
+            IMapper mapper,
+            IFileStorageService fileStorageService
             )
         {
             _brandRepository = brandRepository;
@@ -41,6 +45,7 @@ namespace POS.MediatR.Brand.Handler
             _webHostEnvironment = webHostEnvironment;
             _pathHelper = pathHelper;
             _mapper = mapper;
+            _fileStorageService = fileStorageService;
         }
 
         public async Task<ServiceResponse<BrandDto>> Handle(UpdateBrandCommand request, CancellationToken cancellationToken)
@@ -75,29 +80,30 @@ namespace POS.MediatR.Brand.Handler
 
             if (request.IsImageChanged)
             {
-                string contentRootPath = _webHostEnvironment.WebRootPath;
                 // delete old file
-                if (!string.IsNullOrWhiteSpace(oldImageUrl)
-                    && File.Exists(Path.Combine(contentRootPath, _pathHelper.BrandImagePath, oldImageUrl)))
+                if (!string.IsNullOrWhiteSpace(oldImageUrl))
                 {
-                    FileData.DeleteFile(Path.Combine(contentRootPath, _pathHelper.BrandImagePath, oldImageUrl));
+                    _fileStorageService.DeleteFile(Path.Combine(_pathHelper.BrandImagePath, oldImageUrl));
                 }
 
                 // save new file
                 if (!string.IsNullOrWhiteSpace(request.ImageUrlData))
                 {
-                    var pathToSave = Path.Combine(contentRootPath, _pathHelper.BrandImagePath);
-                    if (!Directory.Exists(pathToSave))
-                    {
-                        Directory.CreateDirectory(pathToSave);
-                    }
-                    await FileData.SaveFile(Path.Combine(pathToSave, entityExist.ImageUrl), request.ImageUrlData);
+                    await _fileStorageService.SaveFileAsync(_pathHelper.BrandImagePath, request.ImageUrlData, entityExist.ImageUrl);
                 }
             }
             var result = _mapper.Map<BrandDto>(entityExist);
             if (!string.IsNullOrWhiteSpace(result.ImageUrl))
             {
-                result.ImageUrl = Path.Combine(_pathHelper.BrandImagePath, result.ImageUrl);
+                 var physicalPath = _fileStorageService.GetPhysicalPath(Path.Combine(_pathHelper.BrandImagePath, result.ImageUrl));
+                 if (File.Exists(physicalPath))
+                 {
+                     result.ImageUrl = Path.Combine(_pathHelper.BrandImagePath, result.ImageUrl).Replace("\\", "/");
+                 }
+                 else
+                 {
+                     result.ImageUrl = null;
+                 }
             }
             return ServiceResponse<BrandDto>.ReturnResultWith200(result);
         }

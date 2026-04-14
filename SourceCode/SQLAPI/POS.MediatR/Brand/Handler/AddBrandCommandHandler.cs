@@ -11,9 +11,11 @@ using POS.MediatR.Brand.Command;
 using POS.MediatR.Tax.Commands;
 using POS.Repository;
 using System;
-using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
+using POS.Common.Services;
+using System.Threading;
+using System.IO;
 
 namespace POS.MediatR.Brand.Handler
 {
@@ -24,7 +26,9 @@ namespace POS.MediatR.Brand.Handler
         private readonly IMapper _mapper;
         private readonly ILogger<AddBrandCommandHandler> _logger;
         private readonly PathHelper _pathHelper;
+
         private readonly IWebHostEnvironment _webHostEnvironment;
+        private readonly IFileStorageService _fileStorageService;
 
         public AddBrandCommandHandler(
            IBrandRepository brandRepository,
@@ -32,7 +36,8 @@ namespace POS.MediatR.Brand.Handler
             IUnitOfWork<POSDbContext> uow,
             ILogger<AddBrandCommandHandler> logger,
             PathHelper pathHelper,
-            IWebHostEnvironment webHostEnvironment
+            IWebHostEnvironment webHostEnvironment,
+            IFileStorageService fileStorageService
             )
         {
             _brandRepository = brandRepository;
@@ -40,7 +45,9 @@ namespace POS.MediatR.Brand.Handler
             _uow = uow;
             _logger = logger;
             _pathHelper = pathHelper;
+
             _webHostEnvironment = webHostEnvironment;
+            _fileStorageService = fileStorageService;
         }
 
         public async Task<ServiceResponse<BrandDto>> Handle(AddBrandCommand request, CancellationToken cancellationToken)
@@ -69,17 +76,20 @@ namespace POS.MediatR.Brand.Handler
 
             if (!string.IsNullOrWhiteSpace(request.ImageUrlData))
             {
-                var pathToSave = Path.Combine(_webHostEnvironment.WebRootPath, _pathHelper.BrandImagePath);
-                if (!Directory.Exists(pathToSave))
-                {
-                    Directory.CreateDirectory(pathToSave);
-                }
-                await FileData.SaveFile(Path.Combine(pathToSave, entity.ImageUrl), request.ImageUrlData);
+                await _fileStorageService.SaveFileAsync(_pathHelper.BrandImagePath, request.ImageUrlData, entity.ImageUrl);
             }
             var entityToReturn = _mapper.Map<BrandDto>(entity);
             if (!string.IsNullOrWhiteSpace(request.ImageUrlData))
             {
-                entityToReturn.ImageUrl = Path.Combine(_pathHelper.BrandImagePath, entityToReturn.ImageUrl);
+                 var physicalPath = _fileStorageService.GetPhysicalPath(Path.Combine(_pathHelper.BrandImagePath, entityToReturn.ImageUrl));
+                 if (File.Exists(physicalPath))
+                 {
+                     entityToReturn.ImageUrl = Path.Combine(_pathHelper.BrandImagePath, entityToReturn.ImageUrl).Replace("\\", "/");
+                 }
+                 else
+                 {
+                     entityToReturn.ImageUrl = null;
+                 }
             }
             return ServiceResponse<BrandDto>.ReturnResultWith200(entityToReturn);
         }

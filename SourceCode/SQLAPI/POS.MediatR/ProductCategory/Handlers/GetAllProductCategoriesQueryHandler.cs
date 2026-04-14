@@ -1,4 +1,4 @@
-﻿using AutoMapper;
+using AutoMapper;
 using POS.Data.Dto;
 using POS.MediatR.CommandAndQuery;
 using POS.Repository;
@@ -24,11 +24,11 @@ namespace POS.MediatR.Handler
         }
         public async Task<List<ProductCategoryDto>> Handle(GetAllProductCategoriesQuery request, CancellationToken cancellationToken)
         {
-            var categories = await _categoryRepository.All
+            var categories = await _categoryRepository.All.AsNoTracking()
                 .Where(c => request.IsDropDown || c.ParentId == request.Id)
                 .OrderBy(c => c.Name)
                 .ProjectTo<ProductCategoryDto>(_mapper.ConfigurationProvider)
-                .ToListAsync();
+                .ToListAsync(cancellationToken);
             return categories;
         }
     }

@@ -5,7 +5,7 @@
 node_modules/
 .npm
 .yarn-integrity
-
+.angular/
 /Published
 Published
 
@@ -442,3 +442,7 @@ coverage/
 *.orig
 clientapp/dist/
 wwwroot/dist/
+/SourceCode/SeedData
+/SourceCode/Angular/publish-release.ps1
+
+SourceCode/Angular/publish-release.ps1

@@ -50,71 +50,40 @@ namespace POS.Repository
 
         public async Task<List<ProductDto>> GetDtos(IQueryable<Product> source, int skip, int pageSize)
         {
+            List<Product> entities;
             if (pageSize == 0)
             {
-                var entities = await source
+                entities = await source
                     .AsNoTracking()
-                    .Select(c => new ProductDto
-                    {
-                        Id = c.Id,
-                        Name = c.Name,
-                        Mrp = c.Mrp,
-                        SalesPrice = c.SalesPrice,
-                        PurchasePrice = c.PurchasePrice,
-                        CategoryId = c.CategoryId,
-                        CategoryName = c.ProductCategory.Name,
-                        UnitName = c.Unit.Name,
-                        UnitId = c.UnitId,
-                        BrandId = c.BrandId,
-                        Barcode = c.Barcode,
-                        SkuCode = c.SkuCode,
-                        SkuName = c.SkuName,
-                        BrandName = c.Brand.Name,
-                        AlertQuantity = c.AlertQuantity,
-                        HasVariant = c.HasVariant,
-                        IsMarginIncludeTax = c.IsMarginIncludeTax,
-                        Margin = c.Margin,
-                        TaxAmount = c.TaxAmount,
-                        VariantId = c.VariantId,
-                        VariantItemId = c.VariantItemId,
-                        ProductTaxes = _mapper.Map<List<ProductTaxDto>>(c.ProductTaxes),
-                        ProductUrl = !string.IsNullOrWhiteSpace(c.ProductUrl) ? Path.Combine(_pathHelper.ProductThumbnailImagePath, c.ProductUrl) : ""
-                    }).ToListAsync();
-                return entities;
+                    .ToListAsync();
             }
             else
             {
-                var entities = await source
-                .Skip(skip)
-                .Take(pageSize)
-                .AsNoTracking()
-                .Select(c => new ProductDto
-                {
-                    Id = c.Id,
-                    Name = c.Name,
-                    Mrp = c.Mrp,
-                    SalesPrice = c.SalesPrice,
-                    PurchasePrice = c.PurchasePrice,
-                    CategoryId = c.CategoryId,
-                    CategoryName = c.ProductCategory.Name,
-                    UnitName = c.Unit.Name,
-                    UnitId = c.UnitId,
-                    BrandId = c.BrandId,
-                    Barcode = c.Barcode,
-                    SkuCode = c.SkuCode,
-                    SkuName = c.SkuName,
-                    BrandName = c.Brand.Name,
-                    AlertQuantity = c.AlertQuantity,
-                    HasVariant = c.HasVariant,
-                    IsMarginIncludeTax = c.IsMarginIncludeTax,
-                    Margin = c.Margin,
-                    VariantId = c.VariantId,
-                    VariantItemId = c.VariantItemId,
-                    ProductTaxes = _mapper.Map<List<ProductTaxDto>>(c.ProductTaxes),
-                    ProductUrl = !string.IsNullOrWhiteSpace(c.ProductUrl) ? Path.Combine(_pathHelper.ProductThumbnailImagePath, c.ProductUrl) : ""
-                }).ToListAsync();
-                return entities;
+                entities = await source
+                    .Skip(skip)
+                    .Take(pageSize)
+                    .AsNoTracking()
+                    .ToListAsync();
             }
+
+            var dtos = _mapper.Map<List<ProductDto>>(entities);
+
+            // Prefix ProductUrl with the image folder path so the frontend
+            // receives the full relative path (e.g. "ProductImages/abc.png")
+            // instead of a raw filename. Matches GetProductCommandHandler behavior.
+            if (_pathHelper != null)
+            {
+                foreach (var dto in dtos)
+                {
+                    if (!string.IsNullOrWhiteSpace(dto.ProductUrl)
+                        && !dto.ProductUrl.Contains('/') && !dto.ProductUrl.Contains('\\'))
+                    {
+                        dto.ProductUrl = Path.Combine(_pathHelper.ProductImagePath, dto.ProductUrl).Replace('\\', '/');
+                    }
+                }
+            }
+
+            return dtos;
         }
     }
 }

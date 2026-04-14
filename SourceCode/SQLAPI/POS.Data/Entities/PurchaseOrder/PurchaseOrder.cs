@@ -1,4 +1,4 @@
-﻿using POS.Data.Entities;
+using POS.Data.Entities;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations.Schema;
@@ -19,6 +19,11 @@ namespace POS.Data
         public PurchaseDeliveryStatus DeliveryStatus { get; set; }
         public Guid SupplierId { get; set; }
         public Supplier Supplier { get; set; }
+
+        public Guid? SalesPersonId { get; set; }
+        [ForeignKey("SalesPersonId")]
+        public User SalesPerson { get; set; }
+
         [Column(TypeName = "decimal(18,2)")]
         public decimal TotalAmount { get; set; }
         [Column(TypeName = "decimal(18,2)")]

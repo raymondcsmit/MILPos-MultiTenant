@@ -7,6 +7,7 @@ using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using POS.API.Helpers;
+using POS.Common;
 
 namespace POS.API.Controllers
 {
@@ -35,7 +36,7 @@ namespace POS.API.Controllers
         /// <returns></returns>
         [HttpGet("{id}", Name = "RoleUsers")]
         [Produces("application/json", "application/xml", Type = typeof(List<UserRoleDto>))]
-        [ClaimCheck("USR_ASSIGN_USR_ROLES")]
+        [ClaimCheck(AppConstants.Claims.USR_ASSIGN_USR_ROLES)]
         public async Task<IActionResult> RoleUsers(Guid id)
         {
             var getUserQuery = new GetRoleUsersQuery { RoleId = id };
@@ -50,7 +51,7 @@ namespace POS.API.Controllers
         /// <returns></returns>
         [HttpPut("{id}")]
         [Produces("application/json", "application/xml", Type = typeof(UserRoleDto))]
-        [ClaimCheck("USR_ASSIGN_USR_ROLES")]
+        [ClaimCheck(AppConstants.Claims.USR_ASSIGN_USR_ROLES)]
         public async Task<IActionResult> UpdateRoleUsers(Guid id, UpdateUserRoleCommand updateRoleCommand)
         {
             updateRoleCommand.Id = id;

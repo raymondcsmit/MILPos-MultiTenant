@@ -1,10 +1,16 @@
-﻿using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection;
 using POS.Common.UnitOfWork;
 using POS.MediatR;
 using POS.MediatR.Accouting.Services;
 using POS.MediatR.Accouting.Strategies;
 using POS.Repository;
 using POS.Repository.Accouting;
+using POS.Common.GenericRepository;
+using POS.Data.Entities;
+using POS.Domain;
+
+using POS.Common.DapperInfrastructure;
+using POS.Domain.DapperInfrastructure;
 
 namespace POS.API.Helpers
 {
@@ -13,9 +19,12 @@ namespace POS.API.Helpers
         public static void AddDependencyInjection(this IServiceCollection services)
         {
             services.AddScoped(typeof(IUnitOfWork<>), typeof(UnitOfWork<>));
+            services.AddScoped<ISqlConnectionAccessor, SqlConnectionAccessor>();
+            services.AddScoped<IGenericRepository<Tenant>, GenericRepository<Tenant, POSDbContext>>();
             services.AddScoped<IPropertyMappingService, PropertyMappingService>();
             services.AddScoped<IPageRepository, PageRepository>();
             services.AddScoped<IActionRepository, ActionRepository>();
+            services.AddScoped<IMenuItemRepository, MenuItemRepository>();
             services.AddScoped<IRoleRepository, RoleRepository>();
             services.AddScoped<IUserRepository, UserRepository>();
             services.AddScoped<IUserRoleRepository, UserRoleRepository>();
@@ -64,6 +73,8 @@ namespace POS.API.Helpers
             services.AddScoped<IInquiryAttachmentRepository, InquiryAttachmentRepository>();
             services.AddScoped<IInquiryActivityRepository, InquiryActivityRepository>();
             services.AddScoped<IInquirySourceRepository, InquirySourceRepository>();
+            services.AddScoped<IDailyProductPriceRepository, DailyProductPriceRepository>();
+
 
             services.AddScoped<IBrandRepository, BrandRepository>();
 

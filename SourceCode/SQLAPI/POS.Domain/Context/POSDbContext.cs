@@ -1,8 +1,12 @@
-﻿using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using POS.Data;
+using POS.Data.Dto;
 using POS.Data.Entities;
+using POS.Data.Entities.Licensing;
 using POS.Data.Entities.Accounts;
+using POS.Data.Entities.Inventory;
+using POS.Common;
 using System;
 using System.Linq;
 using System.Threading.Tasks;
@@ -12,10 +16,12 @@ namespace POS.Domain
     public class POSDbContext : IdentityDbContext<User, Role, Guid, UserClaim, UserRole, UserLogin, RoleClaim, UserToken>
     {
         private readonly ITenantProvider _tenantProvider;
+        private readonly UserInfoToken _userInfoToken;
 
-        public POSDbContext(DbContextOptions options, ITenantProvider tenantProvider) : base(options)
+        public POSDbContext(DbContextOptions options, ITenantProvider tenantProvider, UserInfoToken userInfoToken = null) : base(options)
         {
             _tenantProvider = tenantProvider;
+            _userInfoToken = userInfoToken;
         }
         public override DbSet<User> Users { get; set; }
         public override DbSet<Role> Roles { get; set; }
@@ -27,6 +33,12 @@ namespace POS.Domain
         
         // Multi-tenancy
         public DbSet<Tenant> Tenants { get; set; }
+        
+        public DbSet<License> Licenses { get; set; }
+
+        // Sync entities
+        public DbSet<SyncMetadata> SyncMetadata { get; set; }
+        public DbSet<SyncLog> SyncLogs { get; set; }
         
         public DbSet<Data.Action> Actions { get; set; }
         public DbSet<Page> Pages { get; set; }
@@ -102,25 +114,286 @@ namespace POS.Domain
         public DbSet<LoanDetail> LoanDetails { get; set; }
         public DbSet<LoanRepayment> LoanRepayments { get; set; }
 
+        // Dynamic Menu System
+        public DbSet<MenuItem> MenuItems { get; set; }
+        public DbSet<MenuItemAction> MenuItemActions { get; set; }
+        public DbSet<RoleMenuItem> RoleMenuItems { get; set; }
+        
+        // FBR Integration
+        public DbSet<POS.Data.Entities.FBR.FBRSubmissionLog> FBRSubmissionLogs { get; set; }
+
+
+        public DbSet<DailyProductPrice> DailyProductPrices { get; set; }
+
+        public DbSet<InventoryBatch> InventoryBatches { get; set; }
+
+
 
         protected override void OnModelCreating(ModelBuilder builder)
         {
             base.OnModelCreating(builder);
+            
+            if (Database.IsSqlite())
+            {
+                builder.Entity<User>(b =>
+                {
+                    b.Property(u => u.NormalizedUserName).UseCollation("NOCASE");
+                    b.Property(u => u.NormalizedEmail).UseCollation("NOCASE");
+                });
+
+                builder.Entity<Role>(b =>
+                {
+                    b.Property(r => r.NormalizedName).UseCollation("NOCASE");
+                });
+            }
+
+
+            // DailyProductPrice Configuration
+            builder.Entity<DailyProductPrice>(entity =>
+            {
+                entity.HasKey(e => e.Id);
+                entity.HasIndex(e => new { e.ProductId, e.PriceDate, e.TenantId })
+                      .IsUnique()
+                      .HasDatabaseName("IX_DailyProductPrice_Product_Date_Tenant");
+
+                entity.Property(e => e.SalesPrice).IsRequired();
+                entity.Property(e => e.PriceDate).IsRequired();
+
+                entity.HasOne(e => e.Product)
+                      .WithMany()
+                      .HasForeignKey(e => e.ProductId)
+                      .OnDelete(DeleteBehavior.Restrict);
+            });
+
+            builder.Entity<License>(b =>
+            {
+                b.HasIndex(l => new { l.TenantId, l.Status }).HasDatabaseName("IX_License_Tenant_Status");
+                b.HasIndex(l => new { l.TenantId, l.TokenId }).HasDatabaseName("IX_License_Tenant_TokenId");
+                b.Property(l => l.Plan).HasMaxLength(100);
+                b.Property(l => l.Status).HasMaxLength(50);
+                b.Property(l => l.TokenId).HasMaxLength(100);
+                b.Property(l => l.TokenHash).HasMaxLength(200);
+            });
+
+            builder.Entity<Transaction>(b =>
+            {
+                b.HasIndex(t => new { t.TenantId, t.TransactionDate, t.TransactionType, t.BranchId }).HasDatabaseName("IX_Transaction_Date_Type_Branch");
+            });
+
+            builder.Entity<SalesOrder>(b =>
+            {
+                b.HasIndex(so => new { so.TenantId, so.SOCreatedDate, so.LocationId, so.IsSalesOrderRequest }).HasDatabaseName("IX_SalesOrder_Date_Location_IsRequest");
+                b.HasIndex(so => new { so.TenantId, so.DeliveryDate, so.DeliveryStatus }).HasDatabaseName("IX_SalesOrder_DeliveryDate_Status");
+            });
+
+            builder.Entity<PurchaseOrder>(b =>
+            {
+                b.HasIndex(po => new { po.TenantId, po.POCreatedDate, po.LocationId, po.IsPurchaseOrderRequest }).HasDatabaseName("IX_PurchaseOrder_Date_Location_IsRequest");
+                b.HasIndex(po => new { po.TenantId, po.DeliveryDate, po.DeliveryStatus }).HasDatabaseName("IX_PurchaseOrder_DeliveryDate_Status");
+            });
+
+            builder.Entity<ReminderScheduler>(b =>
+            {
+                b.HasIndex(rs => new { rs.TenantId, rs.UserId, rs.IsRead, rs.IsActive }).HasDatabaseName("IX_ReminderScheduler_User_Read_Active");
+            });
+
+            builder.Entity<SalesOrderItem>(b =>
+            {
+                b.HasIndex(soi => new { soi.ProductId, soi.Status }).HasDatabaseName("IX_SalesOrderItem_Product_Status");
+            });
+
+            builder.Entity<PurchaseOrderItem>(b =>
+            {
+                b.HasIndex(poi => new { poi.ProductId, poi.Status }).HasDatabaseName("IX_PurchaseOrderItem_Product_Status");
+            });
+
+            // Master Data Indexes
+            builder.Entity<Product>(b =>
+            {
+                b.HasIndex(p => new { p.TenantId, p.Name }).HasDatabaseName("IX_Product_Tenant_Name");
+                b.HasIndex(p => new { p.TenantId, p.Code }).IsUnique().HasDatabaseName("IX_Product_Tenant_Code");
+                b.HasIndex(p => new { p.TenantId, p.Barcode }).HasDatabaseName("IX_Product_Tenant_Barcode");
+                b.HasIndex(p => new { p.TenantId, p.CategoryId }).HasDatabaseName("IX_Product_Tenant_Category");
+                b.HasIndex(p => new { p.TenantId, p.IsDeleted }).HasDatabaseName("IX_Product_Tenant_IsDeleted");
+            });
+
+            builder.Entity<Customer>(b =>
+            {
+                b.HasIndex(c => new { c.TenantId, c.CustomerName }).HasDatabaseName("IX_Customer_Name");
+                b.HasIndex(c => new { c.TenantId, c.Email }).HasDatabaseName("IX_Customer_Email");
+                b.HasIndex(c => new { c.TenantId, c.MobileNo }).HasDatabaseName("IX_Customer_MobileNo");
+            });
+
+            builder.Entity<Supplier>(b =>
+            {
+                b.HasIndex(s => new { s.TenantId, s.SupplierName }).HasDatabaseName("IX_Supplier_Name");
+                b.HasIndex(s => new { s.TenantId, s.Email }).HasDatabaseName("IX_Supplier_Email");
+                b.HasIndex(s => new { s.TenantId, s.MobileNo }).HasDatabaseName("IX_Supplier_MobileNo");
+            });
+
+            builder.Entity<ProductCategory>(b =>
+            {
+                b.HasIndex(c => new { c.TenantId, c.ParentId }).HasDatabaseName("IX_ProductCategory_ParentId");
+                b.HasIndex(c => new { c.TenantId, c.Name }).HasDatabaseName("IX_ProductCategory_Tenant_Name");
+                b.HasIndex(c => new { c.TenantId, c.IsDeleted }).HasDatabaseName("IX_ProductCategory_Tenant_IsDeleted");
+            });
+
+            builder.Entity<Brand>(b =>
+            {
+                b.HasIndex(br => new { br.TenantId, br.Name }).HasDatabaseName("IX_Brand_Tenant_Name");
+            });
+
+            builder.Entity<UnitConversation>(b =>
+            {
+                b.HasIndex(u => new { u.TenantId, u.Name }).HasDatabaseName("IX_Unit_Tenant_Name");
+            });
+
+            builder.Entity<ProductStock>(b =>
+            {
+                b.HasIndex(ps => new { ps.TenantId, ps.ProductId, ps.LocationId }).IsUnique().HasDatabaseName("IX_ProductStock_Tenant_Product_Location");
+            });
+
+            // Sales & Purchase Indexes
+            builder.Entity<SalesOrder>(b =>
+            {
+                b.HasIndex(s => new { s.TenantId, s.OrderNumber }).IsUnique().HasDatabaseName("IX_SalesOrder_Tenant_Number");
+                b.HasIndex(s => new { s.TenantId, s.SOCreatedDate }).HasDatabaseName("IX_SalesOrder_Tenant_Date");
+                b.HasIndex(s => new { s.TenantId, s.CustomerId }).HasDatabaseName("IX_SalesOrder_Tenant_Customer");
+                b.HasIndex(s => new { s.TenantId, s.Status }).HasDatabaseName("IX_SalesOrder_Tenant_Status");
+                b.HasIndex(s => new { s.TenantId, s.IsDeleted, s.SOCreatedDate }).HasDatabaseName("IX_SalesOrder_Tenant_IsDeleted_Date");
+            });
+
+            builder.Entity<PurchaseOrder>(b =>
+            {
+                b.HasIndex(p => new { p.TenantId, p.OrderNumber }).IsUnique().HasDatabaseName("IX_PurchaseOrder_Tenant_Number");
+                b.HasIndex(p => new { p.TenantId, p.POCreatedDate }).HasDatabaseName("IX_PurchaseOrder_Tenant_Date");
+                b.HasIndex(p => new { p.TenantId, p.SupplierId }).HasDatabaseName("IX_PurchaseOrder_Tenant_Supplier");
+                b.HasIndex(p => new { p.TenantId, p.IsDeleted, p.POCreatedDate }).HasDatabaseName("IX_PurchaseOrder_Tenant_IsDeleted_Date");
+            });
+
+            builder.Entity<SalesOrderItem>(b =>
+            {
+                b.HasIndex(si => si.SalesOrderId).HasDatabaseName("IX_SalesOrderItem_SalesOrder");
+                b.HasIndex(si => si.ProductId).HasDatabaseName("IX_SalesOrderItem_Product");
+            });
+
+            builder.Entity<PurchaseOrderItem>(b =>
+            {
+                b.HasIndex(pi => pi.PurchaseOrderId).HasDatabaseName("IX_PurchaseOrderItem_PurchaseOrder");
+                b.HasIndex(pi => pi.ProductId).HasDatabaseName("IX_PurchaseOrderItem_Product");
+            });
+
+            // CRM Indexes
+            builder.Entity<Customer>(b =>
+            {
+                b.HasIndex(c => new { c.TenantId, c.Email }).IsUnique().HasDatabaseName("IX_Customer_Tenant_Email");
+                b.HasIndex(c => new { c.TenantId, c.MobileNo }).IsUnique().HasDatabaseName("IX_Customer_Tenant_Mobile");
+                b.HasIndex(c => new { c.TenantId, c.CustomerName }).HasDatabaseName("IX_Customer_Tenant_Name");
+            });
+
+            builder.Entity<Supplier>(b =>
+            {
+                b.HasIndex(s => new { s.TenantId, s.Email }).HasDatabaseName("IX_Supplier_Tenant_Email");
+                b.HasIndex(s => new { s.TenantId, s.MobileNo }).HasDatabaseName("IX_Supplier_Tenant_Mobile");
+            });
+
+            // Financial Indexes
+            builder.Entity<Expense>(b =>
+            {
+                b.HasIndex(e => new { e.TenantId, e.ExpenseDate }).HasDatabaseName("IX_Expense_Tenant_Date");
+                b.HasIndex(e => new { e.TenantId, e.ExpenseCategoryId }).HasDatabaseName("IX_Expense_Tenant_Category");
+                b.HasIndex(e => new { e.TenantId, e.IsDeleted, e.ExpenseDate }).HasDatabaseName("IX_Expense_Tenant_IsDeleted_Date");
+            });
+
+            builder.Entity<Transaction>(b =>
+            {
+                b.HasIndex(t => new { t.TenantId, t.TransactionDate }).HasDatabaseName("IX_Transaction_Tenant_Date");
+            });
+
+            builder.Entity<TransactionItem>(b =>
+            {
+                b.HasIndex(ti => ti.TransactionId).HasDatabaseName("IX_TransactionItem_Transaction");
+            });
+
+            // User Identity Indexes (Custom)
+            builder.Entity<UserClaim>(b =>
+            {
+                b.HasIndex(uc => new { uc.UserId, uc.ClaimType }).HasDatabaseName("IX_UserClaim_User_Type");
+            });
+            
+            builder.Entity<User>(b =>
+            {
+                b.HasIndex(u => new { u.TenantId, u.PhoneNumber }).HasDatabaseName("IX_User_Tenant_Phone");
+            });
+
+            // Configure InventoryBatch to prevent cycles
+            builder.Entity<InventoryBatch>(b =>
+            {
+                b.HasOne(e => e.Product)
+                    .WithMany()
+                    .HasForeignKey(e => e.ProductId)
+                    .OnDelete(DeleteBehavior.Restrict);
+
+                b.HasOne(e => e.Location)
+                    .WithMany()
+                    .HasForeignKey(e => e.LocationId)
+                    .OnDelete(DeleteBehavior.Restrict);
+
+                b.HasOne(e => e.CreatedByUser)
+                    .WithMany()
+                    .HasForeignKey(e => e.CreatedBy)
+                    .OnDelete(DeleteBehavior.Restrict);
+            });
+
 
             // Configure Tenant entity
             builder.Entity<Tenant>(b =>
             {
                 b.HasKey(t => t.Id);
                 b.HasIndex(t => t.Subdomain).IsUnique();
-                b.Property(t => t.Name).IsRequired().HasMaxLength(200);
-                b.Property(t => t.Subdomain).IsRequired().HasMaxLength(100);
-                b.Property(t => t.ContactEmail).HasMaxLength(200);
-                b.Property(t => t.TimeZone).HasMaxLength(100);
+                b.Property(t => t.Name).IsRequired().HasMaxLength(AppConstants.Database.MaxNameLength);
+                b.Property(t => t.Subdomain).IsRequired().HasMaxLength(AppConstants.Database.MaxShortLength);
+                b.Property(t => t.ContactEmail).HasMaxLength(AppConstants.Database.MaxNameLength);
+                b.Property(t => t.TimeZone).HasMaxLength(AppConstants.Database.MaxShortLength);
                 b.Property(t => t.Currency).HasMaxLength(10);
+            });
+
+            // Configure SyncMetadata entity (Desktop only - SQLite)
+            builder.Entity<SyncMetadata>(entity =>
+            {
+                entity.HasKey(e => e.Id);
+                entity.Property(e => e.EntityType).IsRequired().HasMaxLength(100);
+                entity.HasIndex(e => e.EntityType);
+            });
+
+            // Configure SyncLog entity
+            builder.Entity<SyncLog>(entity =>
+            {
+                entity.HasKey(e => e.Id);
+                entity.Property(e => e.DeviceId).HasMaxLength(50);
+                entity.Property(e => e.ErrorMessage).HasMaxLength(4000);
+                entity.HasIndex(e => new { e.TenantId, e.StartedAt });
             });
 
             builder.Entity<User>(b =>
             {
+                // Remove default Identity indexes before adding tenant-aware ones
+                var userIndex = b.Metadata.GetIndexes().FirstOrDefault(i => i.Properties.Any(p => p.Name == "NormalizedUserName") && i.Properties.Count == 1);
+                if (userIndex != null) b.Metadata.RemoveIndex(userIndex);
+
+                var emailIndex = b.Metadata.GetIndexes().FirstOrDefault(i => i.Properties.Any(p => p.Name == "NormalizedEmail") && i.Properties.Count == 1);
+                if (emailIndex != null) b.Metadata.RemoveIndex(emailIndex);
+
+                // Redefine UserNameIndex to be tenant-aware
+                b.HasIndex(u => new { u.NormalizedUserName, u.TenantId })
+                    .IsUnique()
+                    .HasDatabaseName("UserNameIndex");
+
+                // Redefine EmailIndex to be tenant-aware
+                b.HasIndex(u => new { u.NormalizedEmail, u.TenantId })
+                    .IsUnique()
+                    .HasDatabaseName("EmailIndex");
+
                 // Configure User-Tenant relationship
                 b.HasOne(u => u.Tenant)
                     .WithMany()
@@ -173,6 +446,15 @@ namespace POS.Domain
 
             builder.Entity<Role>(b =>
             {
+                // Remove default Identity index before adding tenant-aware one
+                var roleIndex = b.Metadata.GetIndexes().FirstOrDefault(i => i.Properties.Any(p => p.Name == "NormalizedName") && i.Properties.Count == 1);
+                if (roleIndex != null) b.Metadata.RemoveIndex(roleIndex);
+
+                // Redefine RoleNameIndex to be tenant-aware
+                b.HasIndex(r => new { r.NormalizedName, r.TenantId })
+                    .IsUnique()
+                    .HasDatabaseName("RoleNameIndex");
+
                 // Configure Role-Tenant relationship
                 b.HasOne(r => r.Tenant)
                     .WithMany()
@@ -410,6 +692,19 @@ namespace POS.Domain
                     .OnDelete(DeleteBehavior.Restrict);
             });
 
+            builder.Entity<ReminderScheduler>(b =>
+            {
+                b.HasOne(e => e.User)
+                    .WithMany()
+                    .HasForeignKey(rs => rs.UserId)
+                    .OnDelete(DeleteBehavior.Restrict);
+
+                b.HasOne(e => e.CreatedByUser)
+                    .WithMany()
+                    .HasForeignKey(rs => rs.CreatedBy)
+                    .OnDelete(DeleteBehavior.Restrict);
+            });
+
             builder.Entity<Expense>(b =>
             {
                 b.HasOne(e => e.ExpenseBy)
@@ -621,7 +916,12 @@ namespace POS.Domain
                 b.HasOne(st => st.Branch)
                  .WithMany()
                  .HasForeignKey(st => st.BranchId)
-                 .OnDelete(DeleteBehavior.Restrict);
+                 .OnDelete(DeleteBehavior.NoAction);
+
+                b.HasOne(e => e.CreatedByUser)
+                    .WithMany()
+                    .HasForeignKey(e => e.CreatedBy)
+                    .OnDelete(DeleteBehavior.NoAction);
 
             });
 
@@ -630,7 +930,7 @@ namespace POS.Domain
                 b.HasOne(e => e.CreatedByUser)
                     .WithMany()
                     .HasForeignKey(ur => ur.CreatedBy)
-                    .OnDelete(DeleteBehavior.Restrict);
+                    .OnDelete(DeleteBehavior.NoAction);
 
                 b.HasMany(e => e.TransactionItems)
                   .WithOne(e => e.Transaction)
@@ -677,7 +977,7 @@ namespace POS.Domain
                 b.HasOne(e => e.Branch)
                    .WithMany()
                    .HasForeignKey(ur => ur.BranchId)
-                   .OnDelete(DeleteBehavior.Restrict);
+                   .OnDelete(DeleteBehavior.NoAction);
 
             });
 
@@ -691,7 +991,7 @@ namespace POS.Domain
                 b.HasOne(e => e.Branch)
                    .WithMany()
                    .HasForeignKey(ur => ur.BranchId)
-                   .OnDelete(DeleteBehavior.Restrict);
+                   .OnDelete(DeleteBehavior.NoAction);
 
             });
             builder.Entity<StockAdjustment>(b =>
@@ -704,7 +1004,7 @@ namespace POS.Domain
                 b.HasOne(e => e.Branch)
                    .WithMany()
                    .HasForeignKey(ur => ur.BranchId)
-                   .OnDelete(DeleteBehavior.Restrict);
+                   .OnDelete(DeleteBehavior.NoAction);
 
             });
             builder.Entity<Payroll>(b =>
@@ -713,7 +1013,17 @@ namespace POS.Domain
                     .WithMany()
                     .HasForeignKey(ur => ur.EmployeeId)
                     .OnDelete(DeleteBehavior.Restrict);
+
+                b.HasOne(e => e.Location)
+                   .WithMany()
+                   .HasForeignKey(ur => ur.BranchId)
+                   .OnDelete(DeleteBehavior.NoAction);
             });
+
+            // MenuItem Configuration for Hybrid Tenant/Global Filter
+            builder.Entity<MenuItem>().HasQueryFilter(m =>
+                m.TenantId == _tenantProvider.GetTenantId()
+                && !m.IsDeleted);
 
 
             builder.Entity<CustomerLedger>(b =>
@@ -767,6 +1077,249 @@ namespace POS.Domain
                 b.Property(d => d.IsSystem).HasDefaultValue(true);
             });
 
+            // Dynamic Menu System Configuration
+            builder.Entity<MenuItem>(entity =>
+            {
+                entity.HasOne(m => m.Parent)
+                    .WithMany(m => m.Children)
+                    .HasForeignKey(m => m.ParentId)
+                    .OnDelete(DeleteBehavior.Restrict);
+            });
+
+            builder.Entity<MenuItemAction>(entity =>
+            {
+                entity.HasKey(e => new { e.MenuItemId, e.ActionId });
+                
+                entity.HasOne(e => e.MenuItem)
+                    .WithMany(m => m.MenuItemActions)
+                    .HasForeignKey(e => e.MenuItemId)
+                    .OnDelete(DeleteBehavior.Cascade);
+                
+                entity.HasOne(e => e.Action)
+                    .WithMany()
+                    .HasForeignKey(e => e.ActionId)
+                    .OnDelete(DeleteBehavior.Cascade);
+            });
+
+            builder.Entity<RoleMenuItem>(entity =>
+            {
+                entity.HasOne(e => e.Role)
+                    .WithMany()
+                    .HasForeignKey(e => e.RoleId)
+                    .OnDelete(DeleteBehavior.Cascade);
+                    
+                entity.HasOne(e => e.MenuItem)
+                    .WithMany(m => m.RoleMenuItems)
+                    .HasForeignKey(e => e.MenuItemId)
+                    .OnDelete(DeleteBehavior.Cascade);
+
+                entity.HasOne(e => e.AssignedByUser)
+                    .WithMany()
+                    .HasForeignKey(e => e.AssignedBy)
+                    .OnDelete(DeleteBehavior.Restrict);
+            });
+
+            // --- String Length Optimizations ---
+
+            // 1. Identity & Tenant Updates
+            builder.Entity<Tenant>(b => {
+                b.Property(t => t.Address).HasMaxLength(1000);
+                b.Property(t => t.ContactPhone).HasMaxLength(50);
+                b.Property(t => t.SubscriptionPlan).HasMaxLength(100);
+                b.Property(t => t.ConnectionString).HasMaxLength(1000);
+            });
+
+            builder.Entity<User>(b => {
+                b.Property(u => u.FirstName).HasMaxLength(200);
+                b.Property(u => u.LastName).HasMaxLength(200);
+                b.Property(u => u.ProfilePhoto).HasMaxLength(500);
+                b.Property(u => u.Provider).HasMaxLength(100);
+                b.Property(u => u.Address).HasMaxLength(500);
+                b.Property(u => u.ResetPasswordCode).HasMaxLength(500);
+            });
+
+            // 2. Master Data (Shared/Global Entities - Bypass Tenant Filter)
+            builder.Entity<Country>(b => {
+                b.Property(c => c.CountryName).HasMaxLength(200);
+                b.HasQueryFilter(x => true); // Bypass Global Tenant Filter
+            });
+            builder.Entity<City>(b => {
+                b.Property(c => c.CityName).HasMaxLength(200);
+                b.HasQueryFilter(x => true); // Bypass Global Tenant Filter
+            });
+            
+            builder.Entity<Location>(b => {
+                b.Property(l => l.Name).HasMaxLength(200);
+                b.Property(l => l.ContactPerson).HasMaxLength(200);
+                b.Property(l => l.Address).HasMaxLength(500);
+                b.Property(l => l.Email).HasMaxLength(256);
+                b.Property(l => l.Mobile).HasMaxLength(50);
+                b.Property(l => l.Website).HasMaxLength(500);
+                b.Property(l => l.FBRKey).HasMaxLength(500).IsRequired();
+                b.Property(l => l.POSID).HasMaxLength(20).IsRequired();
+                b.Property(l => l.ApiBaseUrl).HasMaxLength(200).IsRequired();
+            });
+
+            builder.Entity<Currency>(b => {
+                b.Property(c => c.Name).HasMaxLength(100);
+                b.Property(c => c.Symbol).HasMaxLength(10);
+                b.HasQueryFilter(x => true); // Bypass Global Tenant Filter
+            });
+
+            builder.Entity<Language>(b => {
+                b.Property(l => l.Name).HasMaxLength(100);
+                b.Property(l => l.Code).HasMaxLength(20);
+                b.Property(l => l.ImageUrl).HasMaxLength(500);
+                b.HasQueryFilter(x => true); // Bypass Global Tenant Filter
+            });
+
+            // 3. Business Entities
+            builder.Entity<Customer>(b => {
+                b.Property(c => c.CustomerName).HasMaxLength(250);
+                b.Property(c => c.ContactPerson).HasMaxLength(200);
+                b.Property(c => c.Email).HasMaxLength(256);
+                b.Property(c => c.PhoneNo).HasMaxLength(50);
+                b.Property(c => c.MobileNo).HasMaxLength(50);
+                b.Property(c => c.Fax).HasMaxLength(50);
+                b.Property(c => c.Website).HasMaxLength(500);
+                b.Property(c => c.Url).HasMaxLength(500);
+                b.Property(c => c.TaxNumber).HasMaxLength(50);
+                b.Property(c => c.Description).HasMaxLength(2000);
+            });
+
+            builder.Entity<Supplier>(b => {
+                b.Property(s => s.SupplierName).HasMaxLength(250);
+                b.Property(s => s.ContactPerson).HasMaxLength(200);
+                b.Property(s => s.Email).HasMaxLength(256);
+                b.Property(s => s.PhoneNo).HasMaxLength(50);
+                b.Property(s => s.MobileNo).HasMaxLength(50);
+                b.Property(s => s.Fax).HasMaxLength(50);
+                b.Property(s => s.Website).HasMaxLength(500);
+                b.Property(s => s.Url).HasMaxLength(500);
+                b.Property(s => s.TaxNumber).HasMaxLength(50);
+                b.Property(s => s.Description).HasMaxLength(2000);
+            });
+
+             builder.Entity<SupplierAddress>(b => {
+                b.Property(a => a.Address).HasMaxLength(500);
+                b.Property(a => a.CountryName).HasMaxLength(200);
+                b.Property(a => a.CityName).HasMaxLength(200);
+            });
+
+            builder.Entity<ContactRequest>(b => {
+                b.Property(c => c.Name).HasMaxLength(200);
+                b.Property(c => c.Email).HasMaxLength(256);
+                b.Property(c => c.Phone).HasMaxLength(50);
+                b.Property(c => c.Message).HasMaxLength(4000); 
+            });
+
+            // 4. Inventory
+             builder.Entity<Product>(b => {
+                b.Property(p => p.Name).HasMaxLength(200);
+                b.Property(p => p.Code).HasMaxLength(100);
+                b.Property(p => p.Barcode).HasMaxLength(100); 
+                b.Property(p => p.SkuCode).HasMaxLength(100); 
+                b.Property(p => p.SkuName).HasMaxLength(200);
+                b.Property(p => p.Description).HasMaxLength(4000);
+                b.Property(p => p.ProductUrl).HasMaxLength(500);
+            });
+
+            builder.Entity<ProductCategory>(b => {
+                b.Property(c => c.Name).HasMaxLength(200);
+                b.Property(c => c.Description).HasMaxLength(1000);
+            });
+            
+             builder.Entity<Brand>(b => {
+                b.Property(b => b.Name).HasMaxLength(200);
+                b.Property(b => b.ImageUrl).HasMaxLength(500);
+            });
+            
+             builder.Entity<UnitConversation>(b => {
+                b.Property(u => u.Name).HasMaxLength(100);
+                b.Property(u => u.Code).HasMaxLength(50); 
+                // Operator is Enum, no MaxLength
+            });
+
+             builder.Entity<Variant>(b => b.Property(v => v.Name).HasMaxLength(200));
+             builder.Entity<VariantItem>(b => b.Property(v => v.Name).HasMaxLength(200));
+
+             builder.Entity<StockTransfer>(b => {
+                b.Property(s => s.ReferenceNo).HasMaxLength(50);
+                b.Property(s => s.Notes).HasMaxLength(1000);
+             });
+
+            // 5. Sales & Purchase orders
+            builder.Entity<SalesOrder>(b => {
+                b.Property(s => s.OrderNumber).HasMaxLength(50);
+                b.Property(s => s.Note).HasMaxLength(2000);
+                b.Property(s => s.SaleReturnNote).HasMaxLength(2000);
+                b.Property(s => s.TermAndCondition).HasMaxLength(4000);
+            });
+
+            builder.Entity<PurchaseOrder>(b => {
+                b.Property(p => p.OrderNumber).HasMaxLength(50);
+                b.Property(p => p.Note).HasMaxLength(2000);
+                b.Property(p => p.TermAndCondition).HasMaxLength(4000);
+            });
+            
+             builder.Entity<SalesOrderPayment>(b => {
+                b.Property(p => p.ReferenceNumber).HasMaxLength(50);
+                b.Property(p => p.Note).HasMaxLength(1000);
+            });
+
+             builder.Entity<PurchaseOrderPayment>(b => {
+                 b.Property(p => p.ReferenceNumber).HasMaxLength(50);
+                 b.Property(p => p.Note).HasMaxLength(1000);
+            });
+
+            // 6. Finance
+            builder.Entity<Expense>(b => {
+                 b.Property(e => e.Reference).HasMaxLength(100);
+                 b.Property(e => e.Description).HasMaxLength(1000);
+                 b.Property(e => e.ReceiptName).HasMaxLength(200);
+                 b.Property(e => e.ReceiptPath).HasMaxLength(500);
+            });
+
+            builder.Entity<ExpenseCategory>(b => b.Property(e => e.Name).HasMaxLength(200));
+
+            builder.Entity<LedgerAccount>(b => {
+                b.Property(l => l.AccountName).HasMaxLength(200);
+                b.Property(l => l.AccountCode).HasMaxLength(50);
+            });
+            
+            builder.Entity<Tax>(b => b.Property(t => t.Name).HasMaxLength(100));
+
+            // 7. Inquiry
+             builder.Entity<Inquiry>(b => {
+                 b.Property(i => i.CompanyName).HasMaxLength(200);
+                 b.Property(i => i.ContactPerson).HasMaxLength(200);
+                 b.Property(i => i.Email).HasMaxLength(256);
+                 b.Property(i => i.Phone).HasMaxLength(50);
+                 b.Property(i => i.MobileNo).HasMaxLength(50);
+                 b.Property(i => i.Website).HasMaxLength(500);
+                 b.Property(i => i.Address).HasMaxLength(500);
+                 b.Property(i => i.CityName).HasMaxLength(200);
+                 b.Property(i => i.CountryName).HasMaxLength(200);
+                 b.Property(i => i.Message).HasMaxLength(4000);
+            });
+            
+             builder.Entity<InquirySource>(b => b.Property(i => i.Name).HasMaxLength(200));
+             builder.Entity<InquiryStatus>(b => b.Property(i => i.Name).HasMaxLength(200));
+
+             // 8. Logs
+             builder.Entity<NLog>(b => {
+                 b.Property(n => n.MachineName).HasMaxLength(100);
+                 b.Property(n => n.Level).HasMaxLength(50);
+                 b.Property(n => n.Logger).HasMaxLength(250);
+             });
+             
+             builder.Entity<EmailLog>(b => {
+                 b.Property(e => e.SenderEmail).HasMaxLength(256);
+                 b.Property(e => e.RecipientEmail).HasMaxLength(256);
+                 b.Property(e => e.Subject).HasMaxLength(500);
+                 b.Property(e => e.ErrorMessage).HasMaxLength(4000);
+             });
+
             // Apply global query filters for multi-tenancy
             ApplyTenantQueryFilters(builder);
 
@@ -779,38 +1332,106 @@ namespace POS.Domain
             builder.Entity<UserToken>().ToTable("UserTokens");
             builder.DefalutMappingValue();
             builder.DefalutDeleteValueFilter();
+
+            // Automated Global Indexing for Multi-Tenancy
+            foreach (var entityType in builder.Model.GetEntityTypes())
+            {
+                // Check if entity inherits from BaseEntity (Tenant Data)
+                if (typeof(BaseEntity).IsAssignableFrom(entityType.ClrType))
+                {
+                    // Configure CreatedBy relationship to Restrict to avoid cycles
+                    try
+                    {
+                        builder.Entity(entityType.ClrType)
+                            .HasOne("CreatedByUser")
+                            .WithMany()
+                            .HasForeignKey("CreatedBy")
+                            .OnDelete(DeleteBehavior.Restrict);
+                    }
+                    catch (InvalidOperationException)
+                    {
+                        // Ignore if navigation property doesn't exist or is already configured (e.g. User entity itself)
+                    }
+
+                    var tenantIdProperty = entityType.FindProperty("TenantId");
+                    if (tenantIdProperty != null)
+                    {
+                        // Add a non-unique index on TenantId if one doesn't exist starting with TenantId
+                        // We check existing indexes to avoid redundancy
+                        var existingIndex = entityType.GetIndexes()
+                            .Any(i => i.Properties.Count > 0 && i.Properties[0].Name == "TenantId");
+
+                        if (!existingIndex)
+                        {
+                            builder.Entity(entityType.ClrType)
+                                .HasIndex("TenantId")
+                                .HasDatabaseName($"IX_{entityType.ClrType.Name}_TenantId");
+                        }
+                    }
+                }
+            }
         }
+
+        public Guid? CurrentTenantId => _tenantProvider?.GetTenantId();
 
         private void ApplyTenantQueryFilters(ModelBuilder builder)
         {
-            var tenantId = _tenantProvider?.GetTenantId();
-
-            // Only apply filters if tenant context is available
-            if (!tenantId.HasValue)
-                return;
-
             // Apply to User entity
             builder.Entity<User>()
-                .HasQueryFilter(u => u.TenantId == tenantId);
+                .HasQueryFilter(u => u.TenantId == CurrentTenantId && !u.IsDeleted);
 
             // Apply to Role entity
             builder.Entity<Role>()
-                .HasQueryFilter(r => r.TenantId == tenantId);
+                .HasQueryFilter(r => r.TenantId == CurrentTenantId && !r.IsDeleted);
 
-            // Apply to all entities inheriting from BaseEntity
-            foreach (var entityType in builder.Model.GetEntityTypes())
+            // Entities that should remain global (Shared Master Data)
+            var globalEntityTypes = new[]
             {
-                if (typeof(BaseEntity).IsAssignableFrom(entityType.ClrType))
-                {
-                    var parameter = System.Linq.Expressions.Expression.Parameter(entityType.ClrType, "e");
-                    var tenantProperty = System.Linq.Expressions.Expression.Property(parameter, nameof(BaseEntity.TenantId));
-                    var tenantValue = System.Linq.Expressions.Expression.Constant(tenantId);
-                    var tenantFilter = System.Linq.Expressions.Expression.Equal(tenantProperty, tenantValue);
+                typeof(POS.Data.Country),
+                typeof(POS.Data.City),
+                typeof(POS.Data.Currency)
+            };
 
-                    var lambda = System.Linq.Expressions.Expression.Lambda(tenantFilter, parameter);
-                    builder.Entity(entityType.ClrType).HasQueryFilter(lambda);
-                }
+            // Apply to all entities inheriting from BaseEntity EXCEPT global ones
+            var entityTypes = builder.Model.GetEntityTypes()
+                .Where(t => typeof(BaseEntity).IsAssignableFrom(t.ClrType) 
+                            && !globalEntityTypes.Contains(t.ClrType))
+                .ToList();
+
+            var setGlobalQueryFilterMethod = typeof(POSDbContext)
+                .GetMethods(System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance)
+                .Single(t => t.IsGenericMethod && t.Name == nameof(SetGlobalQueryFilter));
+
+            foreach (var entityType in entityTypes)
+            {
+                var method = setGlobalQueryFilterMethod.MakeGenericMethod(entityType.ClrType);
+                method.Invoke(this, new object[] { builder });
             }
+            
+            // Apply similar filter for SharedBaseEntity (Global but track IsDeleted)
+             var sharedEntityTypes = builder.Model.GetEntityTypes()
+                .Where(t => typeof(SharedBaseEntity).IsAssignableFrom(t.ClrType))
+                .ToList();
+
+            var setSharedQueryFilterMethod = typeof(POSDbContext)
+                .GetMethods(System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance)
+                .Single(t => t.IsGenericMethod && t.Name == nameof(SetSharedQueryFilter));
+
+            foreach (var entityType in sharedEntityTypes)
+            {
+                var method = setSharedQueryFilterMethod.MakeGenericMethod(entityType.ClrType);
+                method.Invoke(this, new object[] { builder });
+            }
+        }
+
+        private void SetGlobalQueryFilter<T>(ModelBuilder builder) where T : BaseEntity
+        {
+            builder.Entity<T>().HasQueryFilter(e => e.TenantId == CurrentTenantId && !e.IsDeleted);
+        }
+        
+        private void SetSharedQueryFilter<T>(ModelBuilder builder) where T : SharedBaseEntity
+        {
+            builder.Entity<T>().HasQueryFilter(e => !e.IsDeleted);
         }
 
         public override int SaveChanges()
@@ -835,15 +1456,47 @@ namespace POS.Domain
                 return;
             }
 
+            var userId = _userInfoToken?.Id ?? Guid.Empty;
+
+            // Handle BaseEntity - Added state
             foreach (var entry in ChangeTracker.Entries<BaseEntity>()
                 .Where(e => e.State == EntityState.Added))
             {
-                if (entry.Entity.TenantId == Guid.Empty)
+                // Auto-populate TenantId
+                if (entry.Entity.TenantId == Guid.Empty || entry.Entity.TenantId == null)
                 {
                     entry.Entity.TenantId = tenantId.Value;
                 }
+                
+                // Auto-populate audit fields as fallback (only if not already set)
+                if (entry.Entity.CreatedBy == Guid.Empty && userId != Guid.Empty)
+                {
+                    entry.Entity.CreatedBy = userId;
+                }
+                
+                if (entry.Entity.CreatedDate == default(DateTime))
+                {
+                    entry.Entity.CreatedDate = DateTime.UtcNow;
+                }
+            }
+            
+            // Handle BaseEntity - Modified state
+            foreach (var entry in ChangeTracker.Entries<BaseEntity>()
+                .Where(e => e.State == EntityState.Modified))
+            {
+                // Auto-populate modified audit fields as fallback
+                if (entry.Entity.ModifiedBy == Guid.Empty && userId != Guid.Empty)
+                {
+                    entry.Entity.ModifiedBy = userId;
+                }
+                
+                if (entry.Entity.ModifiedDate == default(DateTime))
+                {
+                    entry.Entity.ModifiedDate = DateTime.UtcNow;
+                }
             }
 
+            // Handle User - Added state
             foreach (var entry in ChangeTracker.Entries<User>()
                 .Where(e => e.State == EntityState.Added))
             {
@@ -853,6 +1506,7 @@ namespace POS.Domain
                 }
             }
 
+            // Handle Role - Added state
             foreach (var entry in ChangeTracker.Entries<Role>()
                 .Where(e => e.State == EntityState.Added))
             {

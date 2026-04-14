@@ -20,6 +20,10 @@ export interface Customer {
   isImageUpload?: boolean;
   isWalkIn?: boolean;
   taxNumber?: string;
+  salesPersonId?: string;
+  salesPersonName?: string;
+  locationId?: string;
+  locationName?: string;
   billingAddress?: ContactAddress;
   shippingAddress?: ContactAddress;
   billingAddressId?: string;

@@ -33,7 +33,7 @@
           </div>
         </div>
 
-        <div class="body-section" style="padding:10px 10px 20px 20px;border: 1px solid gray;margin-top:10px;">
+        <div class="body-section" style="padding:10px 10px 20px 20px;border: 1px solid var(--border-color);margin-top:10px;">
           <div class="row" style="display:flex;flex-wrap: wrap;">
             <div class="col-8" style="width:50%;flex: 0 0 auto;">
               <h4 class="heading" style="margin-bottom: 2px;"><strong> {{'SUPPLIER' | translate}} : </strong> </h4>
@@ -96,49 +96,49 @@
             </div>
           </div>
         </div>
-        <div class="body-section" style="padding:16px;border: 1px solid gray;">
+        <div class="body-section" style="padding:16px;border: 1px solid var(--border-color);">
           <h4 class="heading" style="margin-top:2px;">{{'PURCHASE_ORDER_ITEMS' | translate}}</h4>
           <table class="table-bordered"
-            style="background-color: #fff;width:100%;border-collapse:collapse;box-shadow: 0px 0px 5px 0.5px #fff;">
+            style="background-color: var(--surface-color);width:100%;border-collapse:collapse;box-shadow: 0px 0px 5px 0.5px var(--surface-color);">
             <thead>
-              <tr style="border:1px solid #111;background-color:#fff;">
-                <th style="font-size: 13;padding-top:08px;padding-bottom:08px;border:1px solid #dee2e6;width:5%;">
+              <tr style="border: 1px solid var(--text-color);background-color: var(--surface-color);">
+                <th style="font-size: 13;padding-top:08px;padding-bottom:08px;border: 1px solid var(--border-color);width:5%;">
                   {{'NO' | translate}}
                 </th>
-                <th style="font-size: 13;padding-top:08px;padding-bottom:08px;border:1px solid #dee2e6; width:20%;">
+                <th style="font-size: 13;padding-top:08px;padding-bottom:08px;border: 1px solid var(--border-color); width:20%;">
                   {{'DESCRIPTION' | translate}}</th>
                 <th class="w-20"
-                  style="font-size: 13;padding-top:08px;padding-bottom:08px;border:1px solid #dee2e6;width:20%;">
+                  style="font-size: 13;padding-top:08px;padding-bottom:08px;border: 1px solid var(--border-color);width:20%;">
                   {{'UNIT_PRICE' | translate}}</th>
                 <th class="w-20"
-                  style="font-size: 13;padding-top:08px;padding-bottom:08px;border:1px solid #dee2e6;width:8%;">
+                  style="font-size: 13;padding-top:08px;padding-bottom:08px;border: 1px solid var(--border-color);width:8%;">
                   {{'QUANTITY' | translate}} </th>
                 <th class="w-20"
-                  style="font-size: 13;padding-top:08px;padding-bottom:08px;border:1px solid #dee2e6;width:20%;">
+                  style="font-size: 13;padding-top:08px;padding-bottom:08px;border: 1px solid var(--border-color);width:20%;">
                   {{'DISCOUNT' | translate}}</th>
                 <th class="w-20"
-                  style="font-size: 13;padding-top:08px;padding-bottom:08px;border:1px solid #dee2e6;width:20%;">
+                  style="font-size: 13;padding-top:08px;padding-bottom:08px;border: 1px solid var(--border-color);width:20%;">
                   {{'TAX' | translate}}</th>
                 <th class="w-20"
-                  style="font-size: 13;padding-top:08px;padding-bottom:08px;border:1px solid #dee2e6;width:20%;">
+                  style="font-size: 13;padding-top:08px;padding-bottom:08px;border: 1px solid var(--border-color);width:20%;">
                   {{'TOTAL_AMOUNT' | translate}}</th>
               </tr>
             </thead>
             <tbody>
               @for(purchaseItem of purchaseOrderItems;let i=$index; track $index){
               <tr>
-                <td style="font-size: 12px;vertical-align:middle!important;text-align:center;border:1px solid #dee2e6;">
+                <td style="font-size: 12px;vertical-align:middle!important;text-align:center;border: 1px solid var(--border-color);">
                   {{i+1}}</td>
-                <td style="font-size: 12px;vertical-align:middle!important;text-align:center;border:1px solid #dee2e6;">
+                <td style="font-size: 12px;vertical-align:middle!important;text-align:center;border: 1px solid var(--border-color);">
                   {{purchaseItem?.product?.name}}</td>
-                <td style="font-size: 12px;vertical-align:middle!important;text-align:center;border:1px solid #dee2e6;">
+                <td style="font-size: 12px;vertical-align:middle!important;text-align:center;border: 1px solid var(--border-color);">
                   {{purchaseItem.unitPrice | customCurrency}}</td>
-                <td style="font-size: 12px;vertical-align:middle!important;text-align:center;border:1px solid #dee2e6;">
+                <td style="font-size: 12px;vertical-align:middle!important;text-align:center;border: 1px solid var(--border-color);">
                   {{purchaseItem.quantity}} <span
                     style="font-size: 10px;">({{purchaseItem?.unitConversation?.name}})</span></td>
-                <td style="font-size: 12px;vertical-align:middle!important;text-align:center;border:1px solid #dee2e6;">
+                <td style="font-size: 12px;vertical-align:middle!important;text-align:center;border: 1px solid var(--border-color);">
                   {{purchaseItem.discount | customCurrency}}</td>
-                <td style="font-size: 12px;vertical-align:middle!important;text-align:center;border:1px solid #dee2e6;">
+                <td style="font-size: 12px;vertical-align:middle!important;text-align:center;border: 1px solid var(--border-color);">
                   {{purchaseItem.taxValue | customCurrency}}
                   @for(itemTax of purchaseItem.purchaseOrderItemTaxes;let last=$last; track $index){
                   <span style="font-size: 10px;">
@@ -150,32 +150,32 @@
                   </span>
                   }
                 </td>
-                <td style="font-size: 12px;vertical-align:middle!important;text-align:center;border:1px solid #dee2e6;">
+                <td style="font-size: 12px;vertical-align:middle!important;text-align:center;border: 1px solid var(--border-color);">
                   {{( ( purchaseItem?.quantity ?? 0) * ( purchaseItem?.unitPrice ?? 0) ) - purchaseItem.discount +
                   purchaseItem.taxValue | customCurrency }}
                 </td>
               </tr>
               }
               @if(purchaseOrderReturnsItems.length > 0){
-              <tr style="vertical-align:middle!important;border:1px solid #dee2e6;background-color: blanchedalmond;">
+              <tr style="vertical-align:middle!important;border: 1px solid var(--border-color);background-color: var(--primary-50);">
                 <td colspan="100%"><strong> {{'RETURNED_ITEMS' | translate}}</strong></td>
               </tr>
               }
               @for(purchaseItem of purchaseOrderReturnsItems;let i=$index; track $index){
-              <tr style="background-color: blanchedalmond;">
-                <td style="font-size: 12px;vertical-align:middle!important;text-align:center;border:1px solid #dee2e6;">
+              <tr style="background-color: var(--primary-50);">
+                <td style="font-size: 12px;vertical-align:middle!important;text-align:center;border: 1px solid var(--border-color);">
                   {{i+1}}</td>
-                <td style="font-size: 12px;vertical-align:middle!important;text-align:center;border:1px solid #dee2e6;">
+                <td style="font-size: 12px;vertical-align:middle!important;text-align:center;border: 1px solid var(--border-color);">
                   {{purchaseItem?.product?.name}}</td>
-                <td style="font-size: 12px;vertical-align:middle!important;text-align:center;border:1px solid #dee2e6;">
+                <td style="font-size: 12px;vertical-align:middle!important;text-align:center;border: 1px solid var(--border-color);">
                   {{purchaseItem.unitPrice | customCurrency}}</td>
-                <td style="font-size: 12px;vertical-align:middle!important;text-align:center;border:1px solid #dee2e6;">
+                <td style="font-size: 12px;vertical-align:middle!important;text-align:center;border: 1px solid var(--border-color);">
                   {{-1 * purchaseItem.quantity}}<br>
                   <span style="font-size: 10px;">({{purchaseItem?.unitConversation?.name}})</span>
                 </td>
-                <td style="font-size: 12px;vertical-align:middle!important;text-align:center;border:1px solid #dee2e6;">
+                <td style="font-size: 12px;vertical-align:middle!important;text-align:center;border: 1px solid var(--border-color);">
                   {{-1 * purchaseItem.discount | customCurrency}}</td>
-                <td style="font-size: 12px;vertical-align:middle!important;text-align:center;border:1px solid #dee2e6;">
+                <td style="font-size: 12px;vertical-align:middle!important;text-align:center;border: 1px solid var(--border-color);">
                   {{-1 * purchaseItem.taxValue | customCurrency}}<br>
                   @for(itemTax of purchaseItem.purchaseOrderItemTaxes;let last=$last; track $index){
                   <span style="font-size: 10px;">
@@ -187,7 +187,7 @@
                   </span>
                   }
                 </td>
-                <td style="font-size: 12px;vertical-align:middle!important;text-align:center;border:1px solid #dee2e6;">
+                <td style="font-size: 12px;vertical-align:middle!important;text-align:center;border: 1px solid var(--border-color);">
                   {{
                   -1 * (((purchaseItem?.quantity ?? 0 )* ( purchaseItem?.unitPrice ?? 0)) - purchaseItem.discount +
                   purchaseItem.taxValue) | customCurrency }}
@@ -196,46 +196,46 @@
               }
               <tr>
                 <td colspan="3" class="text-end"
-                  style="font-size: 13;text-align:end;border:1px solid #dee2e6;font-weight: bold;">
+                  style="font-size: 13;text-align:end;border: 1px solid var(--border-color);font-weight: bold;">
                   {{'TOTAL' | translate}}
                 </td>
-                <td class="text-end" style="font-size: 13;text-align:end;border:1px solid #dee2e6;font-weight: bold;">
+                <td class="text-end" style="font-size: 13;text-align:end;border: 1px solid var(--border-color);font-weight: bold;">
                   {{purchaseOrderForInvoice.totalQuantity}}
                 </td>
-                <td class="text-end" style="font-size: 13;text-align:end;border:1px solid #dee2e6;font-weight: bold;">
+                <td class="text-end" style="font-size: 13;text-align:end;border: 1px solid var(--border-color);font-weight: bold;">
                   {{purchaseOrderForInvoice.totalDiscount | customCurrency}}
                 </td>
-                <td class="text-end" style="font-size: 13;text-align:end;border:1px solid #dee2e6;font-weight: bold;">
+                <td class="text-end" style="font-size: 13;text-align:end;border: 1px solid var(--border-color);font-weight: bold;">
                   {{purchaseOrderForInvoice.totalTax | customCurrency}}
                 </td>
-                <td style="font-size: 13;text-align:end;border:1px solid #dee2e6;font-weight: bold;">
+                <td style="font-size: 13;text-align:end;border: 1px solid var(--border-color);font-weight: bold;">
                   {{purchaseOrderForInvoice.totalAmount | customCurrency}}
                 </td>
               </tr>
               <tr>
                 <td colspan="6" class="text-end"
-                  style="font-size: 13;text-align:end;border:1px solid #dee2e6;font-weight: bold;">
+                  style="font-size: 13;text-align:end;border: 1px solid var(--border-color);font-weight: bold;">
                   {{'PAID' | translate}}
                 </td>
-                <td style="font-size: 13;text-align:end;border:1px solid #dee2e6;">
+                <td style="font-size: 13;text-align:end;border: 1px solid var(--border-color);">
                   {{purchaseOrderForInvoice.totalPaidAmount | customCurrency}}
                 </td>
               </tr>
               <tr>
                 <td colspan="6" class="text-end"
-                  style="font-size: 13;text-align:end;border:1px solid #dee2e6;font-weight: bold;">
+                  style="font-size: 13;text-align:end;border: 1px solid var(--border-color);font-weight: bold;">
                   {{'REFUND' | translate}}
                 </td>
-                <td style="font-size: 13;text-align:end;border:1px solid #dee2e6;">
+                <td style="font-size: 13;text-align:end;border: 1px solid var(--border-color);">
                   {{-1 * purchaseOrderForInvoice.totalRefundAmount | customCurrency}}
                 </td>
               </tr>
               <tr>
                 <td colspan="6" class="text-end"
-                  style="font-size: 13;text-align:end;border:1px solid #dee2e6;font-weight: bold;">
+                  style="font-size: 13;text-align:end;border: 1px solid var(--border-color);font-weight: bold;">
                   {{'BALANCE' | translate}}
                 </td>
-                <td style="font-size: 13; text-align:end;border:1px solid #dee2e6;">
+                <td style="font-size: 13; text-align:end;border: 1px solid var(--border-color);">
                   {{purchaseOrderForInvoice.totalAmount + purchaseOrderForInvoice.totalRefundAmount - (
                   purchaseOrderForInvoice.totalPaidAmount ?? 0) |
                   customCurrency}}

@@ -1,4 +1,4 @@
-﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -16,7 +16,7 @@ namespace POS.Common.GenericRepository
         protected readonly TContext Context;
         internal readonly DbSet<TC> DbSet;
         protected IUnitOfWork<TContext> _uow;
-        protected GenericRepository(IUnitOfWork<TContext> uow
+        public GenericRepository(IUnitOfWork<TContext> uow
             )
         {
             Context = uow.Context;
@@ -122,18 +122,30 @@ namespace POS.Common.GenericRepository
         }
         public virtual void Delete(Guid id)
         {
-            var entity = Context.Set<TC>().Find(id) as BaseEntity;
-            if (entity != null)
+            var entity = Context.Set<TC>().Find(id);
+            if (entity == null) return;
+
+            if (entity is ISoftDelete softDeleteEntity)
             {
-                entity.IsDeleted = true;
+                softDeleteEntity.IsDeleted = true;
                 Context.Update(entity);
+            }
+            else
+            {
+                 Context.Remove(entity);
             }
         }
         public virtual void Delete(TC entityData)
         {
-            var entity = entityData as BaseEntity;
-            entity.IsDeleted = true;
-            Context.Update(entity);
+             if (entityData is ISoftDelete softDeleteEntity)
+            {
+                softDeleteEntity.IsDeleted = true;
+                Context.Update(entityData);
+            }
+            else
+            {
+                Context.Remove(entityData);
+            }
         }
         public virtual void Remove(TC entity)
         {

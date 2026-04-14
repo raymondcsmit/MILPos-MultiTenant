@@ -8,10 +8,8 @@ using POS.Data.Dto;
 
 namespace POS.Data.Entities
 {
-    public class TableSetting
+    public class TableSetting : BaseEntity
     {
-        [Key]
-        public Guid Id { get; set; }
         [Required]
         public string ScreenName { get; set; }
         public Guid UserId { get; set; }

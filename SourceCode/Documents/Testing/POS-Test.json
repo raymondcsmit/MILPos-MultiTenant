@@ -1,0 +1,421 @@
+{
+    "info": {
+        "name": "POS & Inventory Automated Test Data",
+        "description": "Automated Postman Collection to seed the database with test data.",
+        "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+    },
+    "variable": [
+        {
+            "key": "base_url",
+            "value": "http://localhost:5000/api",
+            "type": "string"
+        },
+        {
+            "key": "jwt_token",
+            "value": "",
+            "type": "string"
+        },
+        {
+            "key": "tenant_id",
+            "value": "",
+            "type": "string"
+        }
+    ],
+    "item": [
+        {
+            "name": "0. Register Tenant (TechCorp)",
+            "request": {
+                "method": "POST",
+                "header": [
+                    {
+                        "key": "Content-Type",
+                        "value": "application/json",
+                        "type": "text"
+                    }
+                ],
+                "url": {
+                    "raw": "{{base_url}}/Tenants/register",
+                    "host": [
+                        "{{base_url}}"
+                    ],
+                    "path": [
+                        "Tenants",
+                        "register"
+                    ]
+                },
+                "body": {
+                    "mode": "raw",
+                    "raw": "{\n    \"name\": \"TechCorp POS\",\n    \"subdomain\": \"techcorp\",\n    \"adminEmail\": \"admin@techcorp.com\",\n    \"adminPassword\": \"TechCorp@2024\",\n    \"phone\": \"+1-555-0101\",\n    \"address\": \"123 TechCorp Way\"\n}"
+                }
+            },
+            "response": []
+        },
+        {
+            "name": "1. Login (Tenant Admin)",
+            "request": {
+                "method": "POST",
+                "header": [
+                    {
+                        "key": "Content-Type",
+                        "value": "application/json",
+                        "type": "text"
+                    },
+                    {
+                        "key": "Authorization",
+                        "value": "Bearer {{jwt_token}}",
+                        "type": "text"
+                    }
+                ],
+                "url": {
+                    "raw": "{{base_url}}/authentication/login",
+                    "host": [
+                        "{{base_url}}"
+                    ],
+                    "path": [
+                        "authentication",
+                        "login"
+                    ]
+                },
+                "body": {
+                    "mode": "raw",
+                    "raw": "{\n    \"userName\": \"admin@techcorp.com\",\n    \"password\": \"TechCorp@2024\"\n}"
+                }
+            },
+            "response": [],
+            "event": [
+                {
+                    "listen": "test",
+                    "script": {
+                        "exec": [
+                            "var jsonData = pm.response.json();",
+                            "if (jsonData && jsonData.bearerToken) {",
+                            "    pm.collectionVariables.set(\"jwt_token\", jsonData.bearerToken);",
+                            "}"
+                        ],
+                        "type": "text/javascript"
+                    }
+                }
+            ]
+        },
+        {
+            "name": "Create Brand: Apple",
+            "request": {
+                "method": "POST",
+                "header": [
+                    {
+                        "key": "Content-Type",
+                        "value": "application/json",
+                        "type": "text"
+                    },
+                    {
+                        "key": "Authorization",
+                        "value": "Bearer {{jwt_token}}",
+                        "type": "text"
+                    }
+                ],
+                "url": {
+                    "raw": "{{base_url}}/Brand",
+                    "host": [
+                        "{{base_url}}"
+                    ],
+                    "path": [
+                        "Brand"
+                    ]
+                },
+                "body": {
+                    "mode": "raw",
+                    "raw": "{\n    \"name\": \"Apple\"\n}"
+                }
+            },
+            "response": []
+        },
+        {
+            "name": "Create Brand: Samsung",
+            "request": {
+                "method": "POST",
+                "header": [
+                    {
+                        "key": "Content-Type",
+                        "value": "application/json",
+                        "type": "text"
+                    },
+                    {
+                        "key": "Authorization",
+                        "value": "Bearer {{jwt_token}}",
+                        "type": "text"
+                    }
+                ],
+                "url": {
+                    "raw": "{{base_url}}/Brand",
+                    "host": [
+                        "{{base_url}}"
+                    ],
+                    "path": [
+                        "Brand"
+                    ]
+                },
+                "body": {
+                    "mode": "raw",
+                    "raw": "{\n    \"name\": \"Samsung\"\n}"
+                }
+            },
+            "response": []
+        },
+        {
+            "name": "Create Brand: Dell",
+            "request": {
+                "method": "POST",
+                "header": [
+                    {
+                        "key": "Content-Type",
+                        "value": "application/json",
+                        "type": "text"
+                    },
+                    {
+                        "key": "Authorization",
+                        "value": "Bearer {{jwt_token}}",
+                        "type": "text"
+                    }
+                ],
+                "url": {
+                    "raw": "{{base_url}}/Brand",
+                    "host": [
+                        "{{base_url}}"
+                    ],
+                    "path": [
+                        "Brand"
+                    ]
+                },
+                "body": {
+                    "mode": "raw",
+                    "raw": "{\n    \"name\": \"Dell\"\n}"
+                }
+            },
+            "response": []
+        },
+        {
+            "name": "Create Category: Electronics",
+            "request": {
+                "method": "POST",
+                "header": [
+                    {
+                        "key": "Content-Type",
+                        "value": "application/json",
+                        "type": "text"
+                    },
+                    {
+                        "key": "Authorization",
+                        "value": "Bearer {{jwt_token}}",
+                        "type": "text"
+                    }
+                ],
+                "url": {
+                    "raw": "{{base_url}}/ProductCategory",
+                    "host": [
+                        "{{base_url}}"
+                    ],
+                    "path": [
+                        "ProductCategory"
+                    ]
+                },
+                "body": {
+                    "mode": "raw",
+                    "raw": "{\n    \"name\": \"Electronics\"\n}"
+                }
+            },
+            "response": []
+        },
+        {
+            "name": "Create Category: Accessories",
+            "request": {
+                "method": "POST",
+                "header": [
+                    {
+                        "key": "Content-Type",
+                        "value": "application/json",
+                        "type": "text"
+                    },
+                    {
+                        "key": "Authorization",
+                        "value": "Bearer {{jwt_token}}",
+                        "type": "text"
+                    }
+                ],
+                "url": {
+                    "raw": "{{base_url}}/ProductCategory",
+                    "host": [
+                        "{{base_url}}"
+                    ],
+                    "path": [
+                        "ProductCategory"
+                    ]
+                },
+                "body": {
+                    "mode": "raw",
+                    "raw": "{\n    \"name\": \"Accessories\"\n}"
+                }
+            },
+            "response": []
+        },
+        {
+            "name": "Create Category: Computers",
+            "request": {
+                "method": "POST",
+                "header": [
+                    {
+                        "key": "Content-Type",
+                        "value": "application/json",
+                        "type": "text"
+                    },
+                    {
+                        "key": "Authorization",
+                        "value": "Bearer {{jwt_token}}",
+                        "type": "text"
+                    }
+                ],
+                "url": {
+                    "raw": "{{base_url}}/ProductCategory",
+                    "host": [
+                        "{{base_url}}"
+                    ],
+                    "path": [
+                        "ProductCategory"
+                    ]
+                },
+                "body": {
+                    "mode": "raw",
+                    "raw": "{\n    \"name\": \"Computers\"\n}"
+                }
+            },
+            "response": []
+        },
+        {
+            "name": "Create UOM: Piece",
+            "request": {
+                "method": "POST",
+                "header": [
+                    {
+                        "key": "Content-Type",
+                        "value": "application/json",
+                        "type": "text"
+                    },
+                    {
+                        "key": "Authorization",
+                        "value": "Bearer {{jwt_token}}",
+                        "type": "text"
+                    }
+                ],
+                "url": {
+                    "raw": "{{base_url}}/UnitConversation",
+                    "host": [
+                        "{{base_url}}"
+                    ],
+                    "path": [
+                        "UnitConversation"
+                    ]
+                },
+                "body": {
+                    "mode": "raw",
+                    "raw": "{\n    \"name\": \"Piece\",\n    \"code\": \"Pc\"\n}"
+                }
+            },
+            "response": []
+        },
+        {
+            "name": "Create UOM: Box",
+            "request": {
+                "method": "POST",
+                "header": [
+                    {
+                        "key": "Content-Type",
+                        "value": "application/json",
+                        "type": "text"
+                    },
+                    {
+                        "key": "Authorization",
+                        "value": "Bearer {{jwt_token}}",
+                        "type": "text"
+                    }
+                ],
+                "url": {
+                    "raw": "{{base_url}}/UnitConversation",
+                    "host": [
+                        "{{base_url}}"
+                    ],
+                    "path": [
+                        "UnitConversation"
+                    ]
+                },
+                "body": {
+                    "mode": "raw",
+                    "raw": "{\n    \"name\": \"Box\",\n    \"code\": \"Bx\"\n}"
+                }
+            },
+            "response": []
+        },
+        {
+            "name": "Create Supplier: Global Tech",
+            "request": {
+                "method": "POST",
+                "header": [
+                    {
+                        "key": "Content-Type",
+                        "value": "application/json",
+                        "type": "text"
+                    },
+                    {
+                        "key": "Authorization",
+                        "value": "Bearer {{jwt_token}}",
+                        "type": "text"
+                    }
+                ],
+                "url": {
+                    "raw": "{{base_url}}/Supplier",
+                    "host": [
+                        "{{base_url}}"
+                    ],
+                    "path": [
+                        "Supplier"
+                    ]
+                },
+                "body": {
+                    "mode": "raw",
+                    "raw": "{\n    \"supplierName\": \"Global Tech Distributors\",\n    \"contactPerson\": \"John Doe\",\n    \"email\": \"sales@globaltech.com\",\n    \"mobileNo\": \"+1-555-0101\",\n    \"address\": \"123 Distributor Way, NY\"\n}"
+                }
+            },
+            "response": []
+        },
+        {
+            "name": "Create Customer: Alice Johnson",
+            "request": {
+                "method": "POST",
+                "header": [
+                    {
+                        "key": "Content-Type",
+                        "value": "application/json",
+                        "type": "text"
+                    },
+                    {
+                        "key": "Authorization",
+                        "value": "Bearer {{jwt_token}}",
+                        "type": "text"
+                    }
+                ],
+                "url": {
+                    "raw": "{{base_url}}/Customer",
+                    "host": [
+                        "{{base_url}}"
+                    ],
+                    "path": [
+                        "Customer"
+                    ]
+                },
+                "body": {
+                    "mode": "raw",
+                    "raw": "{\n    \"customerName\": \"Alice Johnson\",\n    \"contactPerson\": \"Alice Johnson\",\n    \"email\": \"alice@business.com\",\n    \"mobileNo\": \"+1-555-0303\"\n}"
+                }
+            },
+            "response": []
+        }
+    ]
+}

@@ -1,0 +1,213 @@
+<section class="content">
+    <div class="container-fluid">
+      <div class="row g-0 daily-price-content">
+        <!-- LEFT PANEL: Grouped Product List -->
+        <div class="col-md-5 col-lg-4 border-end bg-white product-list-panel">
+          <!-- Sticky Header Controls -->
+          <div class="p-3 border-bottom bg-white sticky-top">
+            <h5 class="mb-3 text-primary fw-bold">Stock Bulk Update</h5>
+            
+            <div class="input-group input-group-sm mb-2">
+              <span class="input-group-text"><i class="fas fa-search"></i></span>
+              <input 
+                type="text" 
+                class="form-control" 
+                placeholder="Search products..."
+                [(ngModel)]="searchTerm"
+                (ngModelChange)="onSearch($event)"
+              />
+            </div>
+            
+            <div class="d-flex gap-2 mb-2">
+              <select class="form-select form-select-sm" [(ngModel)]="groupBy" (change)="onGroupByChange(groupBy)">
+                <option value="Category">By Category</option>
+                <option value="Brand">By Brand</option>
+              </select>
+            </div>
+
+            <div class="d-flex gap-2">
+                <button 
+                  class="btn btn-sm btn-success w-100" 
+                  (click)="saveAllChanges()"
+                  [disabled]="saving || pendingUpdates.length === 0"
+                >
+                  <i class="fas fa-save"></i> 
+                  Save All 
+                  <span *ngIf="pendingUpdates.length > 0" class="badge bg-white text-success ms-1">
+                    {{ pendingUpdates.length }}
+                  </span>
+                </button>
+              </div>
+          </div>
+  
+          <!-- Product List Container -->
+          <div class="product-list-container">
+            <div *ngIf="loading" class="text-center py-5">
+              <div class="spinner-border text-primary" role="status">
+                <span class="visually-hidden">Loading...</span>
+              </div>
+            </div>
+  
+            <div *ngIf="!loading && groupedData.size === 0" class="text-center text-muted py-5">
+              <p>No products found</p>
+            </div>
+  
+            <div *ngFor="let group of groupedData | keyvalue">
+              <div 
+                class="group-header d-flex justify-content-between align-items-center"
+                data-bs-toggle="collapse"
+                [attr.data-bs-target]="'#group-' + toSafeId(group.key)"
+              >
+                <span>{{ group.key }}</span>
+                <span class="badge bg-secondary rounded-pill">{{ group.value.length }}</span>
+              </div>
+              
+              <div [id]="'group-' + toSafeId(group.key)" class="collapse show">
+                <div 
+                  *ngFor="let product of group.value"
+                  class="product-row"
+                  [class.active]="selectedProduct?.id === product.id"
+                  (click)="selectProduct(product)"
+                >
+                  <div class="d-flex justify-content-between align-items-center mb-1">
+                    <strong>{{ product.productName }}</strong>
+                    <span *ngIf="product.id && hasPendingUpdate(product.id)" class="badge bg-warning text-dark">Modified</span>
+                  </div>
+                  <div class="d-flex justify-content-between small text-muted">
+                    <!-- Code property removed as it is missing in interface -->
+                    <span>Total: {{ product.currentStock }}</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+  
+        <!-- RIGHT PANEL: Detailed View -->
+        <div class="main-content col-md-7 col-lg-8 p-4 detail-panel">
+          <div *ngIf="!selectedProduct" class="text-center text-muted py-5">
+            <i class="fas fa-hand-pointer fa-3x mb-3"></i>
+            <p>Select a product to update stock</p>
+          </div>
+  
+          <div *ngIf="selectedProduct">
+            <!-- Header -->
+            <div class="d-flex justify-content-between align-items-start mb-4">
+                <div>
+                    <h2 class="h3 mb-1">{{ selectedProduct.productName }}</h2>
+                    <span class="badge bg-secondary me-2">{{ selectedProduct.categoryName }}</span>
+                    <span class="badge bg-info">{{ selectedProduct.brandName }}</span>
+                </div>
+                <div class="text-end">
+                    <div class="text-muted small">Current Stock</div>
+                    <div class="h5 mb-0 text-success">{{ selectedProduct.currentStock }} {{ selectedProduct.unitName }}</div>
+                </div>
+            </div>
+
+            <div class="row g-4">
+                <!-- Stock Entry Form -->
+                <div class="col-md-6">
+                    <div class="card bg-white border-primary h-100">
+                        <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
+                            <span>Update Stock</span>
+                            <i class="fas fa-boxes"></i>
+                        </div>
+                        <div class="card-body">
+                            <form #stockForm="ngForm">
+                                <div class="row g-2 mb-3">
+                                    <div class="col-md-6">
+                                        <label class="form-label small fw-bold">Reference Number <span class="text-danger">*</span></label>
+                                        <input type="text" class="form-control" name="referenceNumber" [(ngModel)]="currentUpdate.referenceNumber" required placeholder="Inv-001">
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label class="form-label small fw-bold">Location <span class="text-danger">*</span></label>
+                                        <select class="form-select" name="locationId" [(ngModel)]="currentUpdate.locationId" required>
+                                            <option *ngFor="let loc of locations" [value]="loc.id">{{ loc.name }}</option>
+                                        </select>
+                                    </div>
+                                </div>
+
+                                <div class="row g-2 mb-3">
+                                    <div class="col-md-4">
+                                        <label class="form-label small fw-bold">Operation</label>
+                                        <select class="form-select bg-light" name="operation" [(ngModel)]="currentUpdateOperation">
+                                            <option value="add">Add (+)</option>
+                                            <option value="remove">Remove (-)</option>
+                                        </select>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <label class="form-label small fw-bold">Qty <span class="text-danger">*</span></label>
+                                        <input type="number" class="form-control fw-bold" name="stock" [(ngModel)]="currentUpdate.currentStock" required min="0.01">
+                                    </div>
+                                    <div class="col-md-4">
+                                        <label class="form-label small fw-bold">Unit</label>
+                                        <input type="text" class="form-control" [value]="selectedProduct.unitName" disabled readonly>
+                                    </div>
+                                </div>
+
+                                <div class="mb-3">
+                                    <label class="form-label small fw-bold">Unit Price / Cost</label>
+                                    <div class="input-group">
+                                        <span class="input-group-text">$</span>
+                                        <input type="number" class="form-control" name="pricePerUnit" [(ngModel)]="currentUpdate.pricePerUnit">
+                                    </div>
+                                </div>
+
+                                <div class="row g-2 mb-3">
+                                    <div class="col-md-6">
+                                        <label class="form-label small fw-bold">Tax</label>
+                                        <select class="form-select" name="taxId" [(ngModel)]="selectedTaxId" (change)="onTaxChange()">
+                                            <option [ngValue]="null">None</option>
+                                            <option *ngFor="let tax of taxes" [value]="tax.id">{{ tax.name }} ({{tax.percentage}}%)</option>
+                                        </select>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label class="form-label small fw-bold">Payment Method</label>
+                                        <select class="form-select" name="paymentMethod" [(ngModel)]="currentUpdate.paymentMethod">
+                                           <!-- 0: Cash, 1: Cheque, 2: BankTransfer, 3: Other -->
+                                            <option [ngValue]="0">Cash</option>
+                                            <option [ngValue]="1">Cheque</option>
+                                            <option [ngValue]="2">Bank Transfer</option>
+                                            <option [ngValue]="3">Other</option>
+                                        </select>
+                                    </div>
+                                </div>
+
+                                <div class="d-grid gap-2 mt-4">
+                                    <button class="btn btn-primary" type="button" (click)="addToQueue()" [disabled]="!stockForm.valid">
+                                        <i class="fas fa-plus me-2"></i>Add to Queue
+                                    </button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Pending Updates List for this Product? Or Global? -->
+                <!-- Let's show Global Pending List here or History -->
+                <div class="col-md-6">
+                    <h6 class="fw-bold mb-3">Pending Updates ({{ pendingUpdates.length }})</h6>
+                     <div class="card p-2" style="max-height: 400px; overflow-y: auto;">
+                        <ul class="list-group list-group-flush small">
+                            <li *ngFor="let update of pendingUpdates; let i = index" class="list-group-item d-flex justify-content-between align-items-center">
+                                <div>
+                                    <strong>{{ getProductName(update.productId) }}</strong><br>
+                                    <span [class.text-danger]="update.currentStock < 0" [class.text-success]="update.currentStock > 0">
+                                        {{ update.currentStock > 0 ? '+' : ''}}{{ update.currentStock }}
+                                    </span> 
+                                    at {{ getLocationName(update.locationId) }}
+                                </div>
+                                <button class="btn btn-sm btn-outline-danger" (click)="removeFromQueue(i)"><i class="fas fa-times"></i></button>
+                            </li>
+                             <li *ngIf="pendingUpdates.length === 0" class="list-group-item text-muted text-center">
+                                No pending updates
+                            </li>
+                        </ul>
+                     </div>
+                </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>

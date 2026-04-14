@@ -1,0 +1,73 @@
+@{
+    ViewData["Title"] = "Secure Payment";
+    var plan = ViewBag.Plan as string ?? "Professional";
+}
+
+<div class="glass-panel" style="max-width: 800px; margin: 2rem auto; display: flex; gap: 2rem; flex-wrap: wrap;">
+    
+    <!-- Order Summary -->
+    <div style="flex: 1; min-width: 300px;">
+        <h2>Order Summary</h2>
+        <div class="glass-card" style="margin-top: 1rem;">
+            <div style="display: flex; justify-content: space-between; margin-bottom: 1rem;">
+                <span>@plan Plan (Monthly)</span>
+                <span>$49.00</span>
+            </div>
+            <div style="display: flex; justify-content: space-between; margin-bottom: 1rem; color: var(--accent-color);">
+                <span>Discount (New User)</span>
+                <span>-$0.00</span>
+            </div>
+            <hr style="border-color: var(--glass-border);">
+            <div style="display: flex; justify-content: space-between; margin-top: 1rem; font-size: 1.2rem; font-weight: bold;">
+                <span>Total</span>
+                <span>$49.00</span>
+            </div>
+        </div>
+        <p style="margin-top: 1rem; font-size: 0.9rem; opacity: 0.7;">
+            By continuing, you agree to our Terms of Service. Your subscription will renew automatically. cancel anytime.
+        </p>
+    </div>
+
+    <!-- Payment Form -->
+    <div style="flex: 1.5; min-width: 300px;">
+        <h2>Payment Details</h2>
+        <div class="glass-panel" style="margin: 1rem 0; padding: 1.5rem;">
+            <!-- Mock Form - Redirects to Register on Submit -->
+            <form action="@Url.Action("Register", "Pricing", new { plan = plan })" method="get">
+                
+                <label>Cardholder Name</label>
+                <input type="text" class="glass-input" placeholder="Name on Card" required>
+
+                <label>Card Number</label>
+                <div style="position: relative;">
+                    <input type="text" class="glass-input" placeholder="0000 0000 0000 0000" maxlength="19" required>
+                    <span style="position: absolute; right: 10px; top: 12px;">💳</span>
+                </div>
+
+                <div style="display: flex; gap: 1rem;">
+                    <div style="flex: 1;">
+                        <label>Expiry Date</label>
+                        <input type="text" class="glass-input" placeholder="MM/YY" maxlength="5" required>
+                    </div>
+                    <div style="flex: 1;">
+                        <label>CVC</label>
+                        <input type="text" class="glass-input" placeholder="123" maxlength="3" required>
+                    </div>
+                </div>
+
+                <label>Billing Zip Code</label>
+                <input type="text" class="glass-input" placeholder="12345" required>
+
+                <button type="submit" class="glass-btn glass-btn-primary" style="width: 100%; margin-top: 1rem; font-size: 1.1rem;">
+                    Pay $49.00 & Continue
+                </button>
+                
+                <div style="text-align: center; margin-top: 1rem; font-size: 0.8rem; opacity: 0.7;">
+                    🔒 Secure SSL Encrypted Payment
+                    <br>
+                    (This is a mock payment page)
+                </div>
+            </form>
+        </div>
+    </div>
+</div>

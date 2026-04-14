@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Settings - Glassmorphic Mockup</title>
+    <link rel="stylesheet" href="mockup-styles.css">
+</head>
+<body>
+    <div class="app-container">
+        <!-- Sidebar -->
+        <aside class="sidebar glass-panel">
+            <div class="brand">
+                <span class="material-icons">inventory_2</span>
+                POS System
+            </div>
+            <nav class="nav-links">
+                <a href="01_Dashboard.html" class="nav-item">
+                    <span class="material-icons">dashboard</span> Dashboard
+                </a>
+                <a href="02_UserProfile.html" class="nav-item">
+                    <span class="material-icons">person</span> Profile
+                </a>
+                <a href="03_DataEntry.html" class="nav-item">
+                    <span class="material-icons">add_box</span> Add Product
+                </a>
+                <a href="05_SearchResults.html" class="nav-item">
+                    <span class="material-icons">search</span> Search
+                </a>
+                <a href="04_Settings.html" class="nav-item active">
+                    <span class="material-icons">settings</span> Settings
+                </a>
+            </nav>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- Navbar -->
+            <header class="navbar glass-panel">
+                <h2 style="margin: 0; font-weight: 500;">Settings</h2>
+                <div class="user-menu">
+                    <span class="avatar">JD</span>
+                    <span>John Doe</span>
+                    <span class="material-icons">expand_more</span>
+                </div>
+            </header>
+
+            <div class="content-scroll">
+                <div style="display: grid; grid-template-columns: 240px 1fr; gap: 24px;">
+                    
+                    <!-- Settings Nav -->
+                    <div class="card glass-panel" style="padding: 12px;">
+                        <nav class="nav-links">
+                            <a href="#" class="nav-item active">
+                                <span class="material-icons">tune</span> General
+                            </a>
+                            <a href="#" class="nav-item">
+                                <span class="material-icons">lock</span> Security
+                            </a>
+                            <a href="#" class="nav-item">
+                                <span class="material-icons">notifications</span> Notifications
+                            </a>
+                            <a href="#" class="nav-item">
+                                <span class="material-icons">receipt_long</span> Billing
+                            </a>
+                            <a href="#" class="nav-item">
+                                <span class="material-icons">group</span> Team
+                            </a>
+                        </nav>
+                    </div>
+
+                    <!-- Settings Content -->
+                    <div class="card glass-panel">
+                        <div class="card-header">
+                            <h3 class="card-title">General Settings</h3>
+                            <button class="btn">Save Changes</button>
+                        </div>
+                        
+                        <div style="max-width: 600px;">
+                            <h4 style="color: var(--text-secondary); margin-bottom: 20px; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 8px;">App Preferences</h4>
+                            
+                            <div class="form-group" style="display: flex; justify-content: space-between; align-items: center;">
+                                <div>
+                                    <label style="margin-bottom: 4px; color: white;">Dark Mode</label>
+                                    <p style="margin: 0; font-size: 12px; color: var(--text-secondary);">Enable dark theme for the application</p>
+                                </div>
+                                <label class="switch">
+                                    <input type="checkbox" checked>
+                                    <span class="slider"></span>
+                                </label>
+                            </div>
+
+                            <div class="form-group" style="display: flex; justify-content: space-between; align-items: center;">
+                                <div>
+                                    <label style="margin-bottom: 4px; color: white;">Compact Mode</label>
+                                    <p style="margin: 0; font-size: 12px; color: var(--text-secondary);">Reduce spacing and font size</p>
+                                </div>
+                                <label class="switch">
+                                    <input type="checkbox">
+                                    <span class="slider"></span>
+                                </label>
+                            </div>
+
+                            <div class="form-group">
+                                <label>Language</label>
+                                <select>
+                                    <option>English (US)</option>
+                                    <option>Spanish</option>
+                                    <option>French</option>
+                                </select>
+                            </div>
+
+                            <div class="form-group">
+                                <label>Currency</label>
+                                <select>
+                                    <option>USD ($)</option>
+                                    <option>EUR (€)</option>
+                                    <option>GBP (£)</option>
+                                </select>
+                            </div>
+
+                            <h4 style="color: var(--text-secondary); margin: 30px 0 20px 0; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 8px;">Notifications</h4>
+
+                            <div class="form-group" style="display: flex; justify-content: space-between; align-items: center;">
+                                <div>
+                                    <label style="margin-bottom: 4px; color: white;">Email Notifications</label>
+                                    <p style="margin: 0; font-size: 12px; color: var(--text-secondary);">Receive weekly summaries</p>
+                                </div>
+                                <label class="switch">
+                                    <input type="checkbox" checked>
+                                    <span class="slider"></span>
+                                </label>
+                            </div>
+
+                            <div class="form-group" style="display: flex; justify-content: space-between; align-items: center;">
+                                <div>
+                                    <label style="margin-bottom: 4px; color: white;">Push Notifications</label>
+                                    <p style="margin: 0; font-size: 12px; color: var(--text-secondary);">Get alerts on mobile</p>
+                                </div>
+                                <label class="switch">
+                                    <input type="checkbox">
+                                    <span class="slider"></span>
+                                </label>
+                            </div>
+
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </main>
+    </div>
+</body>
+</html>

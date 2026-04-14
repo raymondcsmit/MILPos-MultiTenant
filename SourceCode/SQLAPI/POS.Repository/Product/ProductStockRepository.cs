@@ -143,7 +143,7 @@ namespace POS.Repository
         public async Task<ProductStockList> GetProducStocks(ProductStockResource productStockResource)
         {
             var collectionBeforePaging =
-               AllIncluding(c => c.Product, u => u.Product.Unit).ApplySort(productStockResource.OrderBy,
+               AllIncluding(c => c.Product, u => u.Product.Unit, c => c.Product.ProductCategory, c => c.Product.Brand).ApplySort(productStockResource.OrderBy,
                _propertyMappingService.GetPropertyMapping<ProductStockDto, ProductStock>());
 
             collectionBeforePaging = collectionBeforePaging.Where(c => c.LocationId == productStockResource.LocationId);
@@ -163,6 +163,42 @@ namespace POS.Repository
 
             var productStockList = new ProductStockList();
             return await productStockList.Create(collectionBeforePaging, productStockResource.Skip, productStockResource.PageSize);
+        }
+
+
+
+        public async Task UpdateProductStockAsync(Guid locationId, Guid productId, decimal newStockValue)
+        {
+            var productStock = await All.FirstOrDefaultAsync(c => c.ProductId == productId && c.LocationId == locationId);
+            if (productStock == null)
+            {
+                // Create if not exists with initial value
+                productStock = new ProductStock
+                {
+                    ProductId = productId,
+                    LocationId = locationId,
+                    CurrentStock = newStockValue,
+                    ModifiedDate = DateTime.UtcNow
+                };
+                Add(productStock);
+            }
+            else
+            {
+                // Update absolute value
+                productStock.CurrentStock = newStockValue;
+                productStock.ModifiedDate = DateTime.UtcNow;
+                Update(productStock);
+            }
+            
+            // Note: SaveAsync is usually called by UnitOfWork in the handler, 
+            // but since AddProductStock internally calls SaveAsync, we should follow consistency.
+            // However, typical pattern is Handler calls Complete(). 
+            // ProductStockRepository.AddProductStock calls SaveAsync internally which is inconsistent but we must respect it.
+            // But for this bulk operation, we should probably let the handler call SaveAsync once at the end 
+            // OR if we want to support immediate persistence.
+            // Given BulkUpdateStockCommand handles persistence, we might not need to call SaveAsync here 
+            // IF the handler uses UOW. But looking at AddProductStock, it calls SaveAsync immediately.
+            // We will NOT call SaveAsync here to allow Bulk Handler to save once for performance.
         }
 
     }

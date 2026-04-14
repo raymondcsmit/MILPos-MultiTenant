@@ -19,6 +19,7 @@ using System.IO;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using POS.Common.Services;
 
 namespace POS.MediatR.Handlers
 {
@@ -35,6 +36,7 @@ namespace POS.MediatR.Handlers
         private readonly IUserLocationsRepository _userLocationsRepository;
         private readonly IConnectionMappingRepository _connectionMappingRepository;
         private readonly IHubContext<UserHub, IHubClient> _hubContext;
+        private readonly IFileStorageService _fileStorageService;
 
         public UpdateUserCommandHandler(
             IUserRoleRepository userRoleRepository,
@@ -47,7 +49,9 @@ namespace POS.MediatR.Handlers
             PathHelper pathHelper,
             IUserLocationsRepository userLocationsRepository,
             IConnectionMappingRepository connectionMappingRepository,
-            IHubContext<UserHub, IHubClient> hubContext)
+
+            IHubContext<UserHub, IHubClient> hubContext,
+            IFileStorageService fileStorageService)
         {
             _mapper = mapper;
             _userManager = userManager;
@@ -60,6 +64,7 @@ namespace POS.MediatR.Handlers
             _userLocationsRepository = userLocationsRepository;
             _connectionMappingRepository = connectionMappingRepository;
             _hubContext = hubContext;
+            _fileStorageService = fileStorageService;
         }
 
         public async Task<ServiceResponse<UserDto>> Handle(UpdateUserCommand request, CancellationToken cancellationToken)
@@ -168,17 +173,12 @@ namespace POS.MediatR.Handlers
                 // delete old file
                 if (!string.IsNullOrWhiteSpace(oldProfilePhoto))
                 {
-                    var oldFile = Path.Combine(pathToSave, oldProfilePhoto);
-                    if (File.Exists(oldFile))
-                    {
-                        FileData.DeleteFile(oldFile);
-                    }
+                    _fileStorageService.DeleteFile(Path.Combine(_pathHelper.UserProfilePath, oldProfilePhoto));
                 }
                 // save new file
                 if (!string.IsNullOrWhiteSpace(request.ImgSrc))
                 {
-                    var filePath = Path.Combine(pathToSave, appUser.ProfilePhoto);
-                    await FileData.SaveFile(filePath, request.ImgSrc);
+                    await _fileStorageService.SaveFileAsync(_pathHelper.UserProfilePath, request.ImgSrc, appUser.ProfilePhoto);
                 }
             }
 

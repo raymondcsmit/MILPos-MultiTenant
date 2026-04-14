@@ -1,4 +1,6 @@
-.table-pos>tbody>tr>td {
+// Enforce dark readable text on light table row backgrounds.
+// The global --text-color is white (glassmorphic theme), which would be invisible here.
+.table-pos > tbody > tr > td {
   background-color: inherit !important;
-  color: inherit !important;
+  color: rgba(0, 0, 0, 0.87) !important;
 }
