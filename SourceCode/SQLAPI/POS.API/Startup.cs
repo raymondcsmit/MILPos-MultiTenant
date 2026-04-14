@@ -111,6 +111,20 @@ namespace POS.API
             services.AddMemoryCache();
 
             var isDevelopment = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT") == "Development";
+            var databaseProvider = Configuration.GetValue<string>("DatabaseProvider") ?? "Sqlite";
+
+            if (databaseProvider == "PostgreSql")
+            {
+                services.AddTransient<SqlKata.Compilers.Compiler, SqlKata.Compilers.PostgresCompiler>();
+            }
+            else if (databaseProvider == "SqlServer")
+            {
+                services.AddTransient<SqlKata.Compilers.Compiler, SqlKata.Compilers.SqlServerCompiler>();
+            }
+            else
+            {
+                services.AddTransient<SqlKata.Compilers.Compiler, SqlKata.Compilers.SqliteCompiler>();
+            }
 
             services.AddApiAndQueriesProfiler(options =>
             {

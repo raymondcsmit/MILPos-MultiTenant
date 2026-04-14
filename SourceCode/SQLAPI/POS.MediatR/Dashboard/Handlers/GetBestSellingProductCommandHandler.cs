@@ -72,23 +72,29 @@ namespace POS.MediatR.Dashboard.Handlers
                     // 1 = Not_Return, 0 = Return (assuming PurchaseSaleItemStatusEnum values)
                     var returnStatusValue = (int)PurchaseSaleItemStatusEnum.Return;
 
-                    var sql = $@"
-                        SELECT 
-                            p.Name, 
-                            SUM(CASE WHEN soi.Status = @ReturnStatus THEN -soi.Quantity ELSE soi.Quantity END) as Count
-                        FROM {salesOrderItemTable} soi
-                        INNER JOIN {salesOrderTable} so ON soi.SalesOrderId = so.Id
-                        INNER JOIN {productTable} p ON soi.ProductId = p.Id
-                        WHERE so.TenantId = @TenantId 
-                          AND so.IsDeleted = @IsDeleted
-                          AND so.SOCreatedDate >= @FromDate 
-                          AND so.SOCreatedDate < @ToDate 
-                          AND so.LocationId IN @LocationIds
-                        GROUP BY p.Id, p.Name
-                        ORDER BY Count DESC";
-
                     var connection = _sqlAccessor.GetOpenConnection();
                     var currentTransaction = _sqlAccessor.GetCurrentTransaction();
+                    var providerName = connection.GetType().Name;
+
+                    string limitClause = providerName == "SqlConnection" 
+                        ? @"OFFSET 0 ROWS FETCH NEXT 10 ROWS ONLY" 
+                        : @"LIMIT 10";
+
+                    var sql = $@"
+                        SELECT 
+                            p.""Name"", 
+                            SUM(CASE WHEN soi.""Status"" = @ReturnStatus THEN -soi.""Quantity"" ELSE soi.""Quantity"" END) as ""Count""
+                        FROM {salesOrderItemTable} soi
+                        INNER JOIN {salesOrderTable} so ON soi.""SalesOrderId"" = so.""Id""
+                        INNER JOIN {productTable} p ON soi.""ProductId"" = p.""Id""
+                        WHERE so.""TenantId"" = @TenantId 
+                          AND so.""IsDeleted"" = @IsDeleted
+                          AND so.""SOCreatedDate"" >= @FromDate 
+                          AND so.""SOCreatedDate"" < @ToDate 
+                          AND so.""LocationId"" IN @LocationIds
+                        GROUP BY p.""Id"", p.""Name""
+                        ORDER BY ""Count"" DESC
+                        {limitClause}";
 
                     var parameters = new 
                     { 
@@ -103,7 +109,7 @@ namespace POS.MediatR.Dashboard.Handlers
                     var command = new CommandDefinition(sql, parameters, currentTransaction, commandTimeout: 60, cancellationToken: cancellationToken);
                     var result = await connection.QueryAsync<BestSellingProductStatisticDto>(command);
 
-                    return result.Take(10).ToList();
+                    return result.ToList();
                 }
                 catch (Exception ex)
                 {

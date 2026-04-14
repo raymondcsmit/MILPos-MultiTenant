@@ -18,6 +18,8 @@ using Microsoft.Extensions.Configuration;
 using POS.Common.DapperInfrastructure;
 using POS.Data;
 using POS.Domain;
+using SqlKata;
+using SqlKata.Compilers;
 
 namespace POS.MediatR.PurchaseOrder.Handlers
 {
@@ -31,6 +33,7 @@ namespace POS.MediatR.PurchaseOrder.Handlers
         private readonly IConfiguration _configuration;
         private readonly ISqlConnectionAccessor _sqlAccessor;
         private readonly ITenantProvider _tenantProvider;
+        private readonly Compiler _compiler;
 
         public GetPurchaseOrderRecentDeliveryScheduleQueryHandler(
             IPurchaseOrderRepository purchaseOrderRepository,
@@ -39,7 +42,8 @@ namespace POS.MediatR.PurchaseOrder.Handlers
             UserInfoToken userInfoToken,
             IConfiguration configuration,
             ISqlConnectionAccessor sqlAccessor,
-            ITenantProvider tenantProvider
+            ITenantProvider tenantProvider,
+            Compiler compiler
           )
         {
             _purchaseOrderRepository = purchaseOrderRepository;
@@ -48,11 +52,12 @@ namespace POS.MediatR.PurchaseOrder.Handlers
             _configuration = configuration;
             _sqlAccessor = sqlAccessor;
             _tenantProvider = tenantProvider;
+            _compiler = compiler;
         }
 
         public async Task<List<PurchaseOrderRecentDeliverySchedule>> Handle(GetPurchaseOrderRecentDeliveryScheduleQuery request, CancellationToken cancellationToken)
         {
-            var useDapper = _configuration.GetValue<bool>("Features:Dapper:GetPurchaseOrderRecentDeliveryScheduleQueryHandler");
+            var useDapper = _configuration.GetValue<bool>("Features:Dapper:GetPurchaseOrderRecentDeliveryScheduleQueryHandler", true);
 
             if (useDapper)
             {
@@ -66,43 +71,30 @@ namespace POS.MediatR.PurchaseOrder.Handlers
                     var notReturnStatus = (int)PurchaseSaleItemStatusEnum.Not_Return;
                     var pendingStatus = (int)PurchaseDeliveryStatus.PENDING;
 
-                    var sql = $@"
-                        SELECT 
-                            po.""Id"" AS ""PurchaseOrderId"",
-                            po.""OrderNumber"" AS ""PurchaseOrderNumber"",
-                            po.""DeliveryDate"" AS ""ExpectedDispatchDate"",
-                            po.""SupplierId"",
-                            s.""SupplierName"",
-                            SUM(CASE WHEN poi.""Status"" = @NotReturnStatus THEN poi.""Quantity"" ELSE -poi.""Quantity"" END) AS ""TotalQuantity""
-                        FROM {purchaseOrderTable} po
-                        INNER JOIN {supplierTable} s ON po.""SupplierId"" = s.""Id""
-                        INNER JOIN {purchaseOrderItemTable} poi ON po.""Id"" = poi.""PurchaseOrderId""
-                        WHERE po.""TenantId"" = @TenantId 
-                          AND po.""IsDeleted"" = @IsDeleted
-                          AND po.""IsPurchaseOrderRequest"" = @IsPurchaseOrderRequest
-                          AND po.""DeliveryStatus"" = @PendingStatus
-                          AND po.""LocationId"" IN @LocationIds
-                        GROUP BY 
-                            po.""Id"", po.""OrderNumber"", po.""DeliveryDate"", po.""SupplierId"", s.""SupplierName""
-                        HAVING SUM(CASE WHEN poi.""Status"" = @NotReturnStatus THEN poi.""Quantity"" ELSE -poi.""Quantity"" END) > 0
-                        ORDER BY po.""DeliveryDate"" DESC
-                        LIMIT 10";
+                    var query = new Query($"{purchaseOrderTable} AS po")
+                        .Select("po.Id AS PurchaseOrderId", "po.OrderNumber AS PurchaseOrderNumber", "po.DeliveryDate AS ExpectedDispatchDate", "po.SupplierId", "s.SupplierName")
+                        .SelectRaw("SUM(CASE WHEN poi.\"Status\" = ? THEN poi.\"Quantity\" ELSE -poi.\"Quantity\" END) AS \"TotalQuantity\"", notReturnStatus)
+                        .Join($"{supplierTable} AS s", "po.SupplierId", "s.Id")
+                        .Join($"{purchaseOrderItemTable} AS poi", "po.Id", "poi.PurchaseOrderId")
+                        .Where("po.TenantId", tenantId)
+                        .Where("po.IsDeleted", false)
+                        .Where("po.IsPurchaseOrderRequest", false)
+                        .Where("po.DeliveryStatus", pendingStatus)
+                        .WhereIn("po.LocationId", _userInfoToken.LocationIds ?? new List<Guid>())
+                        .GroupBy("po.Id", "po.OrderNumber", "po.DeliveryDate", "po.SupplierId", "s.SupplierName")
+                        .HavingRaw("SUM(CASE WHEN poi.\"Status\" = ? THEN poi.\"Quantity\" ELSE -poi.\"Quantity\" END) > 0", notReturnStatus)
+                        .OrderByDesc("po.DeliveryDate")
+                        .Limit(10);
 
+                    var compiled = _compiler.Compile(query);
                     var connection = _sqlAccessor.GetOpenConnection();
                     var currentTransaction = _sqlAccessor.GetCurrentTransaction();
 
-                    var parameters = new 
-                    { 
-                        TenantId = tenantId, 
-                        IsDeleted = false,
-                        IsPurchaseOrderRequest = false,
-                        LocationIds = _userInfoToken.LocationIds,
-                        NotReturnStatus = notReturnStatus,
-                        PendingStatus = pendingStatus
-                    };
-
-                    var command = new CommandDefinition(sql, parameters, currentTransaction, commandTimeout: 60, cancellationToken: cancellationToken);
-                    var result = await connection.QueryAsync<PurchaseOrderRecentDeliverySchedule>(command);
+                    var result = await connection.QueryAsync<PurchaseOrderRecentDeliverySchedule>(
+                        compiled.Sql, 
+                        compiled.NamedBindings, 
+                        currentTransaction, 
+                        commandTimeout: 60);
 
                     return result.ToList();
                 }

@@ -18,6 +18,8 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Dapper;
+using SqlKata;
+using SqlKata.Compilers;
 
 namespace POS.MediatR.Brand.Handler
 {
@@ -31,6 +33,7 @@ namespace POS.MediatR.Brand.Handler
         private readonly ISqlConnectionAccessor _sqlAccessor;
         private readonly ITenantProvider _tenantProvider;
         private readonly ILogger<GetAllBrandCommandHandler> _logger;
+        private readonly Compiler _compiler;
 
         public GetAllBrandCommandHandler(
             IBrandRepository brandRepository,
@@ -40,7 +43,8 @@ namespace POS.MediatR.Brand.Handler
             IConfiguration configuration,
             ISqlConnectionAccessor sqlAccessor,
             ITenantProvider tenantProvider,
-            ILogger<GetAllBrandCommandHandler> logger)
+            ILogger<GetAllBrandCommandHandler> logger,
+            Compiler compiler)
         {
             _brandRepository = brandRepository;
             _mapper = mapper;
@@ -50,11 +54,12 @@ namespace POS.MediatR.Brand.Handler
             _sqlAccessor = sqlAccessor;
             _tenantProvider = tenantProvider;
             _logger = logger;
+            _compiler = compiler;
         }
 
         public async Task<List<BrandDto>> Handle(GetAllBrandCommand request, CancellationToken cancellationToken)
         {
-            var useDapper = _configuration.GetValue<bool>("Features:Dapper:GetAllBrandCommandHandler");
+            var useDapper = _configuration.GetValue<bool>("Features:Dapper:GetAllBrandCommandHandler", true);
 
             if (useDapper)
             {
@@ -63,19 +68,18 @@ namespace POS.MediatR.Brand.Handler
                     var tenantId = _tenantProvider.GetTenantId();
                     var brandTable = _sqlAccessor.GetTableName<POS.Data.Brand>();
 
-                    var sql = $@"
-                        SELECT Id, Name, ImageUrl
-                        FROM {brandTable}
-                        WHERE TenantId = @TenantId AND IsDeleted = @IsDeleted
-                        ORDER BY Name";
+                    var query = new Query(brandTable)
+                        .Select("Id", "Name", "ImageUrl")
+                        .Where("TenantId", tenantId)
+                        .Where("IsDeleted", false)
+                        .OrderBy("Name");
+
+                    var compiled = _compiler.Compile(query);
 
                     var connection = _sqlAccessor.GetOpenConnection();
                     var currentTransaction = _sqlAccessor.GetCurrentTransaction();
 
-                    var parameters = new { TenantId = tenantId, IsDeleted = false };
-                    var command = new CommandDefinition(sql, parameters, currentTransaction, commandTimeout: 30, cancellationToken: cancellationToken);
-                    
-                    var brands = await connection.QueryAsync<BrandDto>(command);
+                    var brands = await connection.QueryAsync<BrandDto>(compiled.Sql, compiled.NamedBindings, currentTransaction, commandTimeout: 30);
 
                     // Client-side evaluation for Path.Combine to avoid ORM evaluation overhead
                     foreach (var brand in brands)

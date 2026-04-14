@@ -12,6 +12,8 @@ using System.Text;
 using Dapper;
 using System.Linq;
 using System;
+using SqlKata;
+using SqlKata.Compilers;
 
 namespace POS.MediatR.Handlers
 {
@@ -22,24 +24,27 @@ namespace POS.MediatR.Handlers
         private readonly ISqlConnectionAccessor _sqlAccessor;
         private readonly ITenantProvider _tenantProvider;
         private readonly ILogger<GetAllSupplierQueryHandler> _logger;
+        private readonly Compiler _compiler;
 
         public GetAllSupplierQueryHandler(
             ISupplierRepository supplierRepository,
             IConfiguration configuration,
             ISqlConnectionAccessor sqlAccessor,
             ITenantProvider tenantProvider,
-            ILogger<GetAllSupplierQueryHandler> logger)
+            ILogger<GetAllSupplierQueryHandler> logger,
+            Compiler compiler)
         {
             _supplierRepository = supplierRepository;
             _configuration = configuration;
             _sqlAccessor = sqlAccessor;
             _tenantProvider = tenantProvider;
             _logger = logger;
+            _compiler = compiler;
         }
 
         public async Task<SupplierList> Handle(GetAllSupplierQuery request, CancellationToken cancellationToken)
         {
-            var useDapper = _configuration.GetValue<bool>("Features:Dapper:GetAllSupplierQueryHandler");
+            var useDapper = _configuration.GetValue<bool>("Features:Dapper:GetAllSupplierQueryHandler", true);
             var resource = request.SupplierResource;
 
             if (useDapper)
@@ -49,86 +54,76 @@ namespace POS.MediatR.Handlers
                     var tenantId = _tenantProvider.GetTenantId();
                     var supplierTable = _sqlAccessor.GetTableName<POS.Data.Supplier>();
 
-                    var sqlBuilder = new StringBuilder($@"
-                        FROM {supplierTable}
-                        WHERE TenantId = @TenantId AND IsDeleted = @IsDeleted
-                    ");
-
-                    var parameters = new DynamicParameters();
-                    parameters.Add("TenantId", tenantId);
-                    parameters.Add("IsDeleted", false);
+                    var query = new Query(supplierTable)
+                        .Where("TenantId", tenantId)
+                        .Where("IsDeleted", false);
 
                     if (resource.Id != null)
                     {
-                        parameters.Add("Id", resource.Id);
-                        sqlBuilder.Append(" AND Id = @Id");
+                        query.Where("Id", resource.Id);
                     }
 
                     if (!string.IsNullOrWhiteSpace(resource.SupplierName))
                     {
-                        parameters.Add("SupplierName", $"{resource.SupplierName.Trim().ToLowerInvariant()}%");
-                        sqlBuilder.Append(" AND LOWER(SupplierName) LIKE @SupplierName");
+                        query.WhereRaw(@"LOWER(""SupplierName"") LIKE ?", $"{resource.SupplierName.Trim().ToLowerInvariant()}%");
                     }
 
                     if (!string.IsNullOrWhiteSpace(resource.MobileNo))
                     {
-                        parameters.Add("MobileNo", $"%{resource.MobileNo.Trim().ToLowerInvariant()}%");
-                        sqlBuilder.Append(" AND ((MobileNo IS NOT NULL AND LOWER(MobileNo) LIKE @MobileNo) OR (PhoneNo IS NOT NULL AND LOWER(PhoneNo) LIKE @MobileNo))");
+                        var pattern = $"%{resource.MobileNo.Trim().ToLowerInvariant()}%";
+                        query.Where(q => q
+                            .WhereRaw(@"(""MobileNo"" IS NOT NULL AND LOWER(""MobileNo"") LIKE ?)", pattern)
+                            .OrWhereRaw(@"(""PhoneNo"" IS NOT NULL AND LOWER(""PhoneNo"") LIKE ?)", pattern));
                     }
 
                     if (!string.IsNullOrWhiteSpace(resource.Email))
                     {
-                        parameters.Add("Email", $"{resource.Email.Trim().ToLowerInvariant()}%");
-                        sqlBuilder.Append(" AND LOWER(Email) LIKE @Email");
+                        query.WhereRaw(@"LOWER(""Email"") LIKE ?", $"{resource.Email.Trim().ToLowerInvariant()}%");
                     }
 
                     if (!string.IsNullOrWhiteSpace(resource.Website))
                     {
-                        parameters.Add("Website", $"%{resource.Website.Trim().ToLowerInvariant()}%");
-                        sqlBuilder.Append(" AND LOWER(Website) LIKE @Website");
+                        query.WhereRaw(@"LOWER(""Website"") LIKE ?", $"%{resource.Website.Trim().ToLowerInvariant()}%");
                     }
 
                     if (!string.IsNullOrWhiteSpace(resource.SearchQuery))
                     {
-                        parameters.Add("SearchQuery", $"%{resource.SearchQuery.Trim().ToLowerInvariant()}%");
-                        sqlBuilder.Append(@" AND (
-                            LOWER(SupplierName) LIKE @SearchQuery OR
-                            LOWER(MobileNo) LIKE @SearchQuery OR
-                            (PhoneNo IS NOT NULL AND LOWER(PhoneNo) LIKE @SearchQuery)
-                        )");
+                        var searchPattern = $"%{resource.SearchQuery.Trim().ToLowerInvariant()}%";
+                        query.Where(q => q
+                            .WhereRaw(@"LOWER(""SupplierName"") LIKE ?", searchPattern)
+                            .OrWhereRaw(@"LOWER(""MobileNo"") LIKE ?", searchPattern)
+                            .OrWhereRaw(@"(""PhoneNo"" IS NOT NULL AND LOWER(""PhoneNo"") LIKE ?)", searchPattern)
+                        );
                     }
 
-                    var countSql = $"SELECT COUNT(*) {sqlBuilder.ToString()}";
+                    var countQuery = query.Clone().AsCount();
 
-                    // Default order by SupplierName
-                    var orderBy = "ORDER BY SupplierName ASC";
+                    var dataQuery = query.Clone()
+                        .Select("Id", "SupplierName", "Email", "ContactPerson", "MobileNo", "PhoneNo", "Website", "Description", "Fax", "BillingAddressId")
+                        .Limit(resource.PageSize)
+                        .Offset(resource.Skip);
+
                     if (!string.IsNullOrWhiteSpace(resource.OrderBy))
                     {
                         var sort = resource.OrderBy.ToLower();
-                        if (sort.Contains("suppliername")) orderBy = sort.EndsWith("desc") ? "ORDER BY SupplierName DESC" : "ORDER BY SupplierName ASC";
-                        else if (sort.Contains("email")) orderBy = sort.EndsWith("desc") ? "ORDER BY Email DESC" : "ORDER BY Email ASC";
-                        else if (sort.Contains("mobileno")) orderBy = sort.EndsWith("desc") ? "ORDER BY MobileNo DESC" : "ORDER BY MobileNo ASC";
+                        if (sort.Contains("suppliername")) { if (sort.EndsWith("desc")) dataQuery.OrderByDesc("SupplierName"); else dataQuery.OrderBy("SupplierName"); }
+                        else if (sort.Contains("email")) { if (sort.EndsWith("desc")) dataQuery.OrderByDesc("Email"); else dataQuery.OrderBy("Email"); }
+                        else if (sort.Contains("mobileno")) { if (sort.EndsWith("desc")) dataQuery.OrderByDesc("MobileNo"); else dataQuery.OrderBy("MobileNo"); }
+                        else dataQuery.OrderBy("SupplierName");
                     }
-
-                    var dataSql = $@"
-                        SELECT Id, SupplierName, Email, ContactPerson, MobileNo, PhoneNo, Website, Description, Fax, BillingAddressId
-                        {sqlBuilder.ToString()}
-                        {orderBy}
-                        LIMIT @PageSize OFFSET @Skip
-                    ";
-                    
-                    parameters.Add("PageSize", resource.PageSize);
-                    parameters.Add("Skip", resource.Skip);
+                    else
+                    {
+                        dataQuery.OrderBy("SupplierName");
+                    }
 
                     var connection = _sqlAccessor.GetOpenConnection();
                     var currentTransaction = _sqlAccessor.GetCurrentTransaction();
 
-                    // Execute both queries in a single batch (QueryMultiple)
-                    var multiSql = $"{countSql}; {dataSql};";
-                    using var multi = await connection.QueryMultipleAsync(multiSql, parameters, currentTransaction, commandTimeout: 30);
+                    var compiledCount = _compiler.Compile(countQuery);
+                    var compiledData = _compiler.Compile(dataQuery);
 
-                    var totalCount = await multi.ReadFirstAsync<int>();
-                    var suppliers = (await multi.ReadAsync<SupplierDto>()).ToList();
+                    var totalCount = await connection.ExecuteScalarAsync<int>(compiledCount.Sql, compiledCount.NamedBindings, currentTransaction);
+                    var suppliers = (await connection.QueryAsync<SupplierDto>(compiledData.Sql, compiledData.NamedBindings, currentTransaction)).ToList();
 
                     return new SupplierList(suppliers, totalCount, resource.Skip, resource.PageSize);
                 }

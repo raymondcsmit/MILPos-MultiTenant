@@ -79,57 +79,74 @@ namespace POS.MediatR.Dashboard.Handlers
 
                     // CRITICAL: Dapper bypasses EF Core Global Query Filters. 
                     // You MUST explicitly include `TenantId = @TenantId AND IsDeleted = @IsDeleted` in your SQL!
-                    var salesSql = $@"
-                        SELECT SOCreatedDate as Date, TotalAmount 
-                        FROM {salesOrderTable} 
-                        WHERE TenantId = @TenantId 
-                          AND IsDeleted = @IsDeleted 
-                          AND IsSalesOrderRequest = @IsSalesOrderRequest 
-                          AND SOCreatedDate >= @StartDate 
-                          AND SOCreatedDate <= @EndDate 
-                          AND LocationId IN @LocationIds";
-
-                    var purchaseSql = $@"
-                        SELECT POCreatedDate as Date, TotalAmount 
-                        FROM {purchaseOrderTable} 
-                        WHERE TenantId = @TenantId 
-                          AND IsDeleted = @IsDeleted 
-                          AND IsPurchaseOrderRequest = @IsPurchaseOrderRequest 
-                          AND POCreatedDate >= @StartDate 
-                          AND POCreatedDate <= @EndDate 
-                          AND LocationId IN @LocationIds";
-
                     var connection = _sqlAccessor.GetOpenConnection();
                     var currentTransaction = _sqlAccessor.GetCurrentTransaction();
+                    var providerName = connection.GetType().Name;
+
+                    string salesMonthSelector = providerName switch {
+                        "NpgsqlConnection" => @"EXTRACT(MONTH FROM ""SOCreatedDate"")",
+                        "SqlConnection" => @"MONTH(""SOCreatedDate"")",
+                        "SqliteConnection" => @"CAST(strftime('%m', ""SOCreatedDate"") AS INTEGER)",
+                        _ => @"EXTRACT(MONTH FROM ""SOCreatedDate"")"
+                    };
+
+                    string purchaseMonthSelector = providerName switch {
+                        "NpgsqlConnection" => @"EXTRACT(MONTH FROM ""POCreatedDate"")",
+                        "SqlConnection" => @"MONTH(""POCreatedDate"")",
+                        "SqliteConnection" => @"CAST(strftime('%m', ""POCreatedDate"") AS INTEGER)",
+                        _ => @"EXTRACT(MONTH FROM ""POCreatedDate"")"
+                    };
+
+                    var sql = $@"
+                        SELECT {salesMonthSelector} as ""Month"", COALESCE(SUM(""TotalAmount""), 0) as ""Total"" 
+                        FROM {salesOrderTable} 
+                        WHERE ""TenantId"" = @TenantId 
+                          AND ""IsDeleted"" = @IsDeleted 
+                          AND ""IsSalesOrderRequest"" = @IsSalesOrderRequest 
+                          AND ""SOCreatedDate"" >= @StartDate 
+                          AND ""SOCreatedDate"" <= @EndDate 
+                          AND ""LocationId"" IN @LocationIds
+                        GROUP BY {salesMonthSelector}";
+
+                    var purchaseSql = $@"
+                        SELECT {purchaseMonthSelector} as ""Month"", COALESCE(SUM(""TotalAmount""), 0) as ""Total"" 
+                        FROM {purchaseOrderTable} 
+                        WHERE ""TenantId"" = @TenantId 
+                          AND ""IsDeleted"" = @IsDeleted 
+                          AND ""IsPurchaseOrderRequest"" = @IsPurchaseOrderRequest 
+                          AND ""POCreatedDate"" >= @StartDate 
+                          AND ""POCreatedDate"" <= @EndDate 
+                          AND ""LocationId"" IN @LocationIds
+                        GROUP BY {purchaseMonthSelector}";
 
                     // Current Year Sales
-                    var currentYearSalesCommand = new CommandDefinition(salesSql, 
-                        new { TenantId = tenantId, IsDeleted = false, IsSalesOrderRequest = false, StartDate = currentYearStart, EndDate = currentYearEnd, LocationIds = locationIds },
+                    var currentYearSalesCommand = new CommandDefinition(sql, 
+                        new { TenantId = tenantId, IsDeleted = false, IsSalesOrderRequest = false, StartDate = currentYearStart, EndDate = currentYearEnd, LocationIds = locationIds.ToArray() },
                         transaction: currentTransaction, commandTimeout: 60, cancellationToken: cancellationToken);
-                    var currentYearSalesRaw = await connection.QueryAsync<RawOrderDto>(currentYearSalesCommand);
+                    var currentYearSalesRaw = await connection.QueryAsync<MonthAggregate>(currentYearSalesCommand);
 
                     // Last Year Sales
-                    var lastYearSalesCommand = new CommandDefinition(salesSql, 
-                        new { TenantId = tenantId, IsDeleted = false, IsSalesOrderRequest = false, StartDate = lastYearStart, EndDate = lastYearEnd, LocationIds = locationIds },
+                    var lastYearSalesCommand = new CommandDefinition(sql, 
+                        new { TenantId = tenantId, IsDeleted = false, IsSalesOrderRequest = false, StartDate = lastYearStart, EndDate = lastYearEnd, LocationIds = locationIds.ToArray() },
                         transaction: currentTransaction, commandTimeout: 60, cancellationToken: cancellationToken);
-                    var lastYearSalesRaw = await connection.QueryAsync<RawOrderDto>(lastYearSalesCommand);
+                    var lastYearSalesRaw = await connection.QueryAsync<MonthAggregate>(lastYearSalesCommand);
 
                     // Current Year Purchase
                     var currentYearPurchaseCommand = new CommandDefinition(purchaseSql, 
-                        new { TenantId = tenantId, IsDeleted = false, IsPurchaseOrderRequest = false, StartDate = currentYearStart, EndDate = currentYearEnd, LocationIds = locationIds },
+                        new { TenantId = tenantId, IsDeleted = false, IsPurchaseOrderRequest = false, StartDate = currentYearStart, EndDate = currentYearEnd, LocationIds = locationIds.ToArray() },
                         transaction: currentTransaction, commandTimeout: 60, cancellationToken: cancellationToken);
-                    var currentYearPurchaseRaw = await connection.QueryAsync<RawOrderDto>(currentYearPurchaseCommand);
+                    var currentYearPurchaseRaw = await connection.QueryAsync<MonthAggregate>(currentYearPurchaseCommand);
 
                     // Last Year Purchase
                     var lastYearPurchaseCommand = new CommandDefinition(purchaseSql, 
-                        new { TenantId = tenantId, IsDeleted = false, IsPurchaseOrderRequest = false, StartDate = lastYearStart, EndDate = lastYearEnd, LocationIds = locationIds },
+                        new { TenantId = tenantId, IsDeleted = false, IsPurchaseOrderRequest = false, StartDate = lastYearStart, EndDate = lastYearEnd, LocationIds = locationIds.ToArray() },
                         transaction: currentTransaction, commandTimeout: 60, cancellationToken: cancellationToken);
-                    var lastYearPurchaseRaw = await connection.QueryAsync<RawOrderDto>(lastYearPurchaseCommand);
+                    var lastYearPurchaseRaw = await connection.QueryAsync<MonthAggregate>(lastYearPurchaseCommand);
 
-                    var currentYearSales = currentYearSalesRaw.GroupBy(c => c.Date.Month).ToDictionary(x => x.Key, x => x.Sum(c => c.TotalAmount));
-                    var lastYearSales = lastYearSalesRaw.GroupBy(c => c.Date.Month).ToDictionary(x => x.Key, x => x.Sum(c => c.TotalAmount));
-                    var currentYearPurchase = currentYearPurchaseRaw.GroupBy(c => c.Date.Month).ToDictionary(x => x.Key, x => x.Sum(c => c.TotalAmount));
-                    var lastYearPurchase = lastYearPurchaseRaw.GroupBy(c => c.Date.Month).ToDictionary(x => x.Key, x => x.Sum(c => c.TotalAmount));
+                    var currentYearSales = currentYearSalesRaw.ToDictionary(x => x.Month, x => x.Total);
+                    var lastYearSales = lastYearSalesRaw.ToDictionary(x => x.Month, x => x.Total);
+                    var currentYearPurchase = currentYearPurchaseRaw.ToDictionary(x => x.Month, x => x.Total);
+                    var lastYearPurchase = lastYearPurchaseRaw.ToDictionary(x => x.Month, x => x.Total);
 
                     var result = new List<IncomeComparisonDto>();
 
@@ -207,10 +224,10 @@ namespace POS.MediatR.Dashboard.Handlers
             #endregion
         }
         
-        private class RawOrderDto 
+        private class MonthAggregate
         {
-            public DateTime Date { get; set; }
-            public decimal TotalAmount { get; set; }
+            public int Month { get; set; }
+            public decimal Total { get; set; }
         }
     }
 }

@@ -71,10 +71,10 @@ namespace POS.MediatR.Handlers
                     var returnStatusValue = (int)PurchaseSaleItemStatusEnum.Return;
 
                     var sql = $@"
-                        SELECT COALESCE(SUM(TotalAmount), 0) FROM {poTable} WHERE TenantId = @TenantId AND IsDeleted = @IsDeleted AND IsPurchaseOrderRequest = @IsFalse AND POCreatedDate >= @FromDate AND POCreatedDate < @ToDate AND LocationId IN @LocationIds;
-                        SELECT COALESCE(SUM(TotalAmount), 0) FROM {soTable} WHERE TenantId = @TenantId AND IsDeleted = @IsDeleted AND IsSalesOrderRequest = @IsFalse AND SOCreatedDate >= @FromDate AND SOCreatedDate < @ToDate AND LocationId IN @LocationIds;
-                        SELECT COALESCE(SUM((soi.UnitPrice * soi.Quantity) + soi.TaxValue - soi.Discount), 0) FROM {soiTable} soi INNER JOIN {soTable} so ON soi.SalesOrderId = so.Id WHERE so.TenantId = @TenantId AND so.IsDeleted = @IsDeleted AND soi.Status = @ReturnStatus AND so.SOCreatedDate >= @FromDate AND so.SOCreatedDate < @ToDate AND so.LocationId IN @LocationIds;
-                        SELECT COALESCE(SUM((poi.UnitPrice * poi.Quantity) + poi.TaxValue - poi.Discount), 0) FROM {poiTable} poi INNER JOIN {poTable} po ON poi.PurchaseOrderId = po.Id WHERE po.TenantId = @TenantId AND po.IsDeleted = @IsDeleted AND poi.Status = @ReturnStatus AND po.POCreatedDate >= @FromDate AND po.POCreatedDate < @ToDate AND po.LocationId IN @LocationIds;
+                        SELECT COALESCE(SUM(""TotalAmount""), 0) FROM {poTable} WHERE ""TenantId"" = @TenantId AND ""IsDeleted"" = @IsDeleted AND ""IsPurchaseOrderRequest"" = @IsFalse AND ""POCreatedDate"" >= @FromDate AND ""POCreatedDate"" < @ToDate AND ""LocationId"" IN @LocationIds;
+                        SELECT COALESCE(SUM(""TotalAmount""), 0) FROM {soTable} WHERE ""TenantId"" = @TenantId AND ""IsDeleted"" = @IsDeleted AND ""IsSalesOrderRequest"" = @IsFalse AND ""SOCreatedDate"" >= @FromDate AND ""SOCreatedDate"" < @ToDate AND ""LocationId"" IN @LocationIds;
+                        SELECT COALESCE(SUM((soi.""UnitPrice"" * soi.""Quantity"") + soi.""TaxValue"" - soi.""Discount""), 0) FROM {soiTable} soi INNER JOIN {soTable} so ON soi.""SalesOrderId"" = so.""Id"" WHERE so.""TenantId"" = @TenantId AND so.""IsDeleted"" = @IsDeleted AND soi.""Status"" = @ReturnStatus AND so.""SOCreatedDate"" >= @FromDate AND so.""SOCreatedDate"" < @ToDate AND so.""LocationId"" IN @LocationIds;
+                        SELECT COALESCE(SUM((poi.""UnitPrice"" * poi.""Quantity"") + poi.""TaxValue"" - poi.""Discount""), 0) FROM {poiTable} poi INNER JOIN {poTable} po ON poi.""PurchaseOrderId"" = po.""Id"" WHERE po.""TenantId"" = @TenantId AND po.""IsDeleted"" = @IsDeleted AND poi.""Status"" = @ReturnStatus AND po.""POCreatedDate"" >= @FromDate AND po.""POCreatedDate"" < @ToDate AND po.""LocationId"" IN @LocationIds;
                     ";
 
                     var connection = _sqlAccessor.GetOpenConnection();

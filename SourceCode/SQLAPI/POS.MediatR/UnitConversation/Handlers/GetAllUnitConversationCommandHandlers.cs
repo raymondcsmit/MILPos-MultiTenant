@@ -16,6 +16,8 @@ using System.Linq;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using SqlKata;
+using SqlKata.Compilers;
 
 namespace POS.MediatR.UnitConversation.Handlers
 {
@@ -27,6 +29,7 @@ namespace POS.MediatR.UnitConversation.Handlers
         private readonly ISqlConnectionAccessor _sqlAccessor;
         private readonly ITenantProvider _tenantProvider;
         private readonly ILogger<GetAllUnitConversationCommandHandlers> _logger;
+        private readonly Compiler _compiler;
 
         public GetAllUnitConversationCommandHandlers(
             IUnitConversationRepository unitConversationRepository,
@@ -34,7 +37,8 @@ namespace POS.MediatR.UnitConversation.Handlers
             IConfiguration configuration,
             ISqlConnectionAccessor sqlAccessor,
             ITenantProvider tenantProvider,
-            ILogger<GetAllUnitConversationCommandHandlers> logger)
+            ILogger<GetAllUnitConversationCommandHandlers> logger,
+            Compiler compiler)
         {
             _unitConversationRepository = unitConversationRepository;
             _mapper = mapper;
@@ -42,11 +46,12 @@ namespace POS.MediatR.UnitConversation.Handlers
             _sqlAccessor = sqlAccessor;
             _tenantProvider = tenantProvider;
             _logger = logger;
+            _compiler = compiler;
         }
 
         public async Task<List<UnitConversationDto>> Handle(GetAllUnitConversationCommand request, CancellationToken cancellationToken)
         {
-            var useDapper = _configuration.GetValue<bool>("Features:Dapper:GetAllUnitConversationCommandHandlers");
+            var useDapper = _configuration.GetValue<bool>("Features:Dapper:GetAllUnitConversationCommandHandlers", true);
 
             if (useDapper)
             {
@@ -55,29 +60,31 @@ namespace POS.MediatR.UnitConversation.Handlers
                     var tenantId = _tenantProvider.GetTenantId();
                     var unitTable = _sqlAccessor.GetTableName<POS.Data.UnitConversation>();
 
-                    var sql = $@"
-                        SELECT 
-                            u.""Id"", 
-                            u.""Name"", 
-                            u.""ParentId"", 
-                            CASE WHEN p.""Id"" IS NOT NULL THEN COALESCE(p.""Name"", '') || '(' || COALESCE(p.""Code"", '') || ')' ELSE '' END AS ""BaseUnitName"",
-                            u.""Value"", 
-                            u.""Operator"", 
-                            u.""Code""
-                        FROM {unitTable} u
-                        LEFT JOIN {unitTable} p ON u.""ParentId"" = p.""Id"" AND p.""TenantId"" = @TenantId AND p.""IsDeleted"" = false
-                        WHERE u.""TenantId"" = @TenantId 
-                          AND u.""IsDeleted"" = false
-                        ORDER BY u.""Name"" ASC
-                    ";
+                    var query = new Query($"{unitTable} AS u")
+                        .Select("u.Id", "u.Name", "u.ParentId", "u.Value", "u.Operator", "u.Code")
+                        .Select("p.Name AS ParentName", "p.Code AS ParentCode")
+                        .LeftJoin($"{unitTable} AS p", j => j.On("u.ParentId", "p.Id").Where("p.TenantId", tenantId).Where("p.IsDeleted", false))
+                        .Where("u.TenantId", tenantId)
+                        .Where("u.IsDeleted", false)
+                        .OrderBy("u.Name");
+
+                    var compiled = _compiler.Compile(query);
 
                     var connection = _sqlAccessor.GetOpenConnection();
                     var currentTransaction = _sqlAccessor.GetCurrentTransaction();
 
-                    var command = new CommandDefinition(sql, new { TenantId = tenantId }, currentTransaction, commandTimeout: 30, cancellationToken: cancellationToken);
-                    var units = await connection.QueryAsync<UnitConversationDto>(command);
+                    var units = await connection.QueryAsync<UnitConversationRawDto>(compiled.Sql, compiled.NamedBindings, currentTransaction, commandTimeout: 30);
 
-                    return units.ToList();
+                    return units.Select(u => new UnitConversationDto
+                    {
+                        Id = u.Id,
+                        Name = u.Name,
+                        ParentId = u.ParentId,
+                        BaseUnitName = !string.IsNullOrEmpty(u.ParentName) ? $"{u.ParentName}({u.ParentCode})" : "",
+                        Value = u.Value,
+                        Operator = u.Operator,
+                        Code = u.Code
+                    }).ToList();
                 }
                 catch (Exception ex)
                 {
@@ -99,6 +106,18 @@ namespace POS.MediatR.UnitConversation.Handlers
                 })
                 .ToListAsync(cancellationToken);
             return fallbackUnits;
+        }
+        
+        private class UnitConversationRawDto
+        {
+            public Guid Id { get; set; }
+            public string Name { get; set; }
+            public Guid? ParentId { get; set; }
+            public string ParentName { get; set; }
+            public string ParentCode { get; set; }
+            public decimal? Value { get; set; }
+            public POS.Data.Operator? Operator { get; set; }
+            public string Code { get; set; }
         }
     }
 }

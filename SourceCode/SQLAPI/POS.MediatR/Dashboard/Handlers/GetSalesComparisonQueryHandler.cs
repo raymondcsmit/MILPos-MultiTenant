@@ -70,27 +70,36 @@ namespace POS.MediatR.Dashboard.Handlers
                     // OR we use date range parameters and group locally for performance.
                     // Given the previous income-comparison logic, we will pull Date and Amount and group locally.
                     
-                    var sql = $@"
-                        SELECT SOCreatedDate as Date, TotalAmount 
-                        FROM {soTable} 
-                        WHERE TenantId = @TenantId 
-                          AND IsDeleted = @IsDeleted 
-                          AND IsSalesOrderRequest = @IsSalesOrderRequest 
-                          AND SOCreatedDate >= @StartDate 
-                          AND SOCreatedDate <= @EndDate 
-                          AND LocationId IN @LocationIds";
-
                     var connection = _sqlAccessor.GetOpenConnection();
                     var currentTransaction = _sqlAccessor.GetCurrentTransaction();
+                    var providerName = connection.GetType().Name;
 
-                    var currentParams = new { TenantId = tenantId, IsDeleted = false, IsSalesOrderRequest = false, StartDate = currentYearStart, EndDate = currentYearEnd, LocationIds = locationIds };
-                    var lastParams = new { TenantId = tenantId, IsDeleted = false, IsSalesOrderRequest = false, StartDate = lastYearStart, EndDate = lastYearEnd, LocationIds = locationIds };
+                    string monthSelector = providerName switch {
+                        "NpgsqlConnection" => @"EXTRACT(MONTH FROM ""SOCreatedDate"")",
+                        "SqlConnection" => @"MONTH(""SOCreatedDate"")",
+                        "SqliteConnection" => @"CAST(strftime('%m', ""SOCreatedDate"") AS INTEGER)",
+                        _ => @"EXTRACT(MONTH FROM ""SOCreatedDate"")"
+                    };
+                    
+                    var sql = $@"
+                        SELECT {monthSelector} as ""Month"", COALESCE(SUM(""TotalAmount""), 0) as ""Total"" 
+                        FROM {soTable} 
+                        WHERE ""TenantId"" = @TenantId 
+                          AND ""IsDeleted"" = @IsDeleted 
+                          AND ""IsSalesOrderRequest"" = @IsSalesOrderRequest 
+                          AND ""SOCreatedDate"" >= @StartDate 
+                          AND ""SOCreatedDate"" <= @EndDate 
+                          AND ""LocationId"" IN @LocationIds
+                        GROUP BY {monthSelector}";
 
-                    var currentSales = await connection.QueryAsync<IncomeData>(new CommandDefinition(sql, currentParams, currentTransaction, cancellationToken: cancellationToken));
-                    var lastSales = await connection.QueryAsync<IncomeData>(new CommandDefinition(sql, lastParams, currentTransaction, cancellationToken: cancellationToken));
+                    var currentParams = new { TenantId = tenantId, IsDeleted = false, IsSalesOrderRequest = false, StartDate = currentYearStart, EndDate = currentYearEnd, LocationIds = locationIds.ToArray() };
+                    var lastParams = new { TenantId = tenantId, IsDeleted = false, IsSalesOrderRequest = false, StartDate = lastYearStart, EndDate = lastYearEnd, LocationIds = locationIds.ToArray() };
 
-                    var currentYearSales = currentSales.GroupBy(x => x.Date.Month).ToDictionary(g => g.Key, g => g.Sum(x => x.TotalAmount));
-                    var lastYearSales = lastSales.GroupBy(x => x.Date.Month).ToDictionary(g => g.Key, g => g.Sum(x => x.TotalAmount));
+                    var currentSales = await connection.QueryAsync<MonthAggregate>(new CommandDefinition(sql, currentParams, currentTransaction, cancellationToken: cancellationToken));
+                    var lastSales = await connection.QueryAsync<MonthAggregate>(new CommandDefinition(sql, lastParams, currentTransaction, cancellationToken: cancellationToken));
+
+                    var currentYearSales = currentSales.ToDictionary(x => x.Month, x => x.Total);
+                    var lastYearSales = lastSales.ToDictionary(x => x.Month, x => x.Total);
 
                     var dapperResult = new List<SalesComparisonDto>();
                     for (int month = 1; month <= 12; month++)
@@ -146,10 +155,10 @@ namespace POS.MediatR.Dashboard.Handlers
         }
         
         // Helper class to map Dapper results
-        private class IncomeData
+        private class MonthAggregate
         {
-            public DateTime Date { get; set; }
-            public decimal TotalAmount { get; set; }
+            public int Month { get; set; }
+            public decimal Total { get; set; }
         }
     }
 }

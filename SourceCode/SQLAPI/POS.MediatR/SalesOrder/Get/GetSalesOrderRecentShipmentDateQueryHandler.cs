@@ -15,6 +15,8 @@ using POS.Data.Entities;
 using POS.Domain;
 using POS.MediatR.SalesOrder.Commands;
 using POS.Repository;
+using SqlKata;
+using SqlKata.Compilers;
 
 namespace POS.MediatR.SalesOrder.Handlers
 {
@@ -27,6 +29,7 @@ namespace POS.MediatR.SalesOrder.Handlers
         private readonly ISqlConnectionAccessor _sqlAccessor;
         private readonly ITenantProvider _tenantProvider;
         private readonly ILogger<GetSalesOrderRecentShipmentDateQueryHandler> _logger;
+        private readonly Compiler _compiler;
 
         public GetSalesOrderRecentShipmentDateQueryHandler(
             ISalesOrderRepository salesOrderRepository,
@@ -34,7 +37,8 @@ namespace POS.MediatR.SalesOrder.Handlers
             IConfiguration configuration,
             ISqlConnectionAccessor sqlAccessor,
             ITenantProvider tenantProvider,
-            ILogger<GetSalesOrderRecentShipmentDateQueryHandler> logger)
+            ILogger<GetSalesOrderRecentShipmentDateQueryHandler> logger,
+            Compiler compiler)
         {
             _salesOrderRepository = salesOrderRepository;
             _userInfoToken = userInfoToken;
@@ -42,11 +46,12 @@ namespace POS.MediatR.SalesOrder.Handlers
             _sqlAccessor = sqlAccessor;
             _tenantProvider = tenantProvider;
             _logger = logger;
+            _compiler = compiler;
         }
 
         public async Task<List<SalesOrderRecentShipmentDate>> Handle(GetSalesOrderRecentShipmentDateQuery request, CancellationToken cancellationToken)
         {
-            var useDapper = _configuration.GetValue<bool>("Features:Dapper:GetSalesOrderRecentShipmentDateQueryHandler");
+            var useDapper = _configuration.GetValue<bool>("Features:Dapper:GetSalesOrderRecentShipmentDateQueryHandler", true);
 
             if (useDapper)
             {
@@ -61,43 +66,30 @@ namespace POS.MediatR.SalesOrder.Handlers
                     var notReturnStatus = (int)PurchaseSaleItemStatusEnum.Not_Return;
                     var pendingStatus = (int)SalesDeliveryStatus.PENDING;
 
-                    var sql = $@"
-                        SELECT 
-                            so.""Id"" AS ""SalesOrderId"",
-                            so.""OrderNumber"" AS ""SalesOrderNumber"",
-                            so.""DeliveryDate"" AS ""ExpectedShipmentDate"",
-                            so.""CustomerId"",
-                            c.""CustomerName"",
-                            SUM(CASE WHEN soi.""Status"" = @NotReturnStatus THEN soi.""Quantity"" ELSE -soi.""Quantity"" END) AS ""Quantity""
-                        FROM {salesOrderTable} so
-                        INNER JOIN {customerTable} c ON so.""CustomerId"" = c.""Id""
-                        INNER JOIN {salesOrderItemTable} soi ON so.""Id"" = soi.""SalesOrderId""
-                        WHERE so.""TenantId"" = @TenantId 
-                          AND so.""IsDeleted"" = @IsDeleted
-                          AND so.""IsSalesOrderRequest"" = @IsSalesOrderRequest
-                          AND so.""DeliveryStatus"" = @PendingStatus
-                          AND so.""LocationId"" IN @LocationIds
-                        GROUP BY 
-                            so.""Id"", so.""OrderNumber"", so.""DeliveryDate"", so.""CustomerId"", c.""CustomerName""
-                        HAVING SUM(CASE WHEN soi.""Status"" = @NotReturnStatus THEN soi.""Quantity"" ELSE -soi.""Quantity"" END) > 0
-                        ORDER BY so.""DeliveryDate"" DESC
-                        LIMIT 10";
+                    var query = new Query($"{salesOrderTable} AS so")
+                        .Select("so.Id AS SalesOrderId", "so.OrderNumber AS SalesOrderNumber", "so.DeliveryDate AS ExpectedShipmentDate", "so.CustomerId", "c.CustomerName")
+                        .SelectRaw("SUM(CASE WHEN soi.\"Status\" = ? THEN soi.\"Quantity\" ELSE -soi.\"Quantity\" END) AS \"Quantity\"", notReturnStatus)
+                        .Join($"{customerTable} AS c", "so.CustomerId", "c.Id")
+                        .Join($"{salesOrderItemTable} AS soi", "so.Id", "soi.SalesOrderId")
+                        .Where("so.TenantId", tenantId)
+                        .Where("so.IsDeleted", false)
+                        .Where("so.IsSalesOrderRequest", false)
+                        .Where("so.DeliveryStatus", pendingStatus)
+                        .WhereIn("so.LocationId", _userInfoToken.LocationIds ?? new List<Guid>())
+                        .GroupBy("so.Id", "so.OrderNumber", "so.DeliveryDate", "so.CustomerId", "c.CustomerName")
+                        .HavingRaw("SUM(CASE WHEN soi.\"Status\" = ? THEN soi.\"Quantity\" ELSE -soi.\"Quantity\" END) > 0", notReturnStatus)
+                        .OrderByDesc("so.DeliveryDate")
+                        .Limit(10);
 
+                    var compiled = _compiler.Compile(query);
                     var connection = _sqlAccessor.GetOpenConnection();
                     var currentTransaction = _sqlAccessor.GetCurrentTransaction();
 
-                    var parameters = new 
-                    { 
-                        TenantId = tenantId, 
-                        IsDeleted = false,
-                        IsSalesOrderRequest = false,
-                        LocationIds = _userInfoToken.LocationIds,
-                        NotReturnStatus = notReturnStatus,
-                        PendingStatus = pendingStatus
-                    };
-
-                    var command = new CommandDefinition(sql, parameters, currentTransaction, commandTimeout: 60, cancellationToken: cancellationToken);
-                    var result = await connection.QueryAsync<SalesOrderRecentShipmentDate>(command);
+                    var result = await connection.QueryAsync<SalesOrderRecentShipmentDate>(
+                        compiled.Sql, 
+                        compiled.NamedBindings, 
+                        currentTransaction, 
+                        commandTimeout: 60);
 
                     return result.ToList();
                 }
