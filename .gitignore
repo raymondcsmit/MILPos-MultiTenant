@@ -445,4 +445,8 @@ wwwroot/dist/
 /SourceCode/SeedData
 /SourceCode/Angular/publish-release.ps1
 
+# do not commit GitHub release token
+/SourceCode/Angular/release-token.txt
+release-token.txt
+
 SourceCode/Angular/publish-release.ps1

@@ -1,0 +1,859 @@
+Windows PowerShell 5.1
+Copyright (C) Microsoft Corporation. All rights reserved.
+
+PS F:\MIllyass\pos-with-inventory-management\SourceCode\Angular> .\publish-release.ps1
+GitHub Token and VS 18 Environment Initialized.
+Preparing to publish version: 0.0.23
+Rebuilding native modules for Electron...
+Detected Electron version: 40.3.0
+Ensuring build dependencies are present...
+
+changed 2 packages, and audited 1161 packages in 1m
+
+180 packages are looking for funding
+  run `npm fund` for details
+
+75 vulnerabilities (1 low, 40 moderate, 31 high, 3 critical)
+
+To address issues that do not require attention, run:
+  npm audit fix
+
+To address all issues possible (including breaking changes), run:
+  npm audit fix --force
+
+Some issues need review, and may require choosing
+a different dependency.
+
+Run `npm audit` for details.
+npm warn Unknown cli config "--runtime". This will stop working in the next major version of npm.
+npm warn Unknown cli config "--target". This will stop working in the next major version of npm.
+npm warn Unknown cli config "--dist-url". This will stop working in the next major version of npm.
+npm warn Unknown cli config "--build-from-source". This will stop working in the next major version of npm.
+rebuilt dependencies successfully
+Starting Build and Publish process...
+
+> milpos@0.0.23 electron:publish
+> npm run build:api && npm run electron:build -- --publish always
+
+
+> milpos@0.0.23 build:api
+> dotnet publish ../SQLAPI/POS.API/POS.API.csproj -c Release -r win-x64 --self-contained true
+
+Restore succeeded with 38 warning(s) in 8.3s
+    F:\MIllyass\pos-with-inventory-management\SourceCode\SQLAPI\POS.Helper\POS.Helper.csproj : warning NU1510: PackageReference Microsoft.Extensions.Configuration.Abstractions will not be pruned. Consider removing this package from your dependencies, as it is likely unnecessary.
+    F:\MIllyass\pos-with-inventory-management\SourceCode\SQLAPI\POS.Domain\POS.Domain.csproj : warning NU1902: Package 'MailKit' 4.15.0 has a known moderate severity vulnerability, https://github.com/advisories/GHSA-9j88-vvj5-vhgr
+    F:\MIllyass\pos-with-inventory-management\SourceCode\SQLAPI\POS.Helper\POS.Helper.csproj : warning NU1902: Package 'MailKit' 4.15.0 has a known moderate severity vulnerability, https://github.com/advisories/GHSA-9j88-vvj5-vhgr
+    F:\MIllyass\pos-with-inventory-management\SourceCode\SQLAPI\POS.Domain\POS.Domain.csproj : warning NU1902: Package 'MimeKit' 4.15.0 has a known moderate severity vulnerability, https://github.com/advisories/GHSA-g7hc-96xr-gvvx
+    F:\MIllyass\pos-with-inventory-management\SourceCode\SQLAPI\POS.Helper\POS.Helper.csproj : warning NU1902: Package 'MimeKit' 4.15.0 has a known moderate severity vulnerability, https://github.com/advisories/GHSA-g7hc-96xr-gvvx
+    F:\MIllyass\pos-with-inventory-management\SourceCode\SQLAPI\POS.Domain\POS.Domain.csproj : warning NU1903: Package 'SQLitePCLRaw.lib.e_sqlite3' 2.1.11 has a known high severity vulnerability, https://github.com/advisories/GHSA-2m69-gcr7-jv3q
+    F:\MIllyass\pos-with-inventory-management\SourceCode\SQLAPI\POS.Domain\POS.Domain.csproj : warning NU1903: Package 'System.Security.Cryptography.Xml' 10.0.0 has a known high severity vulnerability, https://github.com/advisories/GHSA-37gx-xxp4-5rgx
+    F:\MIllyass\pos-with-inventory-management\SourceCode\SQLAPI\POS.Domain\POS.Domain.csproj : warning NU1903: Package 'System.Security.Cryptography.Xml' 10.0.0 has a known high severity vulnerability, https://github.com/advisories/GHSA-w3x6-4m5h-cxqf
+    F:\MIllyass\pos-with-inventory-management\SourceCode\SQLAPI\POS.API\POS.API.csproj : warning NU1903: Package 'AutoMapper' 14.0.0 has a known high severity vulnerability, https://github.com/advisories/GHSA-rvv3-g6hj-g44x
+    F:\MIllyass\pos-with-inventory-management\SourceCode\SQLAPI\POS.API\POS.API.csproj : warning NU1902: Package 'MailKit' 4.15.0 has a known moderate severity vulnerability, https://github.com/advisories/GHSA-9j88-vvj5-vhgr
+    F:\MIllyass\pos-with-inventory-management\SourceCode\SQLAPI\POS.API\POS.API.csproj : warning NU1902: Package 'MimeKit' 4.15.0 has a known moderate severity vulnerability, https://github.com/advisories/GHSA-g7hc-96xr-gvvx
+    F:\MIllyass\pos-with-inventory-management\SourceCode\SQLAPI\POS.API\POS.API.csproj : warning NU1903: Package 'SQLitePCLRaw.lib.e_sqlite3' 2.1.11 has a known high severity vulnerability, https://github.com/advisories/GHSA-2m69-gcr7-jv3q
+    F:\MIllyass\pos-with-inventory-management\SourceCode\SQLAPI\ApiAndQueriesProfiler\ApiAndQueriesProfiler.csproj : warning NU1903: Package 'SQLitePCLRaw.lib.e_sqlite3' 2.1.11 has a known high severity vulnerability, https://github.com/advisories/GHSA-2m69-gcr7-jv3q
+    F:\MIllyass\pos-with-inventory-management\SourceCode\SQLAPI\POS.MediatR\POS.MediatR.csproj : warning NU1903: Package 'AutoMapper' 14.0.0 has a known high severity vulnerability, https://github.com/advisories/GHSA-rvv3-g6hj-g44x
+    F:\MIllyass\pos-with-inventory-management\SourceCode\SQLAPI\POS.MediatR\POS.MediatR.csproj : warning NU1902: Package 'MailKit' 4.15.0 has a known moderate severity vulnerability, https://github.com/advisories/GHSA-9j88-vvj5-vhgr
+    F:\MIllyass\pos-with-inventory-management\SourceCode\SQLAPI\POS.MediatR\POS.MediatR.csproj : warning NU1902: Package 'MimeKit' 4.15.0 has a known moderate severity vulnerability, https://github.com/advisories/GHSA-g7hc-96xr-gvvx
+    F:\MIllyass\pos-with-inventory-management\SourceCode\SQLAPI\POS.MediatR\POS.MediatR.csproj : warning NU1903: Package 'SQLitePCLRaw.lib.e_sqlite3' 2.1.11 has a known high severity vulnerability, https://github.com/advisories/GHSA-2m69-gcr7-jv3q
+    F:\MIllyass\pos-with-inventory-management\SourceCode\SQLAPI\POS.Migrations.SqlServer\POS.Migrations.SqlServer.csproj : warning NU1902: Package 'MailKit' 4.15.0 has a known moderate severity vulnerability, https://github.com/advisories/GHSA-9j88-vvj5-vhgr
+    F:\MIllyass\pos-with-inventory-management\SourceCode\SQLAPI\POS.Migrations.SqlServer\POS.Migrations.SqlServer.csproj : warning NU1902: Package 'MimeKit' 4.15.0 has a known moderate severity vulnerability, https://github.com/advisories/GHSA-g7hc-96xr-gvvx
+    F:\MIllyass\pos-with-inventory-management\SourceCode\SQLAPI\POS.Migrations.SqlServer\POS.Migrations.SqlServer.csproj : warning NU1903: Package 'SQLitePCLRaw.lib.e_sqlite3' 2.1.11 has a known high severity vulnerability, https://github.com/advisories/GHSA-2m69-gcr7-jv3q
+    F:\MIllyass\pos-with-inventory-management\SourceCode\SQLAPI\POS.Migrations.SqlServer\POS.Migrations.SqlServer.csproj : warning NU1903: Package 'System.Security.Cryptography.Xml' 10.0.0 has a known high severity vulnerability, https://github.com/advisories/GHSA-37gx-xxp4-5rgx
+    F:\MIllyass\pos-with-inventory-management\SourceCode\SQLAPI\POS.Migrations.SqlServer\POS.Migrations.SqlServer.csproj : warning NU1903: Package 'System.Security.Cryptography.Xml' 10.0.0 has a known high severity vulnerability, https://github.com/advisories/GHSA-w3x6-4m5h-cxqf
+    F:\MIllyass\pos-with-inventory-management\SourceCode\SQLAPI\POS.Migrations.Sqlite\POS.Migrations.Sqlite.csproj : warning NU1902: Package 'MailKit' 4.15.0 has a known moderate severity vulnerability, https://github.com/advisories/GHSA-9j88-vvj5-vhgr
+    F:\MIllyass\pos-with-inventory-management\SourceCode\SQLAPI\POS.Migrations.Sqlite\POS.Migrations.Sqlite.csproj : warning NU1902: Package 'MimeKit' 4.15.0 has a known moderate severity vulnerability, https://github.com/advisories/GHSA-g7hc-96xr-gvvx
+    F:\MIllyass\pos-with-inventory-management\SourceCode\SQLAPI\POS.Migrations.Sqlite\POS.Migrations.Sqlite.csproj : warning NU1903: Package 'SQLitePCLRaw.lib.e_sqlite3' 2.1.11 has a known high severity vulnerability, https://github.com/advisories/GHSA-2m69-gcr7-jv3q
+    F:\MIllyass\pos-with-inventory-management\SourceCode\SQLAPI\POS.Migrations.Sqlite\POS.Migrations.Sqlite.csproj : warning NU1903: Package 'System.Security.Cryptography.Xml' 10.0.0 has a known high severity vulnerability, https://github.com/advisories/GHSA-37gx-xxp4-5rgx
+    F:\MIllyass\pos-with-inventory-management\SourceCode\SQLAPI\POS.Migrations.Sqlite\POS.Migrations.Sqlite.csproj : warning NU1903: Package 'System.Security.Cryptography.Xml' 10.0.0 has a known high severity vulnerability, https://github.com/advisories/GHSA-w3x6-4m5h-cxqf
+    F:\MIllyass\pos-with-inventory-management\SourceCode\SQLAPI\POS.Migrations.PostgreSQL\POS.Migrations.PostgreSQL.csproj : warning NU1902: Package 'MailKit' 4.15.0 has a known moderate severity vulnerability, https://github.com/advisories/GHSA-9j88-vvj5-vhgr
+    F:\MIllyass\pos-with-inventory-management\SourceCode\SQLAPI\POS.Migrations.PostgreSQL\POS.Migrations.PostgreSQL.csproj : warning NU1902: Package 'MimeKit' 4.15.0 has a known moderate severity vulnerability, https://github.com/advisories/GHSA-g7hc-96xr-gvvx
+    F:\MIllyass\pos-with-inventory-management\SourceCode\SQLAPI\POS.Migrations.PostgreSQL\POS.Migrations.PostgreSQL.csproj : warning NU1903: Package 'SQLitePCLRaw.lib.e_sqlite3' 2.1.11 has a known high severity vulnerability, https://github.com/advisories/GHSA-2m69-gcr7-jv3q
+    F:\MIllyass\pos-with-inventory-management\SourceCode\SQLAPI\POS.Migrations.PostgreSQL\POS.Migrations.PostgreSQL.csproj : warning NU1903: Package 'System.Security.Cryptography.Xml' 10.0.0 has a known high severity vulnerability, https://github.com/advisories/GHSA-37gx-xxp4-5rgx
+    F:\MIllyass\pos-with-inventory-management\SourceCode\SQLAPI\POS.Migrations.PostgreSQL\POS.Migrations.PostgreSQL.csproj : warning NU1903: Package 'System.Security.Cryptography.Xml' 10.0.0 has a known high severity vulnerability, https://github.com/advisories/GHSA-w3x6-4m5h-cxqf
+    F:\MIllyass\pos-with-inventory-management\SourceCode\SQLAPI\POS.Repository\POS.Repository.csproj : warning NU1903: Package 'AutoMapper' 14.0.0 has a known high severity vulnerability, https://github.com/advisories/GHSA-rvv3-g6hj-g44x
+    F:\MIllyass\pos-with-inventory-management\SourceCode\SQLAPI\POS.Repository\POS.Repository.csproj : warning NU1902: Package 'MailKit' 4.15.0 has a known moderate severity vulnerability, https://github.com/advisories/GHSA-9j88-vvj5-vhgr
+    F:\MIllyass\pos-with-inventory-management\SourceCode\SQLAPI\POS.Repository\POS.Repository.csproj : warning NU1902: Package 'MimeKit' 4.15.0 has a known moderate severity vulnerability, https://github.com/advisories/GHSA-g7hc-96xr-gvvx
+    F:\MIllyass\pos-with-inventory-management\SourceCode\SQLAPI\POS.Repository\POS.Repository.csproj : warning NU1903: Package 'SQLitePCLRaw.lib.e_sqlite3' 2.1.11 has a known high severity vulnerability, https://github.com/advisories/GHSA-2m69-gcr7-jv3q
+    F:\MIllyass\pos-with-inventory-management\SourceCode\SQLAPI\POS.Repository\POS.Repository.csproj : warning NU1903: Package 'System.Security.Cryptography.Xml' 10.0.0 has a known high severity vulnerability, https://github.com/advisories/GHSA-37gx-xxp4-5rgx
+    F:\MIllyass\pos-with-inventory-management\SourceCode\SQLAPI\POS.Repository\POS.Repository.csproj : warning NU1903: Package 'System.Security.Cryptography.Xml' 10.0.0 has a known high severity vulnerability, https://github.com/advisories/GHSA-w3x6-4m5h-cxqf
+  ApiAndQueriesProfiler net10.0 succeeded with 19 warning(s) (16.3s) → F:\MIllyass\pos-with-inventory-management\SourceCode\SQLAPI\ApiAndQueriesProfiler\bin\Release\net10.0\ApiAndQueriesProfiler.dll
+    F:\MIllyass\pos-with-inventory-management\SourceCode\SQLAPI\ApiAndQueriesProfiler\ApiAndQueriesProfiler.csproj : warning NU1903: Package 'SQLitePCLRaw.lib.e_sqlite3' 2.1.11 has a known high severity vulnerability, https://github.com/advisories/GHSA-2m69-gcr7-jv3q
+    F:\MIllyass\pos-with-inventory-management\SourceCode\SQLAPI\ApiAndQueriesProfiler\ProfilerCommandInterceptor.cs(59,32): warning CS8765: Nullability of type of parameter 'result' doesn't match overridden member (possibly because of nullability attributes).
+    F:\MIllyass\pos-with-inventory-management\SourceCode\SQLAPI\ApiAndQueriesProfiler\ProfilerCommandInterceptor.cs(65,43): warning CS8609: Nullability of reference types in return type doesn't match overridden member.
+    F:\MIllyass\pos-with-inventory-management\SourceCode\SQLAPI\ApiAndQueriesProfiler\ProfilerContext.cs(11,20): warning CS8603: Possible null reference return.
+    F:\MIllyass\pos-with-inventory-management\SourceCode\SQLAPI\ApiAndQueriesProfiler\ProfilerOptions.cs(6,23): warning CS8618: Non-nullable property 'ConnectionString' must contain a non-null value when exiting constructor. Consider adding the 'required' modifier or declaring the property as nullable.
+    F:\MIllyass\pos-with-inventory-management\SourceCode\SQLAPI\ApiAndQueriesProfiler\ApiRequestLog.cs(10,23): warning CS8618: Non-nullable property 'CorrelationId' must contain a non-null value when exiting constructor. Consider adding the 'required' modifier or declaring the property as nullable.
+    F:\MIllyass\pos-with-inventory-management\SourceCode\SQLAPI\ApiAndQueriesProfiler\ApiRequestLog.cs(11,23): warning CS8618: Non-nullable property 'Method' must contain a non-null value when exiting constructor. Consider adding the 'required' modifier or declaring the property as nullable.
+    F:\MIllyass\pos-with-inventory-management\SourceCode\SQLAPI\ApiAndQueriesProfiler\ApiRequestLog.cs(12,23): warning CS8618: Non-nullable property 'Path' must contain a non-null value when exiting constructor. Consider adding the 'required' modifier or declaring the property as nullable.
+    F:\MIllyass\pos-with-inventory-management\SourceCode\SQLAPI\ApiAndQueriesProfiler\ApiRequestLog.cs(13,23): warning CS8618: Non-nullable property 'QueryString' must contain a non-null value when exiting constructor. Consider adding the 'required' modifier or declaring the property as nullable.
+    F:\MIllyass\pos-with-inventory-management\SourceCode\SQLAPI\ApiAndQueriesProfiler\ApiRequestLog.cs(17,23): warning CS8618: Non-nullable property 'IpAddress' must contain a non-null value when exiting constructor. Consider adding the 'required' modifier or declaring the property as nullable.
+    F:\MIllyass\pos-with-inventory-management\SourceCode\SQLAPI\ApiAndQueriesProfiler\ApiRequestLog.cs(18,23): warning CS8618: Non-nullable property 'UserAgent' must contain a non-null value when exiting constructor. Consider adding the 'required' modifier or declaring the property as nullable.
+    F:\MIllyass\pos-with-inventory-management\SourceCode\SQLAPI\ApiAndQueriesProfiler\EfQueryLog.cs(10,23): warning CS8618: Non-nullable property 'CorrelationId' must contain a non-null value when exiting constructor. Consider adding the 'required' modifier or declaring the property as nullable.
+    F:\MIllyass\pos-with-inventory-management\SourceCode\SQLAPI\ApiAndQueriesProfiler\EfQueryLog.cs(11,23): warning CS8618: Non-nullable property 'CommandText' must contain a non-null value when exiting constructor. Consider adding the 'required' modifier or declaring the property as nullable.
+    F:\MIllyass\pos-with-inventory-management\SourceCode\SQLAPI\ApiAndQueriesProfiler\EfQueryLog.cs(12,23): warning CS8618: Non-nullable property 'Parameters' must contain a non-null value when exiting constructor. Consider adding the 'required' modifier or declaring the property as nullable.
+    F:\MIllyass\pos-with-inventory-management\SourceCode\SQLAPI\ApiAndQueriesProfiler\ProfilerLogChannel.cs(31,48): warning CS8601: Possible null reference assignment.
+    F:\MIllyass\pos-with-inventory-management\SourceCode\SQLAPI\ApiAndQueriesProfiler\ProfilerCommandInterceptor.cs(23,13): warning CS8602: Dereference of a possibly null reference.
+    F:\MIllyass\pos-with-inventory-management\SourceCode\SQLAPI\ApiAndQueriesProfiler\ProfilerCommandInterceptor.cs(62,20): warning CS8603: Possible null reference return.
+    F:\MIllyass\pos-with-inventory-management\SourceCode\SQLAPI\ApiAndQueriesProfiler\ProfilerCommandInterceptor.cs(68,20): warning CS8619: Nullability of reference types in value of type 'ValueTask<object?>' doesn't match target type 'ValueTask<object>'.
+    F:\MIllyass\pos-with-inventory-management\SourceCode\SQLAPI\ApiAndQueriesProfiler\ProfilerMiddleware.cs(52,33): warning CS8601: Possible null reference assignment.
+  POS.Data net10.0 succeeded with 34 warning(s) (19.1s) → F:\MIllyass\pos-with-inventory-management\SourceCode\SQLAPI\POS.Data\bin\Release\net10.0\POS.Data.dll
+    F:\MIllyass\pos-with-inventory-management\SourceCode\SQLAPI\POS.Data\Entities\Customer\Customer.cs(9,21): warning CS0108: 'Customer.Id' hides inherited member 'BaseEntity.Id'. Use the new keyword if hiding was intended.
+    F:\MIllyass\pos-with-inventory-management\SourceCode\SQLAPI\POS.Data\Entities\Inquiry\Inquiry.cs(11,21): warning CS0108: 'Inquiry.Id' hides inherited member 'BaseEntity.Id'. Use the new keyword if hiding was intended.
+    F:\MIllyass\pos-with-inventory-management\SourceCode\SQLAPI\POS.Data\Dto\CustomerLedger\CustomerLedgerDto.cs(20,22): warning CS8632: The annotation for nullable reference types should only be used in code within a '#nullable' annotations context.
+    F:\MIllyass\pos-with-inventory-management\SourceCode\SQLAPI\POS.Data\Entities\Email\EmailSMTPSetting.cs(9,21): warning CS0108: 'EmailSMTPSetting.Id' hides inherited member 'BaseEntity.Id'. Use the new keyword if hiding was intended.
+    F:\MIllyass\pos-with-inventory-management\SourceCode\SQLAPI\POS.Data\Entities\PurchaseOrder\PurchaseOrderPayment.cs(14,21): warning CS0108: 'PurchaseOrderPayment.Id' hides inherited member 'BaseEntity.Id'. Use the new keyword if hiding was intended.
+    F:\MIllyass\pos-with-inventory-management\SourceCode\SQLAPI\POS.Data\Entities\Email\EmailTemplate.cs(8,21): warning CS0108: 'EmailTemplate.Id' hides inherited member 'BaseEntity.Id'. Use the new keyword if hiding was intended.
+    F:\MIllyass\pos-with-inventory-management\SourceCode\SQLAPI\POS.Data\Entities\Supplier\Supplier.cs(8,21): warning CS0108: 'Supplier.Id' hides inherited member 'BaseEntity.Id'. Use the new keyword if hiding was intended.
+    F:\MIllyass\pos-with-inventory-management\SourceCode\SQLAPI\POS.Data\Entities\Email\SendEmail.cs(8,21): warning CS0108: 'SendEmail.Id' hides inherited member 'BaseEntity.Id'. Use the new keyword if hiding was intended.
+    F:\MIllyass\pos-with-inventory-management\SourceCode\SQLAPI\POS.Data\Entities\Inquiry\InquirySource.cs(11,21): warning CS0108: 'InquirySource.Id' hides inherited member 'BaseEntity.Id'. Use the new keyword if hiding was intended.
+    F:\MIllyass\pos-with-inventory-management\SourceCode\SQLAPI\POS.Data\Entities\Product\DailyProductPrice.cs(9,21): warning CS0108: 'DailyProductPrice.Id' hides inherited member 'BaseEntity.Id'. Use the new keyword if hiding was intended.
+    F:\MIllyass\pos-with-inventory-management\SourceCode\SQLAPI\POS.Data\Entities\Expense\Expense.cs(10,21): warning CS0108: 'Expense.Id' hides inherited member 'BaseEntity.Id'. Use the new keyword if hiding was intended.
+    F:\MIllyass\pos-with-inventory-management\SourceCode\SQLAPI\POS.Data\Entities\Reminder\Reminder.cs(9,21): warning CS0108: 'Reminder.Id' hides inherited member 'BaseEntity.Id'. Use the new keyword if hiding was intended.
+    F:\MIllyass\pos-with-inventory-management\SourceCode\SQLAPI\POS.Data\Entities\PurchaseOrder\PurchaseOrder.cs(10,21): warning CS0108: 'PurchaseOrder.Id' hides inherited member 'BaseEntity.Id'. Use the new keyword if hiding was intended.
+    F:\MIllyass\pos-with-inventory-management\SourceCode\SQLAPI\POS.Data\Entities\SalesOrder\SalesOrder.cs(11,21): warning CS0108: 'SalesOrder.Id' hides inherited member 'BaseEntity.Id'. Use the new keyword if hiding was intended.
+    F:\MIllyass\pos-with-inventory-management\SourceCode\SQLAPI\POS.Data\Entities\Product\Product.cs(11,21): warning CS0108: 'Product.Id' hides inherited member 'BaseEntity.Id'. Use the new keyword if hiding was intended.
+    F:\MIllyass\pos-with-inventory-management\SourceCode\SQLAPI\POS.Data\Entities\SalesOrder\SalesOrderPayment.cs(14,21): warning CS0108: 'SalesOrderPayment.Id' hides inherited member 'BaseEntity.Id'. Use the new keyword if hiding was intended.
+    F:\MIllyass\pos-with-inventory-management\SourceCode\SQLAPI\POS.Data\Entities\Accounts\AccountingEntry.cs(8,17): warning CS0108: 'AccountingEntry.Id' hides inherited member 'BaseEntity.Id'. Use the new keyword if hiding was intended.
+    F:\MIllyass\pos-with-inventory-management\SourceCode\SQLAPI\POS.Data\Entities\Accounts\LoanRepayment.cs(7,17): warning CS0108: 'LoanRepayment.Id' hides inherited member 'BaseEntity.Id'. Use the new keyword if hiding was intended.
+    F:\MIllyass\pos-with-inventory-management\SourceCode\SQLAPI\POS.Data\Entities\Accounts\LedgerAccount.cs(10,17): warning CS0108: 'LedgerAccount.Id' hides inherited member 'BaseEntity.Id'. Use the new keyword if hiding was intended.
+    F:\MIllyass\pos-with-inventory-management\SourceCode\SQLAPI\POS.Data\Entities\Expense\ExpenseTax.cs(9,21): warning CS0108: 'ExpenseTax.Id' hides inherited member 'BaseEntity.Id'. Use the new keyword if hiding was intended.
+    F:\MIllyass\pos-with-inventory-management\SourceCode\SQLAPI\POS.Data\Entities\Accounts\LoanDetail.cs(8,17): warning CS0108: 'LoanDetail.Id' hides inherited member 'BaseEntity.Id'. Use the new keyword if hiding was intended.
+    F:\MIllyass\pos-with-inventory-management\SourceCode\SQLAPI\POS.Data\Entities\FBR\FBRSubmissionLog.cs(15,21): warning CS0108: 'FBRSubmissionLog.Id' hides inherited member 'BaseEntity.Id'. Use the new keyword if hiding was intended.
+    F:\MIllyass\pos-with-inventory-management\SourceCode\SQLAPI\POS.Data\Entities\Accounts\TaxEntry.cs(8,17): warning CS0108: 'TaxEntry.Id' hides inherited member 'BaseEntity.Id'. Use the new keyword if hiding was intended.
+    F:\MIllyass\pos-with-inventory-management\SourceCode\SQLAPI\POS.Data\Entities\Inquiry\InquiryActivity.cs(8,21): warning CS0108: 'InquiryActivity.Id' hides inherited member 'BaseEntity.Id'. Use the new keyword if hiding was intended.
+    F:\MIllyass\pos-with-inventory-management\SourceCode\SQLAPI\POS.Data\Entities\Inquiry\InquiryAttachment.cs(8,21): warning CS0108: 'InquiryAttachment.Id' hides inherited member 'BaseEntity.Id'. Use the new keyword if hiding was intended.
+    F:\MIllyass\pos-with-inventory-management\SourceCode\SQLAPI\POS.Data\Entities\Inquiry\InquiryNote.cs(8,21): warning CS0108: 'InquiryNote.Id' hides inherited member 'BaseEntity.Id'. Use the new keyword if hiding was intended.
+    F:\MIllyass\pos-with-inventory-management\SourceCode\SQLAPI\POS.Data\Entities\Inquiry\InquiryStatus.cs(7,21): warning CS0108: 'InquiryStatus.Id' hides inherited member 'BaseEntity.Id'. Use the new keyword if hiding was intended.
+    F:\MIllyass\pos-with-inventory-management\SourceCode\SQLAPI\POS.Data\Entities\StockTransfer\StockTransferItem.cs(9,21): warning CS0108: 'StockTransferItem.Id' hides inherited member 'BaseEntity.Id'. Use the new keyword if hiding was intended.
+    F:\MIllyass\pos-with-inventory-management\SourceCode\SQLAPI\POS.Data\Entities\StockTransfer\StockTransfer.cs(11,21): warning CS0108: 'StockTransfer.Id' hides inherited member 'BaseEntity.Id'. Use the new keyword if hiding was intended.
+    F:\MIllyass\pos-with-inventory-management\SourceCode\SQLAPI\POS.Data\Entities\Product\ProductStock.cs(17,21): warning CS0108: 'ProductStock.ModifiedDate' hides inherited member 'BaseEntity.ModifiedDate'. Use the new keyword if hiding was intended.
+    F:\MIllyass\pos-with-inventory-management\SourceCode\SQLAPI\POS.Data\Entities\Variant\Variant.cs(8,21): warning CS0108: 'Variant.Id' hides inherited member 'BaseEntity.Id'. Use the new keyword if hiding was intended.
+    F:\MIllyass\pos-with-inventory-management\SourceCode\SQLAPI\POS.Data\Entities\Variant\VariantItem.cs(8,21): warning CS0108: 'VariantItem.Id' hides inherited member 'BaseEntity.Id'. Use the new keyword if hiding was intended.
+    F:\MIllyass\pos-with-inventory-management\SourceCode\SQLAPI\POS.Data\Entities\Accounts\Transaction.cs(10,17): warning CS0108: 'Transaction.Id' hides inherited member 'BaseEntity.Id'. Use the new keyword if hiding was intended.
+    F:\MIllyass\pos-with-inventory-management\SourceCode\SQLAPI\POS.Data\Entities\CompanyProfile.cs(7,17): warning CS0108: 'CompanyProfile.Id' hides inherited member 'BaseEntity.Id'. Use the new keyword if hiding was intended.
+  POS.Common net10.0 succeeded (5.0s) → F:\MIllyass\pos-with-inventory-management\SourceCode\SQLAPI\POS.Common\bin\Release\net10.0\POS.Common.dll
+  POS.Helper net10.0 succeeded with 5 warning(s) (9.8s) → F:\MIllyass\pos-with-inventory-management\SourceCode\SQLAPI\POS.Helper\bin\Release\net10.0\POS.Helper.dll
+    F:\MIllyass\pos-with-inventory-management\SourceCode\SQLAPI\POS.Helper\POS.Helper.csproj : warning NU1510: PackageReference Microsoft.Extensions.Configuration.Abstractions will not be pruned. Consider removing this package from your dependencies, as it is likely unnecessary.
+    F:\MIllyass\pos-with-inventory-management\SourceCode\SQLAPI\POS.Helper\POS.Helper.csproj : warning NU1902: Package 'MailKit' 4.15.0 has a known moderate severity vulnerability, https://github.com/advisories/GHSA-9j88-vvj5-vhgr
+    F:\MIllyass\pos-with-inventory-management\SourceCode\SQLAPI\POS.Helper\POS.Helper.csproj : warning NU1902: Package 'MimeKit' 4.15.0 has a known moderate severity vulnerability, https://github.com/advisories/GHSA-g7hc-96xr-gvvx
+    F:\MIllyass\pos-with-inventory-management\SourceCode\SQLAPI\POS.Helper\AesOperation.cs(19,42): warning SYSLIB0060: 'Rfc2898DeriveBytes.Rfc2898DeriveBytes(string, byte[])' is obsolete: 'The constructors on Rfc2898DeriveBytes are obsolete. Use the static Pbkdf2 method instead.' (https://aka.ms/dotnet-warnings/SYSLIB0060)
+    F:\MIllyass\pos-with-inventory-management\SourceCode\SQLAPI\POS.Helper\AesOperation.cs(43,42): warning SYSLIB0060: 'Rfc2898DeriveBytes.Rfc2898DeriveBytes(string, byte[])' is obsolete: 'The constructors on Rfc2898DeriveBytes are obsolete. Use the static Pbkdf2 method instead.' (https://aka.ms/dotnet-warnings/SYSLIB0060)
+  POS.Domain net10.0 succeeded with 9 warning(s) (9.9s) → F:\MIllyass\pos-with-inventory-management\SourceCode\SQLAPI\POS.Domain\bin\Release\net10.0\POS.Domain.dll
+    F:\MIllyass\pos-with-inventory-management\SourceCode\SQLAPI\POS.Domain\POS.Domain.csproj : warning NU1902: Package 'MailKit' 4.15.0 has a known moderate severity vulnerability, https://github.com/advisories/GHSA-9j88-vvj5-vhgr
+    F:\MIllyass\pos-with-inventory-management\SourceCode\SQLAPI\POS.Domain\POS.Domain.csproj : warning NU1902: Package 'MimeKit' 4.15.0 has a known moderate severity vulnerability, https://github.com/advisories/GHSA-g7hc-96xr-gvvx
+    F:\MIllyass\pos-with-inventory-management\SourceCode\SQLAPI\POS.Domain\POS.Domain.csproj : warning NU1903: Package 'SQLitePCLRaw.lib.e_sqlite3' 2.1.11 has a known high severity vulnerability, https://github.com/advisories/GHSA-2m69-gcr7-jv3q
+    F:\MIllyass\pos-with-inventory-management\SourceCode\SQLAPI\POS.Domain\POS.Domain.csproj : warning NU1903: Package 'System.Security.Cryptography.Xml' 10.0.0 has a known high severity vulnerability, https://github.com/advisories/GHSA-37gx-xxp4-5rgx
+    F:\MIllyass\pos-with-inventory-management\SourceCode\SQLAPI\POS.Domain\POS.Domain.csproj : warning NU1903: Package 'System.Security.Cryptography.Xml' 10.0.0 has a known high severity vulnerability, https://github.com/advisories/GHSA-w3x6-4m5h-cxqf
+    F:\MIllyass\pos-with-inventory-management\SourceCode\SQLAPI\POS.Domain\Context\POSDbContext.cs(1466,60): warning CS8073: The result of the expression is always 'false' since a value of type 'Guid' is never equal to 'null' of type 'Guid?'
+    F:\MIllyass\pos-with-inventory-management\SourceCode\SQLAPI\POS.Domain\TenantDataMigrationService.cs(45,37): warning EF1002: Method 'ExecuteSqlRawAsync' inserts interpolated strings directly into the SQL, without any protection against SQL injection. Consider using 'ExecuteSqlAsync' instead, which protects against SQL injection, or make sure that the value is sanitized and suppress the warning.
+    F:\MIllyass\pos-with-inventory-management\SourceCode\SQLAPI\POS.Domain\TenantDataMigrationService.cs(49,37): warning EF1002: Method 'ExecuteSqlRawAsync' inserts interpolated strings directly into the SQL, without any protection against SQL injection. Consider using 'ExecuteSqlAsync' instead, which protects against SQL injection, or make sure that the value is sanitized and suppress the warning.
+    F:\MIllyass\pos-with-inventory-management\SourceCode\SQLAPI\POS.Domain\TenantDataMigrationService.cs(63,45): warning EF1002: Method 'ExecuteSqlRawAsync' inserts interpolated strings directly into the SQL, without any protection against SQL injection. Consider using 'ExecuteSqlAsync' instead, which protects against SQL injection, or make sure that the value is sanitized and suppress the warning.
+  POS.Migrations.SqlServer net10.0 succeeded with 5 warning(s) (9.3s) → F:\MIllyass\pos-with-inventory-management\SourceCode\SQLAPI\POS.Migrations.SqlServer\bin\Release\net10.0\POS.Migrations.SqlServer.dll
+    F:\MIllyass\pos-with-inventory-management\SourceCode\SQLAPI\POS.Migrations.SqlServer\POS.Migrations.SqlServer.csproj : warning NU1902: Package 'MailKit' 4.15.0 has a known moderate severity vulnerability, https://github.com/advisories/GHSA-9j88-vvj5-vhgr
+    F:\MIllyass\pos-with-inventory-management\SourceCode\SQLAPI\POS.Migrations.SqlServer\POS.Migrations.SqlServer.csproj : warning NU1902: Package 'MimeKit' 4.15.0 has a known moderate severity vulnerability, https://github.com/advisories/GHSA-g7hc-96xr-gvvx
+    F:\MIllyass\pos-with-inventory-management\SourceCode\SQLAPI\POS.Migrations.SqlServer\POS.Migrations.SqlServer.csproj : warning NU1903: Package 'SQLitePCLRaw.lib.e_sqlite3' 2.1.11 has a known high severity vulnerability, https://github.com/advisories/GHSA-2m69-gcr7-jv3q
+    F:\MIllyass\pos-with-inventory-management\SourceCode\SQLAPI\POS.Migrations.SqlServer\POS.Migrations.SqlServer.csproj : warning NU1903: Package 'System.Security.Cryptography.Xml' 10.0.0 has a known high severity vulnerability, https://github.com/advisories/GHSA-37gx-xxp4-5rgx
+    F:\MIllyass\pos-with-inventory-management\SourceCode\SQLAPI\POS.Migrations.SqlServer\POS.Migrations.SqlServer.csproj : warning NU1903: Package 'System.Security.Cryptography.Xml' 10.0.0 has a known high severity vulnerability, https://github.com/advisories/GHSA-w3x6-4m5h-cxqf
+  POS.Repository net10.0 succeeded with 19 warning(s) (18.0s) → F:\MIllyass\pos-with-inventory-management\SourceCode\SQLAPI\POS.Repository\bin\Release\net10.0\POS.Repository.dll
+    F:\MIllyass\pos-with-inventory-management\SourceCode\SQLAPI\POS.Repository\POS.Repository.csproj : warning NU1903: Package 'AutoMapper' 14.0.0 has a known high severity vulnerability, https://github.com/advisories/GHSA-rvv3-g6hj-g44x
+    F:\MIllyass\pos-with-inventory-management\SourceCode\SQLAPI\POS.Repository\POS.Repository.csproj : warning NU1902: Package 'MailKit' 4.15.0 has a known moderate severity vulnerability, https://github.com/advisories/GHSA-9j88-vvj5-vhgr
+    F:\MIllyass\pos-with-inventory-management\SourceCode\SQLAPI\POS.Repository\POS.Repository.csproj : warning NU1902: Package 'MimeKit' 4.15.0 has a known moderate severity vulnerability, https://github.com/advisories/GHSA-g7hc-96xr-gvvx
+    F:\MIllyass\pos-with-inventory-management\SourceCode\SQLAPI\POS.Repository\POS.Repository.csproj : warning NU1903: Package 'SQLitePCLRaw.lib.e_sqlite3' 2.1.11 has a known high severity vulnerability, https://github.com/advisories/GHSA-2m69-gcr7-jv3q
+    F:\MIllyass\pos-with-inventory-management\SourceCode\SQLAPI\POS.Repository\POS.Repository.csproj : warning NU1903: Package 'System.Security.Cryptography.Xml' 10.0.0 has a known high severity vulnerability, https://github.com/advisories/GHSA-37gx-xxp4-5rgx
+    F:\MIllyass\pos-with-inventory-management\SourceCode\SQLAPI\POS.Repository\POS.Repository.csproj : warning NU1903: Package 'System.Security.Cryptography.Xml' 10.0.0 has a known high severity vulnerability, https://github.com/advisories/GHSA-w3x6-4m5h-cxqf
+    F:\MIllyass\pos-with-inventory-management\SourceCode\SQLAPI\POS.Repository\Accouting\Transaction\TransactionRepository.cs(23,34): warning CS8632: The annotation for nullable reference types should only be used in code within a '#nullable' annotations context.
+    F:\MIllyass\pos-with-inventory-management\SourceCode\SQLAPI\POS.Repository\Accouting\Transaction\TransactionRepository.cs(55,34): warning CS8632: The annotation for nullable reference types should only be used in code within a '#nullable' annotations context.
+    F:\MIllyass\pos-with-inventory-management\SourceCode\SQLAPI\POS.Repository\CustomerLedger\CustomerLedgerList.cs(47,17): warning CA2200: Re-throwing caught exception changes stack information (https://learn.microsoft.com/dotnet/fundamentals/code-analysis/quality-rules/ca2200)
+    F:\MIllyass\pos-with-inventory-management\SourceCode\SQLAPI\POS.Repository\Expense\ExpenseList.cs(55,17): warning CA2200: Re-throwing caught exception changes stack information (https://learn.microsoft.com/dotnet/fundamentals/code-analysis/quality-rules/ca2200)
+    F:\MIllyass\pos-with-inventory-management\SourceCode\SQLAPI\POS.Repository\Expense\ExpenseList.cs(67,17): warning CA2200: Re-throwing caught exception changes stack information (https://learn.microsoft.com/dotnet/fundamentals/code-analysis/quality-rules/ca2200)
+    F:\MIllyass\pos-with-inventory-management\SourceCode\SQLAPI\POS.Repository\Inquiry\InquiryList.cs(49,17): warning CA2200: Re-throwing caught exception changes stack information (https://learn.microsoft.com/dotnet/fundamentals/code-analysis/quality-rules/ca2200)
+    F:\MIllyass\pos-with-inventory-management\SourceCode\SQLAPI\POS.Repository\PurchaseOrderPayment\PurchaseOrderPaymentList.cs(48,17): warning CA2200: Re-throwing caught exception changes stack information (https://learn.microsoft.com/dotnet/fundamentals/code-analysis/quality-rules/ca2200)
+    F:\MIllyass\pos-with-inventory-management\SourceCode\SQLAPI\POS.Repository\PurchaseOrder\PurchaseOrderItemList.cs(50,17): warning CA2200: Re-throwing caught exception changes stack information (https://learn.microsoft.com/dotnet/fundamentals/code-analysis/quality-rules/ca2200)
+    F:\MIllyass\pos-with-inventory-management\SourceCode\SQLAPI\POS.Repository\SalesOrderPayment\SaleOrderPaymentList.cs(49,17): warning CA2200: Re-throwing caught exception changes stack information (https://learn.microsoft.com/dotnet/fundamentals/code-analysis/quality-rules/ca2200)
+    F:\MIllyass\pos-with-inventory-management\SourceCode\SQLAPI\POS.Repository\PurchaseOrder\PurchaseOrderList.cs(50,17): warning CA2200: Re-throwing caught exception changes stack information (https://learn.microsoft.com/dotnet/fundamentals/code-analysis/quality-rules/ca2200)
+    F:\MIllyass\pos-with-inventory-management\SourceCode\SQLAPI\POS.Repository\SalesOrder\SalesOrderItemList.cs(48,17): warning CA2200: Re-throwing caught exception changes stack information (https://learn.microsoft.com/dotnet/fundamentals/code-analysis/quality-rules/ca2200)
+    F:\MIllyass\pos-with-inventory-management\SourceCode\SQLAPI\POS.Repository\SalesOrder\SalesOrderList.cs(49,17): warning CA2200: Re-throwing caught exception changes stack information (https://learn.microsoft.com/dotnet/fundamentals/code-analysis/quality-rules/ca2200)
+    F:\MIllyass\pos-with-inventory-management\SourceCode\SQLAPI\POS.Repository\Stock\DamagedStockList.cs(47,17): warning CA2200: Re-throwing caught exception changes stack information (https://learn.microsoft.com/dotnet/fundamentals/code-analysis/quality-rules/ca2200)
+  POS.Migrations.Sqlite net10.0 succeeded with 5 warning(s) (22.2s) → F:\MIllyass\pos-with-inventory-management\SourceCode\SQLAPI\POS.Migrations.Sqlite\bin\Release\net10.0\POS.Migrations.Sqlite.dll
+    F:\MIllyass\pos-with-inventory-management\SourceCode\SQLAPI\POS.Migrations.Sqlite\POS.Migrations.Sqlite.csproj : warning NU1902: Package 'MailKit' 4.15.0 has a known moderate severity vulnerability, https://github.com/advisories/GHSA-9j88-vvj5-vhgr
+    F:\MIllyass\pos-with-inventory-management\SourceCode\SQLAPI\POS.Migrations.Sqlite\POS.Migrations.Sqlite.csproj : warning NU1902: Package 'MimeKit' 4.15.0 has a known moderate severity vulnerability, https://github.com/advisories/GHSA-g7hc-96xr-gvvx
+    F:\MIllyass\pos-with-inventory-management\SourceCode\SQLAPI\POS.Migrations.Sqlite\POS.Migrations.Sqlite.csproj : warning NU1903: Package 'SQLitePCLRaw.lib.e_sqlite3' 2.1.11 has a known high severity vulnerability, https://github.com/advisories/GHSA-2m69-gcr7-jv3q
+    F:\MIllyass\pos-with-inventory-management\SourceCode\SQLAPI\POS.Migrations.Sqlite\POS.Migrations.Sqlite.csproj : warning NU1903: Package 'System.Security.Cryptography.Xml' 10.0.0 has a known high severity vulnerability, https://github.com/advisories/GHSA-37gx-xxp4-5rgx
+    F:\MIllyass\pos-with-inventory-management\SourceCode\SQLAPI\POS.Migrations.Sqlite\POS.Migrations.Sqlite.csproj : warning NU1903: Package 'System.Security.Cryptography.Xml' 10.0.0 has a known high severity vulnerability, https://github.com/advisories/GHSA-w3x6-4m5h-cxqf
+  POS.Migrations.PostgreSQL net10.0 succeeded with 5 warning(s) (23.0s) → F:\MIllyass\pos-with-inventory-management\SourceCode\SQLAPI\POS.Migrations.PostgreSQL\bin\Release\net10.0\POS.Migrations.PostgreSQL.dll
+    F:\MIllyass\pos-with-inventory-management\SourceCode\SQLAPI\POS.Migrations.PostgreSQL\POS.Migrations.PostgreSQL.csproj : warning NU1902: Package 'MailKit' 4.15.0 has a known moderate severity vulnerability, https://github.com/advisories/GHSA-9j88-vvj5-vhgr
+    F:\MIllyass\pos-with-inventory-management\SourceCode\SQLAPI\POS.Migrations.PostgreSQL\POS.Migrations.PostgreSQL.csproj : warning NU1902: Package 'MimeKit' 4.15.0 has a known moderate severity vulnerability, https://github.com/advisories/GHSA-g7hc-96xr-gvvx
+    F:\MIllyass\pos-with-inventory-management\SourceCode\SQLAPI\POS.Migrations.PostgreSQL\POS.Migrations.PostgreSQL.csproj : warning NU1903: Package 'SQLitePCLRaw.lib.e_sqlite3' 2.1.11 has a known high severity vulnerability, https://github.com/advisories/GHSA-2m69-gcr7-jv3q
+    F:\MIllyass\pos-with-inventory-management\SourceCode\SQLAPI\POS.Migrations.PostgreSQL\POS.Migrations.PostgreSQL.csproj : warning NU1903: Package 'System.Security.Cryptography.Xml' 10.0.0 has a known high severity vulnerability, https://github.com/advisories/GHSA-37gx-xxp4-5rgx
+    F:\MIllyass\pos-with-inventory-management\SourceCode\SQLAPI\POS.Migrations.PostgreSQL\POS.Migrations.PostgreSQL.csproj : warning NU1903: Package 'System.Security.Cryptography.Xml' 10.0.0 has a known high severity vulnerability, https://github.com/advisories/GHSA-w3x6-4m5h-cxqf
+  POS.MediatR net10.0 succeeded with 62 warning(s) (22.6s) → F:\MIllyass\pos-with-inventory-management\SourceCode\SQLAPI\POS.MediatR\bin\Release\net10.0\POS.MediatR.dll
+    F:\MIllyass\pos-with-inventory-management\SourceCode\SQLAPI\POS.MediatR\POS.MediatR.csproj : warning NU1903: Package 'AutoMapper' 14.0.0 has a known high severity vulnerability, https://github.com/advisories/GHSA-rvv3-g6hj-g44x
+    F:\MIllyass\pos-with-inventory-management\SourceCode\SQLAPI\POS.MediatR\POS.MediatR.csproj : warning NU1902: Package 'MailKit' 4.15.0 has a known moderate severity vulnerability, https://github.com/advisories/GHSA-9j88-vvj5-vhgr
+    F:\MIllyass\pos-with-inventory-management\SourceCode\SQLAPI\POS.MediatR\POS.MediatR.csproj : warning NU1902: Package 'MimeKit' 4.15.0 has a known moderate severity vulnerability, https://github.com/advisories/GHSA-g7hc-96xr-gvvx
+    F:\MIllyass\pos-with-inventory-management\SourceCode\SQLAPI\POS.MediatR\POS.MediatR.csproj : warning NU1903: Package 'SQLitePCLRaw.lib.e_sqlite3' 2.1.11 has a known high severity vulnerability, https://github.com/advisories/GHSA-2m69-gcr7-jv3q
+    F:\MIllyass\pos-with-inventory-management\SourceCode\SQLAPI\POS.MediatR\Brand\Handler\AddBrandCommandHandler.cs(17,7): warning CS0105: The using directive for 'System.Threading' appeared previously in this namespace
+    F:\MIllyass\pos-with-inventory-management\SourceCode\SQLAPI\POS.MediatR\Expense\Handlers\AddExpenseCommandHandler.cs(23,7): warning CS0105: The using directive for 'System.Threading' appeared previously in this namespace
+    F:\MIllyass\pos-with-inventory-management\SourceCode\SQLAPI\POS.MediatR\Expense\Handlers\UpdateExpenseCommandHandler.cs(22,7): warning CS0105: The using directive for 'System.Threading' appeared previously in this namespace
+    F:\MIllyass\pos-with-inventory-management\SourceCode\SQLAPI\POS.MediatR\InquiryAttachment\Handlers\AddInquiryAttachmentCommandHandler.cs(16,7): warning CS0105: The using directive for 'System.Threading' appeared previously in this namespace
+    F:\MIllyass\pos-with-inventory-management\SourceCode\SQLAPI\POS.MediatR\Language\Handlers\AddLanguageCommandHandler.cs(17,7): warning CS0105: The using directive for 'System.Threading' appeared previously in this namespace
+    F:\MIllyass\pos-with-inventory-management\SourceCode\SQLAPI\POS.MediatR\Language\Handlers\UpdateLanguageCommandHandler.cs(18,7): warning CS0105: The using directive for 'System.Threading' appeared previously in this namespace
+    F:\MIllyass\pos-with-inventory-management\SourceCode\SQLAPI\POS.MediatR\Supplier\Handlers\AddSupplierCommandHandler.cs(17,7): warning CS0105: The using directive for 'System.Threading' appeared previously in this namespace
+    F:\MIllyass\pos-with-inventory-management\SourceCode\SQLAPI\POS.MediatR\Supplier\Handlers\RemovedSupplierImageCommandHandler.cs(14,7): warning CS0105: The using directive for 'System.Threading' appeared previously in this namespace
+    F:\MIllyass\pos-with-inventory-management\SourceCode\SQLAPI\POS.MediatR\Tenant\Commands\CreateTenantCommand.cs(3,7): warning CS0105: The using directive for 'POS.Helper' appeared previously in this namespace
+    F:\MIllyass\pos-with-inventory-management\SourceCode\SQLAPI\POS.MediatR\Tenant\Commands\ExportTenantToSqliteCommand.cs(3,7): warning CS0105: The using directive for 'POS.Helper' appeared previously in this namespace
+    F:\MIllyass\pos-with-inventory-management\SourceCode\SQLAPI\POS.MediatR\Tenant\Commands\GenerateTenantLicenseKeysCommand.cs(4,7): warning CS0105: The using directive for 'POS.Helper' appeared previously in this namespace
+    F:\MIllyass\pos-with-inventory-management\SourceCode\SQLAPI\POS.MediatR\Tenant\Commands\RegisterTenantCommand.cs(5,7): warning CS0105: The using directive for 'POS.Helper' appeared previously in this namespace
+    F:\MIllyass\pos-with-inventory-management\SourceCode\SQLAPI\POS.MediatR\Tenant\Commands\SwitchTenantCommand.cs(4,7): warning CS0105: The using directive for 'POS.Helper' appeared previously in this namespace
+    F:\MIllyass\pos-with-inventory-management\SourceCode\SQLAPI\POS.MediatR\Tenant\Commands\ToggleTenantStatusCommand.cs(3,7): warning CS0105: The using directive for 'POS.Helper' appeared previously in this namespace
+    F:\MIllyass\pos-with-inventory-management\SourceCode\SQLAPI\POS.MediatR\Tenant\Commands\UpdateTenantAdminCommand.cs(3,7): warning CS0105: The using directive for 'POS.Helper' appeared previously in this namespace
+    F:\MIllyass\pos-with-inventory-management\SourceCode\SQLAPI\POS.MediatR\Tenant\Commands\UpdateTenantLicenseCommand.cs(4,7): warning CS0105: The using directive for 'POS.Helper' appeared previously in this namespace
+    F:\MIllyass\pos-with-inventory-management\SourceCode\SQLAPI\POS.MediatR\Tenant\Handlers\CreateTenantCommandHandler.cs(9,7): warning CS0105: The using directive for 'POS.Helper' appeared previously in this namespace
+    F:\MIllyass\pos-with-inventory-management\SourceCode\SQLAPI\POS.MediatR\Tenant\Handlers\ExportTenantToSqliteCommandHandler.cs(7,7): warning CS0105: The using directive for 'POS.Helper' appeared previously in this namespace
+    F:\MIllyass\pos-with-inventory-management\SourceCode\SQLAPI\POS.MediatR\Tenant\Handlers\ExportTenantToSqliteCommandHandler.cs(11,7): warning CS0105: The using directive for 'POS.Helper' appeared previously in this namespace
+    F:\MIllyass\pos-with-inventory-management\SourceCode\SQLAPI\POS.MediatR\Tenant\Handlers\GenerateTenantLicenseKeysCommandHandler.cs(9,7): warning CS0105: The using directive for 'POS.Helper' appeared previously in this namespace
+    F:\MIllyass\pos-with-inventory-management\SourceCode\SQLAPI\POS.MediatR\Tenant\Handlers\GetAllTenantsQueryHandler.cs(10,7): warning CS0105: The using directive for 'POS.Helper' appeared previously in this namespace
+    F:\MIllyass\pos-with-inventory-management\SourceCode\SQLAPI\POS.MediatR\Tenant\Handlers\RegisterTenantCommandHandler.cs(7,7): warning CS0105: The using directive for 'POS.Helper' appeared previously in this namespace
+    F:\MIllyass\pos-with-inventory-management\SourceCode\SQLAPI\POS.MediatR\Tenant\Handlers\SwitchTenantCommandHandler.cs(8,7): warning CS0105: The using directive for 'POS.Helper' appeared previously in this namespace
+    F:\MIllyass\pos-with-inventory-management\SourceCode\SQLAPI\POS.MediatR\Tenant\Handlers\SwitchTenantCommandHandler.cs(13,7): warning CS0105: The using directive for 'POS.Helper' appeared previously in this namespace
+    F:\MIllyass\pos-with-inventory-management\SourceCode\SQLAPI\POS.MediatR\Tenant\Handlers\ToggleTenantStatusCommandHandler.cs(5,7): warning CS0105: The using directive for 'POS.Helper' appeared previously in this namespace
+    F:\MIllyass\pos-with-inventory-management\SourceCode\SQLAPI\POS.MediatR\Tenant\Handlers\UpdateTenantAdminCommandHandler.cs(9,7): warning CS0105: The using directive for 'POS.Helper' appeared previously in this namespace
+    F:\MIllyass\pos-with-inventory-management\SourceCode\SQLAPI\POS.MediatR\Tenant\Handlers\UpdateTenantLicenseCommandHandler.cs(10,7): warning CS0105: The using directive for 'POS.Helper' appeared previously in this namespace
+    F:\MIllyass\pos-with-inventory-management\SourceCode\SQLAPI\POS.MediatR\Tenant\Queries\GetAllTenantsQuery.cs(7,7): warning CS0105: The using directive for 'POS.Helper' appeared previously in this namespace
+    F:\MIllyass\pos-with-inventory-management\SourceCode\SQLAPI\POS.MediatR\CustomerLedger\Add\AddCustomerLedgerCommand.cs(24,22): warning CS8632: The annotation for nullable reference types should only be used in code within a '#nullable' annotations context.
+    F:\MIllyass\pos-with-inventory-management\SourceCode\SQLAPI\POS.MediatR\Accouting\FinancialYear\Get\GetFinancialYearCommandHandler.cs(16,103): warning CS9113: Parameter '_mapper' is unread.
+    F:\MIllyass\pos-with-inventory-management\SourceCode\SQLAPI\POS.MediatR\User\Handlers\RecoverPasswordCommandHandler.cs(20,25): warning CS9113: Parameter 'userRepository' is unread.
+    F:\MIllyass\pos-with-inventory-management\SourceCode\SQLAPI\POS.MediatR\User\Handlers\RecoverPasswordCommandHandler.cs(22,35): warning CS9113: Parameter 'unitOfWork' is unread.
+    F:\MIllyass\pos-with-inventory-management\SourceCode\SQLAPI\POS.MediatR\Stock\Handlers\AddDamagedStockCommandHandler.cs(30,24): warning CS9113: Parameter '_taxRepository' is unread.
+    F:\MIllyass\pos-with-inventory-management\SourceCode\SQLAPI\POS.MediatR\Stock\Handlers\AddDamagedStockCommandHandler.cs(31,31): warning CS9113: Parameter '_productTaxRepository' is unread.
+    F:\MIllyass\pos-with-inventory-management\SourceCode\SQLAPI\POS.MediatR\Language\Handlers\UpdateLanguageCommandHandler.cs(24,29): warning CS9113: Parameter '_webHostEnvironment' is unread.
+    F:\MIllyass\pos-with-inventory-management\SourceCode\SQLAPI\POS.MediatR\StockTransfer\Handlers\DeleteStockTransferCommandHandler.cs(23,35): warning CS9113: Parameter '_uow' is unread.
+    F:\MIllyass\pos-with-inventory-management\SourceCode\SQLAPI\POS.MediatR\EmailLog\Handlers\DeleteEmailLogCommandHandler.cs(21,29): warning CS9113: Parameter 'webHostEnvironment' is unread.
+    F:\MIllyass\pos-with-inventory-management\SourceCode\SQLAPI\POS.MediatR\Accouting\Strategies\SaleStrategy.cs(13,24): warning CS9113: Parameter '_productRepository' is unread.
+    F:\MIllyass\pos-with-inventory-management\SourceCode\SQLAPI\POS.MediatR\Accouting\Strategies\SaleStrategy.cs(14,29): warning CS9113: Parameter '_productStockRepository' is unread.
+    F:\MIllyass\pos-with-inventory-management\SourceCode\SQLAPI\POS.MediatR\Language\Handlers\AddLanguageCommandHandler.cs(25,29): warning CS9113: Parameter '_webHostEnvironment' is unread.
+    F:\MIllyass\pos-with-inventory-management\SourceCode\SQLAPI\POS.MediatR\Accouting\Strategies\SaleReturnStrategy.cs(14,24): warning CS9113: Parameter '_productRepository' is unread.
+    F:\MIllyass\pos-with-inventory-management\SourceCode\SQLAPI\POS.MediatR\Expense\Handlers\DeleteExpenseCommandHanlder.cs(96,37): warning CS0168: The variable 'ex' is declared but never used
+    F:\MIllyass\pos-with-inventory-management\SourceCode\SQLAPI\POS.MediatR\Expense\Handlers\DeleteExpenseCommandHanlder.cs(28,53): warning CS0169: The field 'DeleteExpenseCommandHanlder._stockAdjustmentRepository' is never used
+    F:\MIllyass\pos-with-inventory-management\SourceCode\SQLAPI\POS.MediatR\PurchaseOrder\Delete\DeletePurchaseOrderCommandHandler.cs(36,53): warning CS0169: The field 'DeletePurchaseOrderCommandHandler._stockAdjustmentRepository' is never used
+    F:\MIllyass\pos-with-inventory-management\SourceCode\SQLAPI\POS.MediatR\PurchaseOrder\Update\UpdatePurchaseOrderCommandHandler.cs(31,53): warning CS0169: The field 'UpdatePurchaseOrderCommandHandler._stockAdjustmentRepository' is never used
+    F:\MIllyass\pos-with-inventory-management\SourceCode\SQLAPI\POS.MediatR\Expense\Handlers\UpdateExpenseCommandHandler.cs(41,53): warning CS0169: The field 'UpdateExpenseCommandHandler._stockAdjustmentRepository' is never used
+    F:\MIllyass\pos-with-inventory-management\SourceCode\SQLAPI\POS.MediatR\SalesOrder\Delete\DeleteSalesOrderCommandHandler.cs(34,53): warning CS0169: The field 'DeleteSalesOrderCommandHandler._stockAdjustmentRepository' is never used
+    F:\MIllyass\pos-with-inventory-management\SourceCode\SQLAPI\POS.MediatR\Accouting\Services\PaymentService.cs(229,13): warning CA2200: Re-throwing caught exception changes stack information (https://learn.microsoft.com/dotnet/fundamentals/code-analysis/quality-rules/ca2200)
+    F:\MIllyass\pos-with-inventory-management\SourceCode\SQLAPI\POS.MediatR\ContactUs\Handlers\DeleteContactUsCommandHandler.cs(38,34): warning CA2017: Number of parameters supplied in the logging message template do not match the number of named placeholders (https://learn.microsoft.com/dotnet/fundamentals/code-analysis/quality-rules/ca2017)
+    F:\MIllyass\pos-with-inventory-management\SourceCode\SQLAPI\POS.MediatR\ContactUs\Handlers\DeleteContactUsCommandHandler.cs(46,34): warning CA2017: Number of parameters supplied in the logging message template do not match the number of named placeholders (https://learn.microsoft.com/dotnet/fundamentals/code-analysis/quality-rules/ca2017)
+    F:\MIllyass\pos-with-inventory-management\SourceCode\SQLAPI\POS.MediatR\Customer\Handlers\DeleteCustomerCommandHandler.cs(60,34): warning CA2017: Number of parameters supplied in the logging message template do not match the number of named placeholders (https://learn.microsoft.com/dotnet/fundamentals/code-analysis/quality-rules/ca2017)
+    F:\MIllyass\pos-with-inventory-management\SourceCode\SQLAPI\POS.MediatR\Customer\Handlers\GetCustomerQueryHandler.cs(40,34): warning CA2017: Number of parameters supplied in the logging message template do not match the number of named placeholders (https://learn.microsoft.com/dotnet/fundamentals/code-analysis/quality-rules/ca2017)
+    F:\MIllyass\pos-with-inventory-management\SourceCode\SQLAPI\POS.MediatR\Expense\Handlers\AddExpenseCommandHandler.cs(110,38): warning CA2017: Number of parameters supplied in the logging message template do not match the number of named placeholders (https://learn.microsoft.com/dotnet/fundamentals/code-analysis/quality-rules/ca2017)
+    F:\MIllyass\pos-with-inventory-management\SourceCode\SQLAPI\POS.MediatR\InquiryAttachment\Handlers\DeleteInquiryAttachmentCommandHandler.cs(38,38): warning CA2017: Number of parameters supplied in the logging message template do not match the number of named placeholders (https://learn.microsoft.com/dotnet/fundamentals/code-analysis/quality-rules/ca2017)
+    F:\MIllyass\pos-with-inventory-management\SourceCode\SQLAPI\POS.MediatR\InquiryAttachment\Handlers\DeleteInquiryAttachmentCommandHandler.cs(41,34): warning CA2017: Number of parameters supplied in the logging message template do not match the number of named placeholders (https://learn.microsoft.com/dotnet/fundamentals/code-analysis/quality-rules/ca2017)
+    F:\MIllyass\pos-with-inventory-management\SourceCode\SQLAPI\POS.MediatR\InquiryAttachment\Handlers\DeleteInquiryAttachmentCommandHandler.cs(44,30): warning CA2017: Number of parameters supplied in the logging message template do not match the number of named placeholders (https://learn.microsoft.com/dotnet/fundamentals/code-analysis/quality-rules/ca2017)
+    F:\MIllyass\pos-with-inventory-management\SourceCode\SQLAPI\POS.MediatR\InquiryAttachment\Handlers\AddInquiryAttachmentCommandHandler.cs(66,34): warning CA2017: Number of parameters supplied in the logging message template do not match the number of named placeholders (https://learn.microsoft.com/dotnet/fundamentals/code-analysis/quality-rules/ca2017)
+    F:\MIllyass\pos-with-inventory-management\SourceCode\SQLAPI\POS.MediatR\Expense\Handlers\UpdateExpenseCommandHandler.cs(130,46): warning CA2017: Number of parameters supplied in the logging message template do not match the number of named placeholders (https://learn.microsoft.com/dotnet/fundamentals/code-analysis/quality-rules/ca2017)
+  POS.API net10.0 win-x64 succeeded with 376 warning(s) (26.3s) → F:\MIllyass\pos-with-inventory-management\SourceCode\SQLAPI\POS.API\bin\Release\net10.0\win-x64\publish\
+    F:\MIllyass\pos-with-inventory-management\SourceCode\SQLAPI\POS.API\POS.API.csproj : warning NU1903: Package 'AutoMapper' 14.0.0 has a known high severity vulnerability, https://github.com/advisories/GHSA-rvv3-g6hj-g44x
+    F:\MIllyass\pos-with-inventory-management\SourceCode\SQLAPI\POS.API\POS.API.csproj : warning NU1902: Package 'MailKit' 4.15.0 has a known moderate severity vulnerability, https://github.com/advisories/GHSA-9j88-vvj5-vhgr
+    F:\MIllyass\pos-with-inventory-management\SourceCode\SQLAPI\POS.API\POS.API.csproj : warning NU1902: Package 'MimeKit' 4.15.0 has a known moderate severity vulnerability, https://github.com/advisories/GHSA-g7hc-96xr-gvvx
+    F:\MIllyass\pos-with-inventory-management\SourceCode\SQLAPI\POS.API\POS.API.csproj : warning NU1903: Package 'SQLitePCLRaw.lib.e_sqlite3' 2.1.11 has a known high severity vulnerability, https://github.com/advisories/GHSA-2m69-gcr7-jv3q
+    F:\MIllyass\pos-with-inventory-management\SourceCode\SQLAPI\POS.API\Controllers\CustomerLedger\CustomerLedgerController.cs(104,13): warning CS1570: XML comment has badly formed XML -- 'End tag was not expected at this location.'
+    F:\MIllyass\pos-with-inventory-management\SourceCode\SQLAPI\POS.API\Program.cs(89,9): warning CS0618: 'PostgreSqlBootstrapperConfigurationExtensions.UsePostgreSqlStorage(IGlobalConfiguration, string, PostgreSqlStorageOptions)' is obsolete: 'Will be removed in 2.0. Please use UsePostgreSqlStorage(Action<PostgreSqlBootstrapperOptions>, PostgreSqlStorageOptions) overload.'
+    F:\MIllyass\pos-with-inventory-management\SourceCode\SQLAPI\POS.API\Helpers\SeedingService.cs(714,43): warning CS0168: The variable 'ex' is declared but never used
+    F:\MIllyass\pos-with-inventory-management\SourceCode\SQLAPI\POS.API\Authorization\SuperAdminHandler.cs(6,18): warning CS1591: Missing XML comment for publicly visible type or member 'SuperAdminRequirement'
+    F:\MIllyass\pos-with-inventory-management\SourceCode\SQLAPI\POS.API\Authorization\SuperAdminHandler.cs(10,18): warning CS1591: Missing XML comment for publicly visible type or member 'SuperAdminHandler'
+    F:\MIllyass\pos-with-inventory-management\SourceCode\SQLAPI\POS.API\Authorization\SuperAdminHandler.cs(12,33): warning CS1591: Missing XML comment for publicly visible type or member 'SuperAdminHandler.HandleRequirementAsync(AuthorizationHandlerContext, SuperAdminRequirement)'
+    F:\MIllyass\pos-with-inventory-management\SourceCode\SQLAPI\POS.API\BackgroundServices\FBRSyncBackgroundService.cs(28,16): warning CS1591: Missing XML comment for publicly visible type or member 'FBRSyncBackgroundService.FBRSyncBackgroundService(IServiceProvider, ILogger<FBRSyncBackgroundService>)'
+    F:\MIllyass\pos-with-inventory-management\SourceCode\SQLAPI\POS.API\BackgroundServices\FBRSyncBackgroundService.cs(36,39): warning CS1591: Missing XML comment for publicly visible type or member 'FBRSyncBackgroundService.ExecuteAsync(CancellationToken)'
+    F:\MIllyass\pos-with-inventory-management\SourceCode\SQLAPI\POS.API\Context\POSDbContextFactory.cs(10,18): warning CS1591: Missing XML comment for publicly visible type or member 'POSDbContextFactory'
+    F:\MIllyass\pos-with-inventory-management\SourceCode\SQLAPI\POS.API\Context\POSDbContextFactory.cs(12,29): warning CS1591: Missing XML comment for publicly visible type or member 'POSDbContextFactory.CreateDbContext(string[])'
+    F:\MIllyass\pos-with-inventory-management\SourceCode\SQLAPI\POS.API\Controllers\Accounting\FinancialYearController.cs(64,26): warning CS1572: XML comment has a param tag for 'command', but there is no parameter by that name
+    F:\MIllyass\pos-with-inventory-management\SourceCode\SQLAPI\POS.API\Controllers\Accounting\LedgerAccountController.cs(35,38): warning CS1591: Missing XML comment for publicly visible type or member 'LedgerAccountController.GetLedgerAccounts(Guid)'
+    F:\MIllyass\pos-with-inventory-management\SourceCode\SQLAPI\POS.API\Controllers\Accounting\LedgerAccountController.cs(70,22): warning CS1572: XML comment has a param tag for 'id', but there is no parameter by that name
+    F:\MIllyass\pos-with-inventory-management\SourceCode\SQLAPI\POS.API\Controllers\Accounting\LedgerAccountController.cs(71,22): warning CS1572: XML comment has a param tag for 'command', but there is no parameter by that name
+    F:\MIllyass\pos-with-inventory-management\SourceCode\SQLAPI\POS.API\Controllers\Accounting\LoanController.cs(13,14): warning CS1591: Missing XML comment for publicly visible type or member 'LoanController'
+    F:\MIllyass\pos-with-inventory-management\SourceCode\SQLAPI\POS.API\Controllers\Accounting\LoanController.cs(13,14): warning CS1591: Missing XML comment for publicly visible type or member 'LoanController.LoanController(IMediator)'
+    F:\MIllyass\pos-with-inventory-management\SourceCode\SQLAPI\POS.API\Controllers\Action\ActionController.cs(21,26): warning CS1591: Missing XML comment for publicly visible type or member 'ActionController._mediator'
+    F:\MIllyass\pos-with-inventory-management\SourceCode\SQLAPI\POS.API\Controllers\Authentication\AuthenticationController.cs(13,18): warning CS1591: Missing XML comment for publicly visible type or member 'AuthenticationController'
+    F:\MIllyass\pos-with-inventory-management\SourceCode\SQLAPI\POS.API\Controllers\Authentication\AuthenticationController.cs(15,26): warning CS1591: Missing XML comment for publicly visible type or member 'AuthenticationController._mediator'
+    F:\MIllyass\pos-with-inventory-management\SourceCode\SQLAPI\POS.API\Controllers\Authentication\AuthenticationController.cs(16,16): warning CS1591: Missing XML comment for publicly visible type or member 'AuthenticationController.AuthenticationController(IMediator)'
+    F:\MIllyass\pos-with-inventory-management\SourceCode\SQLAPI\POS.API\Controllers\BaseController.cs(6,18): warning CS1591: Missing XML comment for publicly visible type or member 'BaseController'
+    F:\MIllyass\pos-with-inventory-management\SourceCode\SQLAPI\POS.API\Controllers\BaseController.cs(8,30): warning CS1591: Missing XML comment for publicly visible type or member 'BaseController.ReturnFormattedResponse<T>(ServiceResponse<T>)'
+    F:\MIllyass\pos-with-inventory-management\SourceCode\SQLAPI\POS.API\Controllers\BaseController.cs(17,30): warning CS1591: Missing XML comment for publicly visible type or member 'BaseController.GenerateResponse<T>(ServiceResponse<T>)'
+    F:\MIllyass\pos-with-inventory-management\SourceCode\SQLAPI\POS.API\Controllers\Brand\BrandController.cs(18,18): warning CS1591: Missing XML comment for publicly visible type or member 'BrandController'
+    F:\MIllyass\pos-with-inventory-management\SourceCode\SQLAPI\POS.API\Controllers\Brand\BrandController.cs(20,26): warning CS1591: Missing XML comment for publicly visible type or member 'BrandController._mediator'
+    F:\MIllyass\pos-with-inventory-management\SourceCode\SQLAPI\POS.API\Controllers\Brand\BrandController.cs(22,16): warning CS1591: Missing XML comment for publicly visible type or member 'BrandController.BrandController(IMediator)'
+    F:\MIllyass\pos-with-inventory-management\SourceCode\SQLAPI\POS.API\Controllers\City\CityController.cs(18,18): warning CS1591: Missing XML comment for publicly visible type or member 'CityController'
+    F:\MIllyass\pos-with-inventory-management\SourceCode\SQLAPI\POS.API\Controllers\City\CityController.cs(22,16): warning CS1591: Missing XML comment for publicly visible type or member 'CityController.CityController(IMediator)'
+    F:\MIllyass\pos-with-inventory-management\SourceCode\SQLAPI\POS.API\Controllers\CompanyProfile\CompanyProfileController.cs(15,14): warning CS1591: Missing XML comment for publicly visible type or member 'CompanyProfileController'
+    F:\MIllyass\pos-with-inventory-management\SourceCode\SQLAPI\POS.API\Controllers\CompanyProfile\CompanyProfileController.cs(18,22): warning CS1591: Missing XML comment for publicly visible type or member 'CompanyProfileController._mediator'
+    F:\MIllyass\pos-with-inventory-management\SourceCode\SQLAPI\POS.API\Controllers\ContactUs\ContactUsController.cs(13,18): warning CS1591: Missing XML comment for publicly visible type or member 'ContactUsController'
+    F:\MIllyass\pos-with-inventory-management\SourceCode\SQLAPI\POS.API\Controllers\ContactUs\ContactUsController.cs(16,16): warning CS1591: Missing XML comment for publicly visible type or member 'ContactUsController.ContactUsController(IMediator)'
+    F:\MIllyass\pos-with-inventory-management\SourceCode\SQLAPI\POS.API\Controllers\ContactUs\ContactUsController.cs(34,42): warning CS1591: Missing XML comment for publicly visible type or member 'ContactUsController.GetContactUsList(ContactUsResource)'
+    F:\MIllyass\pos-with-inventory-management\SourceCode\SQLAPI\POS.API\Controllers\ContactUs\ContactUsController.cs(56,42): warning CS1591: Missing XML comment for publicly visible type or member 'ContactUsController.Delete(Guid)'
+    F:\MIllyass\pos-with-inventory-management\SourceCode\SQLAPI\POS.API\Controllers\Country\CountryController.cs(18,18): warning CS1591: Missing XML comment for publicly visible type or member 'CountryController'
+    F:\MIllyass\pos-with-inventory-management\SourceCode\SQLAPI\POS.API\Controllers\Country\CountryController.cs(20,26): warning CS1591: Missing XML comment for publicly visible type or member 'CountryController._mediator'
+    F:\MIllyass\pos-with-inventory-management\SourceCode\SQLAPI\POS.API\Controllers\Country\CountryController.cs(22,16): warning CS1591: Missing XML comment for publicly visible type or member 'CountryController.CountryController(IMediator)'
+    F:\MIllyass\pos-with-inventory-management\SourceCode\SQLAPI\POS.API\Controllers\Currency\CurrencyController.cs(13,18): warning CS1591: Missing XML comment for publicly visible type or member 'CurrencyController'
+    F:\MIllyass\pos-with-inventory-management\SourceCode\SQLAPI\POS.API\Controllers\CustomerLedger\CustomerLedgerController.cs(16,18): warning CS1591: Missing XML comment for publicly visible type or member 'CustomerLedgerController'
+    F:\MIllyass\pos-with-inventory-management\SourceCode\SQLAPI\POS.API\Controllers\CustomerLedger\CustomerLedgerController.cs(16,18): warning CS1591: Missing XML comment for publicly visible type or member 'CustomerLedgerController.CustomerLedgerController(IMediator)'
+    F:\MIllyass\pos-with-inventory-management\SourceCode\SQLAPI\POS.API\Controllers\Customer\CustomerController.cs(19,18): warning CS1591: Missing XML comment for publicly visible type or member 'CustomerController'
+    F:\MIllyass\pos-with-inventory-management\SourceCode\SQLAPI\POS.API\Controllers\Customer\CustomerController.cs(23,16): warning CS1591: Missing XML comment for publicly visible type or member 'CustomerController.CustomerController(IMediator)'
+    F:\MIllyass\pos-with-inventory-management\SourceCode\SQLAPI\POS.API\Controllers\Customer\CustomerSearchController.cs(13,18): warning CS1591: Missing XML comment for publicly visible type or member 'CustomerSearchController'
+    F:\MIllyass\pos-with-inventory-management\SourceCode\SQLAPI\POS.API\Controllers\DailyProductPrice\DailyProductPriceController.cs(16,18): warning CS1591: Missing XML comment for publicly visible type or member 'DailyProductPriceController'
+    F:\MIllyass\pos-with-inventory-management\SourceCode\SQLAPI\POS.API\Controllers\DailyProductPrice\DailyProductPriceController.cs(20,16): warning CS1591: Missing XML comment for publicly visible type or member 'DailyProductPriceController.DailyProductPriceController(IMediator)'
+    F:\MIllyass\pos-with-inventory-management\SourceCode\SQLAPI\POS.API\Controllers\Dashboard\DashboardController.cs(23,26): warning CS1591: Missing XML comment for publicly visible type or member 'DashboardController._mediator'
+    F:\MIllyass\pos-with-inventory-management\SourceCode\SQLAPI\POS.API\Controllers\EmailLog\EmailLogController.cs(21,18): warning CS1591: Missing XML comment for publicly visible type or member 'EmailLogController'
+    F:\MIllyass\pos-with-inventory-management\SourceCode\SQLAPI\POS.API\Controllers\EmailLog\EmailLogController.cs(23,26): warning CS1591: Missing XML comment for publicly visible type or member 'EmailLogController._mediator'
+    F:\MIllyass\pos-with-inventory-management\SourceCode\SQLAPI\POS.API\Controllers\EmailLog\EmailLogController.cs(27,16): warning CS1591: Missing XML comment for publicly visible type or member 'EmailLogController.EmailLogController(IMediator, PathHelper, IWebHostEnvironment)'
+    F:\MIllyass\pos-with-inventory-management\SourceCode\SQLAPI\POS.API\Controllers\EmailTemplate\EmailTemplateController.cs(18,18): warning CS1591: Missing XML comment for publicly visible type or member 'EmailTemplateController'
+    F:\MIllyass\pos-with-inventory-management\SourceCode\SQLAPI\POS.API\Controllers\EmailTemplate\EmailTemplateController.cs(20,26): warning CS1591: Missing XML comment for publicly visible type or member 'EmailTemplateController._mediator'
+    F:\MIllyass\pos-with-inventory-management\SourceCode\SQLAPI\POS.API\Controllers\Email\EmailController.cs(14,18): warning CS1591: Missing XML comment for publicly visible type or member 'EmailController'
+    F:\MIllyass\pos-with-inventory-management\SourceCode\SQLAPI\POS.API\Controllers\Email\EmailController.cs(17,16): warning CS1591: Missing XML comment for publicly visible type or member 'EmailController.EmailController(IMediator)'
+    F:\MIllyass\pos-with-inventory-management\SourceCode\SQLAPI\POS.API\Controllers\Email\EmailSMTPSettingController.cs(17,18): warning CS1591: Missing XML comment for publicly visible type or member 'EmailSMTPSettingController'
+    F:\MIllyass\pos-with-inventory-management\SourceCode\SQLAPI\POS.API\Controllers\Email\EmailSMTPSettingController.cs(20,16): warning CS1591: Missing XML comment for publicly visible type or member 'EmailSMTPSettingController.EmailSMTPSettingController(IMediator)'
+    F:\MIllyass\pos-with-inventory-management\SourceCode\SQLAPI\POS.API\Controllers\ExpenseCategory\ExpenseCategoryController.cs(17,18): warning CS1591: Missing XML comment for publicly visible type or member 'ExpenseCategoryController'
+    F:\MIllyass\pos-with-inventory-management\SourceCode\SQLAPI\POS.API\Controllers\ExpenseCategory\ExpenseCategoryController.cs(19,26): warning CS1591: Missing XML comment for publicly visible type or member 'ExpenseCategoryController._mediator'
+    F:\MIllyass\pos-with-inventory-management\SourceCode\SQLAPI\POS.API\Controllers\ExpenseCategory\ExpenseCategoryController.cs(21,16): warning CS1591: Missing XML comment for publicly visible type or member 'ExpenseCategoryController.ExpenseCategoryController(IMediator)'
+    F:\MIllyass\pos-with-inventory-management\SourceCode\SQLAPI\POS.API\Controllers\Expense\ExpenseController.cs(22,18): warning CS1591: Missing XML comment for publicly visible type or member 'ExpenseController'
+    F:\MIllyass\pos-with-inventory-management\SourceCode\SQLAPI\POS.API\Controllers\Expense\ExpenseController.cs(29,26): warning CS1572: XML comment has a param tag for 'logger', but there is no parameter by that name
+    F:\MIllyass\pos-with-inventory-management\SourceCode\SQLAPI\POS.API\Controllers\FBR\FBRController.cs(13,18): warning CS1591: Missing XML comment for publicly visible type or member 'FBRController'
+    F:\MIllyass\pos-with-inventory-management\SourceCode\SQLAPI\POS.API\Controllers\FBR\FBRController.cs(17,16): warning CS1591: Missing XML comment for publicly visible type or member 'FBRController.FBRController(IMediator)'
+    F:\MIllyass\pos-with-inventory-management\SourceCode\SQLAPI\POS.API\Controllers\HomeController.cs(5,18): warning CS1591: Missing XML comment for publicly visible type or member 'HomeController'
+    F:\MIllyass\pos-with-inventory-management\SourceCode\SQLAPI\POS.API\Controllers\HomeController.cs(7,30): warning CS1591: Missing XML comment for publicly visible type or member 'HomeController.Index()'
+    F:\MIllyass\pos-with-inventory-management\SourceCode\SQLAPI\POS.API\Controllers\HomeController.cs(12,30): warning CS1591: Missing XML comment for publicly visible type or member 'HomeController.Contact()'
+    F:\MIllyass\pos-with-inventory-management\SourceCode\SQLAPI\POS.API\Controllers\HomeController.cs(17,30): warning CS1591: Missing XML comment for publicly visible type or member 'HomeController.Support()'
+    F:\MIllyass\pos-with-inventory-management\SourceCode\SQLAPI\POS.API\Controllers\HomeController.cs(23,30): warning CS1591: Missing XML comment for publicly visible type or member 'HomeController.Error()'
+    F:\MIllyass\pos-with-inventory-management\SourceCode\SQLAPI\POS.API\Controllers\ImportExportController.cs(15,18): warning CS1591: Missing XML comment for publicly visible type or member 'ImportExportController'
+    F:\MIllyass\pos-with-inventory-management\SourceCode\SQLAPI\POS.API\Controllers\ImportExportController.cs(22,16): warning CS1591: Missing XML comment for publicly visible type or member 'ImportExportController.ImportExportController(IImportExportService<Product>, IImportExportService<Customer>, IImportExportService<Supplier>, ILogger<ImportExportController>)'
+    F:\MIllyass\pos-with-inventory-management\SourceCode\SQLAPI\POS.API\Controllers\ImportExportController.cs(37,42): warning CS1591: Missing XML comment for publicly visible type or member 'ImportExportController.ImportProducts(IFormFile)'
+    F:\MIllyass\pos-with-inventory-management\SourceCode\SQLAPI\POS.API\Controllers\ImportExportController.cs(68,42): warning CS1591: Missing XML comment for publicly visible type or member 'ImportExportController.ValidateProducts(IFormFile)'
+    F:\MIllyass\pos-with-inventory-management\SourceCode\SQLAPI\POS.API\Controllers\ImportExportController.cs(99,42): warning CS1591: Missing XML comment for publicly visible type or member 'ImportExportController.ExportProducts(string)'
+    F:\MIllyass\pos-with-inventory-management\SourceCode\SQLAPI\POS.API\Controllers\ImportExportController.cs(122,42): warning CS1591: Missing XML comment for publicly visible type or member 'ImportExportController.GetProductTemplate(string)'
+    F:\MIllyass\pos-with-inventory-management\SourceCode\SQLAPI\POS.API\Controllers\ImportExportController.cs(147,42): warning CS1591: Missing XML comment for publicly visible type or member 'ImportExportController.ImportCustomers(IFormFile)'
+    F:\MIllyass\pos-with-inventory-management\SourceCode\SQLAPI\POS.API\Controllers\ImportExportController.cs(175,42): warning CS1591: Missing XML comment for publicly visible type or member 'ImportExportController.ExportCustomers(string)'
+    F:\MIllyass\pos-with-inventory-management\SourceCode\SQLAPI\POS.API\Controllers\ImportExportController.cs(195,42): warning CS1591: Missing XML comment for publicly visible type or member 'ImportExportController.GetCustomerTemplate(string)'
+    F:\MIllyass\pos-with-inventory-management\SourceCode\SQLAPI\POS.API\Controllers\ImportExportController.cs(218,42): warning CS1591: Missing XML comment for publicly visible type or member 'ImportExportController.ImportSuppliers(IFormFile)'
+    F:\MIllyass\pos-with-inventory-management\SourceCode\SQLAPI\POS.API\Controllers\ImportExportController.cs(246,42): warning CS1591: Missing XML comment for publicly visible type or member 'ImportExportController.ExportSuppliers(string)'
+    F:\MIllyass\pos-with-inventory-management\SourceCode\SQLAPI\POS.API\Controllers\ImportExportController.cs(266,42): warning CS1591: Missing XML comment for publicly visible type or member 'ImportExportController.GetSupplierTemplate(string)'
+    F:\MIllyass\pos-with-inventory-management\SourceCode\SQLAPI\POS.API\Controllers\InquiryActivity\InquiryActivityController.cs(15,18): warning CS1591: Missing XML comment for publicly visible type or member 'InquiryActivityController'
+    F:\MIllyass\pos-with-inventory-management\SourceCode\SQLAPI\POS.API\Controllers\InquiryAttachment\InquiryAttachmentController.cs(20,18): warning CS1591: Missing XML comment for publicly visible type or member 'InquiryAttachmentController'
+    F:\MIllyass\pos-with-inventory-management\SourceCode\SQLAPI\POS.API\Controllers\InquiryAttachment\InquiryAttachmentController.cs(34,33): warning CS1573: Parameter 'webHostEnvironment' has no matching param tag in the XML comment for 'InquiryAttachmentController.InquiryAttachmentController(IMediator, ILogger<InquiryAttachmentController>, IWebHostEnvironment, PathHelper)' (but other parameters do)
+    F:\MIllyass\pos-with-inventory-management\SourceCode\SQLAPI\POS.API\Controllers\InquiryAttachment\InquiryAttachmentController.cs(35,24): warning CS1573: Parameter 'pathHelper' has no matching param tag in the XML comment for 'InquiryAttachmentController.InquiryAttachmentController(IMediator, ILogger<InquiryAttachmentController>, IWebHostEnvironment, PathHelper)' (but other parameters do)
+    F:\MIllyass\pos-with-inventory-management\SourceCode\SQLAPI\POS.API\Controllers\InquiryAttachment\InquiryAttachmentController.cs(95,42): warning CS1591: Missing XML comment for publicly visible type or member 'InquiryAttachmentController.DownloadFile(Guid)'
+    F:\MIllyass\pos-with-inventory-management\SourceCode\SQLAPI\POS.API\Controllers\InquiryNote\InquiryNoteController.cs(14,18): warning CS1591: Missing XML comment for publicly visible type or member 'InquiryNoteController'
+    F:\MIllyass\pos-with-inventory-management\SourceCode\SQLAPI\POS.API\Controllers\InquirySource\InquirySourceController.cs(17,18): warning CS1591: Missing XML comment for publicly visible type or member 'InquirySourceController'
+    F:\MIllyass\pos-with-inventory-management\SourceCode\SQLAPI\POS.API\Controllers\InquirySource\InquirySourceController.cs(19,26): warning CS1591: Missing XML comment for publicly visible type or member 'InquirySourceController._mediator'
+    F:\MIllyass\pos-with-inventory-management\SourceCode\SQLAPI\POS.API\Controllers\InquirySource\InquirySourceController.cs(21,16): warning CS1591: Missing XML comment for publicly visible type or member 'InquirySourceController.InquirySourceController(IMediator)'
+    F:\MIllyass\pos-with-inventory-management\SourceCode\SQLAPI\POS.API\Controllers\InquiryStatus\InquiryStatusController.cs(17,18): warning CS1591: Missing XML comment for publicly visible type or member 'InquiryStatusController'
+    F:\MIllyass\pos-with-inventory-management\SourceCode\SQLAPI\POS.API\Controllers\InventoryBatchController.cs(15,18): warning CS1591: Missing XML comment for publicly visible type or member 'InventoryBatchController'
+    F:\MIllyass\pos-with-inventory-management\SourceCode\SQLAPI\POS.API\Controllers\InventoryBatchController.cs(19,16): warning CS1591: Missing XML comment for publicly visible type or member 'InventoryBatchController.InventoryBatchController(IMediator)'
+    F:\MIllyass\pos-with-inventory-management\SourceCode\SQLAPI\POS.API\Controllers\InventoryBatchController.cs(25,70): warning CS1591: Missing XML comment for publicly visible type or member 'InventoryBatchController.GetBatches(Guid)'
+    F:\MIllyass\pos-with-inventory-management\SourceCode\SQLAPI\POS.API\Controllers\Language\LanguageController.cs(19,18): warning CS1591: Missing XML comment for publicly visible type or member 'LanguageController'
+    F:\MIllyass\pos-with-inventory-management\SourceCode\SQLAPI\POS.API\Controllers\Language\LanguageController.cs(25,16): warning CS1591: Missing XML comment for publicly visible type or member 'LanguageController.LanguageController(IMediator, PathHelper, IWebHostEnvironment)'
+    F:\MIllyass\pos-with-inventory-management\SourceCode\SQLAPI\POS.API\Controllers\Location\LocationController.cs(16,18): warning CS1591: Missing XML comment for publicly visible type or member 'LocationController'
+    F:\MIllyass\pos-with-inventory-management\SourceCode\SQLAPI\POS.API\Controllers\Location\LocationController.cs(19,16): warning CS1591: Missing XML comment for publicly visible type or member 'LocationController.LocationController(IMediator)'
+    F:\MIllyass\pos-with-inventory-management\SourceCode\SQLAPI\POS.API\Controllers\Location\LocationController.cs(26,42): warning CS1591: Missing XML comment for publicly visible type or member 'LocationController.GetLocation(Guid)'
+    F:\MIllyass\pos-with-inventory-management\SourceCode\SQLAPI\POS.API\Controllers\Location\LocationController.cs(35,42): warning CS1591: Missing XML comment for publicly visible type or member 'LocationController.GetLocations()'
+    F:\MIllyass\pos-with-inventory-management\SourceCode\SQLAPI\POS.API\Controllers\LoginAudit\LoginAuditController.cs(16,18): warning CS1591: Missing XML comment for publicly visible type or member 'LoginAuditController'
+    F:\MIllyass\pos-with-inventory-management\SourceCode\SQLAPI\POS.API\Controllers\LoginAudit\LoginAuditController.cs(18,26): warning CS1591: Missing XML comment for publicly visible type or member 'LoginAuditController._mediator'
+    F:\MIllyass\pos-with-inventory-management\SourceCode\SQLAPI\POS.API\Controllers\LoginAudit\LoginAuditController.cs(19,16): warning CS1591: Missing XML comment for publicly visible type or member 'LoginAuditController.LoginAuditController(IMediator)'
+    F:\MIllyass\pos-with-inventory-management\SourceCode\SQLAPI\POS.API\Controllers\MenuItemsController.cs(17,18): warning CS1591: Missing XML comment for publicly visible type or member 'MenuItemsController'
+    F:\MIllyass\pos-with-inventory-management\SourceCode\SQLAPI\POS.API\Controllers\MenuItemsController.cs(21,16): warning CS1591: Missing XML comment for publicly visible type or member 'MenuItemsController.MenuItemsController(IMediator)'
+    F:\MIllyass\pos-with-inventory-management\SourceCode\SQLAPI\POS.API\Controllers\MenuItemsController.cs(28,42): warning CS1591: Missing XML comment for publicly visible type or member 'MenuItemsController.GetUserMenu()'
+    F:\MIllyass\pos-with-inventory-management\SourceCode\SQLAPI\POS.API\Controllers\MenuItemsController.cs(40,42): warning CS1591: Missing XML comment for publicly visible type or member 'MenuItemsController.CreateMenuItem(CreateMenuItemCommand)'
+    F:\MIllyass\pos-with-inventory-management\SourceCode\SQLAPI\POS.API\Controllers\MenuItemsController.cs(48,42): warning CS1591: Missing XML comment for publicly visible type or member 'MenuItemsController.UpdateMenuItem(Guid, UpdateMenuItemCommand)'
+    F:\MIllyass\pos-with-inventory-management\SourceCode\SQLAPI\POS.API\Controllers\MenuItemsController.cs(60,42): warning CS1591: Missing XML comment for publicly visible type or member 'MenuItemsController.DeleteMenuItem(Guid)'
+    F:\MIllyass\pos-with-inventory-management\SourceCode\SQLAPI\POS.API\Controllers\MenuItemsController.cs(69,42): warning CS1591: Missing XML comment for publicly visible type or member 'MenuItemsController.GetAllMenuItems()'
+    F:\MIllyass\pos-with-inventory-management\SourceCode\SQLAPI\POS.API\Controllers\Migration\DbMigrationController.cs(10,18): warning CS1591: Missing XML comment for publicly visible type or member 'DbMigrationController'
+    F:\MIllyass\pos-with-inventory-management\SourceCode\SQLAPI\POS.API\Controllers\Migration\DbMigrationController.cs(14,16): warning CS1591: Missing XML comment for publicly visible type or member 'DbMigrationController.DbMigrationController(IMediator)'
+    F:\MIllyass\pos-with-inventory-management\SourceCode\SQLAPI\POS.API\Controllers\NLog\NLogController.cs(18,18): warning CS1591: Missing XML comment for publicly visible type or member 'NLogController'
+    F:\MIllyass\pos-with-inventory-management\SourceCode\SQLAPI\POS.API\Controllers\NLog\NLogController.cs(20,26): warning CS1591: Missing XML comment for publicly visible type or member 'NLogController._mediator'
+    F:\MIllyass\pos-with-inventory-management\SourceCode\SQLAPI\POS.API\Controllers\NLog\NLogController.cs(21,16): warning CS1591: Missing XML comment for publicly visible type or member 'NLogController.NLogController(IMediator)'
+    F:\MIllyass\pos-with-inventory-management\SourceCode\SQLAPI\POS.API\Controllers\NotificationController.cs(12,18): warning CS1591: Missing XML comment for publicly visible type or member 'NotificationController'
+    F:\MIllyass\pos-with-inventory-management\SourceCode\SQLAPI\POS.API\Controllers\NotificationController.cs(12,18): warning CS1591: Missing XML comment for publicly visible type or member 'NotificationController.NotificationController(IMediator)'
+    F:\MIllyass\pos-with-inventory-management\SourceCode\SQLAPI\POS.API\Controllers\NotificationController.cs(18,26): warning CS1572: XML comment has a param tag for 'id', but there is no parameter by that name
+    F:\MIllyass\pos-with-inventory-management\SourceCode\SQLAPI\POS.API\Controllers\NotificationController.cs(34,26): warning CS1572: XML comment has a param tag for 'id', but there is no parameter by that name
+    F:\MIllyass\pos-with-inventory-management\SourceCode\SQLAPI\POS.API\Controllers\NotificationController.cs(38,88): warning CS1573: Parameter 'reminderResource' has no matching param tag in the XML comment for 'NotificationController.GetNotifications(ReminderResource)' (but other parameters do)
+    F:\MIllyass\pos-with-inventory-management\SourceCode\SQLAPI\POS.API\Controllers\PageHelper\PageHelperController.cs(16,18): warning CS1591: Missing XML comment for publicly visible type or member 'PageHelperController'
+    F:\MIllyass\pos-with-inventory-management\SourceCode\SQLAPI\POS.API\Controllers\PageHelper\PageHelperController.cs(18,26): warning CS1591: Missing XML comment for publicly visible type or member 'PageHelperController._mediator'
+    F:\MIllyass\pos-with-inventory-management\SourceCode\SQLAPI\POS.API\Controllers\PageHelper\PageHelperController.cs(20,16): warning CS1591: Missing XML comment for publicly visible type or member 'PageHelperController.PageHelperController(IMediator)'
+    F:\MIllyass\pos-with-inventory-management\SourceCode\SQLAPI\POS.API\Controllers\Page\PageController.cs(21,26): warning CS1591: Missing XML comment for publicly visible type or member 'PageController._mediator'
+    F:\MIllyass\pos-with-inventory-management\SourceCode\SQLAPI\POS.API\Controllers\PricingController.cs(10,18): warning CS1591: Missing XML comment for publicly visible type or member 'PricingController'
+    F:\MIllyass\pos-with-inventory-management\SourceCode\SQLAPI\POS.API\Controllers\PricingController.cs(14,16): warning CS1591: Missing XML comment for publicly visible type or member 'PricingController.PricingController(IMediator)'
+    F:\MIllyass\pos-with-inventory-management\SourceCode\SQLAPI\POS.API\Controllers\PricingController.cs(19,30): warning CS1591: Missing XML comment for publicly visible type or member 'PricingController.Index()'
+    F:\MIllyass\pos-with-inventory-management\SourceCode\SQLAPI\POS.API\Controllers\PricingController.cs(24,30): warning CS1591: Missing XML comment for publicly visible type or member 'PricingController.Payment(string)'
+    F:\MIllyass\pos-with-inventory-management\SourceCode\SQLAPI\POS.API\Controllers\PricingController.cs(30,30): warning CS1591: Missing XML comment for publicly visible type or member 'PricingController.Register()'
+    F:\MIllyass\pos-with-inventory-management\SourceCode\SQLAPI\POS.API\Controllers\PricingController.cs(37,42): warning CS1591: Missing XML comment for publicly visible type or member 'PricingController.Subscribe(CreateTenantCommand)'
+    F:\MIllyass\pos-with-inventory-management\SourceCode\SQLAPI\POS.API\Controllers\PricingController.cs(65,30): warning CS1591: Missing XML comment for publicly visible type or member 'PricingController.Success()'
+    F:\MIllyass\pos-with-inventory-management\SourceCode\SQLAPI\POS.API\Controllers\ProductCategory\ProductCategoryController.cs(62,42): warning CS1591: Missing XML comment for publicly visible type or member 'ProductCategoryController.Subcategories(Guid)'
+    F:\MIllyass\pos-with-inventory-management\SourceCode\SQLAPI\POS.API\Controllers\ProductStock\ProductStockController.cs(15,18): warning CS1591: Missing XML comment for publicly visible type or member 'ProductStockController'
+    F:\MIllyass\pos-with-inventory-management\SourceCode\SQLAPI\POS.API\Controllers\ProductStock\ProductStockController.cs(15,18): warning CS1591: Missing XML comment for publicly visible type or member 'ProductStockController.ProductStockController(IMediator)'
+    F:\MIllyass\pos-with-inventory-management\SourceCode\SQLAPI\POS.API\Controllers\Product\ProductController.cs(18,18): warning CS1591: Missing XML comment for publicly visible type or member 'ProductController'
+    F:\MIllyass\pos-with-inventory-management\SourceCode\SQLAPI\POS.API\Controllers\Product\ProductController.cs(21,16): warning CS1591: Missing XML comment for publicly visible type or member 'ProductController.ProductController(IMediator)'
+    F:\MIllyass\pos-with-inventory-management\SourceCode\SQLAPI\POS.API\Controllers\Product\ProductController.cs(120,61): warning CS1573: Parameter 'id' has no matching param tag in the XML comment for 'ProductController.UpdateProduct(Guid, UpdateProductCommand)' (but other parameters do)
+    F:\MIllyass\pos-with-inventory-management\SourceCode\SQLAPI\POS.API\Controllers\PurchaseOrderPayment\PurchaseOrderPaymentController.cs(18,18): warning CS1591: Missing XML comment for publicly visible type or member 'PurchaseOrderPaymentController'
+    F:\MIllyass\pos-with-inventory-management\SourceCode\SQLAPI\POS.API\Controllers\PurchaseOrderPayment\PurchaseOrderPaymentController.cs(20,26): warning CS1591: Missing XML comment for publicly visible type or member 'PurchaseOrderPaymentController._mediator'
+    F:\MIllyass\pos-with-inventory-management\SourceCode\SQLAPI\POS.API\Controllers\PurchaseOrder\PurchaseOrderController.cs(22,18): warning CS1591: Missing XML comment for publicly visible type or member 'PurchaseOrderController'
+    F:\MIllyass\pos-with-inventory-management\SourceCode\SQLAPI\POS.API\Controllers\PurchaseOrder\PurchaseOrderController.cs(24,26): warning CS1591: Missing XML comment for publicly visible type or member 'PurchaseOrderController._mediator'
+    F:\MIllyass\pos-with-inventory-management\SourceCode\SQLAPI\POS.API\Controllers\PurchaseOrder\PurchaseOrderController.cs(123,67): warning CS1573: Parameter 'id' has no matching param tag in the XML comment for 'PurchaseOrderController.UpdatePurchaseOrder(Guid, UpdatePurchaseOrderCommand)' (but other parameters do)
+    F:\MIllyass\pos-with-inventory-management\SourceCode\SQLAPI\POS.API\Controllers\ReminderScheduler\ReminderSchedulerController.cs(17,18): warning CS1591: Missing XML comment for publicly visible type or member 'ReminderSchedulerController'
+    F:\MIllyass\pos-with-inventory-management\SourceCode\SQLAPI\POS.API\Controllers\ReminderScheduler\ReminderSchedulerController.cs(20,16): warning CS1591: Missing XML comment for publicly visible type or member 'ReminderSchedulerController.ReminderSchedulerController(IMediator)'
+    F:\MIllyass\pos-with-inventory-management\SourceCode\SQLAPI\POS.API\Controllers\Reminder\ReminderController.cs(19,18): warning CS1591: Missing XML comment for publicly visible type or member 'ReminderController'
+    F:\MIllyass\pos-with-inventory-management\SourceCode\SQLAPI\POS.API\Controllers\Reminder\ReminderController.cs(21,26): warning CS1591: Missing XML comment for publicly visible type or member 'ReminderController._mediator'
+    F:\MIllyass\pos-with-inventory-management\SourceCode\SQLAPI\POS.API\Controllers\Role\RoleController.cs(21,26): warning CS1591: Missing XML comment for publicly visible type or member 'RoleController._mediator'
+    F:\MIllyass\pos-with-inventory-management\SourceCode\SQLAPI\POS.API\Controllers\Role\RoleController.cs(26,26): warning CS1572: XML comment has a param tag for 'logger', but there is no parameter by that name
+    F:\MIllyass\pos-with-inventory-management\SourceCode\SQLAPI\POS.API\Controllers\Role\RoleUsersController.cs(22,26): warning CS1591: Missing XML comment for publicly visible type or member 'RoleUsersController._mediator'
+    F:\MIllyass\pos-with-inventory-management\SourceCode\SQLAPI\POS.API\Controllers\Role\RoleUsersController.cs(27,26): warning CS1572: XML comment has a param tag for 'logger', but there is no parameter by that name
+    F:\MIllyass\pos-with-inventory-management\SourceCode\SQLAPI\POS.API\Controllers\SalesOrderPayment\SalesOrderPaymentController.cs(18,18): warning CS1591: Missing XML comment for publicly visible type or member 'SalesOrderPaymentController'
+    F:\MIllyass\pos-with-inventory-management\SourceCode\SQLAPI\POS.API\Controllers\SalesOrderPayment\SalesOrderPaymentController.cs(20,26): warning CS1591: Missing XML comment for publicly visible type or member 'SalesOrderPaymentController._mediator'
+    F:\MIllyass\pos-with-inventory-management\SourceCode\SQLAPI\POS.API\Controllers\SalesOrder\SalesOrderController.cs(23,18): warning CS1591: Missing XML comment for publicly visible type or member 'SalesOrderController'
+    F:\MIllyass\pos-with-inventory-management\SourceCode\SQLAPI\POS.API\Controllers\SalesOrder\SalesOrderController.cs(25,26): warning CS1591: Missing XML comment for publicly visible type or member 'SalesOrderController._mediator'
+    F:\MIllyass\pos-with-inventory-management\SourceCode\SQLAPI\POS.API\Controllers\SalesOrder\SalesOrderController.cs(153,64): warning CS1573: Parameter 'id' has no matching param tag in the XML comment for 'SalesOrderController.UpdateSalesOrder(Guid, UpdateSalesOrderCommand)' (but other parameters do)
+    F:\MIllyass\pos-with-inventory-management\SourceCode\SQLAPI\POS.API\Controllers\StockTransfer\StockTransferController.cs(16,18): warning CS1591: Missing XML comment for publicly visible type or member 'StockTransferController'
+    F:\MIllyass\pos-with-inventory-management\SourceCode\SQLAPI\POS.API\Controllers\StockTransfer\StockTransferController.cs(16,18): warning CS1591: Missing XML comment for publicly visible type or member 'StockTransferController.StockTransferController(IMediator)'
+    F:\MIllyass\pos-with-inventory-management\SourceCode\SQLAPI\POS.API\Controllers\Stock\DamagedStockController.cs(22,18): warning CS1591: Missing XML comment for publicly visible type or member 'DamagedStockController'
+    F:\MIllyass\pos-with-inventory-management\SourceCode\SQLAPI\POS.API\Controllers\Stock\DamagedStockController.cs(24,26): warning CS1591: Missing XML comment for publicly visible type or member 'DamagedStockController._mediator'
+    F:\MIllyass\pos-with-inventory-management\SourceCode\SQLAPI\POS.API\Controllers\StoreBaseController.cs(7,27): warning CS1591: Missing XML comment for publicly visible type or member 'StoreBaseController'
+    F:\MIllyass\pos-with-inventory-management\SourceCode\SQLAPI\POS.API\Controllers\StoreController.cs(22,18): warning CS1591: Missing XML comment for publicly visible type or member 'StoreController'
+    F:\MIllyass\pos-with-inventory-management\SourceCode\SQLAPI\POS.API\Controllers\StoreController.cs(26,16): warning CS1591: Missing XML comment for publicly visible type or member 'StoreController.StoreController(IMediator)'
+    F:\MIllyass\pos-with-inventory-management\SourceCode\SQLAPI\POS.API\Controllers\StoreController.cs(32,42): warning CS1591: Missing XML comment for publicly visible type or member 'StoreController.Index(string, int)'
+    F:\MIllyass\pos-with-inventory-management\SourceCode\SQLAPI\POS.API\Controllers\StoreController.cs(63,30): warning CS1591: Missing XML comment for publicly visible type or member 'StoreController.Cart()'
+    F:\MIllyass\pos-with-inventory-management\SourceCode\SQLAPI\POS.API\Controllers\StoreController.cs(70,30): warning CS1591: Missing XML comment for publicly visible type or member 'StoreController.AddToCart(Guid, string, decimal, string)'
+    F:\MIllyass\pos-with-inventory-management\SourceCode\SQLAPI\POS.API\Controllers\StoreController.cs(94,30): warning CS1591: Missing XML comment for publicly visible type or member 'StoreController.RemoveFromCart(Guid)'
+    F:\MIllyass\pos-with-inventory-management\SourceCode\SQLAPI\POS.API\Controllers\StoreController.cs(108,42): warning CS1591: Missing XML comment for publicly visible type or member 'StoreController.Checkout(Dictionary<string, string>)'
+    F:\MIllyass\pos-with-inventory-management\SourceCode\SQLAPI\POS.API\Controllers\Supplier\SupplierController.cs(24,35): warning CS1591: Missing XML comment for publicly visible type or member 'SupplierController._mediator'
+    F:\MIllyass\pos-with-inventory-management\SourceCode\SQLAPI\POS.API\Controllers\Supplier\SupplierController.cs(32,42): warning CS1573: Parameter 'logger' has no matching param tag in the XML comment for 'SupplierController.SupplierController(IMediator, ILogger<SupplierController>)' (but other parameters do)
+    F:\MIllyass\pos-with-inventory-management\SourceCode\SQLAPI\POS.API\Controllers\Supplier\SupplierSearchController.cs(16,18): warning CS1591: Missing XML comment for publicly visible type or member 'SupplierSearchController'
+    F:\MIllyass\pos-with-inventory-management\SourceCode\SQLAPI\POS.API\Controllers\SyncController.cs(21,16): warning CS1591: Missing XML comment for publicly visible type or member 'SyncController.SyncController(SyncEngine, ILogger<SyncController>)'
+    F:\MIllyass\pos-with-inventory-management\SourceCode\SQLAPI\POS.API\Controllers\TableSettings\TableSettingsController.cs(10,18): warning CS1591: Missing XML comment for publicly visible type or member 'TableSettingsController'
+    F:\MIllyass\pos-with-inventory-management\SourceCode\SQLAPI\POS.API\Controllers\TableSettings\TableSettingsController.cs(12,26): warning CS1591: Missing XML comment for publicly visible type or member 'TableSettingsController._mediator'
+    F:\MIllyass\pos-with-inventory-management\SourceCode\SQLAPI\POS.API\Controllers\TableSettings\TableSettingsController.cs(13,16): warning CS1591: Missing XML comment for publicly visible type or member 'TableSettingsController.TableSettingsController(IMediator)'
+    F:\MIllyass\pos-with-inventory-management\SourceCode\SQLAPI\POS.API\Controllers\Tax\TaxController.cs(16,18): warning CS1591: Missing XML comment for publicly visible type or member 'TaxController'
+    F:\MIllyass\pos-with-inventory-management\SourceCode\SQLAPI\POS.API\Controllers\TenantsController.cs(29,18): warning CS1591: Missing XML comment for publicly visible type or member 'TenantsController'
+    F:\MIllyass\pos-with-inventory-management\SourceCode\SQLAPI\POS.API\Controllers\TenantsController.cs(34,16): warning CS1591: Missing XML comment for publicly visible type or member 'TenantsController.TenantsController(TenantDataMigrationService, IMediator)'
+    F:\MIllyass\pos-with-inventory-management\SourceCode\SQLAPI\POS.API\Controllers\TenantsController.cs(346,18): warning CS1591: Missing XML comment for publicly visible type or member 'CreateTenantDto'
+    F:\MIllyass\pos-with-inventory-management\SourceCode\SQLAPI\POS.API\Controllers\TenantsController.cs(348,23): warning CS1591: Missing XML comment for publicly visible type or member 'CreateTenantDto.Name'
+    F:\MIllyass\pos-with-inventory-management\SourceCode\SQLAPI\POS.API\Controllers\TenantsController.cs(349,23): warning CS1591: Missing XML comment for publicly visible type or member 'CreateTenantDto.Subdomain'
+    F:\MIllyass\pos-with-inventory-management\SourceCode\SQLAPI\POS.API\Controllers\TenantsController.cs(350,23): warning CS1591: Missing XML comment for publicly visible type or member 'CreateTenantDto.ContactEmail'
+    F:\MIllyass\pos-with-inventory-management\SourceCode\SQLAPI\POS.API\Controllers\TenantsController.cs(351,23): warning CS1591: Missing XML comment for publicly visible type or member 'CreateTenantDto.ContactPhone'
+    F:\MIllyass\pos-with-inventory-management\SourceCode\SQLAPI\POS.API\Controllers\TenantsController.cs(352,23): warning CS1591: Missing XML comment for publicly visible type or member 'CreateTenantDto.Address'
+    F:\MIllyass\pos-with-inventory-management\SourceCode\SQLAPI\POS.API\Controllers\TenantsController.cs(353,23): warning CS1591: Missing XML comment for publicly visible type or member 'CreateTenantDto.AdminEmail'
+    F:\MIllyass\pos-with-inventory-management\SourceCode\SQLAPI\POS.API\Controllers\TenantsController.cs(354,23): warning CS1591: Missing XML comment for publicly visible type or member 'CreateTenantDto.AdminPassword'
+    F:\MIllyass\pos-with-inventory-management\SourceCode\SQLAPI\POS.API\Controllers\TenantsController.cs(357,18): warning CS1591: Missing XML comment for publicly visible type or member 'UpdateTenantDto'
+    F:\MIllyass\pos-with-inventory-management\SourceCode\SQLAPI\POS.API\Controllers\TenantsController.cs(359,23): warning CS1591: Missing XML comment for publicly visible type or member 'UpdateTenantDto.Name'
+    F:\MIllyass\pos-with-inventory-management\SourceCode\SQLAPI\POS.API\Controllers\TenantsController.cs(360,23): warning CS1591: Missing XML comment for publicly visible type or member 'UpdateTenantDto.ContactEmail'
+    F:\MIllyass\pos-with-inventory-management\SourceCode\SQLAPI\POS.API\Controllers\TenantsController.cs(361,23): warning CS1591: Missing XML comment for publicly visible type or member 'UpdateTenantDto.ContactPhone'
+    F:\MIllyass\pos-with-inventory-management\SourceCode\SQLAPI\POS.API\Controllers\TenantsController.cs(362,23): warning CS1591: Missing XML comment for publicly visible type or member 'UpdateTenantDto.Address'
+    F:\MIllyass\pos-with-inventory-management\SourceCode\SQLAPI\POS.API\Controllers\TenantsController.cs(363,22): warning CS1591: Missing XML comment for publicly visible type or member 'UpdateTenantDto.IsActive'
+    F:\MIllyass\pos-with-inventory-management\SourceCode\SQLAPI\POS.API\Controllers\TenantsController.cs(364,21): warning CS1591: Missing XML comment for publicly visible type or member 'UpdateTenantDto.MaxUsers'
+    F:\MIllyass\pos-with-inventory-management\SourceCode\SQLAPI\POS.API\Controllers\TenantsController.cs(365,23): warning CS1591: Missing XML comment for publicly visible type or member 'UpdateTenantDto.SubscriptionPlan'
+    F:\MIllyass\pos-with-inventory-management\SourceCode\SQLAPI\POS.API\Controllers\TenantsController.cs(368,18): warning CS1591: Missing XML comment for publicly visible type or member 'UpdateLicenseDto'
+    F:\MIllyass\pos-with-inventory-management\SourceCode\SQLAPI\POS.API\Controllers\TenantsController.cs(370,23): warning CS1591: Missing XML comment for publicly visible type or member 'UpdateLicenseDto.LicenseType'
+    F:\MIllyass\pos-with-inventory-management\SourceCode\SQLAPI\POS.API\Controllers\TenantsController.cs(373,18): warning CS1591: Missing XML comment for publicly visible type or member 'UpdateStatusDto'
+    F:\MIllyass\pos-with-inventory-management\SourceCode\SQLAPI\POS.API\Controllers\TenantsController.cs(375,21): warning CS1591: Missing XML comment for publicly visible type or member 'UpdateStatusDto.IsActive'
+    F:\MIllyass\pos-with-inventory-management\SourceCode\SQLAPI\POS.API\Controllers\User\UserClaimController.cs(20,26): warning CS1591: Missing XML comment for publicly visible type or member 'UserClaimController._mediator'
+    F:\MIllyass\pos-with-inventory-management\SourceCode\SQLAPI\POS.API\Controllers\User\UserController.cs(26,26): warning CS1591: Missing XML comment for publicly visible type or member 'UserController._mediator'
+    F:\MIllyass\pos-with-inventory-management\SourceCode\SQLAPI\POS.API\Controllers\User\UserController.cs(27,39): warning CS1591: Missing XML comment for publicly visible type or member 'UserController._userInfo'
+    F:\MIllyass\pos-with-inventory-management\SourceCode\SQLAPI\POS.API\Controllers\User\UserController.cs(150,26): warning CS1572: XML comment has a param tag for 'id', but there is no parameter by that name
+    F:\MIllyass\pos-with-inventory-management\SourceCode\SQLAPI\POS.API\Controllers\Variant\VariantController.cs(18,18): warning CS1591: Missing XML comment for publicly visible type or member 'VariantController'
+    F:\MIllyass\pos-with-inventory-management\SourceCode\SQLAPI\POS.API\Controllers\Variant\VariantController.cs(18,18): warning CS1591: Missing XML comment for publicly visible type or member 'VariantController.VariantController(IMediator)'
+    F:\MIllyass\pos-with-inventory-management\SourceCode\SQLAPI\POS.API\Controllers\WrLicense\WrLicenseController.cs(10,18): warning CS1591: Missing XML comment for publicly visible type or member 'WrLicenseController'
+    F:\MIllyass\pos-with-inventory-management\SourceCode\SQLAPI\POS.API\Controllers\WrLicense\WrLicenseController.cs(14,16): warning CS1591: Missing XML comment for publicly visible type or member 'WrLicenseController.WrLicenseController(IMediator)'
+    F:\MIllyass\pos-with-inventory-management\SourceCode\SQLAPI\POS.API\Controllers\WrLicense\WrLicenseController.cs(20,42): warning CS1591: Missing XML comment for publicly visible type or member 'WrLicenseController.ValidateLicense(ValidateLicenseCommand)'
+    F:\MIllyass\pos-with-inventory-management\SourceCode\SQLAPI\POS.API\Controllers\Middleware\ApiKeyAuthenticationMiddleware.cs(20,16): warning CS1591: Missing XML comment for publicly visible type or member 'ApiKeyAuthenticationMiddleware.ApiKeyAuthenticationMiddleware(RequestDelegate)'
+    F:\MIllyass\pos-with-inventory-management\SourceCode\SQLAPI\POS.API\Controllers\Middleware\ApiKeyAuthenticationMiddleware.cs(25,27): warning CS1591: Missing XML comment for publicly visible type or member 'ApiKeyAuthenticationMiddleware.InvokeAsync(HttpContext, POSDbContext)'
+    F:\MIllyass\pos-with-inventory-management\SourceCode\SQLAPI\POS.API\Controllers\Middleware\GlobalExceptionHandlerMiddleware.cs(10,18): warning CS1591: Missing XML comment for publicly visible type or member 'GlobalExceptionHandlerMiddleware'
+    F:\MIllyass\pos-with-inventory-management\SourceCode\SQLAPI\POS.API\Controllers\Middleware\GlobalExceptionHandlerMiddleware.cs(15,16): warning CS1591: Missing XML comment for publicly visible type or member 'GlobalExceptionHandlerMiddleware.GlobalExceptionHandlerMiddleware(RequestDelegate, ILogger<GlobalExceptionHandlerMiddleware>)'
+    F:\MIllyass\pos-with-inventory-management\SourceCode\SQLAPI\POS.API\Controllers\Middleware\GlobalExceptionHandlerMiddleware.cs(21,27): warning CS1591: Missing XML comment for publicly visible type or member 'GlobalExceptionHandlerMiddleware.Invoke(HttpContext)'
+    F:\MIllyass\pos-with-inventory-management\SourceCode\SQLAPI\POS.API\Controllers\Middleware\TenantIdAuthenticationMiddleware.cs(19,16): warning CS1591: Missing XML comment for publicly visible type or member 'TenantIdAuthenticationMiddleware.TenantIdAuthenticationMiddleware(RequestDelegate)'
+    F:\MIllyass\pos-with-inventory-management\SourceCode\SQLAPI\POS.API\Controllers\Middleware\TenantIdAuthenticationMiddleware.cs(24,27): warning CS1591: Missing XML comment for publicly visible type or member 'TenantIdAuthenticationMiddleware.InvokeAsync(HttpContext, POSDbContext)'
+    F:\MIllyass\pos-with-inventory-management\SourceCode\SQLAPI\POS.API\Controllers\Middleware\TenantResolutionMiddleware.cs(11,18): warning CS1591: Missing XML comment for publicly visible type or member 'TenantResolutionMiddleware'
+    F:\MIllyass\pos-with-inventory-management\SourceCode\SQLAPI\POS.API\Controllers\Middleware\TenantResolutionMiddleware.cs(15,16): warning CS1591: Missing XML comment for publicly visible type or member 'TenantResolutionMiddleware.TenantResolutionMiddleware(RequestDelegate)'
+    F:\MIllyass\pos-with-inventory-management\SourceCode\SQLAPI\POS.API\Controllers\Middleware\TenantResolutionMiddleware.cs(20,27): warning CS1591: Missing XML comment for publicly visible type or member 'TenantResolutionMiddleware.InvokeAsync(HttpContext, ITenantProvider, POSDbContext)'
+    F:\MIllyass\pos-with-inventory-management\SourceCode\SQLAPI\POS.API\Controllers\Middleware\TrialEnforcementMiddleware.cs(19,18): warning CS1591: Missing XML comment for publicly visible type or member 'TrialEnforcementMiddleware'
+    F:\MIllyass\pos-with-inventory-management\SourceCode\SQLAPI\POS.API\Controllers\Middleware\TrialEnforcementMiddleware.cs(38,16): warning CS1591: Missing XML comment for publicly visible type or member 'TrialEnforcementMiddleware.TrialEnforcementMiddleware(RequestDelegate, IMemoryCache)'
+    F:\MIllyass\pos-with-inventory-management\SourceCode\SQLAPI\POS.API\Controllers\Middleware\TrialEnforcementMiddleware.cs(44,27): warning CS1591: Missing XML comment for publicly visible type or member 'TrialEnforcementMiddleware.InvokeAsync(HttpContext, ICompanyProfileRepository, ITenantProvider, POSDbContext, IDbUtilityService)'
+    F:\MIllyass\pos-with-inventory-management\SourceCode\SQLAPI\POS.API\Filters\StoreTenantAttribute.cs(14,18): warning CS1591: Missing XML comment for publicly visible type or member 'StoreTenantAttribute'
+    F:\MIllyass\pos-with-inventory-management\SourceCode\SQLAPI\POS.API\Filters\StoreTenantAttribute.cs(16,36): warning CS1591: Missing XML comment for publicly visible type or member 'StoreTenantAttribute.OnActionExecutionAsync(ActionExecutingContext, ActionExecutionDelegate)'
+    F:\MIllyass\pos-with-inventory-management\SourceCode\SQLAPI\POS.API\Helpers\ArrayModelBinder.cs(10,18): warning CS1591: Missing XML comment for publicly visible type or member 'ArrayModelBinder'
+    F:\MIllyass\pos-with-inventory-management\SourceCode\SQLAPI\POS.API\Helpers\ArrayModelBinder.cs(12,21): warning CS1591: Missing XML comment for publicly visible type or member 'ArrayModelBinder.BindModelAsync(ModelBindingContext)'
+    F:\MIllyass\pos-with-inventory-management\SourceCode\SQLAPI\POS.API\Helpers\ClaimCheckAttribute.cs(12,14): warning CS1591: Missing XML comment for publicly visible type or member 'ClaimCheckAttribute'
+    F:\MIllyass\pos-with-inventory-management\SourceCode\SQLAPI\POS.API\Helpers\ClaimCheckAttribute.cs(16,12): warning CS1591: Missing XML comment for publicly visible type or member 'ClaimCheckAttribute.ClaimCheckAttribute(params string[])'
+    F:\MIllyass\pos-with-inventory-management\SourceCode\SQLAPI\POS.API\Helpers\CompressUtility.cs(7,18): warning CS1591: Missing XML comment for publicly visible type or member 'CompressUtility'
+    F:\MIllyass\pos-with-inventory-management\SourceCode\SQLAPI\POS.API\Helpers\CompressUtility.cs(9,28): warning CS1591: Missing XML comment for publicly visible type or member 'CompressUtility.Compress(DirectoryInfo, string)'
+    F:\MIllyass\pos-with-inventory-management\SourceCode\SQLAPI\POS.API\Helpers\CompressUtility.cs(33,28): warning CS1591: Missing XML comment for publicly visible type or member 'CompressUtility.Decompress(FileInfo)'
+    F:\MIllyass\pos-with-inventory-management\SourceCode\SQLAPI\POS.API\Helpers\DependencyInjectionExtension.cs(17,25): warning CS1591: Missing XML comment for publicly visible type or member 'DependencyInjectionExtension'
+    F:\MIllyass\pos-with-inventory-management\SourceCode\SQLAPI\POS.API\Helpers\DependencyInjectionExtension.cs(19,28): warning CS1591: Missing XML comment for publicly visible type or member 'DependencyInjectionExtension.AddDependencyInjection(IServiceCollection)'
+    F:\MIllyass\pos-with-inventory-management\SourceCode\SQLAPI\POS.API\Helpers\HangfireCleanupService.cs(11,18): warning CS1591: Missing XML comment for publicly visible type or member 'HangfireCleanupService'
+    F:\MIllyass\pos-with-inventory-management\SourceCode\SQLAPI\POS.API\Helpers\HangfireCleanupService.cs(16,16): warning CS1591: Missing XML comment for publicly visible type or member 'HangfireCleanupService.HangfireCleanupService(IConfiguration, ILogger<HangfireCleanupService>)'
+    F:\MIllyass\pos-with-inventory-management\SourceCode\SQLAPI\POS.API\Helpers\HangfireCleanupService.cs(25,27): warning CS1591: Missing XML comment for publicly visible type or member 'HangfireCleanupService.CleanupOldJobs()'
+    F:\MIllyass\pos-with-inventory-management\SourceCode\SQLAPI\POS.API\Helpers\ImageResize.cs(9,25): warning CS1591: Missing XML comment for publicly visible type or member 'ImageResize'
+    F:\MIllyass\pos-with-inventory-management\SourceCode\SQLAPI\POS.API\Helpers\ImageResize.cs(12,28): warning CS1591: Missing XML comment for publicly visible type or member 'ImageResize.resizeImage(ImageInfo, string)'
+    F:\MIllyass\pos-with-inventory-management\SourceCode\SQLAPI\POS.API\Helpers\ImageResize.cs(33,28): warning CS1591: Missing XML comment for publicly visible type or member 'ImageResize.customImageWithOutResize(string, string)'
+    F:\MIllyass\pos-with-inventory-management\SourceCode\SQLAPI\POS.API\Helpers\ImageResize.cs(52,28): warning CS1591: Missing XML comment for publicly visible type or member 'ImageResize.precriptionImageWithOutResize(string, string)'
+    F:\MIllyass\pos-with-inventory-management\SourceCode\SQLAPI\POS.API\Helpers\JobService.cs(10,18): warning CS1591: Missing XML comment for publicly visible type or member 'JobService'
+    F:\MIllyass\pos-with-inventory-management\SourceCode\SQLAPI\POS.API\Helpers\JobService.cs(12,26): warning CS1591: Missing XML comment for publicly visible type or member 'JobService._mediator'
+    F:\MIllyass\pos-with-inventory-management\SourceCode\SQLAPI\POS.API\Helpers\JwtConfigurationExtension.cs(15,25): warning CS1591: Missing XML comment for publicly visible type or member 'JwtAuthenticationConfigurationExtension'
+    F:\MIllyass\pos-with-inventory-management\SourceCode\SQLAPI\POS.API\Helpers\JwtConfigurationExtension.cs(17,28): warning CS1591: Missing XML comment for publicly visible type or member 'JwtAuthenticationConfigurationExtension.AddJwtAutheticationConfiguration(IServiceCollection, JwtSettings)'
+    F:\MIllyass\pos-with-inventory-management\SourceCode\SQLAPI\POS.API\Helpers\JwtMiddleware.cs(12,18): warning CS1591: Missing XML comment for publicly visible type or member 'JwtMiddleware'
+    F:\MIllyass\pos-with-inventory-management\SourceCode\SQLAPI\POS.API\Helpers\JwtMiddleware.cs(16,16): warning CS1591: Missing XML comment for publicly visible type or member 'JwtMiddleware.JwtMiddleware(RequestDelegate, JwtSettings)'
+    F:\MIllyass\pos-with-inventory-management\SourceCode\SQLAPI\POS.API\Helpers\JwtMiddleware.cs(24,27): warning CS1591: Missing XML comment for publicly visible type or member 'JwtMiddleware.Invoke(HttpContext)'
+    F:\MIllyass\pos-with-inventory-management\SourceCode\SQLAPI\POS.API\Helpers\Mapping\AppClaimProfile.cs(7,18): warning CS1591: Missing XML comment for publicly visible type or member 'AppClaimProfile'
+    F:\MIllyass\pos-with-inventory-management\SourceCode\SQLAPI\POS.API\Helpers\Mapping\AppClaimProfile.cs(9,16): warning CS1591: Missing XML comment for publicly visible type or member 'AppClaimProfile.AppClaimProfile()'
+    F:\MIllyass\pos-with-inventory-management\SourceCode\SQLAPI\POS.API\Helpers\Mapping\BrandProfile.cs(8,18): warning CS1591: Missing XML comment for publicly visible type or member 'BrandProfile'
+    F:\MIllyass\pos-with-inventory-management\SourceCode\SQLAPI\POS.API\Helpers\Mapping\BrandProfile.cs(10,16): warning CS1591: Missing XML comment for publicly visible type or member 'BrandProfile.BrandProfile()'
+    F:\MIllyass\pos-with-inventory-management\SourceCode\SQLAPI\POS.API\Helpers\Mapping\CityProfile.cs(8,18): warning CS1591: Missing XML comment for publicly visible type or member 'CityProfile'
+    F:\MIllyass\pos-with-inventory-management\SourceCode\SQLAPI\POS.API\Helpers\Mapping\CityProfile.cs(10,16): warning CS1591: Missing XML comment for publicly visible type or member 'CityProfile.CityProfile()'
+    F:\MIllyass\pos-with-inventory-management\SourceCode\SQLAPI\POS.API\Helpers\Mapping\CompanyProfileProfile.cs(9,18): warning CS1591: Missing XML comment for publicly visible type or member 'CompanyProfileProfile'
+    F:\MIllyass\pos-with-inventory-management\SourceCode\SQLAPI\POS.API\Helpers\Mapping\CompanyProfileProfile.cs(11,16): warning CS1591: Missing XML comment for publicly visible type or member 'CompanyProfileProfile.CompanyProfileProfile()'
+    F:\MIllyass\pos-with-inventory-management\SourceCode\SQLAPI\POS.API\Helpers\Mapping\ContactAddressProfile.cs(8,18): warning CS1591: Missing XML comment for publicly visible type or member 'ContactAddressProfile'
+    F:\MIllyass\pos-with-inventory-management\SourceCode\SQLAPI\POS.API\Helpers\Mapping\ContactAddressProfile.cs(10,16): warning CS1591: Missing XML comment for publicly visible type or member 'ContactAddressProfile.ContactAddressProfile()'
+    F:\MIllyass\pos-with-inventory-management\SourceCode\SQLAPI\POS.API\Helpers\Mapping\CountryProfile.cs(8,18): warning CS1591: Missing XML comment for publicly visible type or member 'CountryProfile'
+    F:\MIllyass\pos-with-inventory-management\SourceCode\SQLAPI\POS.API\Helpers\Mapping\CountryProfile.cs(10,16): warning CS1591: Missing XML comment for publicly visible type or member 'CountryProfile.CountryProfile()'
+    F:\MIllyass\pos-with-inventory-management\SourceCode\SQLAPI\POS.API\Helpers\Mapping\CurrencyProfile.cs(8,18): warning CS1591: Missing XML comment for publicly visible type or member 'CurrencyProfile'
+    F:\MIllyass\pos-with-inventory-management\SourceCode\SQLAPI\POS.API\Helpers\Mapping\CurrencyProfile.cs(10,16): warning CS1591: Missing XML comment for publicly visible type or member 'CurrencyProfile.CurrencyProfile()'
+    F:\MIllyass\pos-with-inventory-management\SourceCode\SQLAPI\POS.API\Helpers\Mapping\CustomerLedgerProfile.cs(8,18): warning CS1591: Missing XML comment for publicly visible type or member 'CustomerLedgerProfile'
+    F:\MIllyass\pos-with-inventory-management\SourceCode\SQLAPI\POS.API\Helpers\Mapping\CustomerLedgerProfile.cs(10,16): warning CS1591: Missing XML comment for publicly visible type or member 'CustomerLedgerProfile.CustomerLedgerProfile()'
+    F:\MIllyass\pos-with-inventory-management\SourceCode\SQLAPI\POS.API\Helpers\Mapping\CustomerProfile.cs(8,18): warning CS1591: Missing XML comment for publicly visible type or member 'CustomerProfile'
+    F:\MIllyass\pos-with-inventory-management\SourceCode\SQLAPI\POS.API\Helpers\Mapping\CustomerProfile.cs(10,16): warning CS1591: Missing XML comment for publicly visible type or member 'CustomerProfile.CustomerProfile()'
+    F:\MIllyass\pos-with-inventory-management\SourceCode\SQLAPI\POS.API\Helpers\Mapping\DamagedStockProfile.cs(8,18): warning CS1591: Missing XML comment for publicly visible type or member 'DamagedStockProfile'
+    F:\MIllyass\pos-with-inventory-management\SourceCode\SQLAPI\POS.API\Helpers\Mapping\DamagedStockProfile.cs(10,16): warning CS1591: Missing XML comment for publicly visible type or member 'DamagedStockProfile.DamagedStockProfile()'
+    F:\MIllyass\pos-with-inventory-management\SourceCode\SQLAPI\POS.API\Helpers\Mapping\EmailProfile.cs(9,18): warning CS1591: Missing XML comment for publicly visible type or member 'EmailProfile'
+    F:\MIllyass\pos-with-inventory-management\SourceCode\SQLAPI\POS.API\Helpers\Mapping\EmailProfile.cs(11,16): warning CS1591: Missing XML comment for publicly visible type or member 'EmailProfile.EmailProfile()'
+    F:\MIllyass\pos-with-inventory-management\SourceCode\SQLAPI\POS.API\Helpers\Mapping\ExpenseProfile.cs(9,18): warning CS1591: Missing XML comment for publicly visible type or member 'ExpenseProfile'
+    F:\MIllyass\pos-with-inventory-management\SourceCode\SQLAPI\POS.API\Helpers\Mapping\ExpenseProfile.cs(11,16): warning CS1591: Missing XML comment for publicly visible type or member 'ExpenseProfile.ExpenseProfile()'
+    F:\MIllyass\pos-with-inventory-management\SourceCode\SQLAPI\POS.API\Helpers\Mapping\FinancialYearProfile.cs(8,18): warning CS1591: Missing XML comment for publicly visible type or member 'FinancialYearProfile'
+    F:\MIllyass\pos-with-inventory-management\SourceCode\SQLAPI\POS.API\Helpers\Mapping\FinancialYearProfile.cs(10,16): warning CS1591: Missing XML comment for publicly visible type or member 'FinancialYearProfile.FinancialYearProfile()'
+    F:\MIllyass\pos-with-inventory-management\SourceCode\SQLAPI\POS.API\Helpers\Mapping\InquiryActivityProfile.cs(8,18): warning CS1591: Missing XML comment for publicly visible type or member 'InquiryActivityProfile'
+    F:\MIllyass\pos-with-inventory-management\SourceCode\SQLAPI\POS.API\Helpers\Mapping\InquiryActivityProfile.cs(10,16): warning CS1591: Missing XML comment for publicly visible type or member 'InquiryActivityProfile.InquiryActivityProfile()'
+    F:\MIllyass\pos-with-inventory-management\SourceCode\SQLAPI\POS.API\Helpers\Mapping\InquiryAttachmentProfile.cs(7,18): warning CS1591: Missing XML comment for publicly visible type or member 'InquiryAttachmentProfile'
+    F:\MIllyass\pos-with-inventory-management\SourceCode\SQLAPI\POS.API\Helpers\Mapping\InquiryAttachmentProfile.cs(9,16): warning CS1591: Missing XML comment for publicly visible type or member 'InquiryAttachmentProfile.InquiryAttachmentProfile()'
+    F:\MIllyass\pos-with-inventory-management\SourceCode\SQLAPI\POS.API\Helpers\Mapping\InquiryNoteProfile.cs(8,18): warning CS1591: Missing XML comment for publicly visible type or member 'InquiryNoteProfile'
+    F:\MIllyass\pos-with-inventory-management\SourceCode\SQLAPI\POS.API\Helpers\Mapping\InquiryNoteProfile.cs(10,16): warning CS1591: Missing XML comment for publicly visible type or member 'InquiryNoteProfile.InquiryNoteProfile()'
+    F:\MIllyass\pos-with-inventory-management\SourceCode\SQLAPI\POS.API\Helpers\Mapping\InquiryStatusProfile.cs(9,18): warning CS1591: Missing XML comment for publicly visible type or member 'InquiryStatusProfile'
+    F:\MIllyass\pos-with-inventory-management\SourceCode\SQLAPI\POS.API\Helpers\Mapping\InquiryStatusProfile.cs(11,16): warning CS1591: Missing XML comment for publicly visible type or member 'InquiryStatusProfile.InquiryStatusProfile()'
+    F:\MIllyass\pos-with-inventory-management\SourceCode\SQLAPI\POS.API\Helpers\Mapping\LanguageProfile.cs(8,18): warning CS1591: Missing XML comment for publicly visible type or member 'LanguageProfile'
+    F:\MIllyass\pos-with-inventory-management\SourceCode\SQLAPI\POS.API\Helpers\Mapping\LanguageProfile.cs(10,16): warning CS1591: Missing XML comment for publicly visible type or member 'LanguageProfile.LanguageProfile()'
+    F:\MIllyass\pos-with-inventory-management\SourceCode\SQLAPI\POS.API\Helpers\Mapping\LedgerAccountProfile.cs(8,18): warning CS1591: Missing XML comment for publicly visible type or member 'LedgerAccountProfile'
+    F:\MIllyass\pos-with-inventory-management\SourceCode\SQLAPI\POS.API\Helpers\Mapping\LedgerAccountProfile.cs(10,16): warning CS1591: Missing XML comment for publicly visible type or member 'LedgerAccountProfile.LedgerAccountProfile()'
+    F:\MIllyass\pos-with-inventory-management\SourceCode\SQLAPI\POS.API\Helpers\Mapping\LoanDetailProfile.cs(7,14): warning CS1591: Missing XML comment for publicly visible type or member 'LoanDetailProfile'
+    F:\MIllyass\pos-with-inventory-management\SourceCode\SQLAPI\POS.API\Helpers\Mapping\LocationProfile.cs(9,18): warning CS1591: Missing XML comment for publicly visible type or member 'LocationProfile'
+    F:\MIllyass\pos-with-inventory-management\SourceCode\SQLAPI\POS.API\Helpers\Mapping\LocationProfile.cs(11,16): warning CS1591: Missing XML comment for publicly visible type or member 'LocationProfile.LocationProfile()'
+    F:\MIllyass\pos-with-inventory-management\SourceCode\SQLAPI\POS.API\Helpers\Mapping\MapperConfig.cs(5,25): warning CS1591: Missing XML comment for publicly visible type or member 'MapperConfig'
+    F:\MIllyass\pos-with-inventory-management\SourceCode\SQLAPI\POS.API\Helpers\Mapping\MapperConfig.cs(7,31): warning CS1591: Missing XML comment for publicly visible type or member 'MapperConfig.GetMapperConfigs()'
+    F:\MIllyass\pos-with-inventory-management\SourceCode\SQLAPI\POS.API\Helpers\Mapping\MenuItemProfile.cs(9,18): warning CS1591: Missing XML comment for publicly visible type or member 'MenuItemProfile'
+    F:\MIllyass\pos-with-inventory-management\SourceCode\SQLAPI\POS.API\Helpers\Mapping\MenuItemProfile.cs(11,16): warning CS1591: Missing XML comment for publicly visible type or member 'MenuItemProfile.MenuItemProfile()'
+    F:\MIllyass\pos-with-inventory-management\SourceCode\SQLAPI\POS.API\Helpers\Mapping\NLogProfile.cs(6,18): warning CS1591: Missing XML comment for publicly visible type or member 'NLogProfile'
+    F:\MIllyass\pos-with-inventory-management\SourceCode\SQLAPI\POS.API\Helpers\Mapping\NLogProfile.cs(8,16): warning CS1591: Missing XML comment for publicly visible type or member 'NLogProfile.NLogProfile()'
+    F:\MIllyass\pos-with-inventory-management\SourceCode\SQLAPI\POS.API\Helpers\Mapping\PageHelperProfile.cs(8,18): warning CS1591: Missing XML comment for publicly visible type or member 'PageHelperProfile'
+    F:\MIllyass\pos-with-inventory-management\SourceCode\SQLAPI\POS.API\Helpers\Mapping\PageHelperProfile.cs(10,16): warning CS1591: Missing XML comment for publicly visible type or member 'PageHelperProfile.PageHelperProfile()'
+    F:\MIllyass\pos-with-inventory-management\SourceCode\SQLAPI\POS.API\Helpers\Mapping\PageProfile.cs(8,18): warning CS1591: Missing XML comment for publicly visible type or member 'PageProfile'
+    F:\MIllyass\pos-with-inventory-management\SourceCode\SQLAPI\POS.API\Helpers\Mapping\PageProfile.cs(10,16): warning CS1591: Missing XML comment for publicly visible type or member 'PageProfile.PageProfile()'
+    F:\MIllyass\pos-with-inventory-management\SourceCode\SQLAPI\POS.API\Helpers\Mapping\PayrollProfile.cs(8,18): warning CS1591: Missing XML comment for publicly visible type or member 'PayrollProfile'
+    F:\MIllyass\pos-with-inventory-management\SourceCode\SQLAPI\POS.API\Helpers\Mapping\PayrollProfile.cs(10,16): warning CS1591: Missing XML comment for publicly visible type or member 'PayrollProfile.PayrollProfile()'
+    F:\MIllyass\pos-with-inventory-management\SourceCode\SQLAPI\POS.API\Helpers\Mapping\ProductCategoryProfile.cs(8,18): warning CS1591: Missing XML comment for publicly visible type or member 'ProductCategoryProfile'
+    F:\MIllyass\pos-with-inventory-management\SourceCode\SQLAPI\POS.API\Helpers\Mapping\ProductCategoryProfile.cs(10,16): warning CS1591: Missing XML comment for publicly visible type or member 'ProductCategoryProfile.ProductCategoryProfile()'
+    F:\MIllyass\pos-with-inventory-management\SourceCode\SQLAPI\POS.API\Helpers\Mapping\ProductProfile.cs(8,18): warning CS1591: Missing XML comment for publicly visible type or member 'ProductProfile'
+    F:\MIllyass\pos-with-inventory-management\SourceCode\SQLAPI\POS.API\Helpers\Mapping\ProductProfile.cs(10,16): warning CS1591: Missing XML comment for publicly visible type or member 'ProductProfile.ProductProfile()'
+    F:\MIllyass\pos-with-inventory-management\SourceCode\SQLAPI\POS.API\Helpers\Mapping\ProductStockProfile.cs(8,18): warning CS1591: Missing XML comment for publicly visible type or member 'ProductStockProfile'
+    F:\MIllyass\pos-with-inventory-management\SourceCode\SQLAPI\POS.API\Helpers\Mapping\ProductStockProfile.cs(10,16): warning CS1591: Missing XML comment for publicly visible type or member 'ProductStockProfile.ProductStockProfile()'
+    F:\MIllyass\pos-with-inventory-management\SourceCode\SQLAPI\POS.API\Helpers\Mapping\PurchaseOrderProfile.cs(10,18): warning CS1591: Missing XML comment for publicly visible type or member 'PurchaseOrderProfile'
+    F:\MIllyass\pos-with-inventory-management\SourceCode\SQLAPI\POS.API\Helpers\Mapping\PurchaseOrderProfile.cs(12,16): warning CS1591: Missing XML comment for publicly visible type or member 'PurchaseOrderProfile.PurchaseOrderProfile()'
+    F:\MIllyass\pos-with-inventory-management\SourceCode\SQLAPI\POS.API\Helpers\Mapping\ReminderProfile.cs(9,18): warning CS1591: Missing XML comment for publicly visible type or member 'ReminderProfile'
+    F:\MIllyass\pos-with-inventory-management\SourceCode\SQLAPI\POS.API\Helpers\Mapping\ReminderProfile.cs(11,16): warning CS1591: Missing XML comment for publicly visible type or member 'ReminderProfile.ReminderProfile()'
+    F:\MIllyass\pos-with-inventory-management\SourceCode\SQLAPI\POS.API\Helpers\Mapping\RoleProfile.cs(8,18): warning CS1591: Missing XML comment for publicly visible type or member 'RoleProfile'
+    F:\MIllyass\pos-with-inventory-management\SourceCode\SQLAPI\POS.API\Helpers\Mapping\RoleProfile.cs(10,16): warning CS1591: Missing XML comment for publicly visible type or member 'RoleProfile.RoleProfile()'
+    F:\MIllyass\pos-with-inventory-management\SourceCode\SQLAPI\POS.API\Helpers\Mapping\SalesOrderProfile.cs(11,18): warning CS1591: Missing XML comment for publicly visible type or member 'SalesOrderProfile'
+    F:\MIllyass\pos-with-inventory-management\SourceCode\SQLAPI\POS.API\Helpers\Mapping\SalesOrderProfile.cs(13,16): warning CS1591: Missing XML comment for publicly visible type or member 'SalesOrderProfile.SalesOrderProfile()'
+    F:\MIllyass\pos-with-inventory-management\SourceCode\SQLAPI\POS.API\Helpers\Mapping\StockTransferProfile.cs(9,18): warning CS1591: Missing XML comment for publicly visible type or member 'StockTransferProfile'
+    F:\MIllyass\pos-with-inventory-management\SourceCode\SQLAPI\POS.API\Helpers\Mapping\StockTransferProfile.cs(11,16): warning CS1591: Missing XML comment for publicly visible type or member 'StockTransferProfile.StockTransferProfile()'
+    F:\MIllyass\pos-with-inventory-management\SourceCode\SQLAPI\POS.API\Helpers\Mapping\TaxProfile.cs(8,18): warning CS1591: Missing XML comment for publicly visible type or member 'TaxProfile'
+    F:\MIllyass\pos-with-inventory-management\SourceCode\SQLAPI\POS.API\Helpers\Mapping\TransactionItemProfile.cs(8,18): warning CS1591: Missing XML comment for publicly visible type or member 'TransactionItemProfile'
+    F:\MIllyass\pos-with-inventory-management\SourceCode\SQLAPI\POS.API\Helpers\Mapping\TransactionItemProfile.cs(10,16): warning CS1591: Missing XML comment for publicly visible type or member 'TransactionItemProfile.TransactionItemProfile()'
+    F:\MIllyass\pos-with-inventory-management\SourceCode\SQLAPI\POS.API\Helpers\Mapping\UnitProfile.cs(12,18): warning CS1591: Missing XML comment for publicly visible type or member 'UnitProfile'
+    F:\MIllyass\pos-with-inventory-management\SourceCode\SQLAPI\POS.API\Helpers\Mapping\UserProfile.cs(9,18): warning CS1591: Missing XML comment for publicly visible type or member 'UserProfile'
+    F:\MIllyass\pos-with-inventory-management\SourceCode\SQLAPI\POS.API\Helpers\Mapping\UserProfile.cs(11,16): warning CS1591: Missing XML comment for publicly visible type or member 'UserProfile.UserProfile()'
+    F:\MIllyass\pos-with-inventory-management\SourceCode\SQLAPI\POS.API\Helpers\Mapping\VariantProfile.cs(11,18): warning CS1591: Missing XML comment for publicly visible type or member 'VariantProfile'
+    F:\MIllyass\pos-with-inventory-management\SourceCode\SQLAPI\POS.API\Helpers\Mapping\ContactUsMapping.cs(8,18): warning CS1591: Missing XML comment for publicly visible type or member 'ContactUsMapping'
+    F:\MIllyass\pos-with-inventory-management\SourceCode\SQLAPI\POS.API\Helpers\Mapping\ContactUsMapping.cs(10,16): warning CS1591: Missing XML comment for publicly visible type or member 'ContactUsMapping.ContactUsMapping()'
+    F:\MIllyass\pos-with-inventory-management\SourceCode\SQLAPI\POS.API\Helpers\Mapping\EmailTemplateProfile.cs(8,18): warning CS1591: Missing XML comment for publicly visible type or member 'EmailTemplateProfile'
+    F:\MIllyass\pos-with-inventory-management\SourceCode\SQLAPI\POS.API\Helpers\Mapping\EmailTemplateProfile.cs(10,16): warning CS1591: Missing XML comment for publicly visible type or member 'EmailTemplateProfile.EmailTemplateProfile()'
+    F:\MIllyass\pos-with-inventory-management\SourceCode\SQLAPI\POS.API\Helpers\Mapping\InquiryProfile.cs(8,18): warning CS1591: Missing XML comment for publicly visible type or member 'InquiryProfile'
+    F:\MIllyass\pos-with-inventory-management\SourceCode\SQLAPI\POS.API\Helpers\Mapping\InquiryProfile.cs(10,16): warning CS1591: Missing XML comment for publicly visible type or member 'InquiryProfile.InquiryProfile()'
+    F:\MIllyass\pos-with-inventory-management\SourceCode\SQLAPI\POS.API\Helpers\Mapping\InquirySourceProfile.cs(8,18): warning CS1591: Missing XML comment for publicly visible type or member 'InquirySourceProfile'
+    F:\MIllyass\pos-with-inventory-management\SourceCode\SQLAPI\POS.API\Helpers\Mapping\InquirySourceProfile.cs(10,16): warning CS1591: Missing XML comment for publicly visible type or member 'InquirySourceProfile.InquirySourceProfile()'
+    F:\MIllyass\pos-with-inventory-management\SourceCode\SQLAPI\POS.API\Helpers\Mapping\TableSettingProfile.cs(9,18): warning CS1591: Missing XML comment for publicly visible type or member 'TableSettingProfile'
+    F:\MIllyass\pos-with-inventory-management\SourceCode\SQLAPI\POS.API\Helpers\Mapping\TableSettingProfile.cs(11,16): warning CS1591: Missing XML comment for publicly visible type or member 'TableSettingProfile.TableSettingProfile()'
+    F:\MIllyass\pos-with-inventory-management\SourceCode\SQLAPI\POS.API\Helpers\QueuePriority.cs(8,25): warning CS1591: Missing XML comment for publicly visible type or member 'QueuePriority'
+    F:\MIllyass\pos-with-inventory-management\SourceCode\SQLAPI\POS.API\Helpers\QueuePriority.cs(10,29): warning CS1591: Missing XML comment for publicly visible type or member 'QueuePriority.Critical'
+    F:\MIllyass\pos-with-inventory-management\SourceCode\SQLAPI\POS.API\Helpers\QueuePriority.cs(11,29): warning CS1591: Missing XML comment for publicly visible type or member 'QueuePriority.Default'
+    F:\MIllyass\pos-with-inventory-management\SourceCode\SQLAPI\POS.API\Helpers\QueuePriority.cs(12,29): warning CS1591: Missing XML comment for publicly visible type or member 'QueuePriority.Passive'
+    F:\MIllyass\pos-with-inventory-management\SourceCode\SQLAPI\POS.API\Helpers\QueuePriority.cs(16,32): warning CS1591: Missing XML comment for publicly visible type or member 'QueuePriority.Priority'
+    F:\MIllyass\pos-with-inventory-management\SourceCode\SQLAPI\POS.API\Helpers\SeedingService.cs(21,18): warning CS1591: Missing XML comment for publicly visible type or member 'SeedingService'
+    F:\MIllyass\pos-with-inventory-management\SourceCode\SQLAPI\POS.API\Helpers\SeedingService.cs(32,16): warning CS1591: Missing XML comment for publicly visible type or member 'SeedingService.SeedingService(POSDbContext, IPasswordHasher<User>, UserManager<User>, RoleManager<Role>, IMediator, IOptions<MasterTenantSettings>, ICsvParserService, IDbUtilityService)'
+    F:\MIllyass\pos-with-inventory-management\SourceCode\SQLAPI\POS.API\Helpers\SeedingService.cs(52,27): warning CS1591: Missing XML comment for publicly visible type or member 'SeedingService.SeedAsync()'
+    F:\MIllyass\pos-with-inventory-management\SourceCode\SQLAPI\POS.API\Helpers\UnprocessableEntityObjectResult.cs(7,18): warning CS1591: Missing XML comment for publicly visible type or member 'UnprocessableEntityObjectResult'
+    F:\MIllyass\pos-with-inventory-management\SourceCode\SQLAPI\POS.API\Helpers\UnprocessableEntityObjectResult.cs(9,16): warning CS1591: Missing XML comment for publicly visible type or member 'UnprocessableEntityObjectResult.UnprocessableEntityObjectResult(ModelStateDictionary)'
+    F:\MIllyass\pos-with-inventory-management\SourceCode\SQLAPI\POS.API\Helpers\UnprocessableEntityObjectResult.cs(19,18): warning CS1591: Missing XML comment for publicly visible type or member 'UnAuthorizedEntityObjectResult'
+    F:\MIllyass\pos-with-inventory-management\SourceCode\SQLAPI\POS.API\Helpers\UnprocessableEntityObjectResult.cs(21,16): warning CS1591: Missing XML comment for publicly visible type or member 'UnAuthorizedEntityObjectResult.UnAuthorizedEntityObjectResult(ModelStateDictionary)'
+    F:\MIllyass\pos-with-inventory-management\SourceCode\SQLAPI\POS.API\Helpers\UnprocessableEntityObjectResult.cs(31,18): warning CS1591: Missing XML comment for publicly visible type or member 'UnAuthenticationEntityObjectResult'
+    F:\MIllyass\pos-with-inventory-management\SourceCode\SQLAPI\POS.API\Helpers\UnprocessableEntityObjectResult.cs(33,16): warning CS1591: Missing XML comment for publicly visible type or member 'UnAuthenticationEntityObjectResult.UnAuthenticationEntityObjectResult(ModelStateDictionary)'
+    F:\MIllyass\pos-with-inventory-management\SourceCode\SQLAPI\POS.API\Helpers\UnprocessableEntityObjectResult.cs(45,18): warning CS1591: Missing XML comment for publicly visible type or member 'BadRequestEntityObjectResult'
+    F:\MIllyass\pos-with-inventory-management\SourceCode\SQLAPI\POS.API\Helpers\UnprocessableEntityObjectResult.cs(47,16): warning CS1591: Missing XML comment for publicly visible type or member 'BadRequestEntityObjectResult.BadRequestEntityObjectResult(ModelStateDictionary)'
+    F:\MIllyass\pos-with-inventory-management\SourceCode\SQLAPI\POS.API\Helpers\UnprocessableEntityObjectResult.cs(58,18): warning CS1591: Missing XML comment for publicly visible type or member 'AlreadyExistEntityObjectResult'
+    F:\MIllyass\pos-with-inventory-management\SourceCode\SQLAPI\POS.API\Helpers\UnprocessableEntityObjectResult.cs(60,16): warning CS1591: Missing XML comment for publicly visible type or member 'AlreadyExistEntityObjectResult.AlreadyExistEntityObjectResult(string)'
+    F:\MIllyass\pos-with-inventory-management\SourceCode\SQLAPI\POS.API\Services\ScheduledSyncService.cs(23,16): warning CS1591: Missing XML comment for publicly visible type or member 'ScheduledSyncService.ScheduledSyncService(IServiceProvider, IConfiguration, ILogger<ScheduledSyncService>)'
+    F:\MIllyass\pos-with-inventory-management\SourceCode\SQLAPI\POS.API\Services\ScheduledSyncService.cs(36,39): warning CS1591: Missing XML comment for publicly visible type or member 'ScheduledSyncService.ExecuteAsync(CancellationToken)'
+    F:\MIllyass\pos-with-inventory-management\SourceCode\SQLAPI\POS.API\Startup.cs(43,18): warning CS1591: Missing XML comment for publicly visible type or member 'Startup'
+    F:\MIllyass\pos-with-inventory-management\SourceCode\SQLAPI\POS.API\Startup.cs(45,16): warning CS1591: Missing XML comment for publicly visible type or member 'Startup.Startup(IConfiguration)'
+    F:\MIllyass\pos-with-inventory-management\SourceCode\SQLAPI\POS.API\Startup.cs(50,31): warning CS1591: Missing XML comment for publicly visible type or member 'Startup.Configuration'
+    F:\MIllyass\pos-with-inventory-management\SourceCode\SQLAPI\POS.API\Startup.cs(53,21): warning CS1591: Missing XML comment for publicly visible type or member 'Startup.ConfigureServices(IServiceCollection)'
+    F:\MIllyass\pos-with-inventory-management\SourceCode\SQLAPI\POS.API\Startup.cs(356,21): warning CS1591: Missing XML comment for publicly visible type or member 'Startup.Configure(IApplicationBuilder, IWebHostEnvironment, ILoggerFactory)'
+    F:\MIllyass\pos-with-inventory-management\SourceCode\SQLAPI\POS.API\Startup.cs(467,28): warning CS1591: Missing XML comment for publicly visible type or member 'Startup.GetJwtSettings()'
+    F:\MIllyass\pos-with-inventory-management\SourceCode\SQLAPI\POS.API\ViewModels\CartViewModel.cs(7,18): warning CS1591: Missing XML comment for publicly visible type or member 'CartViewModel'
+    F:\MIllyass\pos-with-inventory-management\SourceCode\SQLAPI\POS.API\ViewModels\CartViewModel.cs(9,40): warning CS1591: Missing XML comment for publicly visible type or member 'CartViewModel.Items'
+    F:\MIllyass\pos-with-inventory-management\SourceCode\SQLAPI\POS.API\ViewModels\CartViewModel.cs(10,24): warning CS1591: Missing XML comment for publicly visible type or member 'CartViewModel.TotalAmount'
+    F:\MIllyass\pos-with-inventory-management\SourceCode\SQLAPI\POS.API\ViewModels\CartViewModel.cs(13,18): warning CS1591: Missing XML comment for publicly visible type or member 'CartItemViewModel'
+    F:\MIllyass\pos-with-inventory-management\SourceCode\SQLAPI\POS.API\ViewModels\CartViewModel.cs(15,21): warning CS1591: Missing XML comment for publicly visible type or member 'CartItemViewModel.ProductId'
+    F:\MIllyass\pos-with-inventory-management\SourceCode\SQLAPI\POS.API\ViewModels\CartViewModel.cs(16,23): warning CS1591: Missing XML comment for publicly visible type or member 'CartItemViewModel.ProductName'
+    F:\MIllyass\pos-with-inventory-management\SourceCode\SQLAPI\POS.API\ViewModels\CartViewModel.cs(17,24): warning CS1591: Missing XML comment for publicly visible type or member 'CartItemViewModel.Price'
+    F:\MIllyass\pos-with-inventory-management\SourceCode\SQLAPI\POS.API\ViewModels\CartViewModel.cs(18,20): warning CS1591: Missing XML comment for publicly visible type or member 'CartItemViewModel.Quantity'
+    F:\MIllyass\pos-with-inventory-management\SourceCode\SQLAPI\POS.API\ViewModels\CartViewModel.cs(19,23): warning CS1591: Missing XML comment for publicly visible type or member 'CartItemViewModel.ImageUrl'
+    F:\MIllyass\pos-with-inventory-management\SourceCode\SQLAPI\POS.API\ViewModels\CartViewModel.cs(20,24): warning CS1591: Missing XML comment for publicly visible type or member 'CartItemViewModel.Total'
+    F:\MIllyass\pos-with-inventory-management\SourceCode\SQLAPI\POS.API\Program.cs(191,22): warning CS1591: Missing XML comment for publicly visible type or member 'Program'
+    F:\MIllyass\pos-with-inventory-management\SourceCode\SQLAPI\POS.API\Controllers\Stock\DamagedStockController.cs(19,5): warning CS1587: XML comment is not placed on a valid language element
+    F:\MIllyass\pos-with-inventory-management\SourceCode\SQLAPI\POS.API\Program.cs(171,5): warning ASP0014: Suggest using top level route registrations instead of UseEndpoints (https://aka.ms/aspnet/analyzers)
+    F:\MIllyass\pos-with-inventory-management\SourceCode\SQLAPI\POS.API\Helpers\SeedingService.cs(694,70): warning EF1002: Method 'ExecuteSqlRawAsync' inserts interpolated strings directly into the SQL, without any protection against SQL injection. Consider using 'ExecuteSqlAsync' instead, which protects against SQL injection, or make sure that the value is sanitized and suppress the warning.
+    F:\MIllyass\pos-with-inventory-management\SourceCode\SQLAPI\POS.API\Helpers\SeedingService.cs(701,70): warning EF1002: Method 'ExecuteSqlRawAsync' inserts interpolated strings directly into the SQL, without any protection against SQL injection. Consider using 'ExecuteSqlAsync' instead, which protects against SQL injection, or make sure that the value is sanitized and suppress the warning.
+    F:\MIllyass\pos-with-inventory-management\SourceCode\SQLAPI\POS.API\Helpers\SeedingService.cs(705,58): warning EF1002: Method 'ExecuteSqlRawAsync' inserts interpolated strings directly into the SQL, without any protection against SQL injection. Consider using 'ExecuteSqlAsync' instead, which protects against SQL injection, or make sure that the value is sanitized and suppress the warning.
+    F:\MIllyass\pos-with-inventory-management\SourceCode\SQLAPI\POS.API\Helpers\SeedingService.cs(717,77): warning EF1002: Method 'ExecuteSqlRawAsync' inserts interpolated strings directly into the SQL, without any protection against SQL injection. Consider using 'ExecuteSqlAsync' instead, which protects against SQL injection, or make sure that the value is sanitized and suppress the warning.
+    F:\MIllyass\pos-with-inventory-management\SourceCode\SQLAPI\POS.API\Helpers\HangfireCleanupService.cs(50,28): warning DAP005: 1 candidate Dapper methods detected, but none have Dapper.AOT enabled (https://aot.dapperlib.dev/rules/DAP005)
+
+Build succeeded with 577 warning(s) in 116.5s
+
+> milpos@0.0.23 electron:build
+> ng build --configuration=electron --base-href ./ && electron-builder --publish always
+
+Initial chunk files   | Names                         |  Raw size | Estimated transfer size
+styles-ALJ42MUH.css   | styles                        | 489.65 kB |                45.32 kB
+chunk-AFBM63BO.js     | -                             | 309.88 kB |                81.64 kB
+chunk-DQOT2J4G.js     | -                             | 232.39 kB |                65.77 kB
+main-FQ7WZSFZ.js      | main                          | 214.35 kB |                47.22 kB
+chunk-3TESZMZ3.js     | -                             |  99.59 kB |                18.57 kB
+chunk-LUHLTUNQ.js     | -                             |  79.62 kB |                19.84 kB
+chunk-CH5H7RZF.js     | -                             |  57.42 kB |                 9.64 kB
+chunk-LE67VCAP.js     | -                             |  52.19 kB |                12.03 kB
+chunk-62KF6W67.js     | -                             |  50.39 kB |                 9.81 kB
+polyfills-5CFQRCPP.js | polyfills                     |  34.59 kB |                11.33 kB
+chunk-NOFDTCZL.js     | -                             |  33.78 kB |                 8.86 kB
+chunk-NHLAVDEK.js     | -                             |  30.54 kB |                 8.92 kB
+chunk-TC3AI2A7.js     | -                             |  28.08 kB |                 6.67 kB
+chunk-7NRJJLJV.js     | -                             |  26.52 kB |                 7.04 kB
+chunk-FRKOLG6B.js     | -                             |  24.72 kB |                 6.73 kB
+chunk-GKZAYEGL.js     | -                             |  17.34 kB |                 4.67 kB
+chunk-4GU2CUEA.js     | -                             |  15.45 kB |                 4.22 kB
+chunk-UPTRXEMQ.js     | -                             |  13.67 kB |                 1.83 kB
+chunk-QA7B5BMD.js     | -                             |  13.25 kB |                 3.25 kB
+chunk-OQII53M3.js     | -                             |  12.62 kB |                 3.88 kB
+chunk-UJMGRIUG.js     | -                             |  11.03 kB |                 2.46 kB
+chunk-5PGKH3VI.js     | -                             |   9.21 kB |                 2.27 kB
+chunk-HA7AE572.js     | -                             |   6.91 kB |                 1.52 kB
+chunk-EPRKAB3D.js     | -                             |   4.57 kB |                 1.59 kB
+chunk-EFRKDYXQ.js     | -                             |   3.53 kB |                 1.43 kB
+chunk-P5AY3CGP.js     | -                             |   3.35 kB |               708 bytes
+chunk-TVBTDKTQ.js     | -                             |   3.15 kB |                 1.01 kB
+chunk-JG5UZ3DM.js     | -                             |   2.19 kB |               603 bytes
+chunk-I3CZNS3P.js     | -                             |   2.18 kB |               705 bytes
+chunk-WCYVIYSD.js     | -                             |   2.08 kB |               904 bytes
+chunk-COZUMG4R.js     | -                             |   1.58 kB |               694 bytes
+chunk-Y77SSVBN.js     | -                             |   1.30 kB |               482 bytes
+chunk-6BKP3YG7.js     | -                             |   1.28 kB |               536 bytes
+chunk-MLBJCIMV.js     | -                             |   1.24 kB |               530 bytes
+chunk-62L3M4K2.js     | -                             |   1.23 kB |               467 bytes
+chunk-Z2UZT6D3.js     | -                             |   1.14 kB |               444 bytes
+chunk-MUP5VOPI.js     | -                             | 915 bytes |               915 bytes
+chunk-7X4CR6FC.js     | -                             | 863 bytes |               863 bytes
+chunk-HOUVNWR6.js     | -                             | 580 bytes |               580 bytes
+chunk-RDIAT4HJ.js     | -                             | 574 bytes |               574 bytes
+chunk-55MX7LX3.js     | -                             | 514 bytes |               514 bytes
+chunk-ZFFXSRVY.js     | -                             | 406 bytes |               406 bytes
+chunk-S7ZST7NX.js     | -                             | 359 bytes |               359 bytes
+chunk-KPBHDNH6.js     | -                             | 121 bytes |               121 bytes
+chunk-4VC27M6J.js     | -                             | 121 bytes |               121 bytes
+chunk-JCTJTPDO.js     | -                             | 105 bytes |               105 bytes
+chunk-PVDG46DZ.js     | -                             |   0 bytes |                 0 bytes
+chunk-NJY6F3LT.js     | -                             |   0 bytes |                 0 bytes
+
+                      | Initial total                 |   1.90 MB |               398.15 kB
+
+Lazy chunk files      | Names                         |  Raw size | Estimated transfer size
+chunk-CM3SDN7V.js     | index                         |   1.05 MB |               282.47 kB
+chunk-RWXMVGDR.js     | -                             | 409.79 kB |               112.17 kB
+chunk-5QVLRT5K.js     | -                             | 318.59 kB |                89.07 kB
+chunk-IUXCHWDG.js     | calendar-view                 | 239.80 kB |                61.48 kB
+chunk-OR4B7IPE.js     | -                             | 203.20 kB |                38.57 kB
+chunk-F5CJ5ZHT.js     | index-es                      | 158.71 kB |                46.89 kB
+chunk-ZMPXNSTR.js     | -                             | 109.76 kB |                19.51 kB
+chunk-JDOIIYUF.js     | inquiry-routes                | 102.64 kB |                17.04 kB
+chunk-MQXBGNYV.js     | sales-order-routes            |  96.88 kB |                19.24 kB
+chunk-A76Q6PL3.js     | purchase-order-routes         |  96.03 kB |                18.84 kB
+chunk-B2GH72HT.js     | barcode-generator-component   |  85.90 kB |                15.94 kB
+chunk-VFDD267O.js     | role-routes                   |  76.05 kB |                18.57 kB
+chunk-CQRWW73G.js     | purchase-order-request-routes |  62.01 kB |                13.32 kB
+chunk-TYPUS2C2.js     | sales-order-request-routes    |  61.98 kB |                13.35 kB
+chunk-OELBA6Z2.js     | purchase-order-return-routes  |  60.45 kB |                12.68 kB
+...and 165 more lazy chunks files. Use "--verbose" to show all the files.
+
+Application bundle generation complete. [95.544 seconds] - 2026-07-15T04:12:49.898Z
+
+▲ [WARNING] NG8113: PageHelpTextComponent is not used within the template of ProductSalesComparisonComponent [plugin angular-compiler]
+
+    src/app/dashboard/product-sales-comparison/product-sales-comparison.component.ts:24:4:
+      24 │     PageHelpTextComponent,
+         ╵     ~~~~~~~~~~~~~~~~~~~~~
+
+
+▲ [WARNING] Module 'lz-string' used by 'src/app/core/services/indexed-db.service.ts' is not ESM
+
+  CommonJS or AMD dependencies can cause optimization bailouts.
+  For more information see: https://angular.dev/tools/cli/build#configuring-commonjs-dependencies
+
+
+Output location: F:\MIllyass\pos-with-inventory-management\SourceCode\SQLAPI\POS.API\ClientApp
+
+  • electron-builder  version=26.7.0 os=10.0.26100
+  • loaded configuration  file=package.json ("build" field)
+  • writing effective config  file=release\builder-effective-config.yaml
+  • executing @electron/rebuild  electronVersion=40.3.0 arch=x64 buildFromSource=false workspaceRoot=F:\MIllyass\pos-with-inventory-management\SourceCode\Angular projectDir=./ appDir=./
+  • installing native dependencies  arch=x64
+  • preparing       moduleName=@primno/dpapi arch=x64
+  • finished        moduleName=@primno/dpapi arch=x64
+  • completed installing native dependencies
+  • packaging       platform=win32 arch=x64 electron=40.3.0 appOutDir=release\win-unpacked
+  • searching for node modules  pm=npm searchDir=F:\MIllyass\pos-with-inventory-management\SourceCode\Angular
+  • updating asar integrity executable resource  executablePath=release\win-unpacked\MIL POS.exe
+  • signing with signtool.exe  path=release\win-unpacked\resources\api\POS.API.exe
+  • signing with signtool.exe  path=release\win-unpacked\resources\api\createdump.exe
+  • signing with signtool.exe  path=release\win-unpacked\MIL POS.exe
+  • building        target=nsis file=release\MIL POS Setup 0.0.23.exe archs=x64 oneClick=false perMachine=false
+  • signing with signtool.exe  path=release\win-unpacked\resources\elevate.exe
+  • signing with signtool.exe  path=release\MIL POS Setup 0.0.23.__uninstaller.exe
+  • signing with signtool.exe  path=release\MIL POS Setup 0.0.23.exe
+  • building block map  blockMapFile=release\MIL POS Setup 0.0.23.exe.blockmap
+  • publishing      publisher=Github (owner: raymondcsmit, project: MILPOS-Release, version: 0.0.23)
+  • uploading       file=MIL-POS-Setup-0.0.23.exe.blockmap provider=github
+  • uploading       file=MIL-POS-Setup-0.0.23.exe provider=github
+  ⨯ Cannot cleanup:
+
+Error #1 --------------------------------------------------------------------------------
+HttpError: 401 Unauthorized
+"method: GET url: https://api.github.com/repos/raymondcsmit/MILPOS-Release/releases\n\n          Data:\n          {\"message\":\"Bad credentials\",\"documentation_url\":\"https://docs.github.com/rest\",\"status\":\"401\"}\n          "
+Headers: {
+  "content-type": "application/json; charset=utf-8",
+  "x-github-media-type": "github.v3; format=json",
+  "access-control-expose-headers": "ETag, Link, Location, Retry-After, X-GitHub-OTP, X-RateLimit-Limit, X-RateLimit-Remaining, X-RateLimit-Used, X-RateLimit-Resource, X-RateLimit-Reset, X-OAuth-Scopes, X-Accepted-OAuth-Scopes, X-Poll-Interval, X-GitHub-Media-Type, X-GitHub-SSO, X-GitHub-Request-Id, Deprecation, Sunset",
+  "access-control-allow-origin": "*",
+  "strict-transport-security": "max-age=31536000; includeSubdomains; preload",
+  "x-frame-options": "deny",
+  "x-content-type-options": "nosniff",
+  "x-xss-protection": "0",
+  "referrer-policy": "origin-when-cross-origin, strict-origin-when-cross-origin",
+  "content-security-policy": "default-src 'none'",
+  "vary": "Accept-Encoding, Accept, X-Requested-With",
+  "server": "github.com",
+  "date": "Wed, 15 Jul 2026 04:21:18 GMT",
+  "x-github-request-id": "65DB:27CD96:1C9C7FF:1EB3D00:6A570ABE",
+  "connection": "close"
+}
+    at createHttpError (F:\MIllyass\pos-with-inventory-management\SourceCode\Angular\node_modules\builder-util-runtime\src\httpExecutor.ts:31:10)
+    at IncomingMessage.<anonymous> (F:\MIllyass\pos-with-inventory-management\SourceCode\Angular\node_modules\builder-util-runtime\src\httpExecutor.ts:202:13)
+    at IncomingMessage.emit (node:events:536:35)
+    at endReadableNT (node:internal/streams/readable:1698:12)
+    at processTicksAndRejections (node:internal/process/task_queues:90:21)
+
+Error #2 --------------------------------------------------------------------------------
+HttpError: 401 Unauthorized
+"method: GET url: https://api.github.com/repos/raymondcsmit/MILPOS-Release/releases\n\n          Data:\n          {\"message\":\"Bad credentials\",\"documentation_url\":\"https://docs.github.com/rest\",\"status\":\"401\"}\n          "
+Headers: {
+  "content-type": "application/json; charset=utf-8",
+  "x-github-media-type": "github.v3; format=json",
+  "access-control-expose-headers": "ETag, Link, Location, Retry-After, X-GitHub-OTP, X-RateLimit-Limit, X-RateLimit-Remaining, X-RateLimit-Used, X-RateLimit-Resource, X-RateLimit-Reset, X-OAuth-Scopes, X-Accepted-OAuth-Scopes, X-Poll-Interval, X-GitHub-Media-Type, X-GitHub-SSO, X-GitHub-Request-Id, Deprecation, Sunset",
+  "access-control-allow-origin": "*",
+  "strict-transport-security": "max-age=31536000; includeSubdomains; preload",
+  "x-frame-options": "deny",
+  "x-content-type-options": "nosniff",
+  "x-xss-protection": "0",
+  "referrer-policy": "origin-when-cross-origin, strict-origin-when-cross-origin",
+  "content-security-policy": "default-src 'none'",
+  "vary": "Accept-Encoding, Accept, X-Requested-With",
+  "server": "github.com",
+  "date": "Wed, 15 Jul 2026 04:21:18 GMT",
+  "x-github-request-id": "65DB:27CD96:1C9C7FF:1EB3D00:6A570ABE",
+  "connection": "close"
+}
+    at createHttpError (F:\MIllyass\pos-with-inventory-management\SourceCode\Angular\node_modules\builder-util-runtime\src\httpExecutor.ts:31:10)
+    at IncomingMessage.<anonymous> (F:\MIllyass\pos-with-inventory-management\SourceCode\Angular\node_modules\builder-util-runtime\src\httpExecutor.ts:202:13)
+    at IncomingMessage.emit (node:events:536:35)
+    at endReadableNT (node:internal/streams/readable:1698:12)
+    at processTicksAndRejections (node:internal/process/task_queues:90:21)  failedTask=build stackTrace=Error: Cannot cleanup:
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            Error #1 --------------------------------------------------------------------------------
+HttpError: 401 Unauthorized
+"method: GET url: https://api.github.com/repos/raymondcsmit/MILPOS-Release/releases\n\n          Data:\n          {\"message\":\"Bad credentials\",\"documentation_url\":\"https://docs.github.com/rest\",\"status\":\"401\"}\n          "
+Headers: {
+  "content-type": "application/json; charset=utf-8",
+  "x-github-media-type": "github.v3; format=json",
+  "access-control-expose-headers": "ETag, Link, Location, Retry-After, X-GitHub-OTP, X-RateLimit-Limit, X-RateLimit-Remaining, X-RateLimit-Used, X-RateLimit-Resource, X-RateLimit-Reset, X-OAuth-Scopes, X-Accepted-OAuth-Scopes, X-Poll-Interval, X-GitHub-Media-Type, X-GitHub-SSO, X-GitHub-Request-Id, Deprecation, Sunset",
+  "access-control-allow-origin": "*",
+  "strict-transport-security": "max-age=31536000; includeSubdomains; preload",
+  "x-frame-options": "deny",
+  "x-content-type-options": "nosniff",
+  "x-xss-protection": "0",
+  "referrer-policy": "origin-when-cross-origin, strict-origin-when-cross-origin",
+  "content-security-policy": "default-src 'none'",
+  "vary": "Accept-Encoding, Accept, X-Requested-With",
+  "server": "github.com",
+  "date": "Wed, 15 Jul 2026 04:21:18 GMT",
+  "x-github-request-id": "65DB:27CD96:1C9C7FF:1EB3D00:6A570ABE",
+  "connection": "close"
+}
+    at createHttpError (F:\MIllyass\pos-with-inventory-management\SourceCode\Angular\node_modules\builder-util-runtime\src\httpExecutor.ts:31:10)
+    at IncomingMessage.<anonymous> (F:\MIllyass\pos-with-inventory-management\SourceCode\Angular\node_modules\builder-util-runtime\src\httpExecutor.ts:202:13)
+    at IncomingMessage.emit (node:events:536:35)
+    at endReadableNT (node:internal/streams/readable:1698:12)
+    at processTicksAndRejections (node:internal/process/task_queues:90:21)
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            Error #2 --------------------------------------------------------------------------------
+HttpError: 401 Unauthorized
+"method: GET url: https://api.github.com/repos/raymondcsmit/MILPOS-Release/releases\n\n          Data:\n          {\"message\":\"Bad credentials\",\"documentation_url\":\"https://docs.github.com/rest\",\"status\":\"401\"}\n          "
+Headers: {
+  "content-type": "application/json; charset=utf-8",
+  "x-github-media-type": "github.v3; format=json",
+  "access-control-expose-headers": "ETag, Link, Location, Retry-After, X-GitHub-OTP, X-RateLimit-Limit, X-RateLimit-Remaining, X-RateLimit-Used, X-RateLimit-Resource, X-RateLimit-Reset, X-OAuth-Scopes, X-Accepted-OAuth-Scopes, X-Poll-Interval, X-GitHub-Media-Type, X-GitHub-SSO, X-GitHub-Request-Id, Deprecation, Sunset",
+  "access-control-allow-origin": "*",
+  "strict-transport-security": "max-age=31536000; includeSubdomains; preload",
+  "x-frame-options": "deny",
+  "x-content-type-options": "nosniff",
+  "x-xss-protection": "0",
+  "referrer-policy": "origin-when-cross-origin, strict-origin-when-cross-origin",
+  "content-security-policy": "default-src 'none'",
+  "vary": "Accept-Encoding, Accept, X-Requested-With",
+  "server": "github.com",
+  "date": "Wed, 15 Jul 2026 04:21:18 GMT",
+  "x-github-request-id": "65DB:27CD96:1C9C7FF:1EB3D00:6A570ABE",
+  "connection": "close"
+}
+    at createHttpError (F:\MIllyass\pos-with-inventory-management\SourceCode\Angular\node_modules\builder-util-runtime\src\httpExecutor.ts:31:10)
+    at IncomingMessage.<anonymous> (F:\MIllyass\pos-with-inventory-management\SourceCode\Angular\node_modules\builder-util-runtime\src\httpExecutor.ts:202:13)
+    at IncomingMessage.emit (node:events:536:35)
+    at endReadableNT (node:internal/streams/readable:1698:12)
+    at processTicksAndRejections (node:internal/process/task_queues:90:21)
+    at throwError (F:\MIllyass\pos-with-inventory-management\SourceCode\Angular\node_modules\builder-util\src\asyncTaskManager.ts:88:11)
+    at checkErrors (F:\MIllyass\pos-with-inventory-management\SourceCode\Angular\node_modules\builder-util\src\asyncTaskManager.ts:53:9)
+    at AsyncTaskManager.awaitTasks (F:\MIllyass\pos-with-inventory-management\SourceCode\Angular\node_modules\builder-util\src\asyncTaskManager.ts:67:7)
+    at processTicksAndRejections (node:internal/process/task_queues:105:5)
+    at PublishManager.awaitTasks (F:\MIllyass\pos-with-inventory-management\SourceCode\Angular\node_modules\app-builder-lib\src\publish\PublishManager.ts:247:5)
+    at executeFinally (F:\MIllyass\pos-with-inventory-management\SourceCode\Angular\node_modules\builder-util\src\promise.ts:23:3)
+----------------------------------------
+ERROR: Publishing failed. Check logs above.
+----------------------------------------
+Press Enter to continue...:
+PS F:\MIllyass\pos-with-inventory-management\SourceCode\Angular>
