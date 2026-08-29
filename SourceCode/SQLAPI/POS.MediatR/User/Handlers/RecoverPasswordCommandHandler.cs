@@ -1,4 +1,5 @@
-﻿using System;
+using System;
+using System.Linq;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -35,9 +36,13 @@ namespace POS.MediatR
 
             if (!result.Success)
             {
-                return ServiceResponse<bool>.ReturnFailed(500, "Internal Server Error");
+                // SEC-04 fix (N-19): propagate the inner status code (e.g. 404 for unknown user /
+                // wrong token) instead of flattening every failure to 500.
+                return ServiceResponse<bool>.ReturnFailed(result.StatusCode,
+                    result.Errors.FirstOrDefault() ?? "Password reset failed.");
             }
             return ServiceResponse<bool>.ReturnSuccess();
         }
     }
 }
+

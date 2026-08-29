@@ -134,13 +134,17 @@ public sealed class PurchaseOrderReturnPaymentTests : IClassFixture<TestWebAppli
         });
     }
 
+    // FLIPPED [N-16]: the former Gap-Char test Should_Return500AndRollBack_When_PurchaseReturnRequestsRefund
+    // characterized the double-save 500 (refund leg flushed the UoW, the handler's follow-up SaveAsync
+    // hit 0 rows and rolled everything back). The production fix landed in
+    // UpdatePurchaseOrderReturnCommandHandler and this characterization was replaced by
+    // Should_PostRefundAndPersistReturn_When_PurchaseReturnRequestsRefund (Gap-Target, now GREEN).
+
     [Fact]
-    public async Task Should_Return500AndRollBack_When_PurchaseReturnRequestsRefund()
+    public async Task Should_PostRefundAndPersistReturn_When_PurchaseReturnRequestsRefund()
     {
-        // PRODUCT BUG (new finding): the refund leg double-saves — PaymentService.ProcessPaymentAsync
-        // already flushed the UoW, so the handler's own SaveAsync affects 0 rows, is treated as a
-        // failure, and rolls the whole return back. The request 500s and no return data persists.
-        // Wave-1 Gap-Target: fix the double-save and flip this characterization.
+        // Gap-Target [N-16]: the refund leg must not double-save. Desired behavior —
+        // return succeeds (200), mirrored journal posts, stock decreases, supplier refund persists.
         await _factory.EnsureSeededAsync();
         var client = await _factory.CreateAuthorizedClientAsync(TestSeed.AdminEmail, TestSeed.AdminPassword);
         var (orderId, orderNumber) = await CreatePurchaseOrderAsync(client, quantity: 2m);
@@ -157,19 +161,36 @@ public sealed class PurchaseOrderReturnPaymentTests : IClassFixture<TestWebAppli
 
         var returnCommand = BuildReturnCommand(orderId, orderNumber, withRefund: true);
         var response = await client.PutAsJsonAsync($"/api/purchaseOrder/{orderId}/return", returnCommand);
-
-        Assert.Equal(HttpStatusCode.InternalServerError, response.StatusCode);
+        var body = await response.Content.ReadAsStringAsync();
+        Assert.True(response.IsSuccessStatusCode, $"Return with refund failed: {(int)response.StatusCode} {body}");
 
         await _factory.UsingDbAsync(async db =>
         {
-            // Rollback: no PurchaseReturn transaction, stock unchanged, header unchanged.
-            var returnTxCount = await db.Set<Transaction>().AsNoTracking()
-                .CountAsync(t => t.ReferenceNumber == orderNumber && t.TransactionType == TransactionType.PurchaseReturn);
-            Assert.Equal(0, returnTxCount);
-            Assert.Equal(stockAfterPurchase, await GetStockAsync());
+            // --- Stock: purchase granted +2, return removed 1 ---
+            Assert.Equal(stockAfterPurchase - 1m, await GetStockAsync());
 
+            // --- PurchaseReturnStrategy mirrored journal ---
+            var returnTx = await db.Set<Transaction>().AsNoTracking()
+                .SingleAsync(t => t.ReferenceNumber == orderNumber && t.TransactionType == TransactionType.PurchaseReturn);
+            Assert.Equal(100.00m, returnTx.SubTotal);
+            Assert.Equal(117.00m, returnTx.TotalAmount);
+
+            // --- Supplier refund row + journal (Dr Cash / Cr AP) ---
+            var refund = await db.Set<PurchaseOrderPayment>().AsNoTracking()
+                .Where(p => p.PurchaseOrderId == orderId && p.PaymentType == PaymentType.Refund)
+                .ToListAsync();
+            Assert.Equal(117.00m, refund.Sum(p => p.Amount));
+
+            var refundEntry = await db.Set<AccountingEntry>().AsNoTracking()
+                .FirstOrDefaultAsync(e => e.Amount == 117.00m
+                    && e.DebitLedgerAccountId == TestIds.LedgerCashId
+                    && e.CreditLedgerAccountId == TestIds.LedgerApId);
+            Assert.NotNull(refundEntry);
+
+            // --- Header: totals reduced, refund tracked ---
             var order = await db.Set<PurchaseOrder>().AsNoTracking().FirstAsync(o => o.Id == orderId);
-            Assert.Equal(234.00m, order.TotalAmount);
+            Assert.Equal(117.00m, order.TotalAmount);
+            Assert.Equal(117.00m, order.TotalRefundAmount);
         });
     }
 
@@ -247,3 +268,4 @@ public sealed class PurchaseOrderReturnPaymentTests : IClassFixture<TestWebAppli
             .SingleAsync());
     }
 }
+

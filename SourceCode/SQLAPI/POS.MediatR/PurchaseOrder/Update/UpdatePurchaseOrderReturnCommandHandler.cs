@@ -387,14 +387,11 @@ namespace POS.MediatR.PurchaseOrder.Handlers
                             purchaseOrder.TotalRefundAmount = purchaseOrderExit.TotalRefundAmount + request.TotalAmount;
                             _purchaseOrderRepository.Update(purchaseOrder);
                             _purchaseOrderPaymentRepository.Add(purchasePayment);
+                            // N-16 fix: PaymentService.ProcessPaymentAsync already flushes the UoW
+                            // (all tracked changes, including the refund rows above). A second
+                            // SaveAsync here affected 0 rows, was treated as a failure, and rolled
+                            // back the whole return — PO returns with refund always 500'd.
                             await _paymentService.ProcessPaymentAsync(paymentDto);
-                            
-                            if (await _uow.SaveAsync() <= 0)
-                            {
-                                await _uow.RollbackTransactionAsync();
-                                _logger.LogError("Error while Updating purchase Order Refund Payment.");
-                                return ServiceResponse<bool>.Return500();
-                            }
 
                         }
                         catch (System.Exception ex)

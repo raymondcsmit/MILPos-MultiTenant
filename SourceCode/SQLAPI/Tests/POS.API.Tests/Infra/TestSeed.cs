@@ -38,7 +38,12 @@ public sealed class TestSeed(IServiceProvider serviceProvider)
         "PO_ADD_PO", "PO_VIEW_PURCHASE_ORDERS", "PO_UPDATE_PO", "PO_DELETE_PO", "PO_RETURN_PO", "PO_GENERATE_INVOICE", "PO_VIEW_PO_DETAIL",
         "PO_ADD_PO_PAYMENT", "PO_VIEW_PO_PAYMENTS", "PO_DELETE_PO_PAYMENT",
         "POR_ADD_PO_REQUEST", "POR_VIEW_PO_REQUESTS", "POR_UPDATE_PO_REQUEST", "POR_DELETE_PO_REQUEST", "POR_CONVERT_TO_PO",
-        "INVE_VIEW_INVENTORIES", "INVE_MANAGE_INVENTORY", "REP_STOCK_REPORT"
+        "INVE_VIEW_INVENTORIES", "INVE_MANAGE_INVENTORY", "REP_STOCK_REPORT",
+        "STTFR_MANAGE_STTFR", "STTFR_VIEW_STTFR",
+        "PRO_MANAGE_BRAND",
+        "ACCOUNTING_VIEW_TRIAL_BALANCE_REPORT", "ACCOUNTING_VIEW_PROFIT_LOSS_REPORT",
+        "ACCOUNTING_VIEW_BALANCE_SHEET_REPORT", "ACCOUNTING_VIEW_CASH_BANK_REPORT",
+        "ACCOUNTING_VIEW_FINANCIAL_YEARS", "ACCOUNTING_VIEW_TAX_REPORT"
     ];
 
     public async Task SeedAsync()
@@ -299,7 +304,7 @@ public sealed class TestSeed(IServiceProvider serviceProvider)
 
         context.Set<FinancialYear>().Add(new FinancialYear
         {
-            Id = Guid.NewGuid(),
+            Id = TestIds.FinancialYear2026Id,
             TenantId = TestIds.TenantAId,
             IsDeleted = false,
             StartDate = new DateTime(2026, 1, 1, 0, 0, 0, DateTimeKind.Utc),
@@ -310,8 +315,10 @@ public sealed class TestSeed(IServiceProvider serviceProvider)
         context.Set<LedgerAccount>().AddRange(
             Ledger(TestIds.LedgerArId, "1100", "Accounts Receivable", AccountType.Asset, AccountGroup.CurrentAsset),
             Ledger(TestIds.LedgerSalesId, "4100", "Sales Revenue", AccountType.Income, AccountGroup.Revenue),
-            Ledger(TestIds.LedgerGstOutputId, "2150-01", "Output GST 17%", AccountType.Liability, AccountGroup.CurrentLiability),
-            Ledger(TestIds.LedgerGstInputId, "1150-01", "Input GST 17%", AccountType.Asset, AccountGroup.CurrentAsset),
+            Ledger(TestIds.LedgerGstOutputParentId, "2150", "Output GST", AccountType.Liability, AccountGroup.CurrentLiability),
+            Ledger(TestIds.LedgerGstInputParentId, "1150", "Input GST", AccountType.Asset, AccountGroup.CurrentAsset),
+            Ledger(TestIds.LedgerGstOutputId, "2150-01", "Output GST 17%", AccountType.Liability, AccountGroup.CurrentLiability, TestIds.LedgerGstOutputParentId),
+            Ledger(TestIds.LedgerGstInputId, "1150-01", "Input GST 17%", AccountType.Asset, AccountGroup.CurrentAsset, TestIds.LedgerGstInputParentId),
             Ledger(TestIds.LedgerInventoryId, "1200", "Inventory", AccountType.Asset, AccountGroup.CurrentAsset),
             Ledger(TestIds.LedgerCogsId, "5100", "Cost of Goods Sold", AccountType.Expense, AccountGroup.DirectExpense),
             Ledger(TestIds.LedgerDiscountId, "5200", "Discount Given", AccountType.Expense, AccountGroup.DirectExpense),
@@ -450,6 +457,17 @@ public sealed class TestSeed(IServiceProvider serviceProvider)
                 CurrentStock = 100m,
                 PurchasePrice = 30.00m,
                 ModifiedDate = DateTime.UtcNow
+            },
+            new ProductStock
+            {
+                Id = Guid.NewGuid(),
+                TenantId = TestIds.TenantAId,
+                IsDeleted = false,
+                ProductId = productA.Id,
+                LocationId = TestIds.LocationFbrId,
+                CurrentStock = 0m,
+                PurchasePrice = 60.00m,
+                ModifiedDate = DateTime.UtcNow
             });
 
         context.Set<Customer>().Add(new Customer
@@ -480,7 +498,7 @@ public sealed class TestSeed(IServiceProvider serviceProvider)
         await context.SaveChangesAsync();
     }
 
-    private static LedgerAccount Ledger(Guid id, string code, string name, AccountType type, AccountGroup group) =>
+    private static LedgerAccount Ledger(Guid id, string code, string name, AccountType type, AccountGroup group, Guid? parentAccountId = null) =>
         new()
         {
             Id = id,
@@ -490,6 +508,7 @@ public sealed class TestSeed(IServiceProvider serviceProvider)
             AccountName = name,
             AccountType = type,
             AccountGroup = group,
+            ParentAccountId = parentAccountId,
             OpeningBalance = 0m,
             IsActive = true,
             IsSystem = true

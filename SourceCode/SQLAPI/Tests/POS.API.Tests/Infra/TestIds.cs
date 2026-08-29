@@ -21,6 +21,7 @@ public static class TestIds
     public static readonly Guid LedgerArId = Guid.Parse("dddddddd-0000-0000-0000-000000001100");
     public static readonly Guid LedgerSalesId = Guid.Parse("dddddddd-0000-0000-0000-000000004100");
     public static readonly Guid LedgerGstOutputId = Guid.Parse("dddddddd-0000-0000-0000-000000215001");
+    public static readonly Guid LedgerGstOutputParentId = Guid.Parse("dddddddd-0000-0000-0000-000000215000");
     public static readonly Guid LedgerInventoryId = Guid.Parse("dddddddd-0000-0000-0000-000000001200");
     public static readonly Guid LedgerCogsId = Guid.Parse("dddddddd-0000-0000-0000-000000005100");
     public static readonly Guid LedgerDiscountId = Guid.Parse("dddddddd-0000-0000-0000-000000005200");
@@ -29,6 +30,7 @@ public static class TestIds
     public static readonly Guid LedgerBankId = Guid.Parse("dddddddd-0000-0000-0000-000000001060");
     public static readonly Guid LedgerApId = Guid.Parse("dddddddd-0000-0000-0000-000000002100");
     public static readonly Guid LedgerGstInputId = Guid.Parse("dddddddd-0000-0000-0000-000000115001");
+    public static readonly Guid LedgerGstInputParentId = Guid.Parse("dddddddd-0000-0000-0000-000000115000");
 
     public static readonly Guid TaxGst17Id = Guid.Parse("eeeeeeee-0000-0000-0000-000000000001");
 
@@ -50,4 +52,5 @@ public static class TestIds
 
     public static readonly Guid TenantBAdminUserId = Guid.Parse("aaaaaaaa-0000-0000-0000-000000000003");
     public static readonly Guid LedgerAdjustmentId = Guid.Parse("dddddddd-0000-0000-0000-000000005400");
+    public static readonly Guid FinancialYear2026Id = Guid.Parse("eeeeeeee-1111-1111-1111-111111111111");
 }

@@ -98,6 +98,8 @@ Source-verified issues not yet in the gap catalog — each has characterization 
 | N-16 | 🔴 | **PO return with refund always fails**: refund leg double-saves (PaymentService flushes UoW → handler's `SaveAsync()` = 0 rows → false failure → full rollback). Request 500s, no return data persists | Wave-1 IT (`Should_Return500AndRollBack_When_PurchaseReturnRequestsRefund`) |
 | N-17 | 🟠 | **ApiAndQueriesProfiler writes every request's query logs into the main database** via a background drain — production latency + SQLite lock contention amplifier; disabled in test hosts | Test infra |
 | N-18 | 🟡 | FBR staging mapper persists buyer NTN/CNIC fields even when the location is not FBR-enabled (only queueing is gated) | TC-D03/D09 IT |
+| N-19 | ✅ | **SEC-04 FIXED (Wave 1 tranche 4)**: reset token now validated (`&&` → `||` in `ResetPasswordCommandHandler`); `RecoverPasswordCommandHandler` propagates inner status codes instead of flattening to 500. Gap-Target tests GREEN | `PasswordResetFlowTests` |
+| N-20 | ✅ | **N-16 FIXED (Wave 1)**: PO-return refund double-save removed from `UpdatePurchaseOrderReturnCommandHandler`; Gap-Char flipped to Gap-Target, GREEN | `Should_PostRefundAndPersistReturn_When_PurchaseReturnRequestsRefund` |
 
 > Recommended: merge these into `New-Documents/11` when the enhancement plan is built (each already has a characterization test proving the behavior).
 

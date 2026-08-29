@@ -27,7 +27,10 @@ namespace POS.MediatR.Handlers
         public async Task<ServiceResponse<UserDto>> Handle(ResetPasswordCommand request, CancellationToken cancellationToken)
         {
             var entity = await _userManager.FindByEmailAsync(request.UserName);
-            if (entity == null && entity.ResetPasswordCode != request.Token)
+            // SEC-04 fix (N-19): the guard was `entity == null && entity.ResetPasswordCode != request.Token`
+            // — the token was never validated (any token reset a known user's password) and unknown
+            // users dereferenced a null entity. `||` validates both conditions.
+            if (entity == null || entity.ResetPasswordCode != request.Token)
             {
                 _logger.LogError("User not Found.");
                 return ServiceResponse<UserDto>.ReturnFailed(404, "User not Found.");
