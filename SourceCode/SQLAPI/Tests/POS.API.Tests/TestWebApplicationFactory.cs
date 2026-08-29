@@ -83,6 +83,16 @@ public sealed class TestWebApplicationFactory : WebApplicationFactory<Program>
         await assertion(context);
     }
 
+    /// <summary>
+    /// Runs a query block against a fresh <see cref="POSDbContext"/> scope and returns the result.
+    /// </summary>
+    public async Task<T> UsingDbAsync<T>(Func<POSDbContext, Task<T>> query)
+    {
+        using var scope = Services.CreateScope();
+        var context = scope.ServiceProvider.GetRequiredService<POSDbContext>();
+        return await query(context);
+    }
+
     public T GetRequiredService<T>() where T : notnull =>
         Services.CreateScope().ServiceProvider.GetRequiredService<T>();
 

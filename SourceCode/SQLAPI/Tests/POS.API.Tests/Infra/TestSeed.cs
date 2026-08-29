@@ -27,14 +27,18 @@ public sealed class TestSeed(IServiceProvider serviceProvider)
     public const string NoClaimsEmail = "noclaims@test.local";
     public const string NoClaimsPassword = "user@123";
 
-    /// <summary>Claims granted to the admin role (covers Wave-0 + Wave-1 sales/POS paths).</summary>
+    /// <summary>Claims granted to the admin role (covers Wave-0 + Wave-1 sales/purchase/stock paths).</summary>
     public static readonly string[] AdminClaims =
     [
         "POS_POS",
         "SO_ADD_SO", "SO_VIEW_SALES_ORDERS", "SO_UPDATE_SO", "SO_DELETE_SO", "SO_RETURN_SO",
         "SO_GENERATE_INVOICE", "SO_VIEW_SO_DETAIL",
+        "SO_ADD_SO_PAYMENT", "SO_VIEW_SO_PAYMENTS", "SO_DELETE_SO_PAYMENT", "REP_SO_PAYMENT_REP",
         "SOR_ADD_SO_REQUEST", "SOR_VIEW_SO_REQUESTS", "SOR_UPDATE_SO_REQUEST", "SOR_DELETE_SO_REQUEST", "SOR_CONVERT_TO_SO",
-        "PAY_VIEW_SALES_PAYMENT", "PAY_ADD_SALES_PAYMENT", "PAY_DELETE_SALES_PAYMENT"
+        "PO_ADD_PO", "PO_VIEW_PURCHASE_ORDERS", "PO_UPDATE_PO", "PO_DELETE_PO", "PO_RETURN_PO", "PO_GENERATE_INVOICE", "PO_VIEW_PO_DETAIL",
+        "PO_ADD_PO_PAYMENT", "PO_VIEW_PO_PAYMENTS", "PO_DELETE_PO_PAYMENT",
+        "POR_ADD_PO_REQUEST", "POR_VIEW_PO_REQUESTS", "POR_UPDATE_PO_REQUEST", "POR_DELETE_PO_REQUEST", "POR_CONVERT_TO_PO",
+        "INVE_VIEW_INVENTORIES", "INVE_MANAGE_INVENTORY", "REP_STOCK_REPORT"
     ];
 
     public async Task SeedAsync()
@@ -189,6 +193,60 @@ public sealed class TestSeed(IServiceProvider serviceProvider)
         }
         await userManager.AddToRoleAsync(noClaimsUser, "NoClaims");
 
+        // Tenant B admin (tenant-isolation tests authenticate with a TenantId=B JWT).
+        var tenantBAdmin = new User
+        {
+            Id = TestIds.TenantBAdminUserId,
+            UserName = "admin-b@testb.local",
+            Email = "admin-b@testb.local",
+            EmailConfirmed = true,
+            TenantId = TestIds.TenantBId,
+            FirstName = "Tenant B",
+            LastName = "Admin",
+            IsActive = true,
+            IsAllLocations = true,
+            CreatedDate = DateTime.UtcNow,
+            ModifiedDate = DateTime.UtcNow
+        };
+        var createTenantBAdmin = await userManager.CreateAsync(tenantBAdmin, "admin@123b");
+        if (!createTenantBAdmin.Succeeded)
+        {
+            throw new InvalidOperationException("Tenant B admin seed failed: " + string.Join(", ", createTenantBAdmin.Errors));
+        }
+        await userManager.AddToRoleAsync(tenantBAdmin, "Admin");
+
+        // Supplier with addresses (BillingAddressId/ShippingAddressId are non-nullable FKs).
+        var supplierAddress = new SupplierAddress
+        {
+            Id = TestIds.SupplierS1AddressId,
+            TenantId = TestIds.TenantAId,
+            IsDeleted = false,
+            Address = "Supplier Street 1",
+            CountryName = "Pakistan",
+            CityName = "Lahore",
+            CreatedBy = TestIds.AdminUserId,
+            ModifiedBy = TestIds.AdminUserId,
+            CreatedDate = DateTime.UtcNow,
+            ModifiedDate = DateTime.UtcNow
+        };
+        context.Set<SupplierAddress>().Add(supplierAddress);
+        context.Set<Supplier>().Add(new Supplier
+        {
+            Id = TestIds.SupplierS1Id,
+            TenantId = TestIds.TenantAId,
+            IsDeleted = false,
+            SupplierName = "Supplier One",
+            ContactPerson = "Supplier Contact",
+            Email = "supplier@test.local",
+            MobileNo = "0300-0000002",
+            BillingAddressId = TestIds.SupplierS1AddressId,
+            ShippingAddressId = TestIds.SupplierS1AddressId,
+            CreatedBy = TestIds.AdminUserId,
+            ModifiedBy = TestIds.AdminUserId,
+            CreatedDate = DateTime.UtcNow,
+            ModifiedDate = DateTime.UtcNow
+        });
+
         // RoleClaim.ActionId has FK_RoleClaims_Actions_ActionId, so claims are inserted directly
         // (AddClaimAsync cannot set ActionId) against a seeded permission Action row.
         // Users must already exist: CreatedBy carries FK_*_Users_CreatedBy.
@@ -258,6 +316,7 @@ public sealed class TestSeed(IServiceProvider serviceProvider)
             Ledger(TestIds.LedgerCogsId, "5100", "Cost of Goods Sold", AccountType.Expense, AccountGroup.DirectExpense),
             Ledger(TestIds.LedgerDiscountId, "5200", "Discount Given", AccountType.Expense, AccountGroup.DirectExpense),
             Ledger(TestIds.LedgerRoundOffId, "5900", "Round Off", AccountType.Expense, AccountGroup.IndirectExpense),
+            Ledger(TestIds.LedgerAdjustmentId, "5400", "Stock Adjustment", AccountType.Expense, AccountGroup.DirectExpense),
             Ledger(TestIds.LedgerCashId, "1050", "Cash", AccountType.Asset, AccountGroup.CurrentAsset),
             Ledger(TestIds.LedgerBankId, "1060", "Bank", AccountType.Asset, AccountGroup.CurrentAsset),
             Ledger(TestIds.LedgerApId, "2100", "Accounts Payable", AccountType.Liability, AccountGroup.CurrentLiability)

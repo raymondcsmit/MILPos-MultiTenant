@@ -97,6 +97,11 @@ namespace POS.API.Tests.Handlers.Dashboard
             var sqlAccessorMock = new Mock<ISqlConnectionAccessor>();
             sqlAccessorMock.Setup(x => x.GetOpenConnection()).Returns(_connection);
             sqlAccessorMock.Setup(x => x.GetCurrentTransaction()).Returns((System.Data.IDbTransaction)null);
+            // Without table names the Dapper SQL breaks and the handler silently falls back to the
+            // EF path — which then throws over LINQ-to-Objects mocks. Provide the real table names
+            // so the Dapper implementation under test actually executes.
+            sqlAccessorMock.Setup(x => x.GetTableName<POS.Data.SalesOrder>()).Returns("SalesOrders");
+            sqlAccessorMock.Setup(x => x.GetTableName<POS.Data.PurchaseOrder>()).Returns("PurchaseOrders");
 
             var salesOrderRepoMock = new Mock<ISalesOrderRepository>();
             var purchaseOrderRepoMock = new Mock<IPurchaseOrderRepository>();

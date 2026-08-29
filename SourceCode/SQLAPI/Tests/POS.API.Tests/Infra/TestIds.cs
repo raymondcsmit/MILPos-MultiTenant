@@ -43,4 +43,10 @@ public static class TestIds
 
     public static readonly Guid PermissionsPageId = Guid.Parse("f4f4f4f4-0000-0000-0000-000000000001");
     public static readonly Guid PermissionsActionId = Guid.Parse("f5f5f5f5-0000-0000-0000-000000000001");
+
+    public static readonly Guid SupplierS1Id = Guid.Parse("f6f6f6f6-0000-0000-0000-000000000001");
+    public static readonly Guid SupplierS1AddressId = Guid.Parse("f7f7f7f7-0000-0000-0000-000000000001");
+
+    public static readonly Guid TenantBAdminUserId = Guid.Parse("aaaaaaaa-0000-0000-0000-000000000003");
+    public static readonly Guid LedgerAdjustmentId = Guid.Parse("dddddddd-0000-0000-0000-000000005400");
 }

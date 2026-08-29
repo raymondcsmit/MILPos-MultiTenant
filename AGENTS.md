@@ -24,6 +24,11 @@ dotnet tool restore && dotnet reportgenerator -reports:./TestResults/**/coverage
 - `RoleClaim.ActionId` has FK to Actions → seed claims directly, never via `AddClaimAsync`.
 - Audit interceptor stamps `CreatedBy/ModifiedBy` from `DefaultUser:DefaultUserId` — that user must exist or audited writes FK-fail.
 - Seeding order: tenants → identity (roles/users) → Page/Action/RoleClaims → business rows (audit FKs require existing users).
+- **Claim names are exact strings** — `PO_ADD_PO`, `SO_ADD_SO_PAYMENT`, `PO_DELETE_PO`, `INVE_*` etc. Never guess (`PAY_*` names don't exist); check the controller's `[ClaimCheck(...)]` first.
+- **EF replaces Guid.Empty PKs** on insert (client-side value generation) — code-level ACC-05 (Transaction Id = Guid.Empty) is not observable in the DB; don't assert empty transaction ids.
+- xUnit collections are **serialized** (`xunit.runner.json`) — parallel factories × Hangfire (WorkerCount = CPU×5 each) caused 2-minute HTTP timeouts under the coverage collector.
+- `TestWebApplicationFactory.UsingDbAsync` has void (assert) and `<T>` (query) overloads; stock-sensitive tests must capture a "before" value (same-class tests share the fixture DB).
+- Unit tests for strategies: real `AccountingEntryFactory` + mocked repos; `IGenericRepository.Add` is void → Moq `.Callback` only.
 
 ## Known pre-existing failure (not introduced by tests)
 `GetIncomeComparisonQueryHandlerTests` — production dashboard handler mixes Dapper rows into an EF `IQueryable` then calls async operators. Wave-1 candidate.
