@@ -1,6 +1,7 @@
 using POS.Helper;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Metadata;
 using POS.Data;
 using POS.Data.Entities;
 using POS.Domain;
@@ -90,6 +91,12 @@ namespace POS.MediatR.Tenant.Handlers
                     await destinationContext.Database.OpenConnectionAsync(cancellationToken);
                     // DISABLE FOREIGN KEY CONSTRAINTS during import to avoid ordering issues
                     await _dbUtilityService.DisableForeignKeyCheckAsync(destinationContext);
+
+                    // The shipped POSDb.db template can lag the current EF model (schema drift:
+                    // columns added to entities after the template was generated). Reconcile the
+                    // destination's physical tables against the model so inserts never hit
+                    // "table X has no column named Y".
+                    await ReconcileMissingColumnsAsync(destinationContext, cancellationToken);
 
                     // 2. Pre-fetch User and Role IDs for filtering dependent entities
                     var userIds = await _sourceContext.Users
@@ -233,6 +240,59 @@ namespace POS.MediatR.Tenant.Handlers
                 catch
                 {
                     // Ignore cleanup errors (like file locks) to allow the original error response to be returned
+                }
+            }
+        }
+
+        /// Adds any model columns missing from a (possibly stale) template destination before the
+        /// row-copy runs, so tenant data never fails with "table X has no column named Y".
+        /// Source of truth is the EF relational model, not the physical file.
+        private async Task ReconcileMissingColumnsAsync(POSDbContext dest, CancellationToken cancellationToken)
+        {
+            var columnQueries = new List<(string Table, string Column, string Type)>();
+
+            foreach (var entityType in dest.Model.GetEntityTypes())
+            {
+                var tableName = entityType.GetTableName();
+                if (string.IsNullOrEmpty(tableName)) continue;
+
+                var existingColumns = new HashSet<string>(
+                    await dest.Database
+                        .SqlQueryRaw<string>($"SELECT name FROM pragma_table_info('{tableName}') WHERE name IS NOT NULL")
+                        .ToListAsync(cancellationToken),
+                    StringComparer.OrdinalIgnoreCase);
+
+                var tableExists = await dest.Database.SqlQueryRaw<int>(
+                        $"SELECT COUNT(*) AS Value FROM sqlite_master WHERE type = 'table' AND name = '{tableName}'")
+                    .SingleAsync(cancellationToken) > 0;
+                if (!tableExists) continue;
+
+                foreach (var property in entityType.GetProperties())
+                {
+                    if (property.ValueGenerated == Microsoft.EntityFrameworkCore.Metadata.ValueGenerated.OnAdd)
+                    {
+                        continue;
+                    }
+
+                    var columnName = property.GetColumnName();
+                    var columnType = property.GetColumnType();
+                    if (string.IsNullOrEmpty(columnName) || existingColumns.Contains(columnName)) continue;
+
+                    columnQueries.Add((tableName, columnName, columnType));
+                }
+            }
+
+            foreach (var (table, column, type) in columnQueries)
+            {
+                try
+                {
+                    await dest.Database.ExecuteSqlRawAsync(
+                        $"ALTER TABLE \"{table}\" ADD COLUMN \"{column}\" {type};", cancellationToken);
+                }
+                catch (Exception ex)
+                {
+                    throw new InvalidOperationException(
+                        $"Failed to reconcile column {table}.{column}: {ex.Message}");
                 }
             }
         }
