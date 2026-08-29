@@ -26,6 +26,10 @@ public sealed class TestSeed(IServiceProvider serviceProvider)
     public const string AdminPassword = "admin@123";
     public const string NoClaimsEmail = "noclaims@test.local";
     public const string NoClaimsPassword = "user@123";
+    public const string SuperAdminEmail = "super@milpos.local";
+    public const string SuperAdminPassword = "super@123";
+    public const string TenantBAdminEmail = "admin-b@testb.local";
+    public const string TenantBAdminPassword = "admin@123b";
 
     /// <summary>Claims granted to the admin role (covers Wave-0 + Wave-1 sales/purchase/stock paths).</summary>
     public static readonly string[] AdminClaims =
@@ -82,9 +86,10 @@ public sealed class TestSeed(IServiceProvider serviceProvider)
             ContactEmail = "b@test.local",
             IsActive = true,
             CreatedDate = DateTime.UtcNow,
-            SubscriptionPlan = "Desktop",
-            MaxUsers = 999,
-            LicenseType = "Full",
+            SubscriptionPlan = "Trial",
+            MaxUsers = 5,
+            LicenseType = "Trial",
+            TrialExpiryDate = DateTime.UtcNow.AddDays(1),
             ApiKey = "test-api-key-b",
             ApiKeyEnabled = true
         };
@@ -220,6 +225,30 @@ public sealed class TestSeed(IServiceProvider serviceProvider)
         }
         await userManager.AddToRoleAsync(tenantBAdmin, "Admin");
 
+        // SuperAdmin (WF-2.2/2.4): the `isSuperAdmin` JWT claim bypasses trial enforcement and
+        // drives X-Tenant-ID impersonation in TenantProvider. D02 trial/license tests.
+        var superAdmin = new User
+        {
+            Id = TestIds.SuperAdminUserId,
+            UserName = SuperAdminEmail,
+            Email = SuperAdminEmail,
+            EmailConfirmed = true,
+            TenantId = TestIds.TenantAId,
+            FirstName = "Master",
+            LastName = "Super",
+            IsActive = true,
+            IsSuperAdmin = true,
+            IsAllLocations = true,
+            CreatedDate = DateTime.UtcNow,
+            ModifiedDate = DateTime.UtcNow
+        };
+        var createSuperAdmin = await userManager.CreateAsync(superAdmin, SuperAdminPassword);
+        if (!createSuperAdmin.Succeeded)
+        {
+            throw new InvalidOperationException("SuperAdmin seed failed: " + string.Join(", ", createSuperAdmin.Errors));
+        }
+        await userManager.AddToRoleAsync(superAdmin, "Admin");
+
         // Supplier with addresses (BillingAddressId/ShippingAddressId are non-nullable FKs).
         var supplierAddress = new SupplierAddress
         {
@@ -300,6 +329,25 @@ public sealed class TestSeed(IServiceProvider serviceProvider)
             CurrencyCode = "PKR",
             LicenseKey = "TEST-LICENSE-KEY",
             PurchaseCode = "TEST-PURCHASE-CODE"
+        });
+
+        // Tenant B is the canonical TRIAL tenant (WF-2.4): placeholder LicenseKey sentinel
+        // AppConstants.Seeding.DefaultLicenseKey ("AAABBB") — an un-activated profile — with a
+        // fresh 14-day trial clock. D02 trial/license tests mutate this state directly.
+        context.Set<CompanyProfile>().Add(new CompanyProfile
+        {
+            Id = TestIds.TenantBProfileId,
+            TenantId = TestIds.TenantBId,
+            IsDeleted = false,
+            Title = "Test Company B",
+            Email = "admin-b@testb.local",
+            CurrencyCode = "PKR",
+            LicenseKey = "AAABBB",
+            PurchaseCode = "CCCCRR",
+            CreatedDate = DateTime.UtcNow,
+            CreatedBy = TestIds.TenantBAdminUserId,
+            ModifiedBy = TestIds.TenantBAdminUserId,
+            ModifiedDate = DateTime.UtcNow
         });
 
         context.Set<FinancialYear>().Add(new FinancialYear

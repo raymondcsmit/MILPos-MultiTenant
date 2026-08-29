@@ -64,6 +64,7 @@ namespace POS.MediatR.WrLicense.Handler
                 {
                     var tenant = await _unitOfWork.Context.Set<TenantEntity>()
                         .IgnoreQueryFilters()
+                        .AsTracking()
                         .FirstOrDefaultAsync(t => t.Id == tenantId.Value, cancellationToken);
 
                     if (tenant != null)

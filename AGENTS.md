@@ -40,7 +40,10 @@ dotnet tool restore && dotnet reportgenerator -reports:./TestResults/**/coverage
 - **Wave-2 CRUD template exemplar**: `CrudTemplate/BrandCrudTemplateTests.cs` — create/duplicate 409/update/soft-delete/list-excludes-deleted/get-404/permission 403/tenant isolation. Reuse this pattern per module (claims: check the controller's `[ClaimCheck]` first).
 
 ## Known pre-existing failure (not introduced by tests)
-`GetIncomeComparisonQueryHandlerTests` — production dashboard handler mixes Dapper rows into an EF `IQueryable` then calls async operators. Wave-1 candidate.
+None. `GetIncomeComparisonQueryHandlerTests` (Dapper-inside-EF dashboard handler) was the last — **FIXED in Wave 1 tranche 3** (handler optimized, test GREEN). If a test you add surfaces a real production bug, fix it and log it as a product finding (see `New-Documents/11` gap/finding catalog).
+
+## Product findings logged from test-driven work
+- **N-21 (Wave 1 tranche 4): license-activation handlers mutate tenants fetched on a NoTracking context.** `POSDbContext` defaults to NoTracking (bulk edits + audit stamping intended for `BaseEntity` rows). `ValidateLicenseCommandHandler` fetched the tenant via `_unitOfWork.Context.Set<TenantEntity>().IgnoreQueryFilters().FirstOrDefaultAsync(...)` without `.AsTracking()`, so `LicenseType`/`TrialExpiryDate`/`SubscriptionStartDate` changes were silently dropped while the CompanyProfile (explicit `Update()`) persisted — a partial "activated" flip. **FIXED in `ValidateLicenseCommandHandler` (`.AsTracking()` added), proven by Gap-Target `Should_ValidateLicense_And_ReturnDummyToken_When_PurchaseCodeProvided`.** SAME pattern still present (no RED test yet → not yet fixed): `UpdateActivatedLicenseCommandHandler.cs:32` and `UpdateTenantLicenseCommandHandler.cs:38` — both mutate a NoTracking-fetched tenant; fix with their own Gap-Target tests in a later tranche.
 
 ## Coverage
 Baseline Wave 0: 17.2% line. Gate NOT enforced yet — ratchet to ≥90% during Waves 1–6, enforce in CI in Wave 6 (see workflow comment in `.github/workflows/backend-tests.yml`).

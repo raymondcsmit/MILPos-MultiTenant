@@ -51,6 +51,8 @@ public static class TestIds
     public static readonly Guid SupplierS1AddressId = Guid.Parse("f7f7f7f7-0000-0000-0000-000000000001");
 
     public static readonly Guid TenantBAdminUserId = Guid.Parse("aaaaaaaa-0000-0000-0000-000000000003");
+    public static readonly Guid SuperAdminUserId = Guid.Parse("aaaaaaaa-0000-0000-0000-000000000004");
+    public static readonly Guid TenantBProfileId = Guid.Parse("dddddddd-9999-0000-0000-00000000bbb0");
     public static readonly Guid LedgerAdjustmentId = Guid.Parse("dddddddd-0000-0000-0000-000000005400");
     public static readonly Guid FinancialYear2026Id = Guid.Parse("eeeeeeee-1111-1111-1111-111111111111");
 }
