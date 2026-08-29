@@ -86,7 +86,7 @@ namespace POS.MediatR.Product.Handler
                 product.ProductUrl = $"{Guid.NewGuid()}.png";
             }
             var branchIds = await _locationRepository.All.Select(c => c.Id).ToListAsync();
-            if (request.ProductVariants.Count > 0)
+            if (request.ProductVariants?.Count > 0)
             {
                 product.ProductVariants = new List<Data.Product>();
                 foreach (var variant in request.ProductVariants)

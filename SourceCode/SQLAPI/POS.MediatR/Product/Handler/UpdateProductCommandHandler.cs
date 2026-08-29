@@ -61,6 +61,8 @@ namespace POS.MediatR.Product.Handler
         }
         public async Task<ServiceResponse<ProductDto>> Handle(UpdateProductCommand request, CancellationToken cancellationToken)
         {
+            request.ProductTaxes ??= new List<ProductTaxDto>();
+            request.ProductVariants ??= new List<AddProductCommand>();
             //TODO: check sales & purchase order
             var existingProduct = await _productRepository.All
                 .FirstOrDefaultAsync(c => c.Name == request.Name && c.CategoryId == request.CategoryId && c.Id != request.Id);
