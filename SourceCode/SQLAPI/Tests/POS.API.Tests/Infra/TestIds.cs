@@ -52,6 +52,9 @@ public static class TestIds
 
     public static readonly Guid ExpenseCategoryGeneralId = Guid.Parse("f8f8f8f8-0000-0000-0000-000000000001");
 
+    public static readonly Guid InquirySourceWebId = Guid.Parse("f9f9f9f9-0000-0000-0000-000000000001");
+    public static readonly Guid InquiryStatusOpenId = Guid.Parse("fafafafa-0000-0000-0000-000000000001");
+
     public static readonly Guid LedgerExpenseId = Guid.Parse("dddddddd-0000-0000-0000-000000005300");
 
     public static readonly Guid TenantBAdminUserId = Guid.Parse("aaaaaaaa-0000-0000-0000-000000000003");

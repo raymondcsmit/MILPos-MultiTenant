@@ -51,6 +51,7 @@ public sealed class TestSeed(IServiceProvider serviceProvider)
         "SETT_MANAGE_LOCATIONS",
         "PRO_MANAGE_TAX",
         "EXP_MANAGE_EXP_CATEGORY", "EXP_VIEW_EXPENSES", "EXP_ADD_EXPENSE", "EXP_UPDATE_EXPENSE", "EXP_DELETE_EXPENSE",
+        "INQ_ADD_INQUIRY", "INQ_UPDATE_INQUIRY", "INQ_VIEW_INQUIRIES", "INQ_DELETE_INQUIRY", "INQ_MANAGE_INQ_STATUS",
         "ACCOUNTING_VIEW_TRIAL_BALANCE_REPORT", "ACCOUNTING_VIEW_PROFIT_LOSS_REPORT",
         "ACCOUNTING_VIEW_BALANCE_SHEET_REPORT", "ACCOUNTING_VIEW_CASH_BANK_REPORT",
         "ACCOUNTING_VIEW_FINANCIAL_YEARS", "ACCOUNTING_VIEW_TAX_REPORT"
@@ -468,6 +469,21 @@ public sealed class TestSeed(IServiceProvider serviceProvider)
             TenantId = TestIds.TenantAId,
             IsDeleted = false,
             Name = "General Expense"
+        });
+
+        context.Set<InquirySource>().Add(new InquirySource
+        {
+            Id = TestIds.InquirySourceWebId,
+            TenantId = TestIds.TenantAId,
+            IsDeleted = false,
+            Name = "Website"
+        });
+        context.Set<InquiryStatus>().Add(new InquiryStatus
+        {
+            Id = TestIds.InquiryStatusOpenId,
+            TenantId = TestIds.TenantAId,
+            IsDeleted = false,
+            Name = "Open"
         });
 
         var productA = new Product
