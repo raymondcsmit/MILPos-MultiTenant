@@ -50,6 +50,7 @@ public sealed class TestSeed(IServiceProvider serviceProvider)
         "CUST_VIEW_CUSTOMERS", "CUST_ADD_CUSTOMER", "CUST_UPDATE_CUSTOMER", "CUST_DELETE_CUSTOMER",
         "SETT_MANAGE_LOCATIONS",
         "PRO_MANAGE_TAX",
+        "EXP_MANAGE_EXP_CATEGORY", "EXP_VIEW_EXPENSES", "EXP_ADD_EXPENSE", "EXP_UPDATE_EXPENSE", "EXP_DELETE_EXPENSE",
         "ACCOUNTING_VIEW_TRIAL_BALANCE_REPORT", "ACCOUNTING_VIEW_PROFIT_LOSS_REPORT",
         "ACCOUNTING_VIEW_BALANCE_SHEET_REPORT", "ACCOUNTING_VIEW_CASH_BANK_REPORT",
         "ACCOUNTING_VIEW_FINANCIAL_YEARS", "ACCOUNTING_VIEW_TAX_REPORT"
@@ -374,6 +375,7 @@ public sealed class TestSeed(IServiceProvider serviceProvider)
             Ledger(TestIds.LedgerGstInputId, "1150-01", "Input GST 17%", AccountType.Asset, AccountGroup.CurrentAsset, TestIds.LedgerGstInputParentId),
             Ledger(TestIds.LedgerInventoryId, "1200", "Inventory", AccountType.Asset, AccountGroup.CurrentAsset),
             Ledger(TestIds.LedgerCogsId, "5100", "Cost of Goods Sold", AccountType.Expense, AccountGroup.DirectExpense),
+            Ledger(TestIds.LedgerExpenseId, "5300", "General Expense", AccountType.Expense, AccountGroup.IndirectExpense),
             Ledger(TestIds.LedgerDiscountId, "5200", "Discount Given", AccountType.Expense, AccountGroup.DirectExpense),
             Ledger(TestIds.LedgerRoundOffId, "5900", "Round Off", AccountType.Expense, AccountGroup.IndirectExpense),
             Ledger(TestIds.LedgerAdjustmentId, "5400", "Stock Adjustment", AccountType.Expense, AccountGroup.DirectExpense),
@@ -459,6 +461,14 @@ public sealed class TestSeed(IServiceProvider serviceProvider)
             Name = "Default Category"
         };
         context.Set<ProductCategory>().Add(category);
+
+        context.Set<ExpenseCategory>().Add(new ExpenseCategory
+        {
+            Id = TestIds.ExpenseCategoryGeneralId,
+            TenantId = TestIds.TenantAId,
+            IsDeleted = false,
+            Name = "General Expense"
+        });
 
         var productA = new Product
         {
