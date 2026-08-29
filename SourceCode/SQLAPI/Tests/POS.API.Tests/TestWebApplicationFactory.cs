@@ -43,6 +43,13 @@ public sealed class TestWebApplicationFactory : WebApplicationFactory<Program>
         // (FK_CompanyProfiles_Users_CreatedBy and every other audited-table FK).
         builder.UseSetting("DefaultUser:DefaultUserId", Infra.TestIds.AdminUserId.ToString());
 
+        // Registration clones the configured master tenant (TenantRegistrationService.SeedTenantDataAsync
+        // Line 56-63); without a live master it falls back to a CSV-seed path that violates Actions.PageId
+        // FK ordering on SQLite (immediate constraints). Point MasterTenant at seeded Tenant A so the
+        // real production clone path runs (also fixes 5-minute register hangs caused by the FK-fail loop).
+        builder.UseSetting("MasterTenant:TenantId", Infra.TestIds.TenantAId.ToString());
+        builder.UseSetting("MasterTenant:SubDomain", "testa");
+
         // Background hosted services contend for the single SQLite file and cause intermittent
         // "database is locked" → 500s under load: Hangfire server (CPU×5 workers), FBR sync loop,
         // and the ApiAndQueriesProfiler drain writer (logs every command of every request back into

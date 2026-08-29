@@ -21,7 +21,7 @@ namespace POS.API.Tests.MultiTenancy;
 /// own tenant B trial state directly (with IMemoryCache eviction — the middleware caches both the
 /// CompanyProfile and the Tenant subscription for ~5–10 min), then restores the baseline in finally so
 /// fixture state never depends on test ordering.
-/// TC traceability: TC-D02.034 / 035 / 036 / 037 / 038 / 043.
+/// TC traceability: TC-D02.034 / 035 / 036 / 037 / 038 / 043 / 045.
 /// </summary>
 public sealed class TrialEnforcementTests : IClassFixture<TestWebApplicationFactory>
 {
@@ -223,6 +223,46 @@ public sealed class TrialEnforcementTests : IClassFixture<TestWebApplicationFact
                 var profile = await db.Set<CompanyProfile>().IgnoreQueryFilters().AsNoTracking()
                     .SingleAsync(p => p.TenantId == TestIds.TenantBId);
                 Assert.Equal(purchaseCode, profile.PurchaseCode);
+                Assert.Equal(licenseKey, profile.LicenseKey);
+
+                var tenant = await db.Set<TenantEntity>().IgnoreQueryFilters().AsNoTracking()
+                    .SingleAsync(t => t.Id == TestIds.TenantBId);
+                Assert.Equal("Paid", tenant.LicenseType);
+                Assert.Null(tenant.TrialExpiryDate);
+                Assert.Null(tenant.SubscriptionEndDate);
+            });
+        }
+        finally
+        {
+            await SetTenantBAsync(expired: false);
+        }
+    }
+
+    // --- TC-D02.045 (Gap-Char) — activation trusts ANY client-supplied purchase code (SEC-03 pin) ---
+    [Fact]
+    public async Task Should_AcceptArbitraryPurchaseCode_When_ValidateAsTrial()
+    {
+        await _factory.EnsureSeededAsync();
+        await SetTenantBAsync(expired: false);
+        try
+        {
+            var client = await _factory.CreateAuthorizedClientAsync(TestSeed.TenantBAdminEmail, TestSeed.TenantBAdminPassword);
+            var response = await client.PostAsJsonAsync("/api/WrLicense/validate", new { purchaseCode = "X" });
+            var body = await response.Content.ReadAsStringAsync();
+
+            Assert.True(response.IsSuccessStatusCode, $"1-char purchase code rejected: {(int)response.StatusCode} {body}");
+            var root = JsonDocument.Parse(body).RootElement;
+            Assert.True(root.GetProperty("isAuthenticated").GetBoolean());
+            Assert.Equal("X", root.GetProperty("purchaseCode").GetString());
+            var licenseKey = root.GetProperty("licenseKey").GetString()!;
+            Assert.Matches("^[0-9A-F]{32}$", licenseKey);
+            Assert.Equal("DUMMY_TOKEN_FOR_LICENSE_VALIDATION", root.GetProperty("bearerToken").GetString());
+
+            await _factory.UsingDbAsync(async db =>
+            {
+                var profile = await db.Set<CompanyProfile>().IgnoreQueryFilters().AsNoTracking()
+                    .SingleAsync(p => p.TenantId == TestIds.TenantBId);
+                Assert.Equal("X", profile.PurchaseCode);
                 Assert.Equal(licenseKey, profile.LicenseKey);
 
                 var tenant = await db.Set<TenantEntity>().IgnoreQueryFilters().AsNoTracking()
