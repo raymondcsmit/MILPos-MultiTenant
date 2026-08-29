@@ -45,6 +45,8 @@ public sealed class TestSeed(IServiceProvider serviceProvider)
         "INVE_VIEW_INVENTORIES", "INVE_MANAGE_INVENTORY", "REP_STOCK_REPORT",
         "STTFR_MANAGE_STTFR", "STTFR_VIEW_STTFR",
         "PRO_MANAGE_BRAND",
+        "PRO_MANAGE_UNIT", "PRO_MANAGE_PRO_CAT",
+        "SUPP_VIEW_SUPPLIERS", "SUPP_ADD_SUPPLIER", "SUPP_UPDATE_SUPPLIER", "SUPP_DELETE_SUPPLIER",
         "ACCOUNTING_VIEW_TRIAL_BALANCE_REPORT", "ACCOUNTING_VIEW_PROFIT_LOSS_REPORT",
         "ACCOUNTING_VIEW_BALANCE_SHEET_REPORT", "ACCOUNTING_VIEW_CASH_BANK_REPORT",
         "ACCOUNTING_VIEW_FINANCIAL_YEARS", "ACCOUNTING_VIEW_TAX_REPORT"
@@ -538,10 +540,6 @@ public sealed class TestSeed(IServiceProvider serviceProvider)
             if (entry.Entity.CreatedDate == default) entry.Entity.CreatedDate = DateTime.UtcNow;
             if (entry.Entity.ModifiedDate == default) entry.Entity.ModifiedDate = DateTime.UtcNow;
         }
-
-        // TEMP DIAGNOSTIC
-        var pageEntry = context.ChangeTracker.Entries<Page>().FirstOrDefault();
-        Console.WriteLine($"DIAG adminUserId={TestIds.AdminUserId} usersExist={await context.Users.IgnoreQueryFilters().AnyAsync(u => u.Id == TestIds.AdminUserId)} pageCreatedBy={(pageEntry != null ? pageEntry.Entity.CreatedBy.ToString() : "none")}");
 
         await context.SaveChangesAsync();
     }
