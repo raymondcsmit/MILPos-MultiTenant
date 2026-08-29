@@ -352,6 +352,24 @@ public sealed class TestSeed(IServiceProvider serviceProvider)
         };
         context.Set<Location>().Add(locationL1);
 
+        context.Set<Location>().Add(new Location
+        {
+            Id = TestIds.LocationFbrId,
+            TenantId = TestIds.TenantAId,
+            IsDeleted = false,
+            Name = "FBR Branch",
+            Address = "FBR Street 2",
+            Email = AdminEmail,
+            Mobile = "0300-0000003",
+            ContactPerson = "FBR Contact",
+            Website = "https://test.local",
+            FBRKey = "TEST-FBR-KEY-2",
+            POSID = "POS-02",
+            ApiBaseUrl = "https://fbr.test.local",
+            IsFBREnabled = true,
+            AutoSubmitInvoices = true
+        });
+
         var unitPc = new UnitConversation
         {
             Id = TestIds.UnitPcId,

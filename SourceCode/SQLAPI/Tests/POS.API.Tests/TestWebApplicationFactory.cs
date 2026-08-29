@@ -1,5 +1,6 @@
 using System;
 using System.IO;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Hosting;
@@ -41,6 +42,25 @@ public sealed class TestWebApplicationFactory : WebApplicationFactory<Program>
         // Audit interceptor stamps CreatedBy from this id; it must reference an existing seeded user
         // (FK_CompanyProfiles_Users_CreatedBy and every other audited-table FK).
         builder.UseSetting("DefaultUser:DefaultUserId", Infra.TestIds.AdminUserId.ToString());
+
+        // Background hosted services contend for the single SQLite file and cause intermittent
+        // "database is locked" → 500s under load: Hangfire server (CPU×5 workers), FBR sync loop,
+        // and the ApiAndQueriesProfiler drain writer (logs every command of every request back into
+        // the main database). None are under test in API suites — remove them.
+        builder.ConfigureServices(services =>
+        {
+            var backgroundServices = services
+                .Where(d => d.ServiceType == typeof(Microsoft.Extensions.Hosting.IHostedService)
+                            && d.ImplementationType != null
+                            && ((d.ImplementationType.Namespace ?? string.Empty).StartsWith("POS.API.BackgroundServices", StringComparison.Ordinal)
+                                || (d.ImplementationType.FullName ?? string.Empty).Contains("Hangfire", StringComparison.Ordinal)
+                                || (d.ImplementationType.Namespace ?? string.Empty).StartsWith("ApiAndQueriesProfiler", StringComparison.Ordinal)))
+                .ToList();
+            foreach (var descriptor in backgroundServices)
+            {
+                services.Remove(descriptor);
+            }
+        });
     }
 
     /// <summary>

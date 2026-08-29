@@ -95,6 +95,9 @@ Source-verified issues not yet in the gap catalog — each has characterization 
 | N-13 | 🟡 | Numbering quirk: `SO#00009` → `SO#000010` (digit Replace bug) | TC-D03 |
 | N-14 | 🟡 | POS screen never floors totals (flooring lives in sales-order screen); POS submits unfloored totals | TC-D03 |
 | N-15 | ⚪ | `DamagedStock .cs` filename typo; "Adavance Salary" narration typo; FBR backoff off-by-one (first retry 120s vs comment's 60s) | TC-D05, D06, D09 |
+| N-16 | 🔴 | **PO return with refund always fails**: refund leg double-saves (PaymentService flushes UoW → handler's `SaveAsync()` = 0 rows → false failure → full rollback). Request 500s, no return data persists | Wave-1 IT (`Should_Return500AndRollBack_When_PurchaseReturnRequestsRefund`) |
+| N-17 | 🟠 | **ApiAndQueriesProfiler writes every request's query logs into the main database** via a background drain — production latency + SQLite lock contention amplifier; disabled in test hosts | Test infra |
+| N-18 | 🟡 | FBR staging mapper persists buyer NTN/CNIC fields even when the location is not FBR-enabled (only queueing is gated) | TC-D03/D09 IT |
 
 > Recommended: merge these into `New-Documents/11` when the enhancement plan is built (each already has a characterization test proving the behavior).
 

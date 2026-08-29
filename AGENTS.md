@@ -29,6 +29,9 @@ dotnet tool restore && dotnet reportgenerator -reports:./TestResults/**/coverage
 - xUnit collections are **serialized** (`xunit.runner.json`) — parallel factories × Hangfire (WorkerCount = CPU×5 each) caused 2-minute HTTP timeouts under the coverage collector.
 - `TestWebApplicationFactory.UsingDbAsync` has void (assert) and `<T>` (query) overloads; stock-sensitive tests must capture a "before" value (same-class tests share the fixture DB).
 - Unit tests for strategies: real `AccountingEntryFactory` + mocked repos; `IGenericRepository.Add` is void → Moq `.Callback` only.
+- **Background hosted services are removed in the test factory** (Hangfire server, POS.API.BackgroundServices, ApiAndQueriesProfiler drain writer) — the profiler wrote every request's query logs back into the main SQLite file, causing lock storms (14 min → 2.7 min suite time after removal). Factory `ConfigureServices` callbacks DO run after the app's registrations in minimal hosting (verified empirically).
+- `SalesDeliveryStatus.DELIVERED = 0` — the enum default; non-POS orders must set `PENDING` explicitly or the update guard 409s.
+- **PO return with refund always 500s** (double-save: PaymentService flushes the UoW, the handler's follow-up `SaveAsync()` affects 0 rows → treated as failure → rollback). SO return does not have this second save. Wave-1 Gap-Target; characterized in `Should_Return500AndRollBack_When_PurchaseReturnRequestsRefund`.
 
 ## Known pre-existing failure (not introduced by tests)
 `GetIncomeComparisonQueryHandlerTests` — production dashboard handler mixes Dapper rows into an EF `IQueryable` then calls async operators. Wave-1 candidate.

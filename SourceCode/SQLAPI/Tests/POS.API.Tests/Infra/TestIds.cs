@@ -16,6 +16,7 @@ public static class TestIds
     public static readonly Guid NoClaimsRoleId = Guid.Parse("bbbbbbbb-0000-0000-0000-000000000002");
 
     public static readonly Guid LocationL1Id = Guid.Parse("cccccccc-0000-0000-0000-000000000001");
+    public static readonly Guid LocationFbrId = Guid.Parse("cccccccc-0000-0000-0000-000000000002");
 
     public static readonly Guid LedgerArId = Guid.Parse("dddddddd-0000-0000-0000-000000001100");
     public static readonly Guid LedgerSalesId = Guid.Parse("dddddddd-0000-0000-0000-000000004100");
