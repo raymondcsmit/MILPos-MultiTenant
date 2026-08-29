@@ -83,8 +83,8 @@ Source-verified issues not yet in the gap catalog — each has characterization 
 | N-01 | 🔴 | `SyncController` has **no `[Authorize]`** — anonymous sync trigger/status | TC-D10 |
 | N-02 | 🔴 | `ImportExportController`, `FBRController`, `EmailController.salesOrPurchase`, `UserHub` have **no claim/auth checks** | TC-D09 |
 | N-03 | 🔴 | `Paymentreport` endpoint: no ClaimCheck, `[Authorize]` commented out | TC-D07 |
-| N-04 | 🟠 | Sales return: **no server-side over-return check** — max quantity is client-only | TC-D03 |
-| N-05 | 🟠 | Sales-side payment-delete **double-subtracts** on Paid recheck (INT-07 analog on sales) | TC-D03 |
+| N-04 | 🟠 | Sales return: **no server-side over-return check** — max quantity is client-only → negative `TotalAmount` persisted. Automated in `Should_AcceptOverReturn_When_QuantityExceedsOriginalSold` (Gap-Char, GREEN) | TC-D03 |
+| N-05 | 🟠 | Sales-side payment-delete **double-subtracts** on Paid recheck (INT-07 analog on sales) → overpaid order becomes Partial after one delete. Automated in `Should_DoubleSubtractPaymentAmount_When_DeletingOnOverpaidOrder` (Gap-Char, GREEN) | TC-D03 |
 | N-06 | 🟠 | `GET /api/sync/status` returns 200 + stub (not absent); push never advances `LastPushSync` — every push rescans since epoch | TC-D10 |
 | N-07 | 🟠 | CustomerLedger **DELETE + overdue GET have no ClaimCheck**; **negative ledger amounts accepted** | TC-D08 |
 | N-08 | 🟠 | `UpdateRole` NRE on unknown role id; `newOrderNumber` endpoint claimless | TC-D01, D04 |
@@ -101,6 +101,9 @@ Source-verified issues not yet in the gap catalog — each has characterization 
 | N-19 | ✅ | **SEC-04 FIXED (Wave 1 tranche 3)**: reset token now validated (`&&` → `||` in `ResetPasswordCommandHandler`); `RecoverPasswordCommandHandler` propagates inner status codes instead of flattening to 500. Gap-Target tests GREEN | `PasswordResetFlowTests` |
 | N-20 | ✅ | **N-16 FIXED (Wave 1)**: PO-return refund double-save removed from `UpdatePurchaseOrderReturnCommandHandler`; Gap-Char flipped to Gap-Target, GREEN | `Should_PostRefundAndPersistReturn_When_PurchaseReturnRequestsRefund` |
 | N-21 | ✅ | **NoTracking license flip FIXED (Wave 1 tranche 4)**: `ValidateLicenseCommandHandler` fetched the tenant without `.AsTracking()` on a NoTracking context, so LicenseType/SubscriptionStartDate/expiry flips were silently dropped (profile still persisted — "partial activation"). `.AsTracking()` added, RED → GREEN. Siblings still unfixed: `UpdateActivatedLicenseCommandHandler:32`, `UpdateTenantLicenseCommandHandler:38` | `TrialEnforcementTests.Should_ValidateLicense_And_ReturnDummyToken_When_PurchaseCodeProvided` |
+| N-22 | 🟠 | Non-POS **PENDING sales orders deduct stock at creation** (deduction is not gated on `DELIVERED` as the catalog's S-09/BIZ-06 Gap-Target assumes). Gap-Char `Should_DeductStockAtCreation_When_DeliveryStatusIsPending` pins the current behavior | TC-D03 |
+| N-23 | 🟡 | `Transaction.PaidAmount`/`BalanceAmount` are **never maintained** by the payment engine — they stay 0 while Payment entry + transaction post. TC-D03.087's ACC-04 sample (234) is wrong; actual pinned value is 0 (`Should_LeaveTransactionBalanceAmountsUnmaintained_When_PaymentSettlesOrder`) | TC-D03 |
+| N-24 | 🟡 | Race on same `OrderNumber` (TC-D03.019 INT-11/S-08): **exactly-one-winner confirmed** (`Should_HaveExactlyOneWinner_When_ConcurrentCreatesShareOrderNumber`); loser returns **500**, not 409 — `UnitOfWork.SaveAsync` swallows the unique violation, handler treats 0 rows as failure | TC-D03 |
 
 > Recommended: merge these into `New-Documents/11` when the enhancement plan is built (each already has a characterization test proving the behavior).
 
