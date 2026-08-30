@@ -61,6 +61,8 @@ public sealed class TestSeed(IServiceProvider serviceProvider)
         "ACCOUNTING_VIEW_GENERAL_ENTRY_REPORT", "ACCOUNTING_VIEW_ACCOUNT_BALANCE_REPORT",
         "ACCOUNTING_VIEW_CASH_FLOW_REPORT", "ACCOUNTING_ADD_GENERAL_ENTRY", "ACCOUNTING_VIEW_TRANSACTIONS",
         "ACCOUNTING_VIEW_BOOK_CLOSE",
+        "ACCOUNTING_VIEW_LEDGER_ACCOUNTS", "ACCOUNTING_ADD_LEDGER_ACCOUNT", "ACCOUNTING_UPDATE_LEDGER_ACCOUNT",
+        "MANAGE_OPENING_BALANCE", "ACCOUNTING_MANAGE_FINANCIAL_YEAR",
         "EMAIL_SEND_EMAIL", "EMAIL_MANAGE_EMAIL_SMTP_SETTINS", "EMAIL_MANAGE_EMAIL_TEMPLATES",
         "LOGS_VIEW_EMAIL_LOGS", "LOGS_DELETE_EMAIL_LOG",
         "REM_VIEW_REMINDERS", "REM_UPDATE_REMINDER", "REM_DELETE_REMINDER",
@@ -391,7 +393,8 @@ public sealed class TestSeed(IServiceProvider serviceProvider)
             Ledger(TestIds.LedgerAdjustmentId, "5400", "Stock Adjustment", AccountType.Expense, AccountGroup.DirectExpense),
             Ledger(TestIds.LedgerCashId, "1050", "Cash", AccountType.Asset, AccountGroup.CurrentAsset),
             Ledger(TestIds.LedgerBankId, "1060", "Bank", AccountType.Asset, AccountGroup.CurrentAsset),
-            Ledger(TestIds.LedgerApId, "2100", "Accounts Payable", AccountType.Liability, AccountGroup.CurrentLiability)
+            Ledger(TestIds.LedgerApId, "2100", "Accounts Payable", AccountType.Liability, AccountGroup.CurrentLiability),
+            Ledger(TestIds.OpeningBalanceAdjustmentId, "5555", "Opening Balance Adjustment", AccountType.Equity, AccountGroup.Capital)
         );
 
         var gst17 = new Tax
