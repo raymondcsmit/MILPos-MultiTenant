@@ -14,22 +14,25 @@ using System.Threading.Tasks;
 
 namespace POS.MediatR.Country.Handlers
 {
-   public class AddCountryCommandHandler : IRequestHandler<AddCountryCommand, ServiceResponse<CountryDto>>
-    {
+public class AddCountryCommandHandler : IRequestHandler<AddCountryCommand, ServiceResponse<CountryDto>>
+     {
         private readonly ICountryRepository _countryRepository;
         private readonly IUnitOfWork<POSDbContext> _uow;
         private readonly IMapper _mapper;
         private readonly ILogger<AddCountryCommandHandler> _logger;
+        private readonly UserInfoToken _userInfoToken;
         public AddCountryCommandHandler(
            ICountryRepository countryRepository,
             IMapper mapper,
             IUnitOfWork<POSDbContext> uow,
+            UserInfoToken userInfoToken,
             ILogger<AddCountryCommandHandler> logger
             )
         {
             _countryRepository = countryRepository;
             _mapper = mapper;
             _uow = uow;
+            _userInfoToken = userInfoToken;
             _logger = logger;
         }
 
@@ -43,6 +46,8 @@ namespace POS.MediatR.Country.Handlers
             }
             var entity = _mapper.Map<POS.Data.Country>(request);
             entity.Id = Guid.NewGuid();
+            entity.CreatedBy = _userInfoToken.Id;
+            entity.ModifiedBy = _userInfoToken.Id;
             _countryRepository.Add(entity);
             if (await _uow.SaveAsync() <= 0)
             {

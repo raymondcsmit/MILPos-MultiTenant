@@ -21,16 +21,19 @@ namespace POS.MediatR
         private readonly IUnitOfWork<POSDbContext> _uow;
         private readonly IMapper _mapper;
         private readonly ILogger<AddVariantCommandHandler> _logger;
+        private readonly UserInfoToken _userInfoToken;
         public AddVariantCommandHandler(
            IVariantRepository variantRepository,
             IMapper mapper,
             IUnitOfWork<POSDbContext> uow,
+            UserInfoToken userInfoToken,
             ILogger<AddVariantCommandHandler> logger
             )
         {
             _variantRepository = variantRepository;
             _mapper = mapper;
             _uow = uow;
+            _userInfoToken = userInfoToken;
             _logger = logger;
         }
 
@@ -45,7 +48,9 @@ namespace POS.MediatR
             var entity = _mapper.Map<POS.Data.Entities.Variant>(request);
             var variantId = Guid.NewGuid();
             entity.Id = variantId;
-            foreach(var variantItem in entity.VariantItems)
+            entity.CreatedBy = _userInfoToken.Id;
+            entity.ModifiedBy = _userInfoToken.Id;
+            foreach(var variantItem in entity.VariantItems ?? [])
             {
                 variantItem.VariantId= variantId;
                 variantItem.Id= Guid.NewGuid();

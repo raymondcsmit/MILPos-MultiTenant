@@ -20,16 +20,19 @@ namespace POS.MediatR.City.Handlers
         private readonly IUnitOfWork<POSDbContext> _uow;
         private readonly IMapper _mapper;
         private readonly ILogger<AddCityCommandHandler> _logger;
+        private readonly UserInfoToken _userInfoToken;
         public AddCityCommandHandler(
            ICityRepository cityRepository,
             IMapper mapper,
             IUnitOfWork<POSDbContext> uow,
+            UserInfoToken userInfoToken,
             ILogger<AddCityCommandHandler> logger
             )
         {
             _cityRepository = cityRepository;
             _mapper = mapper;
             _uow = uow;
+            _userInfoToken = userInfoToken;
             _logger = logger;
         }
 
@@ -44,6 +47,8 @@ namespace POS.MediatR.City.Handlers
             }
             var entity = _mapper.Map<POS.Data.City>(request);
             entity.Id = Guid.NewGuid();
+            entity.CreatedBy = _userInfoToken.Id;
+            entity.ModifiedBy = _userInfoToken.Id;
             _cityRepository.Add(entity);
             if (await _uow.SaveAsync() <= 0)
             {
