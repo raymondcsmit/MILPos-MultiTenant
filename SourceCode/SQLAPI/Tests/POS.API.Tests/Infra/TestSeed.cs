@@ -65,6 +65,7 @@ public sealed class TestSeed(IServiceProvider serviceProvider)
         "MANAGE_OPENING_BALANCE", "ACCOUNTING_MANAGE_FINANCIAL_YEAR",
         "LOGS_VIEW_LOGIN_AUDITS",
         "SETT_MANAGE_PAGE_HELPER",
+        "LOGS_VIEW_ERROR_LOGS",
         "USR_VIEW_USERS", "USR_ADD_USER", "USR_UPDATE_USER", "USR_DELETE_USER", "USR_RESET_PWD", "USR_ASSIGN_USR_PERMISSIONS",
         "ROLES_ADD_ROLE", "ROLES_UPDATE_ROLE", "ROLES_DELETE_ROLE",
         "EMAIL_SEND_EMAIL", "EMAIL_MANAGE_EMAIL_SMTP_SETTINS", "EMAIL_MANAGE_EMAIL_TEMPLATES",
@@ -398,6 +399,7 @@ public sealed class TestSeed(IServiceProvider serviceProvider)
             Ledger(TestIds.LedgerCashId, "1050", "Cash", AccountType.Asset, AccountGroup.CurrentAsset),
             Ledger(TestIds.LedgerBankId, "1060", "Bank", AccountType.Asset, AccountGroup.CurrentAsset),
             Ledger(TestIds.LedgerApId, "2100", "Accounts Payable", AccountType.Liability, AccountGroup.CurrentLiability),
+            Ledger(TestIds.LedgerDiscountReceivedId, "4200", "Discount Received", AccountType.Income, AccountGroup.Revenue),
             Ledger(TestIds.OpeningBalanceAdjustmentId, "5555", "Opening Balance Adjustment", AccountType.Equity, AccountGroup.Capital)
         );
 
