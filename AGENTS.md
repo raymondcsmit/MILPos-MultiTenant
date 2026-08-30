@@ -68,5 +68,22 @@ None. `GetIncomeComparisonQueryHandlerTests` (Dapper-inside-EF dashboard handler
 ## Coverage
 Baseline Wave 0: 17.2% line. Gate NOT enforced yet — ratchet to ≥90% during Waves 1–6, enforce in CI in Wave 6 (see workflow comment in `.github/workflows/backend-tests.yml`).
 
+## Frontend test commands (run from `SourceCode/Angular`)
+```
+npx ng test --watch=false --no-progress                  # full Karma suite (karma.conf.js wired into angular.json test target)
+npx ng test --watch=false --no-progress --code-coverage  # instrumented run -> text-summary + coverage/ (Statements/Branches/Functions/Lines)
+npx ng test --watch=false --no-progress --include=src/app/product/**/*.spec.ts   # narrow to a directory (keep CLI args short -- Windows 8191-char cmdline limit)
+```
+
+## Frontend test infrastructure facts (hard-won)
+- The Angular 20 test target uses `@angular/build:karma` with `"karmaConfig": "karma.conf.js"`. `karma.conf.js` uses `browsers: ['ChromeHeadlessNoSandbox']` plus large disconnect/activity timeouts. Without the no-sandbox launcher the single big browser process intermittently FREEZES mid-suite (DISCONNECTED at random executed counts); with it the suite runs 241/241 in ~15s. Never use plain `ChromeHeadless`.
+- `app.config.ts` providers are NOT replicated by TestBed. Every component spec needs `imports: [Component, TranslateModule.forRoot()]` and `providers: [provideHttpClient(), { provide: MatDialogRef, useValue: {} }, { provide: MAT_DIALOG_DATA, useValue: {} }, { provide: JwtHelperService, useValue: {} }, CurrencyPipe, provideNativeDateAdapter()]`. Omitting them surfaces as NG0201 for `_HttpClient` / `_TranslateService` / `JwtHelperService` (via `SecurityService -> WrLicenseService` field-inject) / `_CurrencyPipe` / DateAdapter / `MatMdcDialogData`.
+- Components consuming `ActivatedRoute` need a route mock with BOTH `snapshot` (resolver data under `snapshot.data`) AND Observable-style `data`/`queryParams`/`paramMap`/`url` (emit via `of({...})` or `{ subscribe..., pipe: ... }`) because constructors call `route.data.subscribe(...)` / `route.data.pipe(...)`.
+- Components with `input.required<T>()` / required `@Input()` fail with NG0950 on smoke-create: set the input via `setInput(...)` (or property assign) BEFORE `fixture.detectChanges()`.
+- All components are STANDALONE - specs must use `imports: [ComponentClass]`, never `declarations:` (compiler rejects standalone-in-declarations).
+- Never weaken assertions to make a spec pass. For count mismatches (e.g. CacheInterceptor "expected 1 to be 3") fix the FIXTURE data/seed so the real filter produces the asserted count. The only original assertion changed was the dead scaffold check `h1 "Hello, posnew"` in `app.spec.ts`, replaced with `<app-loading-indicator>` + `<router-outlet>` presence.
+- Keep TestBed module config as a multi-line object; single-line `configureTestingModule({...});` breaks injected providers/imports.
+- Coverage baseline (smoke suite green, `--code-coverage`): **Statements 38.94%, Branches 12.92%, Functions 36.07%, Lines 39.35%**. The auto-generated "should create" specs are a harness, NOT the W4 >=90% target; behavior-coverage expansion to >=90% is still open work.
+
 ## Disk caution
 F: drive runs close to full; `bin/obj` regenerable (~2 GB). Never delete `Publish/`, `Published/`, `Backups/` without explicit approval.
