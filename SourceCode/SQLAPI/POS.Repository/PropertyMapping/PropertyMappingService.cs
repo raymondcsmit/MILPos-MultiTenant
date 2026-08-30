@@ -383,6 +383,7 @@ namespace POS.Repository
        new Dictionary<string, PropertyMappingValue>(StringComparer.OrdinalIgnoreCase)
        {
          { "Id", new PropertyMappingValue(new List<string>() { "Id" } ) },
+         { "AccountDate", new PropertyMappingValue(new List<string>() { "Date" } ) },
          { "Date", new PropertyMappingValue(new List<string>() { "Date" }, true )},
          { "Reference", new PropertyMappingValue(new List<string>() { "Reference" } )},
          { "AccountId", new PropertyMappingValue(new List<string>() { "AccountId" } )},
