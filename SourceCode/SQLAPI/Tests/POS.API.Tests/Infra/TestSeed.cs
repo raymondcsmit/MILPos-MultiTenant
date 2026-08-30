@@ -63,6 +63,7 @@ public sealed class TestSeed(IServiceProvider serviceProvider)
         "ACCOUNTING_VIEW_BOOK_CLOSE",
         "EMAIL_SEND_EMAIL", "EMAIL_MANAGE_EMAIL_SMTP_SETTINS", "EMAIL_MANAGE_EMAIL_TEMPLATES",
         "LOGS_VIEW_EMAIL_LOGS", "LOGS_DELETE_EMAIL_LOG",
+        "REM_VIEW_REMINDERS", "REM_UPDATE_REMINDER", "REM_DELETE_REMINDER",
     ];
 
     public async Task SeedAsync()
