@@ -1,6 +1,12 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
 import { SalesOrderRequestListComponent } from './sales-order-request-list.component';
+import { provideHttpClient } from '@angular/common/http';
+import { TranslateModule } from '@ngx-translate/core';
+import { CurrencyPipe } from '@angular/common';
+import { provideNativeDateAdapter } from '@angular/material/core';
+import { JwtHelperService } from '@auth0/angular-jwt';
+import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 
 describe('SalesOrderRequestListComponent', () => {
   let component: SalesOrderRequestListComponent;
@@ -8,7 +14,8 @@ describe('SalesOrderRequestListComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [SalesOrderRequestListComponent]
+      providers: [provideHttpClient(), { provide: MatDialogRef, useValue: {} }, { provide: MAT_DIALOG_DATA, useValue: {} }, { provide: JwtHelperService, useValue: {} }, CurrencyPipe, provideNativeDateAdapter()],
+      imports: [SalesOrderRequestListComponent, TranslateModule.forRoot()]
     })
     .compileComponents();
 

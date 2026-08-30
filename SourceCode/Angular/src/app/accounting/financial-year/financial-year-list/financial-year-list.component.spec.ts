@@ -1,6 +1,12 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
 import { FinancialYearListComponent } from './financial-year-list.component';
+import { provideHttpClient } from '@angular/common/http';
+import { TranslateModule } from '@ngx-translate/core';
+import { CurrencyPipe } from '@angular/common';
+import { provideNativeDateAdapter } from '@angular/material/core';
+import { JwtHelperService } from '@auth0/angular-jwt';
+import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 
 describe('FinancialYearListComponent', () => {
   let component: FinancialYearListComponent;
@@ -8,7 +14,8 @@ describe('FinancialYearListComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [FinancialYearListComponent]
+      providers: [provideHttpClient(), { provide: MatDialogRef, useValue: {} }, { provide: MAT_DIALOG_DATA, useValue: {} }, { provide: JwtHelperService, useValue: {} }, CurrencyPipe, provideNativeDateAdapter()],
+      imports: [FinancialYearListComponent, TranslateModule.forRoot()]
     })
     .compileComponents();
 

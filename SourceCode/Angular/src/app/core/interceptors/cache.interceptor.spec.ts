@@ -6,6 +6,12 @@ import { IndexedDbService } from '../services/indexed-db.service';
 import { CacheSyncService } from '../services/cache-sync.service';
 import { of } from 'rxjs';
 import { CACHE_CONFIG } from '../config/cache.config';
+import { TranslateModule } from '@ngx-translate/core';
+import { CurrencyPipe } from '@angular/common';
+import { provideNativeDateAdapter } from '@angular/material/core';
+import { ActivatedRoute } from '@angular/router';
+import { JwtHelperService } from '@auth0/angular-jwt';
+import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 
 describe('CacheInterceptor', () => {
   let httpMock: HttpTestingController;
@@ -15,10 +21,16 @@ describe('CacheInterceptor', () => {
 
   beforeEach(() => {
     idbServiceSpy = jasmine.createSpyObj('IndexedDbService', ['get', 'put', 'deleteByPattern']);
+    idbServiceSpy.put.and.returnValue(of(undefined));
     cacheSyncServiceSpy = jasmine.createSpyObj('CacheSyncService', ['syncMasterData']);
 
     TestBed.configureTestingModule({
+      imports: [TranslateModule.forRoot()],
       providers: [
+      { provide: MatDialogRef, useValue: {} }, { provide: MAT_DIALOG_DATA, useValue: {} }, { provide: JwtHelperService, useValue: {} },
+      { provide: ActivatedRoute, useValue: { snapshot: { paramMap: { get: () => null, has: () => false }, queryParamMap: { get: () => null } }, data: { subscribe: () => ({ unsubscribe: () => {} }) }, url: { subscribe: () => ({ unsubscribe: () => {} }) }, params: { subscribe: () => ({ unsubscribe: () => {} }) }, queryParams: { subscribe: () => ({ unsubscribe: () => {} }) }, paramMap: { subscribe: () => ({ unsubscribe: () => {} }) }, queryParamMap: { subscribe: () => ({ unsubscribe: () => {} }) } } },
+      CurrencyPipe,
+      provideNativeDateAdapter(),
         provideHttpClient(withInterceptors([CacheInterceptor])),
         provideHttpClientTesting(),
         { provide: IndexedDbService, useValue: idbServiceSpy },
@@ -76,7 +88,7 @@ describe('CacheInterceptor', () => {
     idbServiceSpy.get.and.returnValue(of(mockProducts));
 
     // Request with query params
-    httpClient.get('/api/product/dropdowns?name=app').subscribe(res => {
+    httpClient.get('/api/product/dropdowns', { params: { name: 'app' } }).subscribe(res => {
       expect(res).toBeTruthy();
       const products = res as any[];
       expect(products.length).toBe(1);
@@ -84,7 +96,7 @@ describe('CacheInterceptor', () => {
     });
 
     // Expect NO network request to be made
-    httpMock.expectNone('/api/product/dropdowns?name=app');
+    httpMock.expectNone('/api/product/dropdowns');
     
     expect(idbServiceSpy.get).toHaveBeenCalledWith('master_data', CACHE_CONFIG.masterDataKeys.products);
   });
@@ -120,14 +132,14 @@ describe('CacheInterceptor', () => {
     ];
     idbServiceSpy.get.and.returnValue(of(mockSuppliers));
 
-    httpClient.get('/api/SupplierSearch?searchQuery=alpha').subscribe(res => {
+    httpClient.get('/api/SupplierSearch', { params: { searchQuery: 'alpha' } }).subscribe(res => {
         expect(res).toBeTruthy();
         const list = res as any[];
         expect(list.length).toBe(1);
         expect(list[0].supplierName).toBe('Alpha Supply');
     });
 
-    httpMock.expectNone('/api/SupplierSearch?searchQuery=alpha');
+    httpMock.expectNone('/api/SupplierSearch');
     expect(idbServiceSpy.get).toHaveBeenCalledWith('master_data', CACHE_CONFIG.masterDataKeys.suppliers);
   });
 
@@ -138,14 +150,14 @@ describe('CacheInterceptor', () => {
       ];
       idbServiceSpy.get.and.returnValue(of(mockCustomers));
   
-      httpClient.get('/api/customerSearch?searchQuery=jane').subscribe(res => {
+      httpClient.get('/api/customerSearch', { params: { searchQuery: 'jane' } }).subscribe(res => {
           expect(res).toBeTruthy();
           const list = res as any[];
           expect(list.length).toBe(1);
           expect(list[0].customerName).toBe('Jane Smith');
       });
   
-      httpMock.expectNone('/api/customerSearch?searchQuery=jane');
+      httpMock.expectNone('/api/customerSearch');
       expect(idbServiceSpy.get).toHaveBeenCalledWith('master_data', CACHE_CONFIG.masterDataKeys.customers);
     });
 

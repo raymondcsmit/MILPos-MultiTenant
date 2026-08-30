@@ -1,6 +1,12 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
 import { ManageUnitConversationComponent } from './manage-unit-conversation.component';
+import { provideHttpClient } from '@angular/common/http';
+import { TranslateModule } from '@ngx-translate/core';
+import { CurrencyPipe } from '@angular/common';
+import { provideNativeDateAdapter } from '@angular/material/core';
+import { JwtHelperService } from '@auth0/angular-jwt';
+import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 
 describe('ManageUnitConversationComponent', () => {
   let component: ManageUnitConversationComponent;
@@ -8,7 +14,8 @@ describe('ManageUnitConversationComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      declarations: [ ManageUnitConversationComponent ]
+      providers: [provideHttpClient(), { provide: MatDialogRef, useValue: {} }, { provide: MAT_DIALOG_DATA, useValue: { unitdata: {}, units: [] } }, { provide: JwtHelperService, useValue: {} }, CurrencyPipe, provideNativeDateAdapter()],
+      imports: [ ManageUnitConversationComponent , TranslateModule.forRoot()]
     })
     .compileComponents();
 

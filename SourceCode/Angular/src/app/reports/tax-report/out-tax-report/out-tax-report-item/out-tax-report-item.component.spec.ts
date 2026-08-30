@@ -1,6 +1,12 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
 import { OutTaxReportItemComponent } from './out-tax-report-item.component';
+import { provideHttpClient } from '@angular/common/http';
+import { TranslateModule } from '@ngx-translate/core';
+import { CurrencyPipe } from '@angular/common';
+import { provideNativeDateAdapter } from '@angular/material/core';
+import { JwtHelperService } from '@auth0/angular-jwt';
+import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 
 describe('OutTaxReportItemComponent', () => {
   let component: OutTaxReportItemComponent;
@@ -8,12 +14,14 @@ describe('OutTaxReportItemComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [OutTaxReportItemComponent]
+      providers: [provideHttpClient(), { provide: MatDialogRef, useValue: {} }, { provide: MAT_DIALOG_DATA, useValue: {} }, { provide: JwtHelperService, useValue: {} }, CurrencyPipe, provideNativeDateAdapter()],
+      imports: [OutTaxReportItemComponent, TranslateModule.forRoot()]
     })
     .compileComponents();
 
     fixture = TestBed.createComponent(OutTaxReportItemComponent);
     component = fixture.componentInstance;
+    fixture.componentRef.setInput('salesOrder', { id: 'so-1', salesOrderItems: [] } as any);
     fixture.detectChanges();
   });
 

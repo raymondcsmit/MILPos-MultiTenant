@@ -1,6 +1,12 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
 import { AddSalesOrderPaymentComponent } from './add-sales-order-payment.component';
+import { provideHttpClient } from '@angular/common/http';
+import { TranslateModule } from '@ngx-translate/core';
+import { CurrencyPipe } from '@angular/common';
+import { provideNativeDateAdapter } from '@angular/material/core';
+import { JwtHelperService } from '@auth0/angular-jwt';
+import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 
 describe('AddSalesOrderPaymentComponent', () => {
   let component: AddSalesOrderPaymentComponent;
@@ -8,7 +14,8 @@ describe('AddSalesOrderPaymentComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      declarations: [ AddSalesOrderPaymentComponent ]
+      providers: [provideHttpClient(), { provide: MatDialogRef, useValue: {} }, { provide: MAT_DIALOG_DATA, useValue: {} }, { provide: JwtHelperService, useValue: {} }, CurrencyPipe, provideNativeDateAdapter()],
+      imports: [ AddSalesOrderPaymentComponent , TranslateModule.forRoot()]
     })
     .compileComponents();
   });

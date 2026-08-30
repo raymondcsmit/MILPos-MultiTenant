@@ -1,18 +1,25 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { provideHttpClient } from '@angular/common/http';
 
-import { TenantList } from './tenant-list';
+import { TenantListComponent } from './tenant-list';
+import { TranslateModule } from '@ngx-translate/core';
+import { CurrencyPipe } from '@angular/common';
+import { provideNativeDateAdapter } from '@angular/material/core';
+import { JwtHelperService } from '@auth0/angular-jwt';
+import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 
 describe('TenantList', () => {
-  let component: TenantList;
-  let fixture: ComponentFixture<TenantList>;
+  let component: TenantListComponent;
+  let fixture: ComponentFixture<TenantListComponent>;
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [TenantList]
+      providers: [provideHttpClient(), { provide: MatDialogRef, useValue: {} }, { provide: MAT_DIALOG_DATA, useValue: {} }, { provide: JwtHelperService, useValue: {} }, CurrencyPipe, provideNativeDateAdapter()],
+      imports: [TenantListComponent, TranslateModule.forRoot()]
     })
     .compileComponents();
 
-    fixture = TestBed.createComponent(TenantList);
+    fixture = TestBed.createComponent(TenantListComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });
