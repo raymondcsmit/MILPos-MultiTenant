@@ -2600,6 +2600,9 @@ namespace POS.Migrations.PostgreSQL.Migrations
                     b.HasIndex("TenantId", "Name")
                         .HasDatabaseName("IX_ProductCategory_Tenant_Name");
 
+                    b.HasIndex("TenantId", "ParentId")
+                        .HasDatabaseName("IX_ProductCategory_ParentId");
+
                     b.ToTable("ProductCategories");
                 });
 
@@ -5227,6 +5230,9 @@ namespace POS.Migrations.PostgreSQL.Migrations
 
                     b.HasIndex("TenantId", "MobileNo")
                         .HasDatabaseName("IX_Supplier_Tenant_Mobile");
+
+                    b.HasIndex("TenantId", "SupplierName")
+                        .HasDatabaseName("IX_Supplier_Name");
 
                     b.ToTable("Suppliers");
                 });

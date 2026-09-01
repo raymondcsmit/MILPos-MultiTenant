@@ -67,7 +67,7 @@ namespace POS.Helper.Services
                         ""ProductVersion"" TEXT NOT NULL
                     );
                     INSERT INTO ""__EFMigrationsHistory"" (""MigrationId"", ""ProductVersion"")
-                    VALUES ('20260213024351_MainInitSqlite', '10.0.2');
+                    VALUES ('20260901025351_MainInit', '10.0.2');
                 ";
                 await context.Database.ExecuteSqlRawAsync(historySql);
             }

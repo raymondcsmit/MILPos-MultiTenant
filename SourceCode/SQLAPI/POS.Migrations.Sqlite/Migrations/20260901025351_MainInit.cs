@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace POS.Migrations.Sqlite.Migrations
 {
     /// <inheritdoc />
-    public partial class MainInitSQLITE : Migration
+    public partial class MainInit : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -1147,58 +1147,6 @@ namespace POS.Migrations.Sqlite.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "Customers",
-                columns: table => new
-                {
-                    Id = table.Column<Guid>(type: "TEXT", nullable: false),
-                    CustomerName = table.Column<string>(type: "TEXT", maxLength: 250, nullable: true),
-                    ContactPerson = table.Column<string>(type: "TEXT", maxLength: 200, nullable: true),
-                    Email = table.Column<string>(type: "TEXT", maxLength: 256, nullable: true),
-                    Fax = table.Column<string>(type: "TEXT", maxLength: 50, nullable: true),
-                    MobileNo = table.Column<string>(type: "TEXT", maxLength: 50, nullable: true),
-                    PhoneNo = table.Column<string>(type: "TEXT", maxLength: 50, nullable: true),
-                    Website = table.Column<string>(type: "TEXT", maxLength: 500, nullable: true),
-                    Description = table.Column<string>(type: "TEXT", maxLength: 2000, nullable: true),
-                    Url = table.Column<string>(type: "TEXT", maxLength: 500, nullable: true),
-                    BillingAddressId = table.Column<Guid>(type: "TEXT", nullable: true),
-                    ShippingAddressId = table.Column<Guid>(type: "TEXT", nullable: true),
-                    IsWalkIn = table.Column<bool>(type: "INTEGER", nullable: false),
-                    TaxNumber = table.Column<string>(type: "TEXT", maxLength: 50, nullable: true),
-                    TenantId = table.Column<Guid>(type: "TEXT", nullable: false),
-                    CreatedDate = table.Column<DateTime>(type: "TEXT", nullable: false),
-                    CreatedBy = table.Column<Guid>(type: "TEXT", nullable: false),
-                    ModifiedDate = table.Column<DateTime>(type: "TEXT", nullable: false),
-                    ModifiedBy = table.Column<Guid>(type: "TEXT", nullable: false),
-                    DeletedDate = table.Column<DateTime>(type: "TEXT", nullable: true),
-                    DeletedBy = table.Column<Guid>(type: "TEXT", nullable: true),
-                    SyncVersion = table.Column<long>(type: "INTEGER", nullable: false),
-                    LastSyncedAt = table.Column<DateTime>(type: "TEXT", nullable: true),
-                    IsDeleted = table.Column<bool>(type: "INTEGER", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_Customers", x => x.Id);
-                    table.ForeignKey(
-                        name: "FK_Customers_ContactAddresses_BillingAddressId",
-                        column: x => x.BillingAddressId,
-                        principalTable: "ContactAddresses",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
-                    table.ForeignKey(
-                        name: "FK_Customers_ContactAddresses_ShippingAddressId",
-                        column: x => x.ShippingAddressId,
-                        principalTable: "ContactAddresses",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
-                    table.ForeignKey(
-                        name: "FK_Customers_Users_CreatedBy",
-                        column: x => x.CreatedBy,
-                        principalTable: "Users",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
-                });
-
-            migrationBuilder.CreateTable(
                 name: "Cities",
                 columns: table => new
                 {
@@ -1230,6 +1178,70 @@ namespace POS.Migrations.Sqlite.Migrations
                         principalTable: "Users",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Restrict);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Customers",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(type: "TEXT", nullable: false),
+                    CustomerName = table.Column<string>(type: "TEXT", maxLength: 250, nullable: true),
+                    ContactPerson = table.Column<string>(type: "TEXT", maxLength: 200, nullable: true),
+                    Email = table.Column<string>(type: "TEXT", maxLength: 256, nullable: true),
+                    Fax = table.Column<string>(type: "TEXT", maxLength: 50, nullable: true),
+                    MobileNo = table.Column<string>(type: "TEXT", maxLength: 50, nullable: true),
+                    PhoneNo = table.Column<string>(type: "TEXT", maxLength: 50, nullable: true),
+                    Website = table.Column<string>(type: "TEXT", maxLength: 500, nullable: true),
+                    Description = table.Column<string>(type: "TEXT", maxLength: 2000, nullable: true),
+                    Url = table.Column<string>(type: "TEXT", maxLength: 500, nullable: true),
+                    BillingAddressId = table.Column<Guid>(type: "TEXT", nullable: true),
+                    ShippingAddressId = table.Column<Guid>(type: "TEXT", nullable: true),
+                    IsWalkIn = table.Column<bool>(type: "INTEGER", nullable: false),
+                    TaxNumber = table.Column<string>(type: "TEXT", maxLength: 50, nullable: true),
+                    SalesPersonId = table.Column<Guid>(type: "TEXT", nullable: true),
+                    LocationId = table.Column<Guid>(type: "TEXT", nullable: true),
+                    TenantId = table.Column<Guid>(type: "TEXT", nullable: false),
+                    CreatedDate = table.Column<DateTime>(type: "TEXT", nullable: false),
+                    CreatedBy = table.Column<Guid>(type: "TEXT", nullable: false),
+                    ModifiedDate = table.Column<DateTime>(type: "TEXT", nullable: false),
+                    ModifiedBy = table.Column<Guid>(type: "TEXT", nullable: false),
+                    DeletedDate = table.Column<DateTime>(type: "TEXT", nullable: true),
+                    DeletedBy = table.Column<Guid>(type: "TEXT", nullable: true),
+                    SyncVersion = table.Column<long>(type: "INTEGER", nullable: false),
+                    LastSyncedAt = table.Column<DateTime>(type: "TEXT", nullable: true),
+                    IsDeleted = table.Column<bool>(type: "INTEGER", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Customers", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_Customers_ContactAddresses_BillingAddressId",
+                        column: x => x.BillingAddressId,
+                        principalTable: "ContactAddresses",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
+                        name: "FK_Customers_ContactAddresses_ShippingAddressId",
+                        column: x => x.ShippingAddressId,
+                        principalTable: "ContactAddresses",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
+                        name: "FK_Customers_Locations_LocationId",
+                        column: x => x.LocationId,
+                        principalTable: "Locations",
+                        principalColumn: "Id");
+                    table.ForeignKey(
+                        name: "FK_Customers_Users_CreatedBy",
+                        column: x => x.CreatedBy,
+                        principalTable: "Users",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
+                        name: "FK_Customers_Users_SalesPersonId",
+                        column: x => x.SalesPersonId,
+                        principalTable: "Users",
+                        principalColumn: "Id");
                 });
 
             migrationBuilder.CreateTable(
@@ -1788,130 +1800,6 @@ namespace POS.Migrations.Sqlite.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "CustomerLedgers",
-                columns: table => new
-                {
-                    Id = table.Column<Guid>(type: "TEXT", nullable: false),
-                    Date = table.Column<DateTime>(type: "TEXT", nullable: false),
-                    CustomerId = table.Column<Guid>(type: "TEXT", nullable: true),
-                    AccountName = table.Column<string>(type: "TEXT", nullable: true),
-                    LocationId = table.Column<Guid>(type: "TEXT", nullable: false),
-                    Description = table.Column<string>(type: "TEXT", nullable: true),
-                    Amount = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
-                    Reference = table.Column<string>(type: "TEXT", nullable: true),
-                    Balance = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
-                    Overdue = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
-                    Note = table.Column<string>(type: "TEXT", nullable: true),
-                    TenantId = table.Column<Guid>(type: "TEXT", nullable: false),
-                    CreatedDate = table.Column<DateTime>(type: "TEXT", nullable: false),
-                    CreatedBy = table.Column<Guid>(type: "TEXT", nullable: false),
-                    ModifiedDate = table.Column<DateTime>(type: "TEXT", nullable: false),
-                    ModifiedBy = table.Column<Guid>(type: "TEXT", nullable: false),
-                    DeletedDate = table.Column<DateTime>(type: "TEXT", nullable: true),
-                    DeletedBy = table.Column<Guid>(type: "TEXT", nullable: true),
-                    SyncVersion = table.Column<long>(type: "INTEGER", nullable: false),
-                    LastSyncedAt = table.Column<DateTime>(type: "TEXT", nullable: true),
-                    IsDeleted = table.Column<bool>(type: "INTEGER", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_CustomerLedgers", x => x.Id);
-                    table.ForeignKey(
-                        name: "FK_CustomerLedgers_Customers_CustomerId",
-                        column: x => x.CustomerId,
-                        principalTable: "Customers",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
-                    table.ForeignKey(
-                        name: "FK_CustomerLedgers_Locations_LocationId",
-                        column: x => x.LocationId,
-                        principalTable: "Locations",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
-                    table.ForeignKey(
-                        name: "FK_CustomerLedgers_Users_CreatedBy",
-                        column: x => x.CreatedBy,
-                        principalTable: "Users",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "SalesOrders",
-                columns: table => new
-                {
-                    Id = table.Column<Guid>(type: "TEXT", nullable: false),
-                    OrderNumber = table.Column<string>(type: "TEXT", maxLength: 50, nullable: true),
-                    Note = table.Column<string>(type: "TEXT", maxLength: 2000, nullable: true),
-                    SaleReturnNote = table.Column<string>(type: "TEXT", maxLength: 2000, nullable: true),
-                    TermAndCondition = table.Column<string>(type: "TEXT", maxLength: 4000, nullable: true),
-                    IsSalesOrderRequest = table.Column<bool>(type: "INTEGER", nullable: false),
-                    SOCreatedDate = table.Column<DateTime>(type: "TEXT", nullable: false),
-                    Status = table.Column<int>(type: "INTEGER", nullable: false),
-                    DeliveryDate = table.Column<DateTime>(type: "TEXT", nullable: false),
-                    DeliveryStatus = table.Column<int>(type: "INTEGER", nullable: false),
-                    CustomerId = table.Column<Guid>(type: "TEXT", nullable: false),
-                    TotalAmount = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
-                    TotalTax = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
-                    TotalDiscount = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
-                    FlatDiscount = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
-                    TotalPaidAmount = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
-                    TotalRoundOff = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
-                    TotalRefundAmount = table.Column<decimal>(type: "TEXT", nullable: false),
-                    PaymentStatus = table.Column<int>(type: "INTEGER", nullable: false),
-                    LocationId = table.Column<Guid>(type: "TEXT", nullable: false),
-                    BuyerNTN = table.Column<string>(type: "TEXT", nullable: true),
-                    BuyerCNIC = table.Column<string>(type: "TEXT", nullable: true),
-                    BuyerName = table.Column<string>(type: "TEXT", nullable: true),
-                    BuyerPhoneNumber = table.Column<string>(type: "TEXT", nullable: true),
-                    BuyerAddress = table.Column<string>(type: "TEXT", nullable: true),
-                    SaleType = table.Column<string>(type: "TEXT", nullable: true),
-                    FBRStatus = table.Column<int>(type: "INTEGER", nullable: false),
-                    FBRInvoiceNumber = table.Column<string>(type: "TEXT", nullable: true),
-                    FBRUSIN = table.Column<string>(type: "TEXT", nullable: true),
-                    FBRSubmittedAt = table.Column<DateTime>(type: "TEXT", nullable: true),
-                    FBRAcknowledgedAt = table.Column<DateTime>(type: "TEXT", nullable: true),
-                    FBRQRCodeData = table.Column<string>(type: "TEXT", nullable: true),
-                    FBRQRCodeImagePath = table.Column<string>(type: "TEXT", nullable: true),
-                    FBRRetryCount = table.Column<int>(type: "INTEGER", nullable: false),
-                    FBRNextRetryAt = table.Column<DateTime>(type: "TEXT", nullable: true),
-                    FBRErrorMessage = table.Column<string>(type: "TEXT", nullable: true),
-                    FBRResponseJson = table.Column<string>(type: "TEXT", nullable: true),
-                    TenantId = table.Column<Guid>(type: "TEXT", nullable: false),
-                    CreatedDate = table.Column<DateTime>(type: "TEXT", nullable: false),
-                    CreatedBy = table.Column<Guid>(type: "TEXT", nullable: false),
-                    ModifiedDate = table.Column<DateTime>(type: "TEXT", nullable: false),
-                    ModifiedBy = table.Column<Guid>(type: "TEXT", nullable: false),
-                    DeletedDate = table.Column<DateTime>(type: "TEXT", nullable: true),
-                    DeletedBy = table.Column<Guid>(type: "TEXT", nullable: true),
-                    SyncVersion = table.Column<long>(type: "INTEGER", nullable: false),
-                    LastSyncedAt = table.Column<DateTime>(type: "TEXT", nullable: true),
-                    IsDeleted = table.Column<bool>(type: "INTEGER", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_SalesOrders", x => x.Id);
-                    table.ForeignKey(
-                        name: "FK_SalesOrders_Customers_CustomerId",
-                        column: x => x.CustomerId,
-                        principalTable: "Customers",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
-                    table.ForeignKey(
-                        name: "FK_SalesOrders_Locations_LocationId",
-                        column: x => x.LocationId,
-                        principalTable: "Locations",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
-                    table.ForeignKey(
-                        name: "FK_SalesOrders_Users_CreatedBy",
-                        column: x => x.CreatedBy,
-                        principalTable: "Users",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
-                });
-
-            migrationBuilder.CreateTable(
                 name: "Inquiries",
                 columns: table => new
                 {
@@ -2019,6 +1907,136 @@ namespace POS.Migrations.Sqlite.Migrations
                         principalTable: "Users",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Restrict);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "CustomerLedgers",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(type: "TEXT", nullable: false),
+                    Date = table.Column<DateTime>(type: "TEXT", nullable: false),
+                    CustomerId = table.Column<Guid>(type: "TEXT", nullable: true),
+                    AccountName = table.Column<string>(type: "TEXT", nullable: true),
+                    LocationId = table.Column<Guid>(type: "TEXT", nullable: false),
+                    Description = table.Column<string>(type: "TEXT", nullable: true),
+                    Amount = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
+                    Reference = table.Column<string>(type: "TEXT", nullable: true),
+                    Balance = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
+                    Overdue = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
+                    Note = table.Column<string>(type: "TEXT", nullable: true),
+                    TenantId = table.Column<Guid>(type: "TEXT", nullable: false),
+                    CreatedDate = table.Column<DateTime>(type: "TEXT", nullable: false),
+                    CreatedBy = table.Column<Guid>(type: "TEXT", nullable: false),
+                    ModifiedDate = table.Column<DateTime>(type: "TEXT", nullable: false),
+                    ModifiedBy = table.Column<Guid>(type: "TEXT", nullable: false),
+                    DeletedDate = table.Column<DateTime>(type: "TEXT", nullable: true),
+                    DeletedBy = table.Column<Guid>(type: "TEXT", nullable: true),
+                    SyncVersion = table.Column<long>(type: "INTEGER", nullable: false),
+                    LastSyncedAt = table.Column<DateTime>(type: "TEXT", nullable: true),
+                    IsDeleted = table.Column<bool>(type: "INTEGER", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_CustomerLedgers", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_CustomerLedgers_Customers_CustomerId",
+                        column: x => x.CustomerId,
+                        principalTable: "Customers",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
+                        name: "FK_CustomerLedgers_Locations_LocationId",
+                        column: x => x.LocationId,
+                        principalTable: "Locations",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_CustomerLedgers_Users_CreatedBy",
+                        column: x => x.CreatedBy,
+                        principalTable: "Users",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "SalesOrders",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(type: "TEXT", nullable: false),
+                    OrderNumber = table.Column<string>(type: "TEXT", maxLength: 50, nullable: true),
+                    Note = table.Column<string>(type: "TEXT", maxLength: 2000, nullable: true),
+                    SaleReturnNote = table.Column<string>(type: "TEXT", maxLength: 2000, nullable: true),
+                    TermAndCondition = table.Column<string>(type: "TEXT", maxLength: 4000, nullable: true),
+                    IsSalesOrderRequest = table.Column<bool>(type: "INTEGER", nullable: false),
+                    SOCreatedDate = table.Column<DateTime>(type: "TEXT", nullable: false),
+                    Status = table.Column<int>(type: "INTEGER", nullable: false),
+                    DeliveryDate = table.Column<DateTime>(type: "TEXT", nullable: false),
+                    DeliveryStatus = table.Column<int>(type: "INTEGER", nullable: false),
+                    CustomerId = table.Column<Guid>(type: "TEXT", nullable: false),
+                    SalesPersonId = table.Column<Guid>(type: "TEXT", nullable: true),
+                    TotalAmount = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
+                    TotalTax = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
+                    TotalDiscount = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
+                    FlatDiscount = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
+                    TotalPaidAmount = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
+                    TotalRoundOff = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
+                    TotalRefundAmount = table.Column<decimal>(type: "TEXT", nullable: false),
+                    PaymentStatus = table.Column<int>(type: "INTEGER", nullable: false),
+                    LocationId = table.Column<Guid>(type: "TEXT", nullable: false),
+                    BuyerNTN = table.Column<string>(type: "TEXT", nullable: true),
+                    BuyerCNIC = table.Column<string>(type: "TEXT", nullable: true),
+                    BuyerName = table.Column<string>(type: "TEXT", nullable: true),
+                    BuyerPhoneNumber = table.Column<string>(type: "TEXT", nullable: true),
+                    BuyerAddress = table.Column<string>(type: "TEXT", nullable: true),
+                    SaleType = table.Column<string>(type: "TEXT", nullable: true),
+                    FBRStatus = table.Column<int>(type: "INTEGER", nullable: false),
+                    FBRInvoiceNumber = table.Column<string>(type: "TEXT", nullable: true),
+                    FBRUSIN = table.Column<string>(type: "TEXT", nullable: true),
+                    FBRSubmittedAt = table.Column<DateTime>(type: "TEXT", nullable: true),
+                    FBRAcknowledgedAt = table.Column<DateTime>(type: "TEXT", nullable: true),
+                    FBRQRCodeData = table.Column<string>(type: "TEXT", nullable: true),
+                    FBRQRCodeImagePath = table.Column<string>(type: "TEXT", nullable: true),
+                    FBRRetryCount = table.Column<int>(type: "INTEGER", nullable: false),
+                    FBRNextRetryAt = table.Column<DateTime>(type: "TEXT", nullable: true),
+                    FBRErrorMessage = table.Column<string>(type: "TEXT", nullable: true),
+                    FBRResponseJson = table.Column<string>(type: "TEXT", nullable: true),
+                    TenantId = table.Column<Guid>(type: "TEXT", nullable: false),
+                    CreatedDate = table.Column<DateTime>(type: "TEXT", nullable: false),
+                    CreatedBy = table.Column<Guid>(type: "TEXT", nullable: false),
+                    ModifiedDate = table.Column<DateTime>(type: "TEXT", nullable: false),
+                    ModifiedBy = table.Column<Guid>(type: "TEXT", nullable: false),
+                    DeletedDate = table.Column<DateTime>(type: "TEXT", nullable: true),
+                    DeletedBy = table.Column<Guid>(type: "TEXT", nullable: true),
+                    SyncVersion = table.Column<long>(type: "INTEGER", nullable: false),
+                    LastSyncedAt = table.Column<DateTime>(type: "TEXT", nullable: true),
+                    IsDeleted = table.Column<bool>(type: "INTEGER", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_SalesOrders", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_SalesOrders_Customers_CustomerId",
+                        column: x => x.CustomerId,
+                        principalTable: "Customers",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
+                        name: "FK_SalesOrders_Locations_LocationId",
+                        column: x => x.LocationId,
+                        principalTable: "Locations",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
+                        name: "FK_SalesOrders_Users_CreatedBy",
+                        column: x => x.CreatedBy,
+                        principalTable: "Users",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
+                        name: "FK_SalesOrders_Users_SalesPersonId",
+                        column: x => x.SalesPersonId,
+                        principalTable: "Users",
+                        principalColumn: "Id");
                 });
 
             migrationBuilder.CreateTable(
@@ -2421,89 +2439,6 @@ namespace POS.Migrations.Sqlite.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "FBRSubmissionLogs",
-                columns: table => new
-                {
-                    Id = table.Column<Guid>(type: "TEXT", nullable: false),
-                    SalesOrderId = table.Column<Guid>(type: "TEXT", nullable: false),
-                    AttemptedAt = table.Column<DateTime>(type: "TEXT", nullable: false),
-                    Status = table.Column<int>(type: "INTEGER", nullable: false),
-                    RequestPayload = table.Column<string>(type: "TEXT", nullable: true),
-                    ResponsePayload = table.Column<string>(type: "TEXT", nullable: true),
-                    HttpStatusCode = table.Column<int>(type: "INTEGER", nullable: false),
-                    ErrorMessage = table.Column<string>(type: "TEXT", maxLength: 1000, nullable: true),
-                    ResponseTime = table.Column<TimeSpan>(type: "TEXT", nullable: false),
-                    SubmittedBy = table.Column<string>(type: "TEXT", maxLength: 50, nullable: true),
-                    TenantId = table.Column<Guid>(type: "TEXT", nullable: false),
-                    CreatedDate = table.Column<DateTime>(type: "TEXT", nullable: false),
-                    CreatedBy = table.Column<Guid>(type: "TEXT", nullable: false),
-                    ModifiedDate = table.Column<DateTime>(type: "TEXT", nullable: false),
-                    ModifiedBy = table.Column<Guid>(type: "TEXT", nullable: false),
-                    DeletedDate = table.Column<DateTime>(type: "TEXT", nullable: true),
-                    DeletedBy = table.Column<Guid>(type: "TEXT", nullable: true),
-                    SyncVersion = table.Column<long>(type: "INTEGER", nullable: false),
-                    LastSyncedAt = table.Column<DateTime>(type: "TEXT", nullable: true),
-                    IsDeleted = table.Column<bool>(type: "INTEGER", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_FBRSubmissionLogs", x => x.Id);
-                    table.ForeignKey(
-                        name: "FK_FBRSubmissionLogs_SalesOrders_SalesOrderId",
-                        column: x => x.SalesOrderId,
-                        principalTable: "SalesOrders",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
-                    table.ForeignKey(
-                        name: "FK_FBRSubmissionLogs_Users_CreatedBy",
-                        column: x => x.CreatedBy,
-                        principalTable: "Users",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "SalesOrderPayments",
-                columns: table => new
-                {
-                    Id = table.Column<Guid>(type: "TEXT", nullable: false),
-                    SalesOrderId = table.Column<Guid>(type: "TEXT", nullable: false),
-                    PaymentDate = table.Column<DateTime>(type: "TEXT", nullable: false),
-                    ReferenceNumber = table.Column<string>(type: "TEXT", maxLength: 50, nullable: true),
-                    Amount = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
-                    PaymentMethod = table.Column<int>(type: "INTEGER", nullable: false),
-                    Note = table.Column<string>(type: "TEXT", maxLength: 1000, nullable: true),
-                    AttachmentUrl = table.Column<string>(type: "TEXT", nullable: true),
-                    PaymentType = table.Column<int>(type: "INTEGER", nullable: false),
-                    TenantId = table.Column<Guid>(type: "TEXT", nullable: false),
-                    CreatedDate = table.Column<DateTime>(type: "TEXT", nullable: false),
-                    CreatedBy = table.Column<Guid>(type: "TEXT", nullable: false),
-                    ModifiedDate = table.Column<DateTime>(type: "TEXT", nullable: false),
-                    ModifiedBy = table.Column<Guid>(type: "TEXT", nullable: false),
-                    DeletedDate = table.Column<DateTime>(type: "TEXT", nullable: true),
-                    DeletedBy = table.Column<Guid>(type: "TEXT", nullable: true),
-                    SyncVersion = table.Column<long>(type: "INTEGER", nullable: false),
-                    LastSyncedAt = table.Column<DateTime>(type: "TEXT", nullable: true),
-                    IsDeleted = table.Column<bool>(type: "INTEGER", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_SalesOrderPayments", x => x.Id);
-                    table.ForeignKey(
-                        name: "FK_SalesOrderPayments_SalesOrders_SalesOrderId",
-                        column: x => x.SalesOrderId,
-                        principalTable: "SalesOrders",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
-                    table.ForeignKey(
-                        name: "FK_SalesOrderPayments_Users_CreatedBy",
-                        column: x => x.CreatedBy,
-                        principalTable: "Users",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
-                });
-
-            migrationBuilder.CreateTable(
                 name: "InquiryActivities",
                 columns: table => new
                 {
@@ -2664,6 +2599,89 @@ namespace POS.Migrations.Sqlite.Migrations
                         onDelete: ReferentialAction.Restrict);
                     table.ForeignKey(
                         name: "FK_Suppliers_Users_CreatedBy",
+                        column: x => x.CreatedBy,
+                        principalTable: "Users",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "FBRSubmissionLogs",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(type: "TEXT", nullable: false),
+                    SalesOrderId = table.Column<Guid>(type: "TEXT", nullable: false),
+                    AttemptedAt = table.Column<DateTime>(type: "TEXT", nullable: false),
+                    Status = table.Column<int>(type: "INTEGER", nullable: false),
+                    RequestPayload = table.Column<string>(type: "TEXT", nullable: true),
+                    ResponsePayload = table.Column<string>(type: "TEXT", nullable: true),
+                    HttpStatusCode = table.Column<int>(type: "INTEGER", nullable: false),
+                    ErrorMessage = table.Column<string>(type: "TEXT", maxLength: 1000, nullable: true),
+                    ResponseTime = table.Column<TimeSpan>(type: "TEXT", nullable: false),
+                    SubmittedBy = table.Column<string>(type: "TEXT", maxLength: 50, nullable: true),
+                    TenantId = table.Column<Guid>(type: "TEXT", nullable: false),
+                    CreatedDate = table.Column<DateTime>(type: "TEXT", nullable: false),
+                    CreatedBy = table.Column<Guid>(type: "TEXT", nullable: false),
+                    ModifiedDate = table.Column<DateTime>(type: "TEXT", nullable: false),
+                    ModifiedBy = table.Column<Guid>(type: "TEXT", nullable: false),
+                    DeletedDate = table.Column<DateTime>(type: "TEXT", nullable: true),
+                    DeletedBy = table.Column<Guid>(type: "TEXT", nullable: true),
+                    SyncVersion = table.Column<long>(type: "INTEGER", nullable: false),
+                    LastSyncedAt = table.Column<DateTime>(type: "TEXT", nullable: true),
+                    IsDeleted = table.Column<bool>(type: "INTEGER", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_FBRSubmissionLogs", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_FBRSubmissionLogs_SalesOrders_SalesOrderId",
+                        column: x => x.SalesOrderId,
+                        principalTable: "SalesOrders",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_FBRSubmissionLogs_Users_CreatedBy",
+                        column: x => x.CreatedBy,
+                        principalTable: "Users",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "SalesOrderPayments",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(type: "TEXT", nullable: false),
+                    SalesOrderId = table.Column<Guid>(type: "TEXT", nullable: false),
+                    PaymentDate = table.Column<DateTime>(type: "TEXT", nullable: false),
+                    ReferenceNumber = table.Column<string>(type: "TEXT", maxLength: 50, nullable: true),
+                    Amount = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
+                    PaymentMethod = table.Column<int>(type: "INTEGER", nullable: false),
+                    Note = table.Column<string>(type: "TEXT", maxLength: 1000, nullable: true),
+                    AttachmentUrl = table.Column<string>(type: "TEXT", nullable: true),
+                    PaymentType = table.Column<int>(type: "INTEGER", nullable: false),
+                    TenantId = table.Column<Guid>(type: "TEXT", nullable: false),
+                    CreatedDate = table.Column<DateTime>(type: "TEXT", nullable: false),
+                    CreatedBy = table.Column<Guid>(type: "TEXT", nullable: false),
+                    ModifiedDate = table.Column<DateTime>(type: "TEXT", nullable: false),
+                    ModifiedBy = table.Column<Guid>(type: "TEXT", nullable: false),
+                    DeletedDate = table.Column<DateTime>(type: "TEXT", nullable: true),
+                    DeletedBy = table.Column<Guid>(type: "TEXT", nullable: true),
+                    SyncVersion = table.Column<long>(type: "INTEGER", nullable: false),
+                    LastSyncedAt = table.Column<DateTime>(type: "TEXT", nullable: true),
+                    IsDeleted = table.Column<bool>(type: "INTEGER", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_SalesOrderPayments", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_SalesOrderPayments_SalesOrders_SalesOrderId",
+                        column: x => x.SalesOrderId,
+                        principalTable: "SalesOrders",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_SalesOrderPayments_Users_CreatedBy",
                         column: x => x.CreatedBy,
                         principalTable: "Users",
                         principalColumn: "Id",
@@ -3114,6 +3132,7 @@ namespace POS.Migrations.Sqlite.Migrations
                     DeliveryDate = table.Column<DateTime>(type: "TEXT", nullable: false),
                     DeliveryStatus = table.Column<int>(type: "INTEGER", nullable: false),
                     SupplierId = table.Column<Guid>(type: "TEXT", nullable: false),
+                    SalesPersonId = table.Column<Guid>(type: "TEXT", nullable: true),
                     TotalAmount = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
                     TotalTax = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
                     TotalDiscount = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
@@ -3154,6 +3173,11 @@ namespace POS.Migrations.Sqlite.Migrations
                         principalTable: "Users",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
+                        name: "FK_PurchaseOrders_Users_SalesPersonId",
+                        column: x => x.SalesPersonId,
+                        principalTable: "Users",
+                        principalColumn: "Id");
                 });
 
             migrationBuilder.CreateTable(
@@ -3514,6 +3538,16 @@ namespace POS.Migrations.Sqlite.Migrations
                 column: "CreatedBy");
 
             migrationBuilder.CreateIndex(
+                name: "IX_Customers_LocationId",
+                table: "Customers",
+                column: "LocationId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Customers_SalesPersonId",
+                table: "Customers",
+                column: "SalesPersonId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_Customers_ShippingAddressId",
                 table: "Customers",
                 column: "ShippingAddressId");
@@ -3608,6 +3642,11 @@ namespace POS.Migrations.Sqlite.Migrations
                 name: "IX_Expense_Tenant_Date",
                 table: "Expenses",
                 columns: new[] { "TenantId", "ExpenseDate" });
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Expense_Tenant_IsDeleted_Date",
+                table: "Expenses",
+                columns: new[] { "TenantId", "IsDeleted", "ExpenseDate" });
 
             migrationBuilder.CreateIndex(
                 name: "IX_Expenses_CreatedBy",
@@ -3990,6 +4029,16 @@ namespace POS.Migrations.Sqlite.Migrations
                 column: "ParentId");
 
             migrationBuilder.CreateIndex(
+                name: "IX_ProductCategory_ParentId",
+                table: "ProductCategories",
+                columns: new[] { "TenantId", "ParentId" });
+
+            migrationBuilder.CreateIndex(
+                name: "IX_ProductCategory_Tenant_IsDeleted",
+                table: "ProductCategories",
+                columns: new[] { "TenantId", "IsDeleted" });
+
+            migrationBuilder.CreateIndex(
                 name: "IX_ProductCategory_Tenant_Name",
                 table: "ProductCategories",
                 columns: new[] { "TenantId", "Name" });
@@ -4009,6 +4058,11 @@ namespace POS.Migrations.Sqlite.Migrations
                 table: "Products",
                 columns: new[] { "TenantId", "Code" },
                 unique: true);
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Product_Tenant_IsDeleted",
+                table: "Products",
+                columns: new[] { "TenantId", "IsDeleted" });
 
             migrationBuilder.CreateIndex(
                 name: "IX_Product_Tenant_Name",
@@ -4087,12 +4141,17 @@ namespace POS.Migrations.Sqlite.Migrations
                 column: "TaxId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_PurchaseOrderItems_ProductId",
+                name: "IX_PurchaseOrderItem_Product",
                 table: "PurchaseOrderItems",
                 column: "ProductId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_PurchaseOrderItems_PurchaseOrderId",
+                name: "IX_PurchaseOrderItem_Product_Status",
+                table: "PurchaseOrderItems",
+                columns: new[] { "ProductId", "Status" });
+
+            migrationBuilder.CreateIndex(
+                name: "IX_PurchaseOrderItem_PurchaseOrder",
                 table: "PurchaseOrderItems",
                 column: "PurchaseOrderId");
 
@@ -4127,9 +4186,24 @@ namespace POS.Migrations.Sqlite.Migrations
                 column: "PurchaseOrderId");
 
             migrationBuilder.CreateIndex(
+                name: "IX_PurchaseOrder_Date_Location_IsRequest",
+                table: "PurchaseOrders",
+                columns: new[] { "TenantId", "POCreatedDate", "LocationId", "IsPurchaseOrderRequest" });
+
+            migrationBuilder.CreateIndex(
+                name: "IX_PurchaseOrder_DeliveryDate_Status",
+                table: "PurchaseOrders",
+                columns: new[] { "TenantId", "DeliveryDate", "DeliveryStatus" });
+
+            migrationBuilder.CreateIndex(
                 name: "IX_PurchaseOrder_Tenant_Date",
                 table: "PurchaseOrders",
                 columns: new[] { "TenantId", "POCreatedDate" });
+
+            migrationBuilder.CreateIndex(
+                name: "IX_PurchaseOrder_Tenant_IsDeleted_Date",
+                table: "PurchaseOrders",
+                columns: new[] { "TenantId", "IsDeleted", "POCreatedDate" });
 
             migrationBuilder.CreateIndex(
                 name: "IX_PurchaseOrder_Tenant_Number",
@@ -4151,6 +4225,11 @@ namespace POS.Migrations.Sqlite.Migrations
                 name: "IX_PurchaseOrders_LocationId",
                 table: "PurchaseOrders",
                 column: "LocationId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_PurchaseOrders_SalesPersonId",
+                table: "PurchaseOrders",
+                column: "SalesPersonId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_PurchaseOrders_SupplierId",
@@ -4188,9 +4267,9 @@ namespace POS.Migrations.Sqlite.Migrations
                 column: "CreatedBy");
 
             migrationBuilder.CreateIndex(
-                name: "IX_ReminderScheduler_TenantId",
+                name: "IX_ReminderScheduler_User_Read_Active",
                 table: "ReminderSchedulers",
-                column: "TenantId");
+                columns: new[] { "TenantId", "UserId", "IsRead", "IsActive" });
 
             migrationBuilder.CreateIndex(
                 name: "IX_ReminderSchedulers_CreatedBy",
@@ -4259,14 +4338,19 @@ namespace POS.Migrations.Sqlite.Migrations
                 unique: true);
 
             migrationBuilder.CreateIndex(
+                name: "IX_SalesOrderItem_Product",
+                table: "SalesOrderItems",
+                column: "ProductId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_SalesOrderItem_Product_Status",
+                table: "SalesOrderItems",
+                columns: new[] { "ProductId", "Status" });
+
+            migrationBuilder.CreateIndex(
                 name: "IX_SalesOrderItem_SalesOrder",
                 table: "SalesOrderItems",
                 column: "SalesOrderId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_SalesOrderItems_ProductId",
-                table: "SalesOrderItems",
-                column: "ProductId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_SalesOrderItems_UnitId",
@@ -4299,6 +4383,16 @@ namespace POS.Migrations.Sqlite.Migrations
                 column: "SalesOrderId");
 
             migrationBuilder.CreateIndex(
+                name: "IX_SalesOrder_Date_Location_IsRequest",
+                table: "SalesOrders",
+                columns: new[] { "TenantId", "SOCreatedDate", "LocationId", "IsSalesOrderRequest" });
+
+            migrationBuilder.CreateIndex(
+                name: "IX_SalesOrder_DeliveryDate_Status",
+                table: "SalesOrders",
+                columns: new[] { "TenantId", "DeliveryDate", "DeliveryStatus" });
+
+            migrationBuilder.CreateIndex(
                 name: "IX_SalesOrder_Tenant_Customer",
                 table: "SalesOrders",
                 columns: new[] { "TenantId", "CustomerId" });
@@ -4307,6 +4401,11 @@ namespace POS.Migrations.Sqlite.Migrations
                 name: "IX_SalesOrder_Tenant_Date",
                 table: "SalesOrders",
                 columns: new[] { "TenantId", "SOCreatedDate" });
+
+            migrationBuilder.CreateIndex(
+                name: "IX_SalesOrder_Tenant_IsDeleted_Date",
+                table: "SalesOrders",
+                columns: new[] { "TenantId", "IsDeleted", "SOCreatedDate" });
 
             migrationBuilder.CreateIndex(
                 name: "IX_SalesOrder_Tenant_Number",
@@ -4333,6 +4432,11 @@ namespace POS.Migrations.Sqlite.Migrations
                 name: "IX_SalesOrders_LocationId",
                 table: "SalesOrders",
                 column: "LocationId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_SalesOrders_SalesPersonId",
+                table: "SalesOrders",
+                column: "SalesPersonId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_SendEmail_TenantId",
@@ -4440,6 +4544,11 @@ namespace POS.Migrations.Sqlite.Migrations
                 column: "CreatedBy");
 
             migrationBuilder.CreateIndex(
+                name: "IX_Supplier_Name",
+                table: "Suppliers",
+                columns: new[] { "TenantId", "SupplierName" });
+
+            migrationBuilder.CreateIndex(
                 name: "IX_Supplier_Tenant_Email",
                 table: "Suppliers",
                 columns: new[] { "TenantId", "Email" });
@@ -4521,14 +4630,14 @@ namespace POS.Migrations.Sqlite.Migrations
                 unique: true);
 
             migrationBuilder.CreateIndex(
+                name: "IX_TransactionItem_Transaction",
+                table: "TransactionItems",
+                column: "TransactionId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_TransactionItems_InventoryItemId",
                 table: "TransactionItems",
                 column: "InventoryItemId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_TransactionItems_TransactionId",
-                table: "TransactionItems",
-                column: "TransactionId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_TransactionItems_UnitId",
@@ -4539,6 +4648,11 @@ namespace POS.Migrations.Sqlite.Migrations
                 name: "IX_TransactionItemTaxes_TaxId",
                 table: "TransactionItemTaxes",
                 column: "TaxId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Transaction_Date_Type_Branch",
+                table: "Transactions",
+                columns: new[] { "TenantId", "TransactionDate", "TransactionType", "BranchId" });
 
             migrationBuilder.CreateIndex(
                 name: "IX_Transaction_Tenant_Date",
@@ -4893,13 +5007,13 @@ namespace POS.Migrations.Sqlite.Migrations
                 name: "FinancialYears");
 
             migrationBuilder.DropTable(
-                name: "Locations");
-
-            migrationBuilder.DropTable(
                 name: "SupplierAddresses");
 
             migrationBuilder.DropTable(
                 name: "ContactAddresses");
+
+            migrationBuilder.DropTable(
+                name: "Locations");
 
             migrationBuilder.DropTable(
                 name: "Variants");

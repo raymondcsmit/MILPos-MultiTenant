@@ -129,10 +129,12 @@ public sealed class TestSeed(IServiceProvider serviceProvider)
         // so identity must exist before the business rows are saved.
         var savedTenants = await context.SaveChangesAsync();
 
-        // PRODUCT DRIFT WORKAROUND (documented): the SQLite migration set is 3 migrations behind the
-        // EF model (PostgreSQL has MainInit + SalesPerson + 2 optimization migrations; SQLite only MainInit,
-        // and POSDbContext ignores PendingModelChangesWarning). Patch the known missing columns on the
-        // TEST database only; every entry here is a finding to report for the desktop schema.
+        // SCHEMA-DRIFT DEFENSE (documented): the SQLite migration set was historically 3 migrations
+        // behind the EF model (SQLite only had MainInit; PostgreSQL had MainInit + SalesPerson + 2
+        // optimizations). The migrations were regenerated from the current model (fresh single
+        // MainInit per provider), so the missing columns now exist and each EnsureColumnAsync below
+        // is a defensive no-op. If a future model change ships without a fresh migration, these guard
+        // against "table X has no column named Y" on the TEST database only.
         await PatchMissingColumnsAsync(context);
 
         await SeedIdentityAndCoreDataAsync(userManager, roleManager, context);

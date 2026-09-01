@@ -471,6 +471,9 @@ namespace POS.Migrations.Sqlite.Migrations
                     b.Property<DateTime?>("LastSyncedAt")
                         .HasColumnType("TEXT");
 
+                    b.Property<Guid?>("LocationId")
+                        .HasColumnType("TEXT");
+
                     b.Property<string>("MobileNo")
                         .HasMaxLength(50)
                         .HasColumnType("TEXT");
@@ -483,6 +486,9 @@ namespace POS.Migrations.Sqlite.Migrations
 
                     b.Property<string>("PhoneNo")
                         .HasMaxLength(50)
+                        .HasColumnType("TEXT");
+
+                    b.Property<Guid?>("SalesPersonId")
                         .HasColumnType("TEXT");
 
                     b.Property<Guid?>("ShippingAddressId")
@@ -511,6 +517,10 @@ namespace POS.Migrations.Sqlite.Migrations
                     b.HasIndex("BillingAddressId");
 
                     b.HasIndex("CreatedBy");
+
+                    b.HasIndex("LocationId");
+
+                    b.HasIndex("SalesPersonId");
 
                     b.HasIndex("ShippingAddressId");
 
@@ -1443,7 +1453,8 @@ namespace POS.Migrations.Sqlite.Migrations
 
                     b.HasIndex("InventoryItemId");
 
-                    b.HasIndex("TransactionId");
+                    b.HasIndex("TransactionId")
+                        .HasDatabaseName("IX_TransactionItem_Transaction");
 
                     b.HasIndex("UnitId");
 
@@ -2578,8 +2589,14 @@ namespace POS.Migrations.Sqlite.Migrations
 
                     b.HasIndex("ParentId");
 
+                    b.HasIndex("TenantId", "IsDeleted")
+                        .HasDatabaseName("IX_ProductCategory_Tenant_IsDeleted");
+
                     b.HasIndex("TenantId", "Name")
                         .HasDatabaseName("IX_ProductCategory_Tenant_Name");
+
+                    b.HasIndex("TenantId", "ParentId")
+                        .HasDatabaseName("IX_ProductCategory_ParentId");
 
                     b.ToTable("ProductCategories");
                 });
@@ -2717,10 +2734,10 @@ namespace POS.Migrations.Sqlite.Migrations
 
                     b.HasIndex("CreatedBy");
 
-                    b.HasIndex("TenantId")
-                        .HasDatabaseName("IX_ReminderScheduler_TenantId");
-
                     b.HasIndex("UserId");
+
+                    b.HasIndex("TenantId", "UserId", "IsRead", "IsActive")
+                        .HasDatabaseName("IX_ReminderScheduler_User_Read_Active");
 
                     b.ToTable("ReminderSchedulers");
                 });
@@ -3201,6 +3218,9 @@ namespace POS.Migrations.Sqlite.Migrations
                     b.HasIndex("TenantId", "TransactionDate")
                         .HasDatabaseName("IX_Transaction_Tenant_Date");
 
+                    b.HasIndex("TenantId", "TransactionDate", "TransactionType", "BranchId")
+                        .HasDatabaseName("IX_Transaction_Date_Type_Branch");
+
                     b.ToTable("Transactions");
                 });
 
@@ -3411,6 +3431,9 @@ namespace POS.Migrations.Sqlite.Migrations
 
                     b.HasIndex("TenantId", "ExpenseDate")
                         .HasDatabaseName("IX_Expense_Tenant_Date");
+
+                    b.HasIndex("TenantId", "IsDeleted", "ExpenseDate")
+                        .HasDatabaseName("IX_Expense_Tenant_IsDeleted_Date");
 
                     b.ToTable("Expenses");
                 });
@@ -4021,6 +4044,9 @@ namespace POS.Migrations.Sqlite.Migrations
                         .IsUnique()
                         .HasDatabaseName("IX_Product_Tenant_Code");
 
+                    b.HasIndex("TenantId", "IsDeleted")
+                        .HasDatabaseName("IX_Product_Tenant_IsDeleted");
+
                     b.HasIndex("TenantId", "Name")
                         .HasDatabaseName("IX_Product_Tenant_Name");
 
@@ -4141,6 +4167,9 @@ namespace POS.Migrations.Sqlite.Migrations
                     b.Property<string>("PurchaseReturnNote")
                         .HasColumnType("TEXT");
 
+                    b.Property<Guid?>("SalesPersonId")
+                        .HasColumnType("TEXT");
+
                     b.Property<int>("Status")
                         .HasColumnType("INTEGER");
 
@@ -4181,6 +4210,8 @@ namespace POS.Migrations.Sqlite.Migrations
 
                     b.HasIndex("LocationId");
 
+                    b.HasIndex("SalesPersonId");
+
                     b.HasIndex("SupplierId");
 
                     b.HasIndex("TenantId", "OrderNumber")
@@ -4192,6 +4223,15 @@ namespace POS.Migrations.Sqlite.Migrations
 
                     b.HasIndex("TenantId", "SupplierId")
                         .HasDatabaseName("IX_PurchaseOrder_Tenant_Supplier");
+
+                    b.HasIndex("TenantId", "DeliveryDate", "DeliveryStatus")
+                        .HasDatabaseName("IX_PurchaseOrder_DeliveryDate_Status");
+
+                    b.HasIndex("TenantId", "IsDeleted", "POCreatedDate")
+                        .HasDatabaseName("IX_PurchaseOrder_Tenant_IsDeleted_Date");
+
+                    b.HasIndex("TenantId", "POCreatedDate", "LocationId", "IsPurchaseOrderRequest")
+                        .HasDatabaseName("IX_PurchaseOrder_Date_Location_IsRequest");
 
                     b.ToTable("PurchaseOrders");
                 });
@@ -4243,11 +4283,16 @@ namespace POS.Migrations.Sqlite.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("ProductId");
+                    b.HasIndex("ProductId")
+                        .HasDatabaseName("IX_PurchaseOrderItem_Product");
 
-                    b.HasIndex("PurchaseOrderId");
+                    b.HasIndex("PurchaseOrderId")
+                        .HasDatabaseName("IX_PurchaseOrderItem_PurchaseOrder");
 
                     b.HasIndex("UnitId");
+
+                    b.HasIndex("ProductId", "Status")
+                        .HasDatabaseName("IX_PurchaseOrderItem_Product_Status");
 
                     b.ToTable("PurchaseOrderItems");
                 });
@@ -4775,6 +4820,9 @@ namespace POS.Migrations.Sqlite.Migrations
                     b.Property<string>("SaleType")
                         .HasColumnType("TEXT");
 
+                    b.Property<Guid?>("SalesPersonId")
+                        .HasColumnType("TEXT");
+
                     b.Property<int>("Status")
                         .HasColumnType("INTEGER");
 
@@ -4814,6 +4862,8 @@ namespace POS.Migrations.Sqlite.Migrations
 
                     b.HasIndex("LocationId");
 
+                    b.HasIndex("SalesPersonId");
+
                     b.HasIndex("TenantId", "CustomerId")
                         .HasDatabaseName("IX_SalesOrder_Tenant_Customer");
 
@@ -4826,6 +4876,15 @@ namespace POS.Migrations.Sqlite.Migrations
 
                     b.HasIndex("TenantId", "Status")
                         .HasDatabaseName("IX_SalesOrder_Tenant_Status");
+
+                    b.HasIndex("TenantId", "DeliveryDate", "DeliveryStatus")
+                        .HasDatabaseName("IX_SalesOrder_DeliveryDate_Status");
+
+                    b.HasIndex("TenantId", "IsDeleted", "SOCreatedDate")
+                        .HasDatabaseName("IX_SalesOrder_Tenant_IsDeleted_Date");
+
+                    b.HasIndex("TenantId", "SOCreatedDate", "LocationId", "IsSalesOrderRequest")
+                        .HasDatabaseName("IX_SalesOrder_Date_Location_IsRequest");
 
                     b.ToTable("SalesOrders");
                 });
@@ -4889,12 +4948,16 @@ namespace POS.Migrations.Sqlite.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("ProductId");
+                    b.HasIndex("ProductId")
+                        .HasDatabaseName("IX_SalesOrderItem_Product");
 
                     b.HasIndex("SalesOrderId")
                         .HasDatabaseName("IX_SalesOrderItem_SalesOrder");
 
                     b.HasIndex("UnitId");
+
+                    b.HasIndex("ProductId", "Status")
+                        .HasDatabaseName("IX_SalesOrderItem_Product_Status");
 
                     b.ToTable("SalesOrderItems");
                 });
@@ -5159,6 +5222,9 @@ namespace POS.Migrations.Sqlite.Migrations
 
                     b.HasIndex("TenantId", "MobileNo")
                         .HasDatabaseName("IX_Supplier_Tenant_Mobile");
+
+                    b.HasIndex("TenantId", "SupplierName")
+                        .HasDatabaseName("IX_Supplier_Name");
 
                     b.ToTable("Suppliers");
                 });
@@ -5674,6 +5740,14 @@ namespace POS.Migrations.Sqlite.Migrations
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
+                    b.HasOne("POS.Data.Entities.Location", "Location")
+                        .WithMany()
+                        .HasForeignKey("LocationId");
+
+                    b.HasOne("POS.Data.User", "SalesPerson")
+                        .WithMany()
+                        .HasForeignKey("SalesPersonId");
+
                     b.HasOne("POS.Data.Entities.ContactAddress", "ShippingAddress")
                         .WithMany()
                         .HasForeignKey("ShippingAddressId")
@@ -5682,6 +5756,10 @@ namespace POS.Migrations.Sqlite.Migrations
                     b.Navigation("BillingAddress");
 
                     b.Navigation("CreatedByUser");
+
+                    b.Navigation("Location");
+
+                    b.Navigation("SalesPerson");
 
                     b.Navigation("ShippingAddress");
                 });
@@ -6785,6 +6863,10 @@ namespace POS.Migrations.Sqlite.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
+                    b.HasOne("POS.Data.User", "SalesPerson")
+                        .WithMany()
+                        .HasForeignKey("SalesPersonId");
+
                     b.HasOne("POS.Data.Supplier", "Supplier")
                         .WithMany()
                         .HasForeignKey("SupplierId")
@@ -6794,6 +6876,8 @@ namespace POS.Migrations.Sqlite.Migrations
                     b.Navigation("CreatedByUser");
 
                     b.Navigation("Location");
+
+                    b.Navigation("SalesPerson");
 
                     b.Navigation("Supplier");
                 });
@@ -7021,11 +7105,17 @@ namespace POS.Migrations.Sqlite.Migrations
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
+                    b.HasOne("POS.Data.User", "SalesPerson")
+                        .WithMany()
+                        .HasForeignKey("SalesPersonId");
+
                     b.Navigation("CreatedByUser");
 
                     b.Navigation("Customer");
 
                     b.Navigation("Location");
+
+                    b.Navigation("SalesPerson");
                 });
 
             modelBuilder.Entity("POS.Data.SalesOrderItem", b =>
