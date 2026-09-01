@@ -216,7 +216,8 @@ export class PosComponent extends BaseComponent implements OnInit, AfterViewInit
     this.route.data.pipe().subscribe((salesOrderData: any) => {
       this.salesOrder = salesOrderData.salesorder;
       this.isEdit = false;
-      this.getCustomers();
+      // Build the form BEFORE getCustomers(): its subscribe callback patches
+      // customerId, so the form must exist for any (even synchronous) response.
       this.salesOrderForm = this.fb.group({
         orderNumber: ['', [Validators.required]],
         filerCustomer: [''],
@@ -235,6 +236,7 @@ export class PosComponent extends BaseComponent implements OnInit, AfterViewInit
         filterProductValue: [''],
         filterBarCodeValue: [''],
       });
+      this.getCustomers();
     });
   }
 

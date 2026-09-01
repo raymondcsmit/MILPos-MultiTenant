@@ -110,7 +110,10 @@ export class CustomerSalesOrderListComponent extends BaseComponent implements Af
   public set CustomerFilter(v: string) {
     if (this._customerFilter !== v) {
       this._customerFilter = v;
-      const customerFilter = `customerName:${v}`;
+      // FIX: was `customerName:${v}` — the filter pipeline splits on '#'
+      // (see filterObservable$ subscribe), so the colon silently dropped the
+      // customer name and the list reloaded unfiltered.
+      const customerFilter = `customerName#${v}`;
       this.filterObservable$.next(customerFilter);
     }
   }

@@ -1,32 +1,59 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { TranslateModule } from '@ngx-translate/core';
+import { of, throwError } from 'rxjs';
 
 import { PurchaseOrderExpectedDeliveryComponent } from './purchase-order-expected-delivery.component';
-import { provideHttpClient } from '@angular/common/http';
-import { TranslateModule } from '@ngx-translate/core';
-import { CurrencyPipe } from '@angular/common';
-import { provideNativeDateAdapter } from '@angular/material/core';
-import { JwtHelperService } from '@auth0/angular-jwt';
-import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
+import { DashboardService } from '../dashboard.service';
+import { SecurityService } from '@core/security/security.service';
+import { TranslationService } from '@core/services/translation.service';
+import { CommonService } from '@core/services/common.service';
 
 describe('PurchaseOrderExpectedDeliveryComponent', () => {
   let component: PurchaseOrderExpectedDeliveryComponent;
   let fixture: ComponentFixture<PurchaseOrderExpectedDeliveryComponent>;
+  let dashboardService: jasmine.SpyObj<DashboardService>;
 
-  beforeEach(async () => {
-    await TestBed.configureTestingModule({
-      providers: [provideHttpClient(), { provide: MatDialogRef, useValue: {} }, { provide: MAT_DIALOG_DATA, useValue: {} }, { provide: JwtHelperService, useValue: {} }, CurrencyPipe, provideNativeDateAdapter()],
-      imports: [ PurchaseOrderExpectedDeliveryComponent , TranslateModule.forRoot()]
-    })
-    .compileComponents();
-  });
+  const rows = [
+    { orderNo: 'PO-1', supplierName: 'Supplier A', quantity: 3 },
+  ];
 
   beforeEach(() => {
+    dashboardService = jasmine.createSpyObj<DashboardService>('DashboardService', [
+      'getPurchaseOrderRecentDeliverySchedule',
+    ]);
+    const translationService = jasmine.createSpyObj<TranslationService>('TranslationService', ['getValue']);
+    (translationService as any).lanDir$ = of('ltr');
+
+    TestBed.configureTestingModule({
+      imports: [PurchaseOrderExpectedDeliveryComponent, TranslateModule.forRoot()],
+      providers: [
+        { provide: DashboardService, useValue: dashboardService },
+        { provide: SecurityService, useValue: jasmine.createSpyObj('SecurityService', ['hasClaim']) },
+        { provide: TranslationService, useValue: translationService },
+        { provide: CommonService, useValue: jasmine.createSpyObj('CommonService', ['getPageHelperText']) },
+      ],
+    });
+  });
+
+  function createFixture(): void {
     fixture = TestBed.createComponent(PurchaseOrderExpectedDeliveryComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
+  }
+
+  it('should create and load the delivery schedule', () => {
+    dashboardService.getPurchaseOrderRecentDeliverySchedule.and.returnValue(of(rows as any));
+    createFixture();
+    expect(component).toBeTruthy();
+    expect(dashboardService.getPurchaseOrderRecentDeliverySchedule).toHaveBeenCalledOnceWith();
+    expect(component.dataSource).toBe(rows as any);
+    expect(component.loading).toBeFalse();
   });
 
-  it('should create', () => {
-    expect(component).toBeTruthy();
+  it('should stop loading when the request fails', () => {
+    dashboardService.getPurchaseOrderRecentDeliverySchedule.and.returnValue(throwError(() => new Error('boom')));
+    createFixture();
+    expect(component.loading).toBeFalse();
+    expect(component.dataSource).toEqual([]);
   });
 });
