@@ -1,0 +1,43 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net10.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>disable</Nullable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\POS.Common\POS.Common.csproj" />
+    <ProjectReference Include="..\POS.Data\POS.Data.csproj" />
+    <ProjectReference Include="..\POS.Helper\POS.Helper.csproj" />
+    <ProjectReference Include="..\POS.Domain\POS.Domain.csproj" />
+    <ProjectReference Include="..\POS.Repository\POS.Repository.csproj" />
+    <ProjectReference Include="..\POS.Migrations.Sqlite\POS.Migrations.Sqlite.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="10.0.2" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore" Version="10.0.2" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="10.0.2" />
+    <PackageReference Include="Microsoft.Extensions.Hosting" Version="10.0.2" />
+  </ItemGroup>
+
+  <!-- Make the shared SeedData CSV folder available to the tool at runtime so
+       TenantRegistrationService's _seedDataPath resolution finds the CSVs. -->
+  <ItemGroup>
+    <None Include="..\..\SeedData\**\*.csv;..\..\SeedData\**\*.ps1;..\..\SeedData\**\*.py"
+          CopyToOutputDirectory="PreserveNewest"
+          Link="SeedData\%(RecursiveDir)%(Filename)%(Extension)" />
+  </ItemGroup>
+
+  <!-- Base the generated appsettings.json on the known-good Desktop config so every
+       startup-required key (Kestrel, ImagePathSettings, AesEncryptionKey, Logging, ...)
+       is present; only per-customer keys are overridden. -->
+  <ItemGroup>
+    <None Include="..\POS.API\appsettings.Desktop.json"
+          CopyToOutputDirectory="PreserveNewest"
+          Link="appsettings.Desktop.json" />
+  </ItemGroup>
+
+</Project>

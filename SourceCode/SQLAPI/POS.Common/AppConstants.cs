@@ -60,6 +60,7 @@ namespace POS.Common
             public const string Retail = "Retail";
             public const string Pharmacy = "Pharmacy";
             public const string Petrol = "Petrol";
+            public const string Agriculture = "Agriculture";
         }
 
         public static class Prefix
@@ -67,6 +68,7 @@ namespace POS.Common
              public const string Pharmacy = "PH";
              public const string Petrol = "PT";
              public const string Retail = "RT";
+             public const string Agriculture = "AG";
         }
 
         public static class DatabaseProviders

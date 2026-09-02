@@ -83,17 +83,21 @@ namespace POS.Repository
 
             await SeedTenantTableAsync<EmailTemplate>("EmailTemplates.csv", tenant, adminUser, globalIdMap);
             await SeedTenantTableAsync<EmailSMTPSetting>("EmailSMTPSettings.csv", tenant, adminUser, globalIdMap);
-            await SeedTenantTableAsync<Data.Action>("Actions.csv", tenant, adminUser, globalIdMap);
-            await SeedRoleClaimsAsync(roleMap, globalIdMap);
+            // Pages must be seeded before Actions (Actions.PageId FK, SQLite enforces immediately);
+            // otherwise the raw CSV path fails with error 19 when no master tenant exists to clone.
             await SeedTenantTableAsync<Page>("Pages.csv", tenant, adminUser, globalIdMap);
             await SeedTenantTableAsync<PageHelper>("Pagehelpers.csv", tenant, adminUser, globalIdMap);
+            await SeedTenantTableAsync<Data.Action>("Actions.csv", tenant, adminUser, globalIdMap);
+            await SeedRoleClaimsAsync(roleMap, globalIdMap);
             await SeedTenantTableAsync<InquiryStatus>("InquiryStatuses.csv", tenant, adminUser, globalIdMap);
             await SeedTenantTableAsync<InquirySource>("InquirySources.csv", tenant, adminUser, globalIdMap);
 
             await SeedTenantTableAsync<Supplier>("Suppliers.csv", tenant, adminUser, globalIdMap);
             await SeedTenantTableAsync<SupplierAddress>("SupplierAddresses.csv", tenant, adminUser, globalIdMap);
-            await SeedTenantTableAsync<Customer>("Customers.csv", tenant, adminUser, globalIdMap);
+            // ContactAddresses must be seeded before Customers (Customer.BillingAddressId /
+            // ShippingAddressId FK -> ContactAddress; SQLite enforces immediately).
             await SeedTenantTableAsync<ContactAddress>("ContactAddresses.csv", tenant, adminUser, globalIdMap);
+            await SeedTenantTableAsync<Customer>("Customers.csv", tenant, adminUser, globalIdMap);
 
             await SeedProductsAsync(tenant, adminUser, globalIdMap, mainLocationId);
             await SeedTenantTableAsync<ProductTax>("ProductTaxes.csv", tenant, adminUser, globalIdMap);
@@ -437,6 +441,7 @@ namespace POS.Repository
             string prefix = "";
             if (tenant.BusinessType == AppConstants.BusinessType.Pharmacy) prefix = AppConstants.Prefix.Pharmacy;
             else if (tenant.BusinessType == AppConstants.BusinessType.Petrol) prefix = AppConstants.Prefix.Petrol;
+            else if (tenant.BusinessType == AppConstants.BusinessType.Agriculture) prefix = AppConstants.Prefix.Agriculture;
 
             foreach (var p in allProducts)
             {
@@ -481,6 +486,34 @@ namespace POS.Repository
             if (seededStocks.Any())
             {
                 _context.ProductStocks.AddRange(seededStocks);
+                await _context.SaveChangesAsync();
+            }
+
+            // N-47: ProductStocks.csv only carries rows for business types like PH/PT, so an
+            // Agriculture (AG) tenant would end up with products but zero ProductStock rows.
+            // Auto-create a CurrentStock=0 row per seeded product missing a CSV stock entry,
+            // mirroring AddProductCommandHandler's per-location auto-stock behavior.
+            var coveredProductIds = seededStocks.Select(s => s.ProductId).ToHashSet();
+            var autoStocks = new List<ProductStock>();
+            foreach (var p in seededProducts)
+            {
+                if (coveredProductIds.Contains(p.Id)) continue;
+                autoStocks.Add(new ProductStock
+                {
+                    Id = Guid.NewGuid(),
+                    ProductId = p.Id,
+                    LocationId = mainLocationId,
+                    CurrentStock = 0.0m,
+                    PurchasePrice = p.PurchasePrice ?? 0m,
+                    ModifiedDate = DateTime.UtcNow,
+                    CreatedBy = adminUser.Id,
+                    CreatedDate = DateTime.UtcNow,
+                    ModifiedBy = adminUser.Id
+                });
+            }
+            if (autoStocks.Any())
+            {
+                _context.ProductStocks.AddRange(autoStocks);
                 await _context.SaveChangesAsync();
             }
         }
