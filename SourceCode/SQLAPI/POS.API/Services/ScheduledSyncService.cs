@@ -36,10 +36,22 @@ namespace POS.API.Services
         protected override async Task ExecuteAsync(CancellationToken stoppingToken)
         {
             // Only run in Desktop mode
-            var deploymentMode = _configuration["DeploymentSettings:DeploymentMode"];
+            var deploymentMode = _configuration["DeploymentSettings:DeploymentMode"] 
+                                 ?? _configuration["DeploymentMode"];
             if (deploymentMode != "Desktop")
             {
                 _logger.LogInformation("ScheduledSyncService disabled - not in Desktop mode");
+                return;
+            }
+
+            // Check if sync is enabled in configuration
+            var isSyncEnabled = _configuration.GetValue<bool?>("SyncSettings:Enabled") ??
+                                _configuration.GetValue<bool?>("SyncSettings:AutoSync") ??
+                                _configuration.GetValue<bool?>("DeploymentSettings:SyncSettings:Enabled") ??
+                                true;
+            if (!isSyncEnabled)
+            {
+                _logger.LogInformation("ScheduledSyncService disabled - Sync is disabled in configuration (SyncSettings:Enabled = false)");
                 return;
             }
 

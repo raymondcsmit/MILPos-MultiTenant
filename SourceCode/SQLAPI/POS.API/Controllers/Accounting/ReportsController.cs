@@ -1,4 +1,5 @@
-﻿using MediatR;
+using MediatR;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using POS.API.Helpers;
@@ -15,7 +16,7 @@ namespace POS.API.Controllers.Accounting
     /// </summary>
     [Route("api/[controller]")]
     [ApiController]
-    //[Authorize]
+    [Authorize]
     public class ReportsController(IMediator _mediator) : BaseController
     {
         /// <summary>
@@ -142,6 +143,7 @@ namespace POS.API.Controllers.Accounting
         /// <param name="paymentEntryResource"></param>
         /// <returns></returns>
         [HttpGet("Paymentreport")]
+        [ClaimCheck("ACCOUNTING_VIEW_GENERAL_ENTRY_REPORT")]
         public async Task<IActionResult> GetAllPaymentEntryReport([FromQuery] PaymentEntryResource paymentEntryResource)
         {
             var GetGeneralEntryList = new GetPaymentEntryListCommand()

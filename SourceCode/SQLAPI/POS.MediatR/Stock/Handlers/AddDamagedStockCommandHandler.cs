@@ -1,4 +1,4 @@
-﻿using AutoMapper;
+using AutoMapper;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
@@ -32,6 +32,25 @@ namespace POS.MediatR.Stock.Handlers
     {
         public async Task<ServiceResponse<List<DamagedStockDto>>> Handle(AddDamagedStockCommand request, CancellationToken cancellationToken)
         {
+            if (request.DamagedStockItems == null || request.DamagedStockItems.Count == 0)
+            {
+                return ServiceResponse<List<DamagedStockDto>>.Return422("At least one damaged stock item is required.");
+            }
+
+            var requsetProductIds = request.DamagedStockItems.Select(c => c.ProductId).ToList();
+            var stockList = await _productStockRepository.All
+                .Where(c => c.LocationId == request.LocationId && requsetProductIds.Contains(c.ProductId)).ToListAsync(cancellationToken);
+
+            foreach (var item in request.DamagedStockItems)
+            {
+                var productStock = stockList.FirstOrDefault(s => s.ProductId == item.ProductId);
+                if (productStock == null || productStock.CurrentStock < item.DamagedQuantity)
+                {
+                    return ServiceResponse<List<DamagedStockDto>>.Return422(
+                        $"Insufficient stock to write off damage. Available: {(productStock?.CurrentStock ?? 0)}, Requested: {item.DamagedQuantity}");
+                }
+            }
+
             var damagedStock = new List<DamagedStock>();
             foreach (var item in request.DamagedStockItems)
             {
@@ -60,9 +79,6 @@ namespace POS.MediatR.Stock.Handlers
             //Accounting Entries
             try
             {
-                var requsetProductIds = request.DamagedStockItems.Select(c => c.ProductId).ToList();
-                var stockList = await _productStockRepository.All
-                    .Where(c => c.LocationId == request.LocationId && requsetProductIds.Contains(c.ProductId)).ToListAsync();
 
                 var transactionItems = new List<TransactionItemDto>();
                 foreach (var item in request.DamagedStockItems)

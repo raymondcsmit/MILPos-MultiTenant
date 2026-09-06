@@ -181,6 +181,7 @@ namespace POS.Domain.Sync
             if (!localChanges.Any())
             {
                 _logger.LogInformation("No local changes to push");
+                await _changeTracker.UpdateSyncMetadata("All", DateTime.UtcNow, isPull: false);
                 return;
             }
 
@@ -232,7 +233,13 @@ namespace POS.Domain.Sync
                         result.RecordsFailed++;
                     }
                 }
+
+                // Update metadata for this entity type
+                await _changeTracker.UpdateSyncMetadata(group.Key, DateTime.UtcNow, isPull: false);
             }
+
+            // Update global push sync metadata
+            await _changeTracker.UpdateSyncMetadata("All", DateTime.UtcNow, isPull: false);
         }
 
         /// <summary>

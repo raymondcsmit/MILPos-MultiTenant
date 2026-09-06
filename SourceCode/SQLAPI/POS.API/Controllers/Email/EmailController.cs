@@ -1,4 +1,4 @@
-﻿using MediatR;
+using MediatR;
 using Microsoft.AspNetCore.Mvc;
 using System.Threading.Tasks;
 using POS.MediatR.CommandAndQuery;
@@ -39,6 +39,7 @@ namespace POS.API.Controllers.Email
         /// <param name="addSendEmailSuppliersCommand"></param>
         /// <returns></returns>
         [HttpPost("salesOrPurchase")]
+        [ClaimCheck("EMAIL_SEND_EMAIL")]
         public async Task<IActionResult> SendSalesOrdPurchase(SendSalesOrPurchaseCommand addSendEmailSuppliersCommand)
         {
             var result = await _mediator.Send(addSendEmailSuppliersCommand);

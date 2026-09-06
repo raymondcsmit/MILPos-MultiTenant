@@ -1,9 +1,11 @@
 using System;
 using System.IO;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
+using POS.API.Helpers;
 using POS.Data;
 using POS.Domain.ImportExport;
 using POS.Helper;
@@ -12,6 +14,7 @@ namespace POS.API.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
+    [Authorize]
     public class ImportExportController : BaseController
     {
         private readonly IImportExportService<POS.Data.Product> _productService;
@@ -34,6 +37,7 @@ namespace POS.API.Controllers
         #region Product Endpoints
 
         [HttpPost("products/import")]
+        [ClaimCheck("PRO_ADD_PRODUCT")]
         public async Task<IActionResult> ImportProducts(IFormFile file)
         {
             if (file == null || file.Length == 0)
@@ -65,6 +69,7 @@ namespace POS.API.Controllers
         }
 
         [HttpPost("products/validate")]
+        [ClaimCheck("PRO_ADD_PRODUCT")]
         public async Task<IActionResult> ValidateProducts(IFormFile file)
         {
             if (file == null || file.Length == 0)
@@ -96,6 +101,7 @@ namespace POS.API.Controllers
         }
 
         [HttpGet("products/export")]
+        [ClaimCheck("PRO_VIEW_PRODUCTS")]
         public async Task<IActionResult> ExportProducts([FromQuery] string format = "csv")
         {
             try
@@ -119,6 +125,7 @@ namespace POS.API.Controllers
         }
 
         [HttpGet("products/template")]
+        [ClaimCheck("PRO_VIEW_PRODUCTS")]
         public async Task<IActionResult> GetProductTemplate([FromQuery] string format = "csv")
         {
             try
@@ -144,6 +151,7 @@ namespace POS.API.Controllers
         #region Customer Endpoints
 
         [HttpPost("customers/import")]
+        [ClaimCheck("CUST_ADD_CUSTOMER")]
         public async Task<IActionResult> ImportCustomers(IFormFile file)
         {
             if (file == null || file.Length == 0)
@@ -172,6 +180,7 @@ namespace POS.API.Controllers
         }
 
         [HttpGet("customers/export")]
+        [ClaimCheck("CUST_VIEW_CUSTOMERS")]
         public async Task<IActionResult> ExportCustomers([FromQuery] string format = "csv")
         {
             try
@@ -192,6 +201,7 @@ namespace POS.API.Controllers
         }
 
         [HttpGet("customers/template")]
+        [ClaimCheck("CUST_VIEW_CUSTOMERS")]
         public async Task<IActionResult> GetCustomerTemplate([FromQuery] string format = "csv")
         {
             try
@@ -215,6 +225,7 @@ namespace POS.API.Controllers
         #region Supplier Endpoints
 
         [HttpPost("suppliers/import")]
+        [ClaimCheck("SUPP_ADD_SUPPLIER")]
         public async Task<IActionResult> ImportSuppliers(IFormFile file)
         {
             if (file == null || file.Length == 0)
@@ -243,6 +254,7 @@ namespace POS.API.Controllers
         }
 
         [HttpGet("suppliers/export")]
+        [ClaimCheck("SUPP_VIEW_SUPPLIERS")]
         public async Task<IActionResult> ExportSuppliers([FromQuery] string format = "csv")
         {
             try
@@ -263,6 +275,7 @@ namespace POS.API.Controllers
         }
 
         [HttpGet("suppliers/template")]
+        [ClaimCheck("SUPP_VIEW_SUPPLIERS")]
         public async Task<IActionResult> GetSupplierTemplate([FromQuery] string format = "csv")
         {
             try

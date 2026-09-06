@@ -1,4 +1,4 @@
-﻿using MediatR;
+using MediatR;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using POS.Common.UnitOfWork;
@@ -63,7 +63,7 @@ namespace POS.MediatR.SalesOrderPayment.Handler
             {
                 salesOrder.PaymentStatus = PaymentStatus.Pending;
             }
-            else if (salesOrder.TotalAmount <= salesOrder.TotalPaidAmount - salesOrderPayment.Amount)
+            else if (salesOrder.TotalAmount <= salesOrder.TotalPaidAmount)
             {
                 salesOrder.PaymentStatus = PaymentStatus.Paid;
             }
@@ -75,7 +75,7 @@ namespace POS.MediatR.SalesOrderPayment.Handler
             _salesOrderRepository.Update(salesOrder);
             if (await _uow.SaveAsync() <= 0)
             {
-                _logger.LogError("Error while deleting Purchase Order Payment.");
+                _logger.LogError("Error while deleting Sales Order Payment.");
                 return ServiceResponse<bool>.Return500();
             }
             // Refund accounting

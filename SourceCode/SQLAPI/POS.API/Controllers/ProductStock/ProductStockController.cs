@@ -1,5 +1,6 @@
-﻿using System.Threading.Tasks;
+using System.Threading.Tasks;
 using MediatR;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using POS.API.Helpers;
@@ -12,6 +13,7 @@ namespace POS.API.Controllers.ProductStock
 {
     [Route("api/[controller]")]
     [ApiController]
+    [Authorize]
     public class ProductStockController(
         IMediator _mediator) : BaseController
     {
@@ -22,7 +24,7 @@ namespace POS.API.Controllers.ProductStock
         /// <param name="command"></param>
         /// <returns></returns>
         [HttpPost]
-        //[ClaimCheck("INVE_MANAGE_INVENTORY")]
+        [ClaimCheck("INVE_MANAGE_INVENTORY")]
         //[Produces("application/json", "application/xml", Type = typeof(InventoryDto))]
         public async Task<IActionResult> AddProductStock(AddProductStockCommand command)
         {
@@ -36,7 +38,7 @@ namespace POS.API.Controllers.ProductStock
         /// <param name="command"></param>
         /// <returns></returns>
         [HttpPost("bulk-update")]
-        //[ClaimCheck("INVE_MANAGE_INVENTORY")]
+        [ClaimCheck("INVE_MANAGE_INVENTORY")]
         public async Task<IActionResult> BulkUpdateProductStock(BulkUpdateProductStockCommand command)
         {
             var result = await _mediator.Send(command);
@@ -49,7 +51,7 @@ namespace POS.API.Controllers.ProductStock
         /// <param name="command"></param>
         /// <returns></returns>
         [HttpPost("bulk-adjust")]
-        //[ClaimCheck("INVE_MANAGE_INVENTORY")]
+        [ClaimCheck("INVE_MANAGE_INVENTORY")]
         public async Task<IActionResult> BulkAdjustProductStock(BulkAdjustProductStockCommand command)
         {
             var result = await _mediator.Send(command);

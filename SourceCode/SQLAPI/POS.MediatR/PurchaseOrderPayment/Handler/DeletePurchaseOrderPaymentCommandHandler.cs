@@ -1,4 +1,4 @@
-﻿using AutoMapper;
+using AutoMapper;
 using MediatR;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.EntityFrameworkCore;
@@ -64,7 +64,7 @@ namespace POS.MediatR.PurchaseOrderPayment.Handler
             {
                 purchaseOrder.PaymentStatus = PaymentStatus.Pending;
             }
-            else if (purchaseOrder.TotalAmount <= purchaseOrder.TotalPaidAmount - purchaseOrderPayment.Amount)
+            else if (purchaseOrder.TotalAmount <= purchaseOrder.TotalPaidAmount)
             {
                 purchaseOrder.PaymentStatus = PaymentStatus.Paid;
             }

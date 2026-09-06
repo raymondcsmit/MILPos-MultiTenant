@@ -1,4 +1,4 @@
-﻿using AutoMapper;
+using AutoMapper;
 using MediatR;
 using Microsoft.AspNetCore.SignalR;
 using Microsoft.EntityFrameworkCore;
@@ -68,6 +68,11 @@ namespace POS.MediatR.Handlers
 
             // Update Role
             entityExist = await _roleRepository.FindByInclude(v => v.Id == request.Id, c => c.RoleClaims).FirstOrDefaultAsync();
+            if (entityExist == null)
+            {
+                _logger.LogError("Role not found.");
+                return ServiceResponse<RoleDto>.Return404("Role not found.");
+            }
 
             if (entityExist.IsSuperRole)
             {

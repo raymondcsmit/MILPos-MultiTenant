@@ -1,9 +1,13 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using POS.Data.Entities;
+using POS.Domain;
 using POS.Domain.Sync;
 using System;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace POS.API.Controllers
@@ -11,17 +15,34 @@ namespace POS.API.Controllers
     /// <summary>
     /// Controller for manual sync operations and sync status
     /// </summary>
+    [Authorize]
     [ApiController]
     [Route("api/[controller]")]
     public class SyncController : ControllerBase
     {
         private readonly SyncEngine _syncEngine;
+        private readonly POSDbContext _context;
+        private readonly IConfiguration _configuration;
         private readonly ILogger<SyncController> _logger;
 
-        public SyncController(SyncEngine syncEngine, ILogger<SyncController> logger)
+        public SyncController(
+            SyncEngine syncEngine,
+            POSDbContext context,
+            IConfiguration configuration,
+            ILogger<SyncController> logger)
         {
             _syncEngine = syncEngine;
+            _context = context;
+            _configuration = configuration;
             _logger = logger;
+        }
+
+        private bool IsSyncEnabled()
+        {
+            return _configuration.GetValue<bool?>("SyncSettings:Enabled") ??
+                   _configuration.GetValue<bool?>("SyncSettings:AutoSync") ??
+                   _configuration.GetValue<bool?>("DeploymentSettings:SyncSettings:Enabled") ??
+                   true;
         }
 
         /// <summary>
@@ -30,6 +51,17 @@ namespace POS.API.Controllers
         [HttpPost("now")]
         public async Task<IActionResult> SyncNow([FromQuery] string direction = "Bidirectional")
         {
+            if (!IsSyncEnabled())
+            {
+                _logger.LogWarning("Manual sync rejected - Sync is disabled in configuration");
+                return BadRequest(new
+                {
+                    Success = false,
+                    Status = "Disabled",
+                    ErrorMessage = "Synchronization is disabled in appsettings configuration (SyncSettings:Enabled is false)."
+                });
+            }
+
             try
             {
                 SyncDirection syncDirection = direction.ToLower() switch
@@ -70,12 +102,43 @@ namespace POS.API.Controllers
         [HttpGet("status")]
         public async Task<IActionResult> GetSyncStatus()
         {
-            // TODO: Implement sync status retrieval from SyncLog table
-            return Ok(new
+            try
             {
-                Message = "Sync status endpoint - to be implemented",
-                LastSync = DateTime.UtcNow
-            });
+                var syncEnabled = IsSyncEnabled();
+                var latestLog = await _context.SyncLogs
+                    .OrderByDescending(l => l.StartedAt)
+                    .FirstOrDefaultAsync();
+
+                var metadataList = await _context.SyncMetadata
+                    .ToListAsync();
+
+                var lastSyncTime = latestLog?.CompletedAt ?? latestLog?.StartedAt;
+
+                return Ok(new
+                {
+                    SyncEnabled = syncEnabled,
+                    LastSync = lastSyncTime,
+                    Status = latestLog?.Status.ToString() ?? "NeverSynced",
+                    RecordsSynced = latestLog?.RecordsSynced ?? 0,
+                    RecordsConflicted = latestLog?.RecordsConflicted ?? 0,
+                    RecordsFailed = latestLog?.RecordsFailed ?? 0,
+                    DeviceId = latestLog?.DeviceId,
+                    ErrorMessage = latestLog?.ErrorMessage,
+                    Entities = metadataList.Select(m => new
+                    {
+                        m.EntityType,
+                        m.LastPullSync,
+                        m.LastPushSync,
+                        m.LastSuccessfulSync,
+                        m.PendingChanges
+                    })
+                });
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Failed to retrieve sync status");
+                return StatusCode(500, new { Error = ex.Message });
+            }
         }
     }
 }

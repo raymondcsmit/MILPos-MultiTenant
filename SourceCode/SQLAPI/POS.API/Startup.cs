@@ -92,8 +92,16 @@ namespace POS.API
             services.AddHttpClient<CloudApiClient>();
             services.AddScoped<SyncEngine>();
             
-            // Register scheduled sync service (Desktop only)
-            if (deploymentSettings?.DeploymentMode == "Desktop")
+            // Register scheduled sync service (Desktop only and when Sync is enabled)
+            var isDesktopMode = deploymentSettings?.DeploymentMode == "Desktop" ||
+                                Configuration.GetValue<string>("DeploymentMode") == "Desktop" ||
+                                Configuration.GetValue<string>("DeploymentSettings:DeploymentMode") == "Desktop";
+            var isSyncEnabled = Configuration.GetValue<bool?>("SyncSettings:Enabled") ??
+                                Configuration.GetValue<bool?>("SyncSettings:AutoSync") ??
+                                Configuration.GetValue<bool?>("DeploymentSettings:SyncSettings:Enabled") ??
+                                deploymentSettings?.SyncSettings?.Enabled ??
+                                true;
+            if (isDesktopMode && isSyncEnabled)
             {
                 services.AddHostedService<POS.API.Services.ScheduledSyncService>();
             }

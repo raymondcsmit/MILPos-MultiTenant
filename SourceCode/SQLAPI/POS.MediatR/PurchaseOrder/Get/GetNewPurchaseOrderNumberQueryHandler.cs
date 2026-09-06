@@ -1,4 +1,4 @@
-﻿using POS.MediatR.CommandAndQuery;
+using POS.MediatR.CommandAndQuery;
 using POS.Repository;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
@@ -35,14 +35,16 @@ namespace POS.MediatR.Handlers
             }
 
             var lastPONumber = lastPurchaseOrder.OrderNumber;
-            var poId = Regex.Match(lastPONumber, @"\d+").Value;
-            var isNumber = int.TryParse(poId, out int poNumber);
-            if (isNumber)
+            var match = Regex.Match(lastPONumber, @"^(.*?)(\d+)$");
+            if (match.Success && int.TryParse(match.Groups[2].Value, out int poNumber))
             {
-                var newPoId = lastPONumber.Replace(poNumber.ToString(), "");
-                return $"{newPoId}{poNumber + 1}";
+                var prefix = match.Groups[1].Value;
+                var digitsLength = match.Groups[2].Value.Length;
+                var nextNumber = poNumber + 1;
+                return $"{prefix}{nextNumber.ToString().PadLeft(digitsLength, '0')}";
             }
-            else {
+            else
+            {
                 return $"{lastPONumber}#00001";
             }
         }

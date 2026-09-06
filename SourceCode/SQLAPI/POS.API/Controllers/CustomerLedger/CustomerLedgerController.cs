@@ -1,4 +1,5 @@
-﻿using MediatR;
+using MediatR;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using POS.API.Helpers;
@@ -13,6 +14,7 @@ namespace POS.API.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
+    [Authorize]
     public class CustomerLedgerController(IMediator _mediator) : BaseController
     {
 
@@ -34,6 +36,7 @@ namespace POS.API.Controllers
         /// </summary>
         /// <returns></returns>
         [HttpGet("{id}")]
+        [ClaimCheck("CUST_VIEW_CUSTOMER_LADGERS")]
         public async Task<IActionResult> GetCustomerLedger(Guid id)
         {
             var query = new GetCustomerLedgerCommand() { Id = id };
@@ -49,6 +52,7 @@ namespace POS.API.Controllers
         /// <param name="pageSize">Size of the page.</param>
         /// <returns></returns>
         [HttpGet("customerLedger")]
+        [ClaimCheck("CUST_VIEW_CUSTOMER_LADGERS")]
         public async Task<IActionResult> LedgerSearch(string searchQuery, int pageSize)
         {
             var query = new SearchCustomerLedgerCommand
@@ -90,6 +94,7 @@ namespace POS.API.Controllers
         /// <param name="id"></param>
         /// <returns></returns>
         [HttpDelete("{id}")]
+        [ClaimCheck("CUST_MANAGE_CUSTOMER_LADGER")]
         public async Task<IActionResult> DeleteAccountLedger(Guid id)
         {
             var result = await _mediator.Send(new DeleteCustomerLedgerCommand()
@@ -105,6 +110,7 @@ namespace POS.API.Controllers
         /// <param name="id"></param>
         /// <returns></returns>
         [HttpGet("{id}/overdue")]
+        [ClaimCheck("CUST_VIEW_CUSTOMER_LADGERS")]
         public async Task<IActionResult> GetSalesOrderOverdueByCustomerId(Guid id)
         {
             var getSaleOrdeOverdueCommand = new GetSalesOrderOverdueByCustomerIdCommand

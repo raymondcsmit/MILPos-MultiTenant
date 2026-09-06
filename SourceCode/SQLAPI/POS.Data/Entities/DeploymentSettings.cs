@@ -43,6 +43,9 @@ namespace POS.Data.Entities
 
     public class SyncSettings
     {
+        public bool Enabled { get; set; } = true;
+        public bool AutoSync { get; set; } = true;
         public string CloudApiUrl { get; set; }
+        public int SyncIntervalMinutes { get; set; } = 5;
     }
 }

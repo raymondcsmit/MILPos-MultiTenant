@@ -118,7 +118,7 @@ ipcMain.handle('clear-auth', async (event) => {
   }
 });
 
-const CLOUD_API_URL = 'http://208.110.72.211'; // Production Cloud API
+const CLOUD_API_URL = process.env.CLOUD_API_URL || 'http://208.110.72.211'; // Production Cloud API (configurable via env)
 
 ipcMain.handle('cloud-login', async (event, { email, password }) => {
   try {
@@ -311,7 +311,17 @@ function startApi() {
   // 2. Database setup
   const dbPath = path.join(userDataPath, 'POSDb.db');
   
-  // First Run Check: If no DB exists, show Cloud Login
+  // Copy bundled seed database template if local user DB doesn't exist yet
+  if (!fs.existsSync(dbPath) && fs.existsSync(sourceDbPath)) {
+      try {
+          fs.copyFileSync(sourceDbPath, dbPath);
+          appendLog(`Bundled database copied to: ${dbPath}`);
+      } catch (err) {
+          appendLog(`ERROR: Failed to copy bundled database: ${err}`);
+      }
+  }
+
+  // First Run Check: If no DB exists (and no bundled template), show Cloud Login
   if (!fs.existsSync(dbPath)) {
       clearTimeout(startupTimeout);
       logToFile('STARTUP: No database found. Triggering Cloud Login Flow.');
@@ -325,15 +335,6 @@ function startApi() {
       showCloudLogin();
       return;
   }
-
-    if (!fs.existsSync(dbPath) && fs.existsSync(sourceDbPath)) {
-        try {
-            fs.copyFileSync(sourceDbPath, dbPath);
-            appendLog(`Database copied to: ${dbPath}`);
-        } catch (err) {
-            appendLog(`ERROR: Failed to copy database: ${err}`);
-        }
-    }
 
     // 3. Spawn Process
     try {
@@ -486,8 +487,9 @@ function createMainWindow() {
     show: false, // Wait for ready-to-show
     icon: path.join(__dirname, 'icon.png'),
     webPreferences: {
-      nodeIntegration: true,
-      contextIsolation: false
+      nodeIntegration: false,
+      contextIsolation: true,
+      preload: path.join(__dirname, 'preload.js')
     }
   });
 
@@ -551,12 +553,14 @@ function showCloudLogin() {
         nodeIntegration: false,
         contextIsolation: true,
         preload: path.join(__dirname, 'preload.js'),
-        devTools: false // Explicitly enable DevTools
+        devTools: process.argv.includes('--dev')
       }
     });
 
-    // Open DevTools for debugging
-    win.webContents.openDevTools({ mode: 'detach' });
+    // Open DevTools for debugging only if dev mode requested
+    if (process.argv.includes('--dev')) {
+        win.webContents.openDevTools({ mode: 'detach' });
+    }
 
     win.loadFile(path.join(__dirname, 'login-cloud.html'));
     

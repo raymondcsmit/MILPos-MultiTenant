@@ -48,7 +48,7 @@ namespace POS.Repository
             }
         }
 
-        public async Task SeedTenantDataAsync(POS.Data.Entities.Tenant tenant, User adminUser)
+        public async Task SeedTenantDataAsync(POS.Data.Entities.Tenant tenant, User adminUser, bool includeTransactions = true)
         {
             var masterSettings = _masterTenantSettings.Value;
             bool isMaster = (tenant.Subdomain == masterSettings.SubDomain || tenant.Id == masterSettings.TenantId);

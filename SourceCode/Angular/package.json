@@ -1,6 +1,6 @@
 {
   "name": "milpos",
-  "version": "0.0.25",
+  "version": "0.0.26",
   "description": "A comprehensive, multi-tenant POS with Inventory Management System designed to streamline retail operations, integrating POS, inventory tracking, accounting, purchasing, and CRM.",
   "author": {
     "name": "Waqar Habib",

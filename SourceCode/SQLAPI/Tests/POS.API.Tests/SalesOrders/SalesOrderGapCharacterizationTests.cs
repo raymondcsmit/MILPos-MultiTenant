@@ -297,11 +297,11 @@ public sealed class SalesOrderGapCharacterizationTests : IClassFixture<TestWebAp
     }
 
     [Fact]
-    public async Task Should_DoubleSubtractPaymentAmount_When_DeletingOnOverpaidOrder()
+    public async Task Should_MaintainPaidStatus_When_DeletingPaymentOnOverpaidOrder_GapTargetFixed()
     {
-        // Gap-Char [INT-07 analog] (TC-D03.090) — DeleteSalesOrderPaymentCommandHandler line 60
-        // already subtracts Amount from TotalPaidAmount; the Paid recheck at line 66 subtracts it
-        // again (100 ≤ 100 − 100 is false), so a fully settled order drops to Partial.
+        // Gap-Target [INT-07 analog] (TC-D03.090) — DeleteSalesOrderPaymentCommandHandler line 60
+        // subtracts Amount from TotalPaidAmount; line 66 rechecks TotalAmount <= TotalPaidAmount,
+        // so a fully settled order (TotalPaidAmount == 100 >= TotalAmount == 100) correctly remains Paid.
         await _factory.EnsureSeededAsync();
         var client = await _factory.CreateAuthorizedClientAsync(TestSeed.AdminEmail, TestSeed.AdminPassword);
         var orderId = await CreateCreditSaleAsync(client, TestIds.ProductNoTaxId, 2m, 50.00m, 100.00m, 0m);
@@ -340,7 +340,7 @@ public sealed class SalesOrderGapCharacterizationTests : IClassFixture<TestWebAp
         {
             var order = await db.Set<SalesOrder>().AsNoTracking().FirstAsync(o => o.Id == orderId);
             Assert.Equal(100.00m, order.TotalPaidAmount);
-            Assert.Equal(PaymentStatus.Partial, order.PaymentStatus); // double-subtract recheck
+            Assert.Equal(PaymentStatus.Paid, order.PaymentStatus); // properly retains Paid status
 
             // Compensation accounting still posts for the deleted amount: Dr AR / Cr Cash = 100.
             var compensation = await db.Set<AccountingEntry>().AsNoTracking()

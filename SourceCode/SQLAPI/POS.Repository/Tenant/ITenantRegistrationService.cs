@@ -7,6 +7,6 @@ namespace POS.Repository
 {
     public interface ITenantRegistrationService
     {
-        Task SeedTenantDataAsync(POS.Data.Entities.Tenant tenant, User adminUser);
+        Task SeedTenantDataAsync(POS.Data.Entities.Tenant tenant, User adminUser, bool includeTransactions = true);
     }
 }

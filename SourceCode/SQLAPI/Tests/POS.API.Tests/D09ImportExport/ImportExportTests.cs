@@ -7,9 +7,9 @@ using Xunit;
 namespace POS.API.Tests.D09ImportExport;
 
 /// <summary>
-/// D09 data exchange: ImportExportController carries NO [Authorize] and NO [ClaimCheck] on any
-/// action (N-40) — exports, templates, imports and validation are reachable with zero auth.
-/// Pin: an UNAUTHENTICATED client gets a full product CSV export (with seeded rows).
+/// D09 data exchange: ImportExportController is protected with [Authorize] and [ClaimCheck]
+/// (BUG-19 / N-40 fixed) — anonymous callers receive HTTP 401 Unauthorized, users without claims
+/// receive HTTP 403 Forbidden, and authorized users can successfully export and template.
 /// </summary>
 public sealed class ImportExportTests : IClassFixture<TestWebApplicationFactory>
 {
@@ -21,16 +21,14 @@ public sealed class ImportExportTests : IClassFixture<TestWebApplicationFactory>
     }
 
     [Fact]
-    public async Task Should_ExportProducts_Csv_Without_Authentication_GapCharacterization()
+    public async Task Should_Return401_When_ExportingProducts_Unauthenticated()
     {
         await _factory.EnsureSeededAsync();
         var client = _factory.CreateClient();
 
         var response = await client.GetAsync("/api/ImportExport/products/export?format=csv");
 
-        Assert.True(response.IsSuccessStatusCode, $"{(int)response.StatusCode} {await response.Content.ReadAsStringAsync()}");
-        Assert.Equal("text/csv", response.Content.Headers.ContentType?.MediaType);
-        Assert.Contains("Product A", await response.Content.ReadAsStringAsync());
+        Assert.Equal(HttpStatusCode.Unauthorized, response.StatusCode);
     }
 
     [Theory]
@@ -39,26 +37,48 @@ public sealed class ImportExportTests : IClassFixture<TestWebApplicationFactory>
     [InlineData("products/template?format=csv")]
     [InlineData("customers/template?format=csv")]
     [InlineData("suppliers/template?format=csv")]
-    public async Task Should_ReachExportsAndTemplates_Without_Authentication_GapCharacterization(string route)
+    public async Task Should_Return401_When_ReachingExportsAndTemplates_Unauthenticated(string route)
     {
         await _factory.EnsureSeededAsync();
         var client = _factory.CreateClient();
 
         var response = await client.GetAsync($"/api/ImportExport/{route}");
 
-        Assert.NotEqual(HttpStatusCode.Forbidden, response.StatusCode);
-        Assert.NotEqual(HttpStatusCode.Unauthorized, response.StatusCode);
+        Assert.Equal(HttpStatusCode.Unauthorized, response.StatusCode);
     }
 
     [Fact]
-    public async Task Should_ReachImportRoute_Without_Authentication_GapCharacterization()
+    public async Task Should_Return401_When_ReachingImportRoute_Unauthenticated()
     {
         await _factory.EnsureSeededAsync();
         var client = _factory.CreateClient();
 
         var response = await client.PostAsync("/api/ImportExport/products/import", new ByteArrayContent(System.Array.Empty<byte>()));
 
-        Assert.NotEqual(HttpStatusCode.Forbidden, response.StatusCode);
-        Assert.NotEqual(HttpStatusCode.Unauthorized, response.StatusCode);
+        Assert.Equal(HttpStatusCode.Unauthorized, response.StatusCode);
+    }
+
+    [Fact]
+    public async Task Should_Return403_When_ReachingExport_WithoutClaims()
+    {
+        await _factory.EnsureSeededAsync();
+        var client = await _factory.CreateAuthorizedClientAsync(TestSeed.NoClaimsEmail, TestSeed.NoClaimsPassword);
+
+        var response = await client.GetAsync("/api/ImportExport/products/export?format=csv");
+
+        Assert.Equal(HttpStatusCode.Forbidden, response.StatusCode);
+    }
+
+    [Fact]
+    public async Task Should_ExportProducts_Csv_When_Authorized()
+    {
+        await _factory.EnsureSeededAsync();
+        var client = await _factory.CreateAuthorizedClientAsync(TestSeed.AdminEmail, TestSeed.AdminPassword);
+
+        var response = await client.GetAsync("/api/ImportExport/products/export?format=csv");
+
+        Assert.True(response.IsSuccessStatusCode, $"{(int)response.StatusCode} {await response.Content.ReadAsStringAsync()}");
+        Assert.Equal("text/csv", response.Content.Headers.ContentType?.MediaType);
+        Assert.Contains("Product A", await response.Content.ReadAsStringAsync());
     }
 }
