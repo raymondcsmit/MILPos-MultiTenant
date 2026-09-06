@@ -483,4 +483,33 @@ describe('PosComponent', () => {
     const built = component.buildSalesOrder();
     expect(built.id).toBe('');
   }));
+
+  it('onSelectionChange correctly multiplies unit price when unit operator is Multiply (BUG-01/UX-02)', fakeAsync(() => {
+    create();
+    const prod = makeProduct({ id: 'p-air', salesPrice: 3.5 });
+    component.filterProducts = [prod];
+    component.unitConversationlist = [
+      { id: 'u-dozen', operator: Operators.Multiply, value: '12', name: 'Dozen' } as any,
+      { id: 'u-half', operator: Operators.Divide, value: '2', name: 'Half' } as any,
+      { id: 'u-plus', operator: Operators.Plush, value: '1.5', name: 'Pack' } as any,
+      { id: 'u-minus', operator: Operators.Minus, value: '0.5', name: 'Discount' } as any
+    ];
+    component.onProductSelect(prod);
+
+    // Test Multiply: 3.5 * 12 = 42
+    component.onSelectionChange('u-dozen', 0);
+    expect(component.salesOrderItemsArray.controls[0].get('unitPrice')?.value).toBe(42);
+
+    // Test Divide: 3.5 / 2 = 1.75
+    component.onSelectionChange('u-half', 0);
+    expect(component.salesOrderItemsArray.controls[0].get('unitPrice')?.value).toBe(1.75);
+
+    // Test Plush: 3.5 + 1.5 = 5.0
+    component.onSelectionChange('u-plus', 0);
+    expect(component.salesOrderItemsArray.controls[0].get('unitPrice')?.value).toBe(5);
+
+    // Test Minus: 3.5 - 0.5 = 3.0
+    component.onSelectionChange('u-minus', 0);
+    expect(component.salesOrderItemsArray.controls[0].get('unitPrice')?.value).toBe(3);
+  }));
 });

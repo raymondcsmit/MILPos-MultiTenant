@@ -1,0 +1,1067 @@
+# AI-Powered Help System & Chatbot — Implementation Plan
+
+## Goal
+
+Build a **100% local, self-contained AI help system and chatbot** for ModApp using **ONNX models running entirely on-server**. No cloud APIs, no external dependencies, no data leaving the server. Every page gets a contextual help button; a floating chatbot with a local LLM guides users step-by-step through any workflow.
+
+**Core AI Stack (all local):**
+- **Semantic Search**: `all-MiniLM-L6-v2` ONNX model (23 MB) — sentence embeddings for document retrieval
+- **Text Generation**: `Phi-3-mini-4k-instruct` ONNX model (INT4 quantized, ~2.5 GB) — local LLM for conversational responses
+- **Intent Classification**: ML.NET `SdcaMaximumEntropy` — lightweight text classifier
+
+---
+
+## Background & Current State Analysis
+
+### What We Have
+| Asset | Details |
+|-------|---------|
+| **Documentation Corpus** | **700+ markdown files** across `Document/` (533 files), `User Document/` (148+ files), `Documents/`, `docs/`, testing guides — totaling ~5 MB of rich structured content covering all 28 modules |
+| **Existing ChatHub** | [ChatHub.cs](file:///F:/MIllyass/ModulerMonolith/ModApp/src/Modules/Core/Communications/Application/Hubs/ChatHub.cs) — tenant-scoped SignalR hub for real-time messaging |
+| **NotificationHub** | SignalR notification infrastructure at `/hubs/notifications` |
+| **ML.NET Packages** | Already registered in [Directory.Packages.props](file:///F:/MIllyass/ModulerMonolith/ModApp/Directory.Packages.props) — `Microsoft.ML` 5.0.0, `Microsoft.ML.FastTree` 5.0.0, `Microsoft.Extensions.ML` 5.0.0 |
+| **Global Search** | [SearchController.cs](file:///F:/MIllyass/ModulerMonolith/ModApp/src/Web/Controllers/SearchController.cs) fan-out pattern with `GlobalSearchResult` model |
+| **Layout System** | [_Layout.cshtml](file:///F:/MIllyass/ModulerMonolith/ModApp/src/Web/Views/Shared/_Layout.cshtml) — 6 layout variants with shared `<main>` |
+| **Help Placeholder** | [_LayoutTopbar.cshtml](file:///F:/MIllyass/ModulerMonolith/ModApp/src/Web/Views/Shared/_LayoutTopbar.cshtml) line 16: `"Help & Docs coming soon"` |
+| **Toast API** | `window.showToast()` in `toast.js` |
+
+### Why Fully Local AI Works Here
+
+| Concern | Answer |
+|---------|--------|
+| **"Won't local LLM be too slow?"** | Phi-3-mini INT4 on modern CPU: **5-15 seconds per response**. For a help assistant (not a real-time chat), this is acceptable — users expect a moment while the AI "thinks." A typing indicator makes this feel natural. |
+| **"Won't 2.5 GB model be too large?"** | Your published web app (`web-publish.zip`) is already 112 MB. The model ships as a downloadable asset on first run (or can be pre-bundled). It loads lazily — zero impact on startup until first help request. |
+| **"Quality vs. GPT-4?"** | For **grounded, document-based Q&A** (not open-ended creativity), Phi-3-mini with RAG context performs excellently. It's answering from YOUR docs, not making things up. The retrieval layer ensures accuracy. |
+| **"RAM requirements?"** | INT4 quantized Phi-3-mini: **~3-4 GB RAM** during inference. Your ERP server should have this headroom. Embedding model adds ~200 MB. |
+
+---
+
+## Design Decisions (All Resolved)
+
+| Question | Decision | Rationale |
+|----------|----------|-----------|
+| **AI Backend** | **100% Local ONNX** — no cloud APIs | Self-contained product. No API keys, no recurring costs, no data privacy concerns. Phi-3-mini ONNX for generation + MiniLM for embeddings. |
+| **Multi-language** | **English-only** | Consistent with project-wide `i18n is a non-goal` decision |
+| **User Feedback** | **Yes** — thumbs up/down | Minimal cost, enables ranking improvement and gap identification |
+| **Content Authoring** | **Both** — auto-ingest markdown + Admin UI CRUD | 700+ files auto-indexed, admins can add/edit via UI |
+| **Fallback** | **Template engine** when LLM model not present | System works for retrieval+templates even without the 2.5 GB model download |
+
+---
+
+## Architecture Overview
+
+```mermaid
+graph TB
+    subgraph "100% Local AI Stack"
+        subgraph "Embedding Layer (23 MB)"
+            EmbModel["all-MiniLM-L6-v2<br/>ONNX Model"]
+            Tokenizer["WordPiece<br/>Tokenizer"]
+        end
+        subgraph "Generation Layer (2.5 GB, Optional)"
+            GenModel["Phi-3-mini-4k-instruct<br/>ONNX INT4"]
+            GenRT["OnnxRuntimeGenAI<br/>CPU Inference"]
+        end
+        subgraph "Classification Layer (< 1 MB)"
+            IntentML["ML.NET SDCA<br/>Intent Classifier"]
+        end
+    end
+
+    subgraph "Document Pipeline"
+        MD["700+ Markdown Files"] --> Parser["Markdig Parser"]
+        AdminDB["Admin-Authored Articles"] --> Parser
+        Parser --> Chunker["Heading-Aware Chunker"]
+        Chunker --> EmbModel
+        EmbModel --> VecIdx["Vector Index<br/>(In-Memory + Cache)"]
+    end
+
+    subgraph "Contextual Help"
+        HelpBtn["Help Button / F1"] --> HelpAPI["HelpApiController"]
+        HelpAPI --> RouteMap["Route → Topic Mapper"]
+        RouteMap --> Search["Semantic Search"]
+        Search --> VecIdx
+        Search --> Panel["Help Panel UI"]
+    end
+
+    subgraph "Chatbot (Local RAG)"
+        UserMsg["User Message"] --> Hub["HelpChatHub<br/>(SignalR)"]
+        Hub --> IntentML
+        IntentML --> Search2["Semantic Search"]
+        Search2 --> VecIdx
+        Search2 --> Generator{"IResponseGenerator"}
+        Generator -->|"Model Present"| GenModel
+        Generator -->|"No Model"| Templates["Template Engine"]
+        GenModel --> Response["AI Response"]
+        Templates --> Response
+    end
+
+    subgraph "Admin"
+        Admin["Help Admin"] --> Reindex["Re-index"]
+        Admin --> CRUD["Article CRUD"]
+        Admin --> Analytics["Analytics"]
+    end
+```
+
+---
+
+## Proposed Changes
+
+### Component 1: SharedKernel Contracts
+
+#### [NEW] `src/SharedKernel.Contracts/Help/IHelpContentProvider.cs`
+Interface for per-module contextual help route mappings:
+```csharp
+public interface IHelpContentProvider
+{
+    string ModuleName { get; }
+    IReadOnlyDictionary<string, string[]> GetRouteToTopicMappings();
+}
+```
+
+#### [NEW] `src/SharedKernel.Contracts/Help/HelpSearchResult.cs`
+DTO: `Title`, `ContentSnippet`, `RelevanceScore`, `Module`, `Url`, `SourceType` (File/Database), `Tags[]`, `RelatedArticleIds[]`
+
+#### [NEW] `src/SharedKernel.Contracts/Help/IResponseGenerator.cs`
+Abstraction for the generative layer:
+```csharp
+public interface IResponseGenerator
+{
+    Task<ChatResponse> GenerateResponseAsync(
+        string userMessage,
+        ClassifiedIntent intent,
+        IReadOnlyList<HelpSearchResult> retrievedContext,
+        IReadOnlyList<ChatMessageDto> conversationHistory,
+        CancellationToken ct = default);
+    
+    bool IsAvailable { get; }
+}
+```
+
+Two implementations — both local:
+- `LocalLlmResponseGenerator` — uses Phi-3-mini ONNX (when model files present)
+- `TemplateResponseGenerator` — retrieval + template fallback (always available)
+
+#### [NEW] `src/SharedKernel.Contracts/Help/ChatDtos.cs`
+`ClassifiedIntent`, `ChatMessageDto`, `ChatResponse`, `IntentType` enum (`HowTo`, `Explain`, `Navigate`, `Troubleshoot`, `Search`, `Greeting`, `Farewell`, `Unknown`)
+
+---
+
+### Component 2: Modules.Help Project & Domain
+
+#### [NEW] `src/Modules/Features/Help/Modules.Help.csproj`
+```xml
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+  </PropertyGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\..\..\SharedKernel\SharedKernel.csproj" />
+  </ItemGroup>
+  <ItemGroup>
+    <!-- Embeddings (semantic search) -->
+    <PackageReference Include="Microsoft.ML" />
+    <PackageReference Include="Microsoft.ML.OnnxRuntime" />
+    <PackageReference Include="Microsoft.ML.OnnxTransformer" />
+    <PackageReference Include="Microsoft.Extensions.ML" />
+    <!-- Local LLM generation -->
+    <PackageReference Include="Microsoft.ML.OnnxRuntimeGenAI" />
+    <!-- Markdown parsing -->
+    <PackageReference Include="Markdig" />
+  </ItemGroup>
+</Project>
+```
+
+> [!NOTE]
+> **No `Azure.AI.OpenAI`**. No cloud SDK. Everything runs through `Microsoft.ML.OnnxRuntimeGenAI` which is Microsoft's official .NET package for running ONNX generative models locally.
+
+#### [NEW] `src/Modules/Features/Help/Domain/HelpArticle.cs`
+```csharp
+public sealed class HelpArticle : BaseEntity, IMustHaveTenant
+{
+    public Guid TenantId { get; set; }
+    public string Title { get; private set; } = null!;
+    public string Content { get; private set; } = null!;         // Markdown
+    public string Module { get; private set; } = null!;           // "Finance", "Procurement"
+    public string[] Tags { get; private set; } = [];              // ["journal-entry", "posting"]
+    public string[] RoutePatterns { get; private set; } = [];     // ["/Finance/JournalEntries/*"]
+    public string? SourceFilePath { get; private set; }           // null = admin-authored
+    public bool IsPublished { get; private set; } = true;
+    public int SortOrder { get; private set; }
+    public int ViewCount { get; private set; }
+    public int HelpfulCount { get; private set; }
+    public int NotHelpfulCount { get; private set; }
+    public DateTime? LastIndexedAt { get; private set; }
+
+    public void IncrementView() => ViewCount++;
+    public void MarkHelpful() => HelpfulCount++;
+    public void MarkNotHelpful() => NotHelpfulCount++;
+    public void MarkIndexed() => LastIndexedAt = DateTime.UtcNow;
+    
+    public static HelpArticle CreateFromFile(string title, string content, string module, 
+        string[] tags, string[] routePatterns, string sourceFilePath, Guid tenantId)
+    { /* factory method */ }
+    
+    public static HelpArticle CreateManual(string title, string content, string module,
+        string[] tags, string[] routePatterns, Guid tenantId)
+    { /* factory method — no sourceFilePath */ }
+    
+    public void Update(string title, string content, string module, string[] tags, string[] routePatterns)
+    { /* domain update method */ }
+}
+```
+
+#### [NEW] `src/Modules/Features/Help/Domain/HelpInteraction.cs`
+```csharp
+public sealed class HelpInteraction : BaseEntity, IMustHaveTenant
+{
+    public Guid TenantId { get; set; }
+    public Guid? UserId { get; set; }
+    public string SessionId { get; set; } = null!;
+    public string Query { get; set; } = null!;
+    public Guid? MatchedArticleId { get; set; }
+    public bool? WasHelpful { get; set; }
+    public InteractionType Type { get; set; }           // ContextualHelp, ChatMessage, Search
+    public string Route { get; set; } = null!;
+    public float? RelevanceScore { get; set; }
+    public string? IntentClassification { get; set; }
+}
+```
+
+#### [NEW] `src/Modules/Features/Help/Domain/ChatSession.cs`
+```csharp
+public sealed class ChatSession : BaseEntity, IMustHaveTenant
+{
+    public Guid TenantId { get; set; }
+    public Guid UserId { get; set; }
+    public ChatSessionStatus Status { get; set; } = ChatSessionStatus.Active;
+    public DateTime LastMessageAt { get; set; } = DateTime.UtcNow;
+    private readonly List<ChatMessageEntity> _messages = new();
+    public IReadOnlyCollection<ChatMessageEntity> Messages => _messages.AsReadOnly();
+    
+    public ChatMessageEntity AddMessage(ChatMessageRole role, string content, 
+        string? intentClassification = null, string? retrievedArticleIds = null)
+    { /* adds to _messages, updates LastMessageAt */ }
+    
+    public void Resolve() => Status = ChatSessionStatus.Resolved;
+    public void Abandon() => Status = ChatSessionStatus.Abandoned;
+}
+```
+
+#### [NEW] `src/Modules/Features/Help/Domain/ChatMessageEntity.cs`
+```csharp
+public sealed class ChatMessageEntity : BaseEntity
+{
+    public Guid ChatSessionId { get; set; }
+    public ChatMessageRole Role { get; set; }
+    public string Content { get; set; } = null!;
+    public string? IntentClassification { get; set; }
+    public string? RetrievedArticleIds { get; set; }    // JSON array
+}
+```
+
+#### [NEW] `src/Modules/Features/Help/Domain/Enums.cs`
+```csharp
+public enum InteractionType { ContextualHelp, ChatMessage, Search }
+public enum ChatSessionStatus { Active, Resolved, Abandoned }
+public enum ChatMessageRole { User, Assistant, System }
+```
+
+---
+
+### Component 3: Local ONNX AI Engine
+
+#### [NEW] `Infrastructure/AI/OnnxEmbeddingService.cs`
+**Singleton** — semantic search embeddings:
+- Loads `all-MiniLM-L6-v2.onnx` (23 MB, 384-dim embeddings)
+- `Microsoft.ML.OnnxRuntime.InferenceSession` — thread-safe
+- Interface: `Task<float[]> EmbedAsync(string text)` + `Task<float[][]> EmbedBatchAsync(string[] texts)`
+- Lazy initialization — loaded on first call, not at startup
+- Normalizes output vectors for fast cosine similarity (pre-computed norms)
+
+#### [NEW] `Infrastructure/AI/WordPieceTokenizer.cs`
+Tokenizer matching the embedding model's vocabulary:
+- Loads `vocab.txt` (30,522 WordPiece tokens)
+- `[CLS]` + tokens + `[SEP]` framing
+- Subword splitting with `##` prefix convention
+- Outputs `input_ids`, `attention_mask`, `token_type_ids` as `long[]`
+- Max sequence length: 128 tokens (truncate + pad)
+
+#### [NEW] `Infrastructure/AI/VectorIndex.cs`
+In-memory vector similarity index:
+- `ConcurrentDictionary<string, (float[] Embedding, DocumentChunkMetadata Meta)>`
+- Cosine similarity via pre-normalized dot product
+- Top-K retrieval: `Search(float[] query, int topK, float minThreshold = 0.3f)`
+- Binary serialization: `Save(string path)` / `Load(string path)` for startup cache
+- `ReaderWriterLockSlim` for concurrent read / exclusive write
+- Incremental add/remove without full rebuild
+
+#### [NEW] `Infrastructure/AI/LocalLlmService.cs`
+**Singleton** — local text generation via Phi-3-mini ONNX:
+```csharp
+public sealed class LocalLlmService : IDisposable
+{
+    private readonly Model _model;        // Microsoft.ML.OnnxRuntimeGenAI.Model
+    private readonly Tokenizer _tokenizer;
+    private readonly SemaphoreSlim _gate = new(1, 1); // One inference at a time
+    
+    public bool IsModelLoaded { get; private set; }
+    
+    public async Task<string> GenerateAsync(string systemPrompt, string userPrompt, 
+        int maxTokens = 512, float temperature = 0.3f, CancellationToken ct = default)
+    {
+        await _gate.WaitAsync(ct);
+        try
+        {
+            // Build prompt in Phi-3 chat format:
+            // <|system|>\n{systemPrompt}<|end|>\n<|user|>\n{userPrompt}<|end|>\n<|assistant|>
+            var prompt = FormatChatPrompt(systemPrompt, userPrompt);
+            var sequences = _tokenizer.Encode(prompt);
+            
+            var generatorParams = new GeneratorParams(_model);
+            generatorParams.SetSearchOption("max_length", maxTokens);
+            generatorParams.SetSearchOption("temperature", temperature);
+            generatorParams.SetInputSequences(sequences);
+            
+            var output = _model.Generate(generatorParams);
+            return _tokenizer.Decode(output[0]);
+        }
+        finally { _gate.Release(); }
+    }
+    
+    // Streaming variant for SignalR real-time display
+    public async IAsyncEnumerable<string> GenerateStreamingAsync(
+        string systemPrompt, string userPrompt, 
+        [EnumeratorCancellation] CancellationToken ct = default)
+    {
+        // Token-by-token generation using Generator class
+        // Each token yielded immediately for real-time UI
+    }
+}
+```
+
+Key characteristics:
+- **Lazy loading** — model loaded on first help request, not at app startup
+- **Serialized inference** — `SemaphoreSlim(1,1)` prevents concurrent generation (single-threaded GPU/CPU inference is faster than competing threads)
+- **Configurable** — if model files aren't present, `IsModelLoaded = false` and system falls back to templates
+- **Streaming** — tokens streamed via `IAsyncEnumerable` for real-time SignalR display
+
+#### [NEW] `Infrastructure/AI/IntentClassifier.cs`
+ML.NET-trained multi-class classifier:
+- Intents: `HowTo`, `Explain`, `Navigate`, `Troubleshoot`, `Search`, `Greeting`, `Farewell`, `Unknown`
+- `MulticlassClassification.Trainers.SdcaMaximumEntropy`
+- Trained from `intent-training-data.tsv` (~500 examples)
+- Serialized to `intent-classifier.zip` (< 1 MB)
+- Confidence threshold: ≥ 0.6, else `Unknown`
+
+---
+
+### Component 4: Document Ingestion Pipeline
+
+#### [NEW] `Infrastructure/Ingestion/DocumentIngestionService.cs`
+Full pipeline orchestrator:
+1. **Discover** — scans directories from `help-routes.json` config for `.md` files
+2. **Parse** — Markdig converts to structured AST (headings, paragraphs, code blocks, lists)
+3. **Chunk** — heading-aware splitting into ~400-token segments with 50-token overlap
+4. **Extract Metadata** — auto-tags module from file path, keywords from headings
+5. **Embed** — ONNX batch embedding (100 chunks at a time)
+6. **Upsert** — stores in `HelpDbContext` + updates `VectorIndex`
+7. **Cache** — serializes vector index to disk
+
+#### [NEW] `Infrastructure/Ingestion/DocumentIngestionHostedService.cs`
+`IHostedService` that runs ingestion in the background on startup:
+- Checks if vector cache exists and is fresh (< 24h old)
+- If fresh: loads from cache (< 1 second startup)
+- If stale/missing: runs full ingestion (~2-5 min, background, non-blocking)
+- Logs progress to `ILogger`
+
+#### [NEW] `Infrastructure/Ingestion/DocumentChunker.cs`
+Intelligent markdown splitting:
+- Respects heading hierarchy: `## Section` starts a new chunk
+- Keeps fenced code blocks intact (never splits mid-code)
+- Overlapping context: parent heading chain as prefix
+- Target: ~400 tokens, min 50 tokens
+- Returns `DocumentChunk { Id, Content, ParentHeadings, SourceFile, Module, Tags }`
+
+#### [NEW] `Infrastructure/Ingestion/RouteToTopicMapper.cs`
+Maps route → help topics via 3 strategies:
+1. **Static config** from `help-routes.json` (pattern matching)
+2. **Module `IHelpContentProvider`s** (per-module registrations)
+3. **Convention inference**: `/Finance/JournalEntries/Create` → `["Journal Entries", "Create Journal Entry", "Finance"]`
+
+---
+
+### Component 5: Response Generation (Both Local)
+
+#### [NEW] `Infrastructure/ResponseGeneration/LocalLlmResponseGenerator.cs`
+Uses `LocalLlmService` for conversational responses grounded in retrieved docs:
+```csharp
+public sealed class LocalLlmResponseGenerator : IResponseGenerator
+{
+    private readonly LocalLlmService _llm;
+    
+    public bool IsAvailable => _llm.IsModelLoaded;
+    
+    public async Task<ChatResponse> GenerateResponseAsync(
+        string userMessage, ClassifiedIntent intent,
+        IReadOnlyList<HelpSearchResult> context,
+        IReadOnlyList<ChatMessageDto> history, CancellationToken ct)
+    {
+        var systemPrompt = BuildSystemPrompt(intent, context);
+        // System prompt includes:
+        // - Role: "You are the ModApp Help Assistant"
+        // - Retrieved doc chunks as context
+        // - Instruction: "Answer ONLY from the provided context"
+        // - Format guidance based on intent (steps for HowTo, definition for Explain, etc.)
+        
+        var response = await _llm.GenerateAsync(systemPrompt, userMessage, ct: ct);
+        return new ChatResponse(response, intent, context.Select(c => c.Url).ToList());
+    }
+}
+```
+
+System prompt template:
+```
+<|system|>
+You are the ModApp Help Assistant — an AI assistant for ModApp, an enterprise ERP platform 
+with 28 modules. Answer ONLY based on the documentation context provided below. 
+If the answer isn't in the context, say "I don't have specific documentation about that, 
+but you might find it in the Help Center."
+
+DOCUMENTATION CONTEXT:
+---
+{chunk1.Content}
+Source: {chunk1.Module} — {chunk1.Title}
+---
+{chunk2.Content}
+Source: {chunk2.Module} — {chunk2.Title}
+---
+
+INSTRUCTIONS:
+- For "how to" questions: provide numbered step-by-step instructions
+- For explanations: give a clear definition, then examples
+- For navigation: provide the direct page URL
+- For troubleshooting: list possible causes and solutions
+- Always mention which module the information relates to
+- Keep responses concise but complete
+<|end|>
+```
+
+#### [NEW] `Infrastructure/ResponseGeneration/TemplateResponseGenerator.cs`
+Always-available fallback — **no LLM needed**, still useful:
+```csharp
+public sealed class TemplateResponseGenerator : IResponseGenerator
+{
+    public bool IsAvailable => true; // Always works
+    
+    // Intent-based response assembly:
+    // HowTo → Extracts numbered steps from matched chunks
+    // Explain → Returns most relevant chunk with "Learn more" link
+    // Navigate → Returns direct URL: "Here's the page: [link]"
+    // Troubleshoot → Extracts warning-related content as checklist
+    // Search → Top-5 results with snippets
+    // Greeting → "Hi! I'm the ModApp Help Assistant. Ask me about..."
+}
+```
+
+#### [NEW] `Infrastructure/ResponseGeneration/StepByStepGuideEngine.cs`
+Extracts step-by-step workflows from documentation:
+- Scans chunks for ordered lists, numbered headings
+- Combines related chunks into multi-step guides
+- Adds navigation links per step
+- Handles cross-module flows (e.g., PO → GR → Invoice)
+
+---
+
+### Component 6: Persistence
+
+#### [NEW] `Persistence/HelpDbContext.cs`
+```csharp
+public sealed class HelpDbContext : DbContext
+{
+    private readonly ICurrentTenantService? _currentTenantService;
+    
+    public DbSet<HelpArticle> HelpArticles => Set<HelpArticle>();
+    public DbSet<HelpInteraction> HelpInteractions => Set<HelpInteraction>();
+    public DbSet<ChatSession> ChatSessions => Set<ChatSession>();
+    public DbSet<ChatMessageEntity> ChatMessages => Set<ChatMessageEntity>();
+
+    protected override void OnModelCreating(ModelBuilder builder)
+    {
+        builder.HasDefaultSchema("help");
+        
+        // Explicit tenant filter — NO ApplyGlobalTenantFilter (project convention)
+        builder.Entity<HelpArticle>().HasQueryFilter(x =>
+            _currentTenantService == null ||
+            _currentTenantService.IsHostAdmin ||
+            x.TenantId == _currentTenantService.TenantId);
+        
+        builder.Entity<HelpInteraction>().HasQueryFilter(x =>
+            _currentTenantService == null ||
+            _currentTenantService.IsHostAdmin ||
+            x.TenantId == _currentTenantService.TenantId);
+        
+        builder.Entity<ChatSession>().HasQueryFilter(x =>
+            _currentTenantService == null ||
+            _currentTenantService.IsHostAdmin ||
+            x.TenantId == _currentTenantService.TenantId);
+        
+        // Tags and RoutePatterns stored as JSON arrays
+        builder.Entity<HelpArticle>(e =>
+        {
+            e.Property(x => x.Tags).HasConversion(
+                v => JsonSerializer.Serialize(v, (JsonSerializerOptions?)null),
+                v => JsonSerializer.Deserialize<string[]>(v, (JsonSerializerOptions?)null) ?? []);
+            e.Property(x => x.RoutePatterns).HasConversion(
+                v => JsonSerializer.Serialize(v, (JsonSerializerOptions?)null),
+                v => JsonSerializer.Deserialize<string[]>(v, (JsonSerializerOptions?)null) ?? []);
+            e.HasIndex(x => x.TenantId);
+            e.HasIndex(x => x.Module);
+        });
+    }
+}
+```
+
+#### [NEW] `Persistence/Configurations/` (4 files)
+Entity type configurations for `HelpArticle`, `HelpInteraction`, `ChatSession`, `ChatMessageEntity`.
+
+---
+
+### Component 7: CQRS Commands & Queries
+
+#### Commands
+
+| Command | Handler Logic |
+|---------|--------------|
+| `SearchHelpCommand(string Query, int Limit)` | Embed query → vector search → return ranked results |
+| `GetContextualHelpCommand(string Route)` | Map route → topics → semantic search → return page-relevant articles |
+| `SendChatMessageCommand(Guid SessionId, string Message)` | Classify intent → retrieve context → generate response (LLM or template) → persist → return |
+| `RateHelpArticleCommand(Guid ArticleId, bool IsHelpful)` | Update article counters + record interaction |
+| `ReindexDocumentsCommand` | Trigger full re-ingestion (HostAdmin only) |
+| `CreateHelpArticleCommand(...)` | Create admin article → embed → add to index |
+| `UpdateHelpArticleCommand(...)` | Update article → re-embed → update index |
+| `DeleteHelpArticleCommand(Guid Id)` | Soft-delete → remove from index |
+
+#### Queries
+
+| Query | Returns |
+|-------|---------|
+| `GetHelpArticleQuery(Guid Id)` | Single article with full content |
+| `GetHelpArticlesListQuery(string? Module, int Page, int PageSize)` | Paginated admin list |
+| `GetChatSessionHistoryQuery(Guid SessionId)` | All messages in a chat session |
+| `GetHelpAnalyticsQuery(DateTime From, DateTime To)` | Top searches, unanswered queries, article ratings, gaps |
+| `GetStepByStepGuideQuery(string Topic)` | Step-by-step workflow guide |
+| `GetRelatedArticlesQuery(Guid ArticleId, int Limit)` | Similar articles by vector similarity |
+
+---
+
+### Component 8: HelpChatHub (SignalR)
+
+#### [NEW] `Application/Hubs/HelpChatHub.cs`
+```csharp
+[Authorize]
+public sealed class HelpChatHub : Hub
+{
+    private readonly ISender _sender;
+    private readonly ICurrentTenantService _tenantService;
+    private readonly LocalLlmService _llm;
+
+    public async Task SendMessage(Guid sessionId, string message)
+    {
+        var result = await _sender.Send(new SendChatMessageCommand(sessionId, message));
+        if (result.IsSuccess)
+            await Clients.Caller.SendAsync("ReceiveMessage", result.Value);
+    }
+    
+    // Streaming variant — token-by-token for real-time typing effect
+    public async Task SendMessageStreaming(Guid sessionId, string message)
+    {
+        // 1. Classify + retrieve (fast)
+        // 2. Stream LLM tokens via Clients.Caller.SendAsync("ReceiveToken", token)
+        // 3. Final Clients.Caller.SendAsync("GenerationComplete", fullResponse)
+    }
+    
+    public async Task LoadHistory(Guid sessionId) { /* ... */ }
+    public async Task StartNewSession() { /* ... */ }
+    
+    public override async Task OnConnectedAsync()
+    {
+        var tenantId = _tenantService.TenantId;
+        await Groups.AddToGroupAsync(Context.ConnectionId, $"HelpChat_{tenantId}");
+        await base.OnConnectedAsync();
+    }
+}
+```
+
+Endpoint: `/hubs/help-chat`
+
+---
+
+### Component 9: Controllers
+
+#### [NEW] `Presentation/Controllers/HelpController.cs`
+MVC pages:
+- `GET /Help` — Help center landing (search, popular topics, recent)
+- `GET /Help/Article/{id}` — Single article with rating buttons
+- `GET /Help/Search?q=` — Search results with semantic ranking
+- `GET /Help/Guide/{topic}` — Step-by-step guide view
+
+#### [NEW] `Presentation/Controllers/HelpApiController.cs`
+AJAX/chatbot API:
+- `GET /api/help/contextual?route=` — Contextual help for current page
+- `POST /api/help/search` — Semantic search
+- `POST /api/help/chat` — HTTP fallback for chatbot
+- `POST /api/help/rate/{articleId}` — Rate article
+- `GET /api/help/suggestions?route=` — Quick suggestions
+- `GET /api/help/status` — System health (index size, model status, last re-index)
+
+#### [NEW] `Presentation/Controllers/HelpAdminController.cs`
+Admin (`[Authorize(Roles = "HostAdmin")]`):
+- `GET /Help/Admin` — Dashboard with analytics charts
+- `GET /Help/Admin/Articles` — DynamicIndex grid
+- `GET/POST /Help/Admin/Articles/Create` — Create article
+- `GET/POST /Help/Admin/Articles/Edit/{id}` — Edit article
+- `POST /Help/Admin/Reindex` — Trigger re-indexing
+- `GET /Help/Admin/Analytics` — Detailed analytics
+- `GET /Help/Admin/Feedback` — User feedback report
+- `GET /Help/Admin/ModelStatus` — AI model status page (loaded, RAM usage, version)
+
+---
+
+### Component 10: Frontend UI
+
+#### [NEW] `src/Web/Views/Shared/_HelpPanel.cshtml`
+Slide-out contextual help panel — mirrors the existing notification panel pattern at line 164 of [_Layout.cshtml](file:///F:/MIllyass/ModulerMonolith/ModApp/src/Web/Views/Shared/_Layout.cshtml):
+- Glass-panel styling, 480px wide, fixed right-side
+- Auto-loads relevant articles for the current page
+- In-panel search with live results
+- Expandable article cards with markdown rendering
+- "Was this helpful?" thumbs up/down on each article
+- "Open full Help Center" link in footer
+- Keyboard shortcut: `F1` or `Ctrl+Shift+/`
+
+#### [NEW] `src/Web/Views/Shared/_ChatbotWidget.cshtml`
+Floating chatbot widget (bottom-right):
+- **FAB Button**: Gradient sky-to-indigo circle with `fa-robot` icon, pulsing glow
+- **Chat Window**: 400×560px glass-panel, rounded-2xl
+  - Header: "ModApp AI Assistant" + model status indicator (green dot when LLM loaded)
+  - Messages: user (right, sky-blue) and bot (left, subtle bg) bubbles
+  - Typing indicator: animated dots during generation
+  - Quick-action chips: "How do I create a PO?", "Explain workflows", etc.
+  - Input: text area + send button
+- Session persistence via `localStorage`
+- Mobile: full-width on small screens
+- Minimize/maximize without losing conversation
+
+#### [NEW] `src/Web/wwwroot/js/modules/help-panel.js`
+~200 lines:
+- `F1` / `Ctrl+Shift+/` keyboard shortcut
+- Route detection via `window.location.pathname`
+- Fetch: `GET /api/help/contextual?route=${route}`
+- Client-side markdown rendering
+- Feedback: `POST /api/help/rate/{id}`
+- Debounced search
+
+#### [NEW] `src/Web/wwwroot/js/modules/chatbot.js`
+~400 lines:
+- SignalR connection to `/hubs/help-chat` with auto-reconnect
+- HTTP fallback when SignalR unavailable
+- Streaming token display (character-by-character)
+- Session management (`localStorage` sessionId)
+- Markdown rendering in messages
+- Quick-action chip handlers
+- Auto-scroll, typing indicator
+- `Enter` to send, `Shift+Enter` for newline, `Escape` to minimize
+
+---
+
+### Component 11: Layout Integration
+
+#### [MODIFY] `_Layout.cshtml` (after line ~196)
+```diff
+     <partial name="_ShortcutsModal" />
+     <partial name="_ConfirmModal" />
+     <partial name="_SessionTimeoutWarning" />
++    <partial name="_HelpPanel" />
++    <partial name="_ChatbotWidget" />
+```
+
+#### [MODIFY] `_LayoutTopbar.cshtml` (line 16)
+```diff
+-            <span class="text-gray-500">Help &amp; Docs coming soon</span>
++            <button id="helpToggleTopbar" type="button"
++                class="text-gray-400 hover:text-sky-400 transition-colors flex items-center gap-1.5 text-xs font-medium"
++                aria-label="Open contextual help">
++                <i class="fa-regular fa-circle-question"></i>
++                <span>Help</span>
++            </button>
+```
+
+#### Help buttons in all 6 layout variants
+Each layout gets a help button (? icon) wired to the same help panel.
+
+---
+
+### Component 12: ONNX Model Bundle
+
+#### [NEW] `src/Web/App_Data/help/models/`
+| File | Size | Source | Purpose |
+|------|------|--------|---------|
+| `all-MiniLM-L6-v2.onnx` | ~23 MB | [HuggingFace](https://huggingface.co/sentence-transformers/all-MiniLM-L6-v2) | Sentence embeddings |
+| `vocab.txt` | ~230 KB | Same model | WordPiece tokenizer vocab |
+| `phi3-mini-4k-instruct-int4/` | ~2.5 GB | [HuggingFace ONNX](https://huggingface.co/microsoft/Phi-3-mini-4k-instruct-onnx) | Local text generation |
+| `intent-classifier.zip` | < 1 MB | Trained at build time | Intent classification |
+
+> [!IMPORTANT]
+> **Model download strategy**: The embedding model (23 MB) ships with the application. The generative model (2.5 GB) is **downloaded on first use** via a `ModelDownloadService` — the system works immediately with template-based responses while the LLM downloads in the background. Admin panel shows download progress. Alternatively, it can be pre-bundled for air-gapped deployments.
+
+#### [NEW] `Infrastructure/AI/ModelDownloadService.cs`
+Handles one-time download of the Phi-3 ONNX model:
+```csharp
+public sealed class ModelDownloadService
+{
+    public ModelDownloadStatus Status { get; private set; } // NotStarted, Downloading, Ready, Failed
+    public double ProgressPercent { get; private set; }
+    
+    public async Task EnsureModelAsync(CancellationToken ct)
+    {
+        if (Directory.Exists(modelPath) && File.Exists(Path.Combine(modelPath, "model.onnx")))
+        {
+            Status = ModelDownloadStatus.Ready;
+            return;
+        }
+        // Download from HuggingFace hub (or configurable URL)
+        // Progress tracking for admin UI
+    }
+}
+```
+
+---
+
+### Component 13: Configuration
+
+#### [NEW] Additions to `src/Web/appsettings.json`
+```json
+{
+  "HelpSystem": {
+    "EmbeddingModel": {
+      "ModelPath": "App_Data/help/models/all-MiniLM-L6-v2.onnx",
+      "VocabPath": "App_Data/help/models/vocab.txt",
+      "EmbeddingDimension": 384,
+      "MaxSequenceLength": 128
+    },
+    "GenerativeModel": {
+      "Enabled": true,
+      "ModelDirectory": "App_Data/help/models/phi3-mini-4k-instruct-int4",
+      "MaxTokens": 512,
+      "Temperature": 0.3,
+      "DownloadUrl": "https://huggingface.co/microsoft/Phi-3-mini-4k-instruct-onnx/resolve/main/cpu_and_mobile/cpu-int4-rtn-block-32-acc-level-4"
+    },
+    "IntentClassifier": {
+      "ModelPath": "App_Data/help/models/intent-classifier.zip",
+      "TrainingDataPath": "App_Data/help/intent-training-data.tsv",
+      "ConfidenceThreshold": 0.6
+    },
+    "Ingestion": {
+      "DocumentDirectories": ["Document", "User Document", "User Document/Modules", "docs"],
+      "VectorCachePath": "App_Data/help/cache/vector-index.bin",
+      "ChunkSize": 400,
+      "ChunkOverlap": 50,
+      "ReindexOnStartup": true,
+      "CacheMaxAgeHours": 24
+    },
+    "Search": {
+      "DefaultResultLimit": 10,
+      "MinSimilarityThreshold": 0.3,
+      "ContextualHelpLimit": 5
+    },
+    "RouteConfigPath": "App_Data/help/help-routes.json"
+  }
+}
+```
+
+---
+
+### Component 14: Module Registration
+
+#### [NEW] `HelpModuleServiceRegistration.cs`
+```csharp
+public static class HelpModuleServiceRegistration
+{
+    public static IServiceCollection AddHelpModule(this IServiceCollection services, IConfiguration config)
+    {
+        // DbContext
+        services.AddDbContext<HelpDbContext>(options =>
+            options.UseSqlServer(config.GetConnectionString("DefaultConnection")));
+        
+        // AI Services — Singletons (expensive, thread-safe)
+        services.AddSingleton<OnnxEmbeddingService>();
+        services.AddSingleton<IEmbeddingService>(sp => sp.GetRequiredService<OnnxEmbeddingService>());
+        services.AddSingleton<VectorIndex>();
+        services.AddSingleton<IVectorIndex>(sp => sp.GetRequiredService<VectorIndex>());
+        services.AddSingleton<LocalLlmService>();
+        services.AddSingleton<IntentClassifier>();
+        services.AddSingleton<ModelDownloadService>();
+        
+        // Response Generators — both registered, resolved by availability
+        services.AddScoped<LocalLlmResponseGenerator>();
+        services.AddScoped<TemplateResponseGenerator>();
+        services.AddScoped<IResponseGenerator>(sp =>
+        {
+            var llm = sp.GetRequiredService<LocalLlmResponseGenerator>();
+            return llm.IsAvailable ? llm : sp.GetRequiredService<TemplateResponseGenerator>();
+        });
+        
+        // Application Services
+        services.AddScoped<IChatbotService, ChatbotService>();
+        services.AddScoped<IStepByStepGuideEngine, StepByStepGuideEngine>();
+        services.AddScoped<IRouteToTopicMapper, RouteToTopicMapper>();
+        
+        // Background ingestion
+        services.AddHostedService<DocumentIngestionHostedService>();
+        
+        // MediatR + Validation
+        services.AddMediatR(cfg => cfg.RegisterServicesFromAssembly(typeof(HelpModuleServiceRegistration).Assembly));
+        services.AddValidatorsFromAssembly(typeof(HelpModuleServiceRegistration).Assembly);
+        
+        // Menu provider
+        services.AddScoped<IMenuDefinitionProvider, HelpMenuProvider>();
+        
+        return services;
+    }
+}
+```
+
+#### [MODIFY] `ModAppServiceExtensions.cs` — Add `services.AddHelpModule(configuration);`
+#### [MODIFY] `ModAppPipelineExtensions.cs` — Add `app.MapHub<HelpChatHub>("/hubs/help-chat");`
+#### [MODIFY] `Web.csproj` — Add `<ProjectReference>` to `Modules.Help`
+#### [MODIFY] `Directory.Packages.props`:
+```diff
+     <PackageVersion Include="Microsoft.ML" Version="5.0.0" />
+     <PackageVersion Include="Microsoft.ML.FastTree" Version="5.0.0" />
++    <PackageVersion Include="Microsoft.ML.OnnxRuntime" Version="1.21.0" />
++    <PackageVersion Include="Microsoft.ML.OnnxTransformer" Version="5.0.0" />
++    <PackageVersion Include="Microsoft.ML.OnnxRuntimeGenAI" Version="0.6.0" />
++    <PackageVersion Include="Markdig" Version="0.41.0" />
+```
+
+> [!NOTE]
+> **No `Azure.AI.OpenAI` package.** Zero cloud dependencies.
+
+---
+
+### Component 15: Menu Provider
+
+#### [NEW] `Presentation/HelpMenuProvider.cs`
+- "Help Center" (`/Help`) — section "Admin", icon `fa-regular fa-circle-question`
+- "Help Admin" (`/Help/Admin`) — section "Host", `RequiredRole = "HostAdmin"`, icon `fa-solid fa-book-open`
+
+---
+
+### Component 16: Respawn Schema Registration
+
+> [!WARNING]
+> Add `"help"` to `ModAppWebApplicationFactory.RespawnerOptions.SchemasToInclude` — otherwise help tables survive test resets (same pattern as the `shared.OutboxMessages` bug).
+
+---
+
+### Component 17: Route Coverage Map (`help-routes.json`)
+
+All 28 modules covered with explicit route → topic mappings:
+
+| Module | Route Pattern | Topics |
+|--------|--------------|--------|
+| Finance | `/Finance/JournalEntries/**` | Journal Entries, General Ledger, Double-Entry |
+| Finance | `/Finance/FixedAssets/**` | Fixed Assets, Depreciation |
+| Finance | `/Finance/Budgets/**` | Budgets, Financial Planning |
+| Finance | `/Finance/TaxRules/**` | Tax Rules, Tax Configuration |
+| Finance | `/Finance/Currencies/**` | Multi-Currency, Exchange Rates |
+| Finance | `/Finance/FiscalYears/**` | Fiscal Years, Period Close |
+| Finance | `/Finance/BankStatements/**` | Bank Reconciliation |
+| Finance | `/Finance/AgingReports/**` | Aging Reports, AR/AP Aging |
+| Procurement | `/Procurement/PurchaseOrders/**` | Purchase Orders, PO Approval |
+| Procurement | `/Procurement/RequestForQuotations/**` | RFQ, Vendor Quotes |
+| Procurement | `/Procurement/VendorPortal/**` | Vendor Portal, Vendor Registration |
+| Sales | `/Sales/Orders/**` | Sales Orders, Order Management |
+| Sales | `/Sales/Quotations/**` | Quotations, Sales Quotes |
+| Sales | `/Sales/Invoices/**` | Invoices, Billing, AR |
+| Sales | `/Sales/Customers/**` | Customer Management |
+| Sales | `/Sales/Pricing/**` | Pricing, Price Lists |
+| Sales | `/Sales/SupportTickets/**` | Support Tickets |
+| Sales | `/Sales/RMA/**` | Returns, RMA, Credit Notes |
+| HR | `/HR/Employees/**` | Employees, Employee Management |
+| HR | `/HR/Leaves/**` | Leave Management, Leave Approval |
+| HR | `/HR/Payroll/**` | Payroll, Salary Processing |
+| HR | `/HR/Performance/**` | Performance Reviews, KPIs |
+| Inventory | `/Inventory/**` | Inventory, Stock, Reorder Points |
+| Warehouse | `/Warehouse/**` | Warehouse, Locations, Zones |
+| Manufacturing | `/Manufacturing/**` | BOM, Production Orders, MRP |
+| Quality | `/Quality/**` | Inspections, Defects, Certificates |
+| Projects | `/Projects/**` | Projects, Milestones, Timesheets |
+| Logistics | `/Logistics/**` | Shipments, Delivery, Fleet |
+| CRM | `/CRM/**` | Leads, Opportunities, Pipeline |
+| Partners | `/Partners/**` | Customers, Vendors |
+| Marketplace | `/Marketplace/**` | Storefront, Cart, Checkout |
+| ECommerce | `/ECommerce/**` | Cart, Wishlist, Coupons |
+| Workflows | `/Workflows/**` | Approvals, Task Management |
+| Settings | `/Settings/**` | Configuration, Appearance |
+| Tenants | `/Tenants/**` | Multi-Tenancy |
+| Identity | `/Identity/**` | Users, Roles, Permissions |
+| Notifications | `/Notifications/**` | Email Templates, Alerts |
+| DatabaseBackup | `/DatabaseBackup/**` | Backup, Restore |
+| GDrive | `/GDrive/**` | Google Drive, Files |
+| PdfOcr | `/PdfOcr/**` | PDF Processing, OCR |
+| Reports | `/Reports/**` | Report Builder, Custom Reports |
+| LblGen | `/LblGen/**` | Labels, Barcode |
+| ErpProducts | `/ErpProducts/**` | Product Catalog, Categories |
+| Organization | `/Organization/**` | Departments, Org Chart |
+
+---
+
+## Complete File Manifest
+
+### New Files (~42 files)
+
+| # | Path (relative to `src/`) | Purpose |
+|---|---------------------------|---------|
+| 1 | `SharedKernel.Contracts/Help/IHelpContentProvider.cs` | Module help mappings interface |
+| 2 | `SharedKernel.Contracts/Help/HelpSearchResult.cs` | Search result DTO |
+| 3 | `SharedKernel.Contracts/Help/IResponseGenerator.cs` | Generation abstraction |
+| 4 | `SharedKernel.Contracts/Help/ChatDtos.cs` | Chat DTOs + enums |
+| 5 | `Modules/Features/Help/Modules.Help.csproj` | Project file |
+| 6 | `Modules/Features/Help/Domain/HelpArticle.cs` | Help article entity |
+| 7 | `Modules/Features/Help/Domain/HelpInteraction.cs` | Interaction tracking entity |
+| 8 | `Modules/Features/Help/Domain/ChatSession.cs` | Chat session entity |
+| 9 | `Modules/Features/Help/Domain/ChatMessageEntity.cs` | Chat message entity |
+| 10 | `Modules/Features/Help/Domain/Enums.cs` | Domain enums |
+| 11 | `Modules/Features/Help/Persistence/HelpDbContext.cs` | DbContext |
+| 12-15 | `Modules/Features/Help/Persistence/Configurations/*.cs` | EF configurations (4) |
+| 16 | `Modules/Features/Help/Infrastructure/AI/OnnxEmbeddingService.cs` | Sentence embeddings |
+| 17 | `Modules/Features/Help/Infrastructure/AI/WordPieceTokenizer.cs` | Tokenizer |
+| 18 | `Modules/Features/Help/Infrastructure/AI/VectorIndex.cs` | Vector search index |
+| 19 | `Modules/Features/Help/Infrastructure/AI/LocalLlmService.cs` | Local Phi-3 LLM inference |
+| 20 | `Modules/Features/Help/Infrastructure/AI/IntentClassifier.cs` | ML.NET classifier |
+| 21 | `Modules/Features/Help/Infrastructure/AI/ModelDownloadService.cs` | Auto-download Phi-3 |
+| 22 | `Modules/Features/Help/Infrastructure/Ingestion/DocumentIngestionService.cs` | Parse + chunk + embed |
+| 23 | `Modules/Features/Help/Infrastructure/Ingestion/DocumentIngestionHostedService.cs` | Background startup |
+| 24 | `Modules/Features/Help/Infrastructure/Ingestion/DocumentChunker.cs` | Heading-aware splitter |
+| 25 | `Modules/Features/Help/Infrastructure/Ingestion/RouteToTopicMapper.cs` | Route → topic mapping |
+| 26 | `Modules/Features/Help/Infrastructure/ResponseGeneration/LocalLlmResponseGenerator.cs` | Phi-3 response gen |
+| 27 | `Modules/Features/Help/Infrastructure/ResponseGeneration/TemplateResponseGenerator.cs` | Template fallback |
+| 28 | `Modules/Features/Help/Infrastructure/ResponseGeneration/StepByStepGuideEngine.cs` | Step extraction |
+| 29 | `Modules/Features/Help/Application/Hubs/HelpChatHub.cs` | SignalR hub |
+| 30 | `Modules/Features/Help/Application/Services/ChatbotService.cs` | Chatbot orchestrator |
+| 31-38 | `Modules/Features/Help/Application/Commands/*.cs` | 8 commands + handlers + validators |
+| 39-44 | `Modules/Features/Help/Application/Queries/*.cs` | 6 queries + handlers |
+| 45 | `Modules/Features/Help/Presentation/Controllers/HelpController.cs` | MVC pages |
+| 46 | `Modules/Features/Help/Presentation/Controllers/HelpApiController.cs` | API endpoints |
+| 47 | `Modules/Features/Help/Presentation/Controllers/HelpAdminController.cs` | Admin |
+| 48 | `Modules/Features/Help/Presentation/HelpMenuProvider.cs` | Menu items |
+| 49 | `Modules/Features/Help/HelpModuleServiceRegistration.cs` | DI registration |
+| 50 | `Web/Views/Shared/_HelpPanel.cshtml` | Help panel UI |
+| 51 | `Web/Views/Shared/_ChatbotWidget.cshtml` | Chatbot widget UI |
+| 52-55 | `Web/Views/Help/*.cshtml` | Help pages (Index, Article, Search, Guide) |
+| 56-60 | `Web/Views/Help/Admin/*.cshtml` | Admin pages (Dashboard, Articles, Create, Edit, Analytics) |
+| 61 | `Web/wwwroot/js/modules/help-panel.js` | Help panel JS |
+| 62 | `Web/wwwroot/js/modules/chatbot.js` | Chatbot JS |
+| 63 | `Web/App_Data/help/help-routes.json` | Route config |
+| 64 | `Web/App_Data/help/intent-training-data.tsv` | ML training data |
+
+### Modified Files (7 files)
+
+| File | Change |
+|------|--------|
+| `Directory.Packages.props` | +4 packages (OnnxRuntime, OnnxTransformer, OnnxRuntimeGenAI, Markdig) |
+| `Web.csproj` | +1 ProjectReference |
+| `_Layout.cshtml` | +2 partial includes |
+| `_LayoutTopbar.cshtml` | Replace "coming soon" → working help button |
+| `ModAppPipelineExtensions.cs` | +1 MapHub |
+| `ModAppServiceExtensions.cs` | +1 AddHelpModule |
+| Test factory (Respawn) | +1 schema `"help"` |
+
+---
+
+## Phased Delivery
+
+### Phase 1: Foundation — ONNX Engine + Ingestion (~3-4 days)
+- [ ] Create `Modules.Help` project structure and domain entities
+- [ ] Add NuGet packages to `Directory.Packages.props`
+- [ ] Download embedding model (`all-MiniLM-L6-v2.onnx` + `vocab.txt`)
+- [ ] Implement `OnnxEmbeddingService` + `WordPieceTokenizer`
+- [ ] Build `VectorIndex` with cosine similarity + file caching
+- [ ] Build `DocumentChunker` + `DocumentIngestionService` + `HostedService`
+- [ ] Create `HelpDbContext` with entity configurations
+- [ ] Generate EF migration
+- [ ] Implement `RouteToTopicMapper` with `help-routes.json` (all 28 modules)
+- [ ] Register module in `ModAppServiceExtensions` + `Web.csproj`
+- [ ] SharedKernel contracts
+
+### Phase 2: Contextual Help UI (~2-3 days)
+- [ ] Implement `GetContextualHelpCommand` + `SearchHelpCommand` handlers
+- [ ] Build `HelpApiController` (contextual + search endpoints)
+- [ ] Build `HelpController` (Help Center pages)
+- [ ] Create `_HelpPanel.cshtml` slide-out panel
+- [ ] Create `help-panel.js` with route detection + keyboard shortcut
+- [ ] Wire help button into all 6 layout variants
+- [ ] Implement `HelpInteraction` tracking + `RateHelpArticleCommand`
+
+### Phase 3: Local LLM Chatbot (~3-4 days)
+- [ ] Implement `ModelDownloadService` for Phi-3 ONNX auto-download
+- [ ] Build `LocalLlmService` with `OnnxRuntimeGenAI` (+ streaming)
+- [ ] Train `IntentClassifier` with ML.NET
+- [ ] Build `TemplateResponseGenerator` (always-available fallback)
+- [ ] Build `LocalLlmResponseGenerator` (when model present)
+- [ ] Build `ChatbotService` orchestrator + `StepByStepGuideEngine`
+- [ ] Create `HelpChatHub` SignalR hub + map endpoint
+- [ ] Create `_ChatbotWidget.cshtml` floating UI
+- [ ] Create `chatbot.js` (SignalR + streaming + fallback)
+- [ ] `ChatSession` + `ChatMessageEntity` persistence
+
+### Phase 4: Admin, Polish & Tests (~2-3 days)
+- [ ] Build `HelpAdminController` + admin views (dashboard, CRUD, analytics)
+- [ ] Create `HelpMenuProvider`
+- [ ] Article CRUD commands (`Create`, `Update`, `Delete`)
+- [ ] `ReindexDocumentsCommand`
+- [ ] Admin model-status page (download progress, RAM, version)
+- [ ] Add `"help"` schema to Respawn
+- [ ] Unit tests (AI engine, chunker, tokenizer, classifier, route mapper)
+- [ ] Integration tests (ingestion → search → contextual help → chatbot)
+- [ ] Architecture ratchet updates
+
+---
+
+## Verification Plan
+
+### Automated Tests
+```bash
+# Unit tests
+dotnet test src/tests/ModApp.UnitTests -c Release --filter "FullyQualifiedName~Modules.Help"
+
+# Integration tests
+dotnet test src/tests/ModApp.IntegrationTests -c Release --filter "FullyQualifiedName~Modules.Help"
+
+# Full build
+dotnet build ModularMonolith.sln -c Release
+```
+
+### Manual Verification
+1. **Contextual Help**: `/Finance/JournalEntries` → `F1` → verify "Journal Entries" articles
+2. **Contextual Help**: `/Procurement/PurchaseOrders/Create` → help → verify PO creation guide
+3. **Chatbot (Template)**: "How do I create a purchase order?" → step-by-step guide
+4. **Chatbot (Local LLM)**: Same question → conversational, context-aware response
+5. **Chatbot (Navigate)**: "Take me to inventory" → direct link
+6. **Chatbot (Troubleshoot)**: "My invoice won't post" → troubleshooting checklist
+7. **Feedback**: Rate article thumbs down → verify tracked in analytics
+8. **Admin**: `/Help/Admin` → analytics dashboard with charts
+9. **Admin**: Create new article → appears in search results
+10. **Admin**: Trigger re-index → new docs picked up
+11. **Admin**: Model status page → shows Phi-3 loaded, RAM usage
+12. **All 6 layouts**: Help button + chatbot widget visible
+13. **Mobile**: Chatbot responsive on small screens
+14. **Template fallback**: Delete Phi-3 model → system still works with templates
+
+### Hardware Verification
+- Embedding inference: < 50ms per query
+- LLM generation: < 15 seconds for typical help response
+- Vector search: < 10ms for top-10 over 700+ documents
+- RAM: < 4 GB total for all AI models loaded

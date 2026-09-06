@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
@@ -53,6 +53,16 @@ namespace POS.MediatR.Handlers
             {
                 _logger.LogError("Customer Name is already exist.");
                 return ServiceResponse<CustomerDto>.Return422("Customer Name is already exist.");
+            }
+
+            if (!string.IsNullOrWhiteSpace(request.MobileNo))
+            {
+                var mobileExists = await _customerRepository.FindBy(c => c.MobileNo == request.MobileNo).AnyAsync();
+                if (mobileExists)
+                {
+                    _logger.LogError("Customer Mobile Number already exists.");
+                    return ServiceResponse<CustomerDto>.Return422("Customer with this mobile number already exists.");
+                }
             }
 
             if (request.IsImageUpload && !string.IsNullOrEmpty(request.Logo))

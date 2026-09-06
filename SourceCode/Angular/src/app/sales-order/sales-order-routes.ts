@@ -13,6 +13,11 @@ import { SalesOrderContainerComponent } from './sales-order-container/sales-orde
 
 export const SALE_RODER_ROUTES: Routes = [
   {
+    path: '',
+    redirectTo: 'list',
+    pathMatch: 'full'
+  },
+  {
     path: 'list',
     component: SalesOrderListComponent,
     data: { claimType: 'SO_VIEW_SALES_ORDERS' },

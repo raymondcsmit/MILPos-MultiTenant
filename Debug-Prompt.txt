@@ -1,0 +1,499 @@
+You are a senior QA engineer performing exhaustive end-to-end manual testing of a full-stack POS (Point of Sale) with Inventory Management application. The stack is ASP.NET Core Web API (backend) and Angular (frontend). Follow every phase below with precision. Do not skip any step. Execute everything by running the application and testing it like a real human user.
+
+---
+
+## PROJECT CONTEXT
+
+- Project root: F:\MIllyass\pos-with-inventory-management
+- API (Backend): F:\MIllyass\pos-with-inventory-management\SourceCode\SQLAPI
+- Angular (Frontend): F:\MIllyass\pos-with-inventory-management\SourceCode\Angular
+- Documentation locations:
+  - F:\MIllyass\pos-with-inventory-management\SourceCode\Documents
+  - F:\MIllyass\pos-with-inventory-management\Test-Documentation
+  - F:\MIllyass\pos-with-inventory-management (root-level docs)
+- Architecture: ASP.NET Core Web API + Angular SPA
+- Database: Yes — SQL Server (or as configured)
+
+---
+
+## PHASE 0 — READ ALL DOCUMENTATION & UNDERSTAND THE SYSTEM
+
+### 0.1 — Read All Documentation
+1. Read ALL files in F:\MIllyass\pos-with-inventory-management\SourceCode\Documents
+2. Read ALL files in F:\MIllyass\pos-with-inventory-management\Test-Documentation
+3. Read ALL files in F:\MIllyass\pos-with-inventory-management (any README, docs, configuration files at root level)
+4. Understand:
+   - What the application does (POS sales, inventory tracking, stock management, reports, etc.)
+   - What modules/features exist
+   - What the expected user flows are
+   - What test data or test scenarios are documented
+   - Any API documentation (Swagger, Postman collections, API docs)
+   - Any known issues or constraints mentioned
+
+### 0.2 — Map the API Structure
+1. Read Program.cs / Startup.cs in the API project (F:\MIllyass\pos-with-inventory-management\SourceCode\SQLAPI)
+2. Identify:
+   - All API controllers and their endpoints
+   - All DbContext classes and connection strings
+   - All registered services (DI container)
+   - Authentication/Authorization configuration (JWT, Identity, etc.)
+   - Middleware pipeline (CORS, exception handling, logging, etc.)
+   - All models, DTOs, and entity relationships
+3. Run: `dotnet build` in the API project folder
+4. If build fails, read every error, fix them, rebuild until successful.
+5. Apply all database migrations: `dotnet ef database update`
+6. If there is a seeder, run it or trigger it.
+7. If the database is empty and no seeder exists, create seed data based on the documentation and test files. A POS system needs at minimum:
+   - User accounts (admin, cashier, manager, etc.)
+   - Product categories
+   - Products with prices, SKUs, stock quantities
+   - Suppliers (if applicable)
+   - Customers (if applicable)
+   - Tax configurations
+   - Some sample transactions/orders (if applicable)
+
+### 0.3 — Map the Angular Structure
+1. Read the Angular project structure in F:\MIllyass\pos-with-inventory-management\SourceCode\Angular
+2. Identify:
+   - All Angular modules and routing configuration (app-routing.module.ts and feature routing)
+   - All components and their routes
+   - All services that call the API (HTTP services)
+   - Authentication flow (login, token storage, interceptors, guards)
+   - State management approach (if any — NgRx, services, etc.)
+   - All forms and form validation
+   - Environment configuration (API base URL in environment.ts)
+3. Install dependencies: `npm install`
+4. Verify the Angular project builds: `ng build`
+5. If build fails, fix errors and rebuild.
+
+---
+
+## PHASE 1 — BUILD, RUN, AND LAUNCH BOTH APPLICATIONS
+
+### 1.1 — Start the API
+1. Navigate to: F:\MIllyass\pos-with-inventory-management\SourceCode\SQLAPI
+2. Run: `dotnet run`
+3. Capture the exact URL and port from console output (e.g., https://localhost:5001)
+4. Make an HTTP request to the base URL using curl to confirm the API responds.
+5. If Swagger is enabled, open the Swagger URL and document every endpoint listed.
+6. If the API fails to start, read the error, fix it, and restart.
+
+### 1.2 — Start the Angular App
+1. Navigate to: F:\MIllyass\pos-with-inventory-management\SourceCode\Angular
+2. Run: `ng serve` (or `npm start`)
+3. Capture the exact URL and port (usually http://localhost:4200)
+4. Open the URL and confirm the Angular app loads.
+5. If it fails to start, read the error, fix it, and restart.
+
+### 1.3 — Verify Connectivity
+1. Open browser developer tools (Network tab).
+2. Trigger an action in the Angular app that calls the API.
+3. Verify the API call succeeds (HTTP 200 or appropriate status).
+4. Verify CORS is configured correctly (no CORS errors in console).
+5. Verify the API base URL in Angular's environment file points to the running API.
+
+---
+
+## PHASE 2 — SYSTEMATIC API TESTING
+
+Test every API endpoint thoroughly before testing the UI.
+
+### A. Authentication & Authorization Endpoints
+
+1. POST /api/auth/login (or equivalent):
+   - Login with valid credentials → verify JWT token is returned.
+   - Login with invalid credentials → verify 401 Unauthorized.
+   - Login with empty fields → verify 400 Bad Request with validation messages.
+   - Login with SQL injection payload → verify it is rejected.
+   - Capture the JWT token for use in subsequent requests.
+2. Token validation:
+   - Call a protected endpoint without a token → verify 401.
+   - Call a protected endpoint with an expired token → verify 401.
+   - Call a protected endpoint with a malformed token → verify 401.
+   - Call a protected endpoint with a valid token → verify 200.
+3. Role-based access:
+   - Call admin-only endpoints as a regular user → verify 403 Forbidden.
+   - Call admin-only endpoints as an admin → verify 200.
+4. Registration (if applicable):
+   - Register with valid data → verify success.
+   - Register with duplicate email/username → verify error.
+   - Register with weak password → verify validation error.
+
+### B. CRUD Endpoints — Every Entity
+
+For EVERY entity/resource in the API (Products, Categories, Suppliers, Customers, Orders, Inventory, Users, etc.):
+
+1. GET (List All):
+   - Verify returns all records (with proper pagination if implemented).
+   - Test query parameters: page, pageSize, sort, filter, search.
+   - Test with no records in database.
+   - Verify response structure matches expected DTO.
+
+2. GET (Single by ID):
+   - Verify returns correct record with all fields.
+   - Test with non-existent ID → verify 404.
+   - Test with invalid ID (string, negative number, zero).
+
+3. POST (Create):
+   - Create with all valid fields → verify 201 Created.
+   - Verify the Location header is returned.
+   - Create with missing required fields → verify 400 with validation messages.
+   - Create with duplicate unique fields (e.g., duplicate SKU) → verify error.
+   - Create with invalid data types.
+   - Create with extremely long strings.
+   - Create with special characters and HTML.
+   - Verify the created record matches what was submitted.
+
+4. PUT/PATCH (Update):
+   - Update with valid data → verify 200 and changes persist.
+   - Update non-existent record → verify 404.
+   - Update with invalid data → verify 400.
+   - Partial update (PATCH) → verify only specified fields change.
+   - Update with same data → verify no error.
+
+5. DELETE:
+   - Delete existing record → verify 200/204.
+   - Delete non-existent record → verify 404.
+   - Delete record that has child/related records → verify cascade behavior (should it fail? should it cascade?).
+   - Attempt to delete after already deleting → verify 404.
+
+### C. POS-Specific API Testing
+
+1. Sales/Transactions:
+   - Create a sale with multiple items → verify total calculation is correct.
+   - Create a sale with quantities exceeding stock → verify rejection or appropriate handling.
+   - Verify tax calculations are correct.
+   - Verify discount application works.
+   - Verify stock is reduced after a sale.
+   - Test voiding/canceling a transaction.
+   - Test partial returns/refunds if supported.
+   - Test with zero-quantity items.
+   - Test with negative prices or quantities.
+
+2. Inventory/Stock Management:
+   - Add stock (receive inventory) → verify stock quantity increases.
+   - Remove stock (manual adjustment) → verify stock quantity decreases.
+   - Transfer stock between locations (if supported).
+   - Test stock level alerts/notifications (if implemented).
+   - Test minimum stock threshold warnings.
+   - Verify stock counts are accurate after multiple transactions.
+   - Test concurrent stock updates (race condition awareness).
+
+3. Reporting Endpoints (if any):
+   - Sales report for a date range → verify data accuracy.
+   - Inventory report → verify stock levels match expected.
+   - Daily/weekly/monthly summaries → verify calculations.
+   - Test with date ranges that have no data.
+   - Test with future dates.
+   - Test with extremely large date ranges.
+
+4. Search & Filtering:
+   - Search products by name, SKU, barcode, category.
+   - Filter by multiple criteria simultaneously.
+   - Search with no results.
+   - Search with partial matches.
+
+### D. Data Integrity Testing
+
+1. Verify foreign key relationships are enforced (cannot create order with non-existent product).
+2. Verify unique constraints are enforced.
+3. Verify decimal precision for prices and quantities (no floating point errors).
+4. Verify date fields store and return correct values (timezone handling).
+5. Verify soft delete behavior if implemented (records are marked deleted, not removed).
+
+---
+
+## PHASE 3 — SYSTEMATIC ANGULAR FRONTEND TESTING
+
+Test every page and user flow in the Angular application.
+
+### A. Authentication Flow
+
+1. Navigate to login page.
+2. Submit with valid credentials → verify redirect to dashboard/home.
+3. Submit with invalid credentials → verify error message appears.
+4. Submit with empty fields → verify validation messages.
+5. Verify the token is stored correctly (check localStorage/sessionStorage/cookies).
+6. Verify protected routes redirect to login when not authenticated.
+7. Test logout → verify token is cleared and redirect to login.
+8. Test session expiry → verify redirect to login after token expires.
+9. Test that the auth token is sent with every API request (check interceptors).
+10. Test direct URL access to protected pages without login.
+
+### B. Navigation & Routing
+
+1. Visit every route/page in the application.
+2. Click every link, button, and menu item.
+3. Verify no 404 pages (unless intentionally testing 404 page).
+4. Verify no blank pages.
+5. Verify the sidebar/navbar/header renders correctly on every page.
+6. Verify active menu item highlighting.
+7. Verify breadcrumb navigation (if implemented).
+8. Test browser back/forward buttons.
+9. Test deep linking (paste URL directly in browser).
+10. Verify role-based menu visibility (users only see menu items for their role).
+
+### C. POS / Sales Screen Testing
+
+This is the core feature — test it exhaustively:
+
+1. Add items to cart/sale:
+   - Search for product by name → add to cart.
+   - Search for product by SKU/barcode → add to cart.
+   - Add same item multiple times → verify quantity increases.
+   - Add item when stock is zero → verify warning or prevention.
+   - Verify product price displays correctly.
+2. Cart management:
+   - Change item quantity → verify subtotal updates.
+   - Remove item from cart → verify it is removed and total updates.
+   - Clear entire cart → verify empty state.
+   - Set quantity to zero → verify behavior.
+   - Set quantity to negative → verify prevention.
+   - Set quantity exceeding available stock → verify warning.
+3. Pricing & totals:
+   - Verify subtotal calculation is correct (price x quantity for each item).
+   - Verify total is correct (sum of all subtotals).
+   - Verify tax is calculated and displayed correctly.
+   - Verify discount application (percentage and fixed amount).
+   - Verify grand total = subtotal + tax - discount.
+4. Checkout/Payment:
+   - Complete a sale with cash payment → verify success.
+   - Complete a sale with card payment (if supported) → verify success.
+   - Complete a sale with split payment (if supported).
+   - Enter payment amount less than total → verify error/remaining balance.
+   - Enter payment amount more than total → verify change calculation.
+   - Verify receipt/invoice is generated (if implemented).
+   - Verify stock is reduced after successful sale.
+   - Verify the transaction appears in transaction history.
+5. Error handling:
+   - Network error during checkout → verify appropriate error message.
+   - API timeout → verify loading state and error handling.
+
+### D. Inventory Management Testing
+
+1. Product list page:
+   - Verify all products display in a table/grid.
+   - Test search/filter functionality.
+   - Test sorting by name, price, stock, category.
+   - Test pagination.
+   - Verify product images load (if applicable).
+   - Verify stock level indicators (low stock warnings, out of stock badges).
+2. Add new product:
+   - Fill all fields and submit → verify product is created.
+   - Submit with missing required fields → verify validation.
+   - Upload product image (if supported) → verify upload works.
+   - Enter price with too many decimal places → verify handling.
+   - Enter duplicate SKU → verify error.
+3. Edit product:
+   - Edit all fields → verify changes persist.
+   - Edit only some fields → verify other fields unchanged.
+   - Edit price → verify price updates in POS screen.
+4. Delete product:
+   - Delete a product with no transaction history → verify deletion.
+   - Delete a product that has been sold → verify behavior (prevent or cascade).
+5. Stock management:
+   - Receive stock (add quantity) → verify stock increases.
+   - Adjust stock (manual correction) → verify stock changes.
+   - Set minimum stock level → verify alert triggers when stock is low.
+6. Categories:
+   - CRUD operations for categories.
+   - Assign products to categories.
+   - Filter products by category.
+   - Delete category with products → verify behavior.
+
+### E. Supplier Management (if applicable)
+
+1. CRUD operations for suppliers.
+2. Associate products with suppliers.
+3. View supplier's product list.
+4. Create purchase orders (if implemented).
+
+### F. Customer Management (if applicable)
+
+1. CRUD operations for customers.
+2. View customer transaction history.
+3. Search customers.
+4. Customer loyalty/points (if implemented).
+
+### G. User Management (if applicable)
+
+1. Admin: create, edit, delete users.
+2. Admin: assign roles to users.
+3. User: edit own profile.
+4. User: change own password.
+5. Verify users cannot escalate their own privileges.
+
+### H. Reporting & Dashboard (if applicable)
+
+1. Dashboard loads with correct summary data.
+2. Sales reports display accurate data for selected date range.
+3. Inventory reports show current stock levels.
+4. Verify charts/graphs render correctly.
+5. Test report export (PDF, Excel, CSV) if supported.
+6. Test with date ranges that have no data.
+7. Verify calculations match actual transaction data.
+
+### I. UI/UX Quality
+
+1. Verify no raw TypeScript errors visible in the UI.
+2. Verify all CSS loads correctly (no unstyled pages).
+3. Verify all images and icons load.
+4. Check browser console for JavaScript errors on every page.
+5. Test responsive design:
+   - Desktop (1920px) → verify layout.
+   - Tablet (768px) → verify layout adapts.
+   - Mobile (375px) → verify layout adapts (POS may be tablet+ only).
+6. Verify loading spinners/indicators appear during API calls.
+7. Verify error messages are user-friendly (not raw API errors).
+8. Verify success notifications appear after create/update/delete.
+9. Verify confirmation dialogs appear before destructive actions.
+10. Test keyboard navigation (Tab through forms, Enter to submit).
+
+### J. Edge Cases & Stress Testing
+
+1. Enter extremely long strings in every input field (5000+ characters).
+2. Enter special characters: <, >, &, ', ", /, \, emojis.
+3. Enter HTML/XSS payloads in every text field.
+4. Enter SQL injection payloads in every text field.
+5. Rapid double-click on submit buttons (check for duplicate submissions).
+6. Open multiple browser tabs and perform conflicting operations.
+7. Disconnect network while performing an operation → verify error handling.
+8. Test with JavaScript disabled → verify graceful degradation.
+9. Manipulate URL parameters and query strings.
+10. Test with empty database (no products, no transactions).
+
+---
+
+## PHASE 4 — INTEGRATION TESTING (FRONTEND + API)
+
+1. Perform a complete end-to-end sale:
+   - Login → navigate to POS → search product → add to cart → checkout → verify receipt → verify stock reduced → verify transaction in history → verify in reports.
+2. Perform a complete inventory flow:
+   - Add product → set stock → make a sale (stock reduces) → receive new stock → verify stock level → edit product → delete product.
+3. Perform a complete user flow:
+   - Admin creates user → new user logs in → new user makes a sale → admin sees transaction → admin deactivates user → deactivated user cannot login.
+4. Verify API error messages display correctly in the Angular UI.
+5. Verify Angular handles all HTTP status codes:
+   - 200/201 → success handling
+   - 400 → validation error display
+   - 401 → redirect to login
+   - 403 → access denied message
+   - 404 → not found message
+   - 500 → generic error message
+6. Verify loading states appear during slow API responses.
+7. Verify that data displayed in the Angular UI matches the API response exactly.
+
+---
+
+## PHASE 5 — LOG EVERY ISSUE FOUND
+
+For EACH bug or issue, record it in this exact format:
+
+BUG #[sequential number]
+Severity: Critical / High / Medium / Low
+Layer: API / Angular / Integration
+Module/Feature: [Which feature: POS, Inventory, Auth, Reports, etc.]
+Location: [Exact page, route, component, or API endpoint]
+Steps to Reproduce:
+  1. ...
+  2. ...
+  3. ...
+Expected Behavior: ...
+Actual Behavior: ...
+Root Cause: [Your analysis — which file, which code, why it happens]
+Suggested Fix: [Your recommendation]
+
+Severity definitions:
+- Critical: Application crashes, data loss, security vulnerability, financial calculation error (wrong totals), stock corruption
+- High: Core feature broken (cannot complete sale, cannot login, cannot manage inventory), API returns 500
+- Medium: Feature partially broken, workaround exists, incorrect behavior, validation missing
+- Low: UI inconsistency, typo, cosmetic issue, minor UX problem
+
+Maintain a running bug log. Log EVERYTHING. Do not skip any issue.
+
+---
+
+## PHASE 6 — FIX ALL BUGS
+
+After completing the FULL test pass and logging ALL bugs:
+
+1. Sort bugs by severity: Critical first, then High, Medium, Low.
+2. Fix each bug in the appropriate codebase:
+   - API bugs → fix in F:\MIllyass\pos-with-inventory-management\SourceCode\SQLAPI
+   - Angular bugs → fix in F:\MIllyass\pos-with-inventory-management\SourceCode\Angular
+   - Integration bugs → fix in whichever layer is responsible
+3. After each fix:
+   - Verify the fix by re-running the specific test scenario that found the bug.
+   - Verify the fix does not break other functionality.
+4. After all individual fixes, do a FULL regression pass:
+   - Re-test every API endpoint from Phase 2.
+   - Re-test every Angular page and flow from Phase 3.
+   - Re-test every integration scenario from Phase 4.
+5. If regressions are found, log them and fix them.
+6. Continue the fix-test cycle until ZERO bugs remain.
+
+---
+
+## PHASE 7 — FINAL REPORT
+
+After all bugs are fixed and regression testing passes, provide this summary:
+
+### 7.1 — Application Architecture Summary
+- API endpoints discovered and tested: [count and list]
+- Angular pages/components tested: [count and list]
+- Database entities: [list]
+- User roles: [list]
+
+### 7.2 — Bug Summary
+- Total bugs found: [number]
+- Critical: [count]
+- High: [count]
+- Medium: [count]
+- Low: [count]
+- API layer bugs: [count]
+- Angular layer bugs: [count]
+- Integration bugs: [count]
+
+### 7.3 — Complete Bug Log
+- List every bug with full details from Phase 5
+
+### 7.4 — Fixes Applied
+For each fix:
+- Bug #: [number]
+- Layer: API / Angular
+- File(s) modified: [full path]
+- Description of fix: [what changed and why]
+- Verified: Yes/No
+
+### 7.5 — Database Status
+- Migrations applied: [list]
+- Seed data loaded: [what data exists]
+- Data integrity confirmed: Yes/No
+
+### 7.6 — Final Status
+- API builds and runs: Yes/No
+- Angular builds and serves: Yes/No
+- Frontend-Backend connectivity: Yes/No
+- Authentication flow working: Yes/No
+- All POS operations working: Yes/No
+- All inventory operations working: Yes/No
+- All reports accurate: Yes/No
+- All CRUD operations working: Yes/No
+- All known bugs resolved: Yes/No
+- Remaining known issues or recommendations: [list or "None"]
+
+---
+
+## ABSOLUTE RULES
+
+1. ACTUALLY RUN AND TEST BOTH APPLICATIONS (API and Angular). Do not guess. Execute every step.
+2. Test EVERY API endpoint. No endpoint is skipped.
+3. Test EVERY Angular page, component, and form. Nothing is skipped.
+4. POS financial calculations (totals, tax, change, discounts) must be verified with EXACT numbers. No rounding errors allowed.
+5. Inventory stock levels must be verified for accuracy after every operation that affects stock.
+6. If the database is empty, seed it with realistic test data before testing.
+7. If either application crashes during testing, fix the crash, restart, and continue from where you left off.
+8. Be thorough and adversarial. Think like a cashier who makes mistakes, a manager who wants reports, and a hacker who wants to break in.
+9. Do not stop testing early. Complete every phase fully.
+10. After fixing bugs, always re-test. Never assume a fix works without verification.
+11. Test the complete integration between Angular and API on every flow — do not test them in isolation only.

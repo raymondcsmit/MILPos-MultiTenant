@@ -416,9 +416,9 @@ public class AccountingStrategyJournalTests
     // --- LoanStrategy (WF-6.3) ---
 
     [Fact]
-    public async Task LoanStrategy_InterestRepayment_PostsLoanAmount_NotInterestAmount()
+    public async Task LoanStrategy_InterestRepayment_PostsInterestAmount_GapTargetFixed()
     {
-        // Gap-Char [ACC-01]: interest leg uses loanDetail.LoanAmount instead of loanRepayment.InterestAmount.
+        // Gap-Target [ACC-01] FIXED: interest leg uses loanRepayment.InterestAmount instead of loanDetail.LoanAmount.
         var (repo, entries) = EntrySink();
         var strategy = new LoanStrategy(new AccountingEntryFactory(), repo.Object, LedgerRepo().Object);
 
@@ -436,8 +436,8 @@ public class AccountingStrategyJournalTests
 
         await strategy.ProcessPaymentOfLoanAsync(loanDetail, transaction, repayment);
 
-        // Current (buggy) behavior: amount = 10000 (LoanAmount). Post-fix target: 100 (InterestAmount).
-        AssertEntry(entries, Id("6900"), Id("1060"), 10000m, EntryType.Loan);
+        // Fixed target: amount = 100 (InterestAmount).
+        AssertEntry(entries, Id("6900"), Id("1060"), 100m, EntryType.Loan);
     }
 
     [Fact]

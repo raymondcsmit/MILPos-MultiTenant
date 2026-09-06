@@ -1,4 +1,4 @@
-﻿using POS.Data.Entities;
+using POS.Data.Entities;
 using POS.Data.Entities.Accounts;
 using POS.Repository;
 using POS.Repository.Accouting;
@@ -45,7 +45,7 @@ public class LoanStrategy(
         if (loanRepayment.InterestAmount > 0)
         {
             _accountingEntryRepository.Add(await _accountingEntryFactory.CreateEntryAsync(
-                transaction.Id, loanDetail.BranchId, loanDetail.LoanAccountInterestExpenseId, bankAccount.Id, loanDetail.LoanAmount, loanDetail.Narration, loanDetail.Id.ToString(), transaction.FinancialYearId, EntryType.Loan));
+                transaction.Id, loanDetail.BranchId, loanDetail.LoanAccountInterestExpenseId, bankAccount.Id, loanRepayment.InterestAmount, loanDetail.Narration, loanDetail.Id.ToString(), transaction.FinancialYearId, EntryType.Loan));
 
         }
     }

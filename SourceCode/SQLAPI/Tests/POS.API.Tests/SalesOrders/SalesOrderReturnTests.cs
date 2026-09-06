@@ -134,6 +134,52 @@ public sealed class SalesOrderReturnTests : IClassFixture<TestWebApplicationFact
         });
     }
 
+    [Fact]
+    public async Task Should_Return409_When_ReturnQuantityExceedsPurchasedQuantity()
+    {
+        await _factory.EnsureSeededAsync();
+        var client = await _factory.CreateAuthorizedClientAsync(TestSeed.AdminEmail, TestSeed.AdminPassword);
+
+        // Create sale with quantity = 2
+        var (orderId, orderNumber) = await CreatePosCashSaleAsync(client);
+
+        // Attempt to return quantity = 5 (exceeds purchased quantity of 2)
+        var returnCommand = new
+        {
+            id = orderId,
+            orderNumber,
+            locationId = TestIds.LocationL1Id,
+            customerId = TestIds.WalkInCustomerId,
+            isSalesOrderRequest = false,
+            totalAmount = 585.00m,
+            totalTax = 85.00m,
+            totalDiscount = 0m,
+            flatDiscount = 0m,
+            totalRoundOff = 0m,
+            paymentMethod = 1,
+            isSelectPaymentMethod = true,
+            note = "Attempting to return more than purchased",
+            deliveryDate = DateTime.UtcNow,
+            salesOrderItems = new object[]
+            {
+                new
+                {
+                    productId = TestIds.ProductPcMonitorId,
+                    quantity = 5m,
+                    unitPrice = 100.00m,
+                    unitId = TestIds.UnitPcId,
+                    discountType = "fixed",
+                    discountPercentage = 0m,
+                    purchasePrice = 60.00m,
+                    salesOrderItemTaxes = new object[] { new { taxId = TestIds.TaxGst17Id, taxValue = 17.00m } }
+                }
+            }
+        };
+
+        var response = await client.PutAsJsonAsync($"/api/salesOrder/{orderId}/return", returnCommand);
+        Assert.Equal(HttpStatusCode.Conflict, response.StatusCode);
+    }
+
     private static void AssertEntry(List<AccountingEntry> entries, Guid debit, Guid credit, decimal amount) =>
         Assert.Contains(entries, e => e.DebitLedgerAccountId == debit && e.CreditLedgerAccountId == credit && e.Amount == amount);
 

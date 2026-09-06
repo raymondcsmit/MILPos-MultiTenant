@@ -8,6 +8,11 @@ import { salesOrderUnitResolver } from '../sales-order/sales-order-add-edit/sale
 
 export const DAMAGED_STOCK_ROUTES: Routes = [
   {
+    path: '',
+    redirectTo: 'list',
+    pathMatch: 'full'
+  },
+  {
     path: 'list',
     component: DamagedStockListComponent,
     data: { claimType: 'DMG_ST_VIEW_DMG_ST' },

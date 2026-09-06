@@ -1,4 +1,4 @@
-﻿using AutoMapper;
+using AutoMapper;
 using POS.Common.UnitOfWork;
 using POS.Data;
 using POS.Data.Dto;
@@ -65,6 +65,23 @@ namespace POS.MediatR.Handlers
 			{
 				_logger.LogError("Customer can not be Edited because it is Walk In Customer");
 				return ServiceResponse<CustomerDto>.Return409("Customer can not be Edited because it is Walk In Customer");
+			}
+
+			var nameExists = await _customerRepository.FindBy(c => c.CustomerName == request.CustomerName && c.Id != request.Id).AnyAsync();
+			if (nameExists)
+			{
+				_logger.LogError("Customer Name already exists.");
+				return ServiceResponse<CustomerDto>.Return422("Customer Name already exists.");
+			}
+
+			if (!string.IsNullOrWhiteSpace(request.MobileNo))
+			{
+				var mobileExists = await _customerRepository.FindBy(c => c.MobileNo == request.MobileNo && c.Id != request.Id).AnyAsync();
+				if (mobileExists)
+				{
+					_logger.LogError("Customer Mobile Number already exists.");
+					return ServiceResponse<CustomerDto>.Return422("Customer with this mobile number already exists.");
+				}
 			}
 
 			var oldImageUrl = customer.Url;

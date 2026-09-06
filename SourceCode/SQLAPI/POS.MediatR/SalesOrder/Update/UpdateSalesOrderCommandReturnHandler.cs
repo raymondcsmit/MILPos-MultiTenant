@@ -1,4 +1,4 @@
-﻿using AutoMapper;
+using AutoMapper;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
@@ -77,7 +77,39 @@ namespace POS.MediatR.Handlers
                 item.Product = null;
                 item.SalesOrderItemTaxes.ForEach(tax => { tax.Tax = null; });
             });
-            var salesOrderExit = await _salesOrderRepository.FindAsync(request.Id);
+            var salesOrderExit = await _salesOrderRepository.AllIncluding(s => s.SalesOrderItems)
+                .FirstOrDefaultAsync(s => s.Id == request.Id);
+
+            if (salesOrderExit == null)
+            {
+                _logger.LogError("Sales order does not exist.");
+                return ServiceResponse<bool>.Return404("Sales order does not exist.");
+            }
+
+            // Guard against over-returns (N-04 / BUG-04): return quantity cannot exceed purchased quantity minus previous returns
+            foreach (var returnItem in request.SalesOrderItems)
+            {
+                if (returnItem.Quantity <= 0)
+                {
+                    _logger.LogError("Return quantity must be greater than zero.");
+                    return ServiceResponse<bool>.Return409("Return quantity must be greater than zero.");
+                }
+
+                var originalSoldQty = salesOrderExit.SalesOrderItems
+                    .Where(i => i.ProductId == returnItem.ProductId && i.Status != POS.Data.Entities.PurchaseSaleItemStatusEnum.Return)
+                    .Sum(i => i.Quantity);
+
+                var previouslyReturnedQty = salesOrderExit.SalesOrderItems
+                    .Where(i => i.ProductId == returnItem.ProductId && i.Status == POS.Data.Entities.PurchaseSaleItemStatusEnum.Return)
+                    .Sum(i => i.Quantity);
+
+                var maxReturnable = originalSoldQty - previouslyReturnedQty;
+                if (returnItem.Quantity > maxReturnable)
+                {
+                    _logger.LogError("Return quantity {ReturnQty} exceeds available quantity {MaxReturnable}.", returnItem.Quantity, maxReturnable);
+                    return ServiceResponse<bool>.Return409($"Return quantity ({returnItem.Quantity}) cannot exceed purchased quantity ({maxReturnable}).");
+                }
+            }
 
             salesOrderExit.SaleReturnNote = salesOrderUpdate.Note;
             salesOrderExit.Status = SalesOrderStatus.Return;

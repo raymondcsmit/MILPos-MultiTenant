@@ -280,11 +280,16 @@ namespace POS.API
                 options.Providers.Add<GzipCompressionProvider>();
             });
 
-            // Conditionally register Controllers/Views based on deployment mode
+            // Register controllers and views based on deployment mode.
+            // The public storefront (StoreController) renders MVC Razor views, so Desktop
+            // mode must also register the MVC view features (ITempDataDictionaryFactory,
+            // view engines, antiforgery). Previously Desktop registered only AddControllers(),
+            // which left GET /store unrenderable -> 500 "No service for type
+            // 'ITempDataDictionaryFactory'". N-48.
             if (deploymentSettings?.DeploymentMode == "Desktop")
             {
-                // Desktop mode: Only API controllers, no Razor Views
-                services.AddControllers()
+                // Desktop mode: API controllers + the MVC view features the storefront needs.
+                services.AddControllersWithViews()
                     .AddNewtonsoftJson(options =>
                     {
                         options.SerializerSettings.ReferenceLoopHandling = ReferenceLoopHandling.Ignore;
@@ -391,10 +396,29 @@ namespace POS.API
                 c.SwaggerEndpoint($"v1/swagger.json", "POS API");
                 c.RoutePrefix = "swagger";
             });
-            app.UseStaticFiles();
-            
             // Get deployment settings first
             var deploymentSettings = app.ApplicationServices.GetService<Microsoft.Extensions.Options.IOptions<DeploymentSettings>>()?.Value;
+
+            // Apply CORS based on deployment mode before serving static files
+            if (deploymentSettings?.IsCloud == true)
+            {
+                app.UseCors("CloudCorsPolicy");
+            }
+            else
+            {
+                app.UseCors("DesktopCorsPolicy");
+            }
+
+            var staticFileOptions = new StaticFileOptions
+            {
+                OnPrepareResponse = ctx =>
+                {
+                    ctx.Context.Response.Headers["Access-Control-Allow-Origin"] = "*";
+                    ctx.Context.Response.Headers["Access-Control-Allow-Headers"] = "*";
+                    ctx.Context.Response.Headers["Access-Control-Allow-Methods"] = "GET, HEAD, OPTIONS";
+                }
+            };
+            app.UseStaticFiles(staticFileOptions);
 
             // Always serve files from ProgramData/MILPOS/wwwroot as a secondary file location.
             // FileStorageService falls back to here when WebRoot is read-only.
@@ -409,19 +433,14 @@ namespace POS.API
             app.UseStaticFiles(new StaticFileOptions
             {
                 FileProvider = new PhysicalFileProvider(appDataStaticPath),
-                RequestPath = ""
+                RequestPath = "",
+                OnPrepareResponse = ctx =>
+                {
+                    ctx.Context.Response.Headers["Access-Control-Allow-Origin"] = "*";
+                    ctx.Context.Response.Headers["Access-Control-Allow-Headers"] = "*";
+                    ctx.Context.Response.Headers["Access-Control-Allow-Methods"] = "GET, HEAD, OPTIONS";
+                }
             });
-
-            
-            // Apply CORS based on deployment mode
-            if (deploymentSettings?.IsCloud == true)
-            {
-                app.UseCors("CloudCorsPolicy");
-            }
-            else
-            {
-                app.UseCors("DesktopCorsPolicy");
-            }
             
             if (deploymentSettings?.DeploymentMode != "Desktop")
             {

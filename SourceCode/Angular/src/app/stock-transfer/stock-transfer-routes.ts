@@ -8,6 +8,11 @@ import { salesOrderUnitResolver } from '../sales-order/sales-order-add-edit/sale
 
 export const STOCK_TRANSFER_ROUTES: Routes = [
   {
+    path: '',
+    redirectTo: 'list',
+    pathMatch: 'full'
+  },
+  {
     path: 'list',
     component: StockTransferListComponent,
     data: { claimType: 'STTFR_VIEW_STTFR' },

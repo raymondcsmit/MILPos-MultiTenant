@@ -60,19 +60,18 @@ public sealed class CustomerCrudTemplateTests : IClassFixture<TestWebApplication
     }
 
     [Fact]
-    public async Task Should_Return500_When_CreatingSecondCustomerWithSameMobile()
+    public async Task Should_Return422_When_CreatingSecondCustomerWithSameMobile_GapTargetFixed()
     {
         await _factory.EnsureSeededAsync();
         var client = await _factory.CreateAuthorizedClientAsync(TestSeed.AdminEmail, TestSeed.AdminPassword);
 
-        // Gap-Char: the handler validates Name duplicates (422) but NOT the DB-level unique
-        // index on (TenantId, MobileNo) — a repeat MobileNo explodes into a generic 500.
+        // Gap-Target [N-29] FIXED: duplicate mobile number returns 422 UnprocessableEntity instead of generic 500.
         var mobile = "0300-" + Guid.NewGuid().ToString("N")[..8];
         var first = await client.PostAsJsonAsync("/api/Customer", CustomerPayload($"Customer-{Guid.NewGuid():N}"[..18], null, mobile));
         Assert.True(first.IsSuccessStatusCode, await first.Content.ReadAsStringAsync());
 
         var second = await client.PostAsJsonAsync("/api/Customer", CustomerPayload($"Another-{Guid.NewGuid():N}"[..18], null, mobile));
-        Assert.Equal(HttpStatusCode.InternalServerError, second.StatusCode);
+        Assert.Equal(HttpStatusCode.UnprocessableEntity, second.StatusCode);
     }
 
     [Fact]

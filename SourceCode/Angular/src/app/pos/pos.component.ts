@@ -279,13 +279,13 @@ export class PosComponent extends BaseComponent implements OnInit, AfterViewInit
           price = (product?.salesPrice ?? 0) + parseFloat(unit.value);
           break;
         case Operators.Minus:
-          price = product?.salesPrice ?? 0 - parseFloat(unit.value);
+          price = (product?.salesPrice ?? 0) - parseFloat(unit.value);
           break;
         case Operators.Multiply:
-          price = product?.salesPrice ?? 0 * parseFloat(unit.value);
+          price = (product?.salesPrice ?? 0) * parseFloat(unit.value);
           break;
         case Operators.Divide:
-          price = product?.salesPrice ?? 0 / parseFloat(unit.value);
+          price = (product?.salesPrice ?? 0) / parseFloat(unit.value);
           break;
       }
       this.salesOrderItemsArray.controls[index].patchValue({
@@ -296,6 +296,7 @@ export class PosComponent extends BaseComponent implements OnInit, AfterViewInit
         unitPrice: product?.salesPrice,
       });
     }
+    this.getAllTotal();
   }
 
   onProductSelect(product: Product, isFromBarcodeScan = false) {
